@@ -34,10 +34,9 @@ SKIP : {
 
 TOKEN : {
          <AVIS_DOPERATION: "Avis d'Opération">
-       | <TEXT_INTRO: "Nous vous prions de trouver ci-dessous votre relevé d'operations. Sans observation de votre part au sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos salutations distinguées. Le">
-       | <OPEN_PAREN: "(">
-       | <CLOSE_PAREN: ")">
        | <COMPTE: "COMPTE N°">
+       | <QUELQUECHOSE: "DEIMPROBABLEQUIARRIVERAJAMAISJUSTEPOUREXEMPLE"> : EXAMPLE_BLOC
+       | <WORD: (["A"-"Z","a"-"z"])+>
        | <DATE_HEADER : "Date">
        | <DESIGNATION_HEADER : "Désignation">
        | <DEBIT_HEADER : "Débit">
@@ -46,42 +45,26 @@ TOKEN : {
        | <DEVISE:  ("€"|"$"|"EUR"|"USD")>
        | <DATE: ["0"-"9"]["0"-"9"]"/"["0"-"9"]["0"-"9"]"/20"["0"-"2"]["0"-"9"]>
        | <ACCOUNT_NUMBER: (["A"-"Z","0"-"9"])+>
-       | <ACCOUNT_TYPE: (["a"-"z","A"-"Z"])+>
 }
 
-SimpleNode start() :
-{}
-{
+<EXAMPLE_BLOC>
+TOKEN : {
+    <EXAMPLE_TOKEN:  ["\n","\r"] (~["\n","\r"])+ > : DEFAULT
+}
+
+SimpleNode account() :
+{ Token num, type; }{
     <AVIS_DOPERATION>
-    account()
-   /*  <TEXT_INTRO>
-   <DATE>
-    // (<OWNER_ADDRESS_LINE>)+
-    tab_header()
-    tab_body()*/
-    <EOF>
+    <COMPTE> num=<ACCOUNT_NUMBER> type=<WORD>
+    {
+         jjtThis.value=new String[]{num.image, type.image};
+    }
     { return jjtThis; }
 }
 
-void account() :
-{ Token num, type; }{
-    <COMPTE> num=<ACCOUNT_NUMBER> type=<ACCOUNT_TYPE>
-        {
-             jjtThis.value=new String[]{num.image, type.image};
-        }
-}
-
-void tab_header() :
+SimpleNode dataset() :
 {}
 {
-    <DATE_HEADER>
-    <DESIGNATION_HEADER>
-    <DEBIT_HEADER><OPEN_PAREN><DEVISE><CLOSE_PAREN>
-    <CREDIT_HEADER><OPEN_PAREN><DEVISE><CLOSE_PAREN>
-}
-
-void tab_body() :
-{}
-{
-    (<DATE>)+
+    // TODO
+    { return jjtThis; }
 }

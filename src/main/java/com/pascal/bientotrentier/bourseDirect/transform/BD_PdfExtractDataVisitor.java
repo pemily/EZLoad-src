@@ -9,11 +9,6 @@ public class BD_PdfExtractDataVisitor implements BourseDirectParserVisitor {
     }
 
     @Override
-    public Object visit(BD_start node, Object data) {
-        return next(node, data);
-    }
-
-    @Override
     public Object visit(BD_account node, Object data) {
         model(data).setAccountNumber(values(node)[0]);
         model(data).setAccountType(values(node)[1]);
@@ -21,12 +16,7 @@ public class BD_PdfExtractDataVisitor implements BourseDirectParserVisitor {
     }
 
     @Override
-    public Object visit(BD_tab_header node, Object data) {
-        return node.childrenAccept(this, data);
-    }
-
-    @Override
-    public Object visit(BD_tab_body node, Object data) {
+    public Object visit(BD_dataset node, Object data) {
         return next(node, data);
     }
 

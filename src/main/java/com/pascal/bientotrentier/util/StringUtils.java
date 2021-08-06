@@ -1,0 +1,30 @@
+package com.pascal.bientotrentier.util;
+
+public class StringUtils {
+
+
+    public static String[] divide(String text, char... splitChars){
+        int index = -1;
+        for (int i = 0; i < text.length(); i++) {
+            int c = text.charAt(i);
+            for (int j=0; j< splitChars.length; j++) {
+                if (c == splitChars[j]){
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) break;
+        }
+        if (index == -1) return null;
+        return new String[]{ text.substring(0, index), text.substring(index+1)};
+    }
+
+
+
+    public static String[] divide(String textToDivide, String centerText){
+        int index = textToDivide.indexOf(centerText);
+        if (index == -1) return null;
+        if (index+centerText.length() > textToDivide.length()) return null;
+        return new String[]{ textToDivide.substring(0, index), textToDivide.substring(index+centerText.length())};
+    }
+}
