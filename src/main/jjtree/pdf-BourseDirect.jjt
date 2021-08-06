@@ -2,6 +2,8 @@
 // https://programmersought.com/article/51626165921/
 // https://www.codeproject.com/Articles/35748/An-Introduction-to-JavaCC
 // https://netbeans.apache.org/tutorials/nbm-javacc-parser.html
+
+// https://www.engr.mun.ca/~theo/JavaCC-FAQ/javacc-faq-moz.htm#tth_sEc3.12
 options {
   JAVA_UNICODE_ESCAPE = true;
   ERROR_REPORTING = true;
@@ -21,8 +23,12 @@ PARSER_BEGIN(BourseDirectParser)
 package com.pascal.bientotrentier.parsers.bourseDirect;
 
 public class BourseDirectParser {
+    public static final String
+        ACTION_NAME = "ACTION_NAME",
+        ACTION_ID = "ACTION_ID";
+
     public static void uselessMethod(){
-        // I created this method, just because the syntax highlighter of intellij do not want an empty class
+            // I created this method, just because the syntax highlighter of intellij do not want an empty class
     }
 }
 
@@ -37,14 +43,14 @@ TOKEN : {
        | <COMPTE: "COMPTE N°">
        | <QUELQUECHOSE: "DEIMPROBABLEQUIARRIVERAJAMAISJUSTEPOUREXEMPLE"> : EXAMPLE_BLOC
        | <WORD: (["A"-"Z","a"-"z"])+>
-       | <DATE_HEADER : "Date">
-       | <DESIGNATION_HEADER : "Désignation">
-       | <DEBIT_HEADER : "Débit">
-       | <CREDIT_HEADER : "Crédit">
        | <AMOUNT:  ["0"-"9"](["0"-"9"," "])*(","(["0"-"9"])+)?>
-       | <DEVISE:  ("€"|"$"|"EUR"|"USD")>
        | <DATE: ["0"-"9"]["0"-"9"]"/"["0"-"9"]["0"-"9"]"/20"["0"-"2"]["0"-"9"]>
-       | <ACCOUNT_NUMBER: (["A"-"Z","0"-"9"])+>
+       | <ID: (["A"-"Z","0"-"9"])+>
+}
+
+<TEXT_UNTIL_EOL>
+TOKEN : {
+    <TEXT: (~["\n","\r"])+ > : DEFAULT
 }
 
 <EXAMPLE_BLOC>
@@ -53,18 +59,74 @@ TOKEN : {
 }
 
 SimpleNode account() :
-{ Token num, type; }{
+{ Token num, type; }
+{
     <AVIS_DOPERATION>
-    <COMPTE> num=<ACCOUNT_NUMBER> type=<WORD>
+    <COMPTE> num=<ID> type=<WORD>
     {
          jjtThis.value=new String[]{num.image, type.image};
-    }
-    { return jjtThis; }
+         return jjtThis;
+     }
 }
 
 SimpleNode dataset() :
-{}
 {
-    // TODO
-    { return jjtThis; }
+    java.util.List<String> dates = new java.util.LinkedList();
+    java.util.List<java.util.Map<String, String>> operations = new java.util.LinkedList();
+    Token date; SimpleNode opNode;
+}
+{
+    (date=<DATE> { dates.add(date.image); })*
+    (opNode=operation() { operations.add(opNode.value); })*
+    {
+        jjThis.value=new Object[]{ dates, operations };
+        return jjtThis;
+    }
+}
+/* Est ce que je peux définir ma proper class Operation?? avec un héritage achatComptant/achatEtranger? etc... */
+SimpleNode operation() :
+{
+  SimpleNode operation;
+}
+{
+    LOOKAHEAD(3)
+        operation = achatComptant()
+        | operation = achatEtranger()
+    {
+        jjThis.value = operation;
+        return jjThis;
+    }
+}
+
+SimpleNode achatComptant() :
+{
+    java.util.Map<String, String> operation = new java.util.HashMap();
+    Token actionName, actionId;
+}
+{
+    "ACHAT COMPTANT" actionId=<ID> { token_source.SwitchTo("TEXT_UNTIL_EOL") ; } actionName=<TEXT>
+    "QUANTITE :"
+    {
+        operation.put(ACTION_ID, actionId.image);
+        operation.put(ACTION_NAME, actionName.image);
+        jjThis.value = operation;
+        return jjThis;
+    }
+}
+
+
+SimpleNode achatEtranger() :
+{
+    Map<String, String> operation = new HashMap();
+    Token actionName, actionId;
+}
+{
+    "ACHAT COMPTANT" actionId=<ID> { token_source.SwitchTo("TEXT_UNTIL_EOL") ; } actionName=<TEXT>
+    "QUANTITE :"
+    {
+        operation.put(ACTION_ID, actionId.image);
+        operation.put(ACTION_NAME, actionName.image);
+        jjThis.value = operation;
+        return operation;
+    }
 }
