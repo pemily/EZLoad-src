@@ -1,0 +1,87 @@
+// https://cs.lmu.edu/~ray/notes/javacc/
+// https://programmersought.com/article/51626165921/
+// https://www.codeproject.com/Articles/35748/An-Introduction-to-JavaCC
+// https://netbeans.apache.org/tutorials/nbm-javacc-parser.html
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  ERROR_REPORTING = true;
+  STATIC = false;
+  COMMON_TOKEN_ACTION = false;
+  JDK_VERSION = "1.8";
+  BUILD_NODE_FILES=true;
+  MULTI = true; // many class names
+  NODE_PREFIX = "BD_"; // Prefix for generated AST classes, BD == BourseDirect
+  VISITOR=true; // generate the visitor classes
+  // VISITOR_DATA_TYPE="com.pascal.bientotrentier.bourseDirect.transform.VisitorContext";
+  // VISITOR_RETURN_TYPE="com.pascal.bientotrentier.bourseDirect.transform.VisitorContext";
+  VISITOR_EXCEPTION="";
+}
+PARSER_BEGIN(BourseDirectParser)
+
+package com.pascal.bientotrentier.parsers.bourseDirect;
+
+public class BourseDirectParser {
+    public static void uselessMethod(){
+        // I created this method, just because the syntax highlighter of intellij do not want an empty class
+    }
+}
+
+PARSER_END (BourseDirectParser)
+
+SKIP : {
+  " " | "\t" | "\n" | "\r"
+}
+
+TOKEN : {
+         <AVIS_DOPERATION: "Avis d'Opération">
+       | <TEXT_INTRO: "Nous vous prions de trouver ci-dessous votre relevé d'operations. Sans observation de votre part au sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos salutations distinguées. Le">
+       | <OPEN_PAREN: "(">
+       | <CLOSE_PAREN: ")">
+       | <COMPTE: "COMPTE N°">
+       | <DATE_HEADER : "Date">
+       | <DESIGNATION_HEADER : "Désignation">
+       | <DEBIT_HEADER : "Débit">
+       | <CREDIT_HEADER : "Crédit">
+       | <AMOUNT:  ["0"-"9"](["0"-"9"," "])*(","(["0"-"9"])+)?>
+       | <DEVISE:  ("€"|"$"|"EUR"|"USD")>
+       | <DATE: ["0"-"9"]["0"-"9"]"/"["0"-"9"]["0"-"9"]"/20"["0"-"2"]["0"-"9"]>
+       | <ACCOUNT_NUMBER: (["A"-"Z","0"-"9"])+>
+       | <ACCOUNT_TYPE: (["a"-"z","A"-"Z"])+>
+}
+
+SimpleNode start() :
+{}
+{
+    <AVIS_DOPERATION>
+    account()
+   /*  <TEXT_INTRO>
+   <DATE>
+    // (<OWNER_ADDRESS_LINE>)+
+    tab_header()
+    tab_body()*/
+    <EOF>
+    { return jjtThis; }
+}
+
+void account() :
+{ Token num, type; }{
+    <COMPTE> num=<ACCOUNT_NUMBER> type=<ACCOUNT_TYPE>
+        {
+             jjtThis.value=new String[]{num.image, type.image};
+        }
+}
+
+void tab_header() :
+{}
+{
+    <DATE_HEADER>
+    <DESIGNATION_HEADER>
+    <DEBIT_HEADER><OPEN_PAREN><DEVISE><CLOSE_PAREN>
+    <CREDIT_HEADER><OPEN_PAREN><DEVISE><CLOSE_PAREN>
+}
+
+void tab_body() :
+{}
+{
+    (<DATE>)+
+}
