@@ -10,9 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +37,6 @@ public class BourseDirectPdfAnalyser {
         this.bourseDirectSettings = mainSettings.getBourseDirect();
     }
 
-
     public void start() throws IOException {
         try(Stream<Path> stream = Files.walk(Paths.get(this.bourseDirectSettings.getPdfOutputDir()), 5)){
             stream
@@ -58,9 +55,9 @@ public class BourseDirectPdfAnalyser {
 
                         String pdfText = tStripper.getText(document);
 
+                        // generateFileForTest(pdfText);
+
                         analyzePdfText(pdfText);
-
-
 
                     } catch (IOException | ParseException e) {
                         logger.error("Error while reading file: "+ p.toFile().getAbsolutePath(), e);
@@ -70,6 +67,15 @@ public class BourseDirectPdfAnalyser {
         }
     }
 
+    private static int n = 1;
+    private void generateFileForTest(String pdfText) throws IOException {
+        Writer w = new FileWriter(new File("D:\\dev\\BientotRentier\\src\\test\\resources\\com\\pascal\\bientotrentier\\parsers\\bourseDirect\\avisOperation"+n+".txt"));
+        n++;
+        w.write(pdfText);
+        w.flush();
+        w.close();
+    }
+
     /*
 Avis d'Opération
 COMPTE N° 508TI00085554410EUR Ordinaire
@@ -77,12 +83,37 @@ MR EMILY PASCAL
 Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
 sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
 salutations distinguées.
-Le 24/02/2021
+Le 19/03/2021
 MR EMILY PASCAL
 192 ROUTE DE PEGOMAS
 06130  GRASSE
 Date Désignation Débit (€) Crédit (€)
- 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ ACHAT COMPTANT  FR0013269123  RUBIS
+ QUANTITE :  +120
+ COURS :  +39,9  BRUT :  +4 788,00
+ COURTAGE :  +4,31  TVA :  +0,00
+ Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
+ ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
+ QUANTITE :  +19
+ COURS :  +187,230039236  BRUT :  +3 557,37
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US92936U1097  W.P. CAREY
+ QUANTITE :  +60
+ COURS :  +58,223207176  BRUT :  +3 493,39
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ TAXE TRANSACT FINANCIERES  FR0013269123  TTF
+ 4 792,31
+ 3 565,87
+ 3 501,89
+ 14,36
 Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
 Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
 1/1
@@ -106,7 +137,7 @@ Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, 
         if (!leDate.startsWith("Le ")){
             throw new ParseException("Invalid Format detected.");
         }
-        model.setDateAvisOpere(leDate.substring(3).trim());
+        model.setDateAvisOperation(leDate.substring(3).trim());
 
         List<String> addr = new LinkedList<>(Arrays.asList(section2Splitted));
         addr.remove(0);

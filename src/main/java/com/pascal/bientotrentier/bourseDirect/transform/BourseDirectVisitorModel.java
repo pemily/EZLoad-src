@@ -5,7 +5,7 @@ public class BourseDirectVisitorModel {
     private String accountType;
     private String accountOwnerName;
     private String address;
-    private String dateAvisOpere;
+    private String dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
 
@@ -41,12 +41,12 @@ public class BourseDirectVisitorModel {
         this.address = address;
     }
 
-    public String getDateAvisOpere() {
-        return dateAvisOpere;
+    public String getDateAvisOperation() {
+        return dateAvisOperation;
     }
 
-    public void setDateAvisOpere(String dateAvisOpere) {
-        this.dateAvisOpere = dateAvisOpere;
+    public void setDateAvisOperation(String dateAvisOperation) {
+        this.dateAvisOperation = dateAvisOperation;
     }
 
     public String getDeviseCredit() {

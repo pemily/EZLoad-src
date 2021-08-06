@@ -4,12 +4,29 @@ MR EMILY PASCAL
 Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
 sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
 salutations distinguées.
-Le 24/02/2021
+Le 16/03/2021
 MR EMILY PASCAL
 192 ROUTE DE PEGOMAS
 06130  GRASSE
 Date Désignation Débit (€) Crédit (€)
- 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+ 16/03/2021
+ 16/03/2021
+ VENTE ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  -45
+ COURS :  +66,356440254  BRUT :  +2 986,04
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,2  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:50:11       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VENTE ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ COURS :  +159,364458794  BRUT :  +3 187,29
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +190,2101  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:45:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ 2 977,53
+ 3 178,78
 Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
 Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
 1/1
