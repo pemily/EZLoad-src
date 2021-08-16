@@ -3058,3 +3058,2401 @@ Was expecting:
 2021-08-07 00:12:31 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-12.pdf...
 2021-08-07 00:12:31 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-15.pdf...
 2021-08-07 00:12:31 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-19.pdf...
+2021-08-16 10:47:08 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 10:50:15 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 10:50:32 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:132)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 10:52:49 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 10:52:54 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+_TOKEN_13
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:615)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:603)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:132)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 10:54:30 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 10:54:47 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:132)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 10:55:24 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 10:59:03 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:132)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 11:06:00 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 11:12:02 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 11:12:09 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) Avis d'Opération
+
+COMPTE N° 508TI00085554410EUR Ordinaire
+:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 11:12:35 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 11:13:46 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) Avis d'Opération
+
+COMPTE N° 508TI00085554410EUR Ordinaire
+:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 11:16:26 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 11:16:32 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) Avis d'Opération
+
+COMPTE N° 508TI00085554410EUR Ordinaire
+:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 11:17:41 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 11:17:49 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) Avis d'Opération
+
+COMPTE N° 508TI00085554410EUR Ordinaire
+:1:1
+Was expecting one of the following:
+AVIS_DOPERATION
+Found string "Avis d\'Opération" of type TEXT
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.handleUnexpectedTokenType(BourseDirectParser.java:617)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.consumeToken(BourseDirectParser.java:605)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser.account(BourseDirectParser.java:224)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 12:01:13 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 12:01:58 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 12:06:31 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:07:51 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:08:28 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:12:39 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:13:36 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:21:43 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:22:27 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:22:40 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:22:57 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:23:47 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:24:10 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:25:48 INFO  BourseDirectPdfAnalyser:47 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:26:09 ERROR BourseDirectPdfAnalyser:64 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:880)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:868)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:160)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:61)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:45)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+2021-08-16 14:32:11 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:32:14 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:880)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:868)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:172)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+2021-08-16 14:41:02 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:41:04 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:980)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:968)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:172)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+2021-08-16 14:43:57 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 14:43:58 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:980)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:968)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:18:55 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:18:57 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:980)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:968)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:38:53 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:38:54 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:958)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:41:49 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:41:50 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:958)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:42:43 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:42:45 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:928)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:916)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:51:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:52:53 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:176)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:958)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:173)
+	... 15 more
+2021-08-16 18:53:33 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 18:53:39 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:958)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 19:40:53 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 19:40:55 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:958)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 19:43:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 19:43:38 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:946)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:934)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 19:45:56 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 19:45:58 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:879)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:867)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:28:10 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:31:52 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:879)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:867)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:32:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:33:54 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type TEXT_EOL
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:867)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:855)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:42:18 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:42:27 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type TEXT_EOL
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:847)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:835)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:276)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:43:31 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:46:02 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: java.lang.NullPointerException: Cannot invoke "java.util.List.add(Object)" because the return value of "com.pascal.bientotrentier.parsers.bourseDirect.Dataset.getDates()" is null
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:296)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+2021-08-16 20:48:07 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:48:26 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 20:48:26 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-16 20:48:27 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-07.pdf...
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-19.pdf...
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-30.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-11.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-18.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-06.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-08.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-12.pdf...
+2021-08-16 20:48:28 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-15.pdf...
+2021-08-16 20:48:29 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-19.pdf...
+2021-08-16 20:50:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:50:14 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 24/02/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+24/02/2021  VIREMENT ESPECES  VIRT M. ET/OU MME  2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:1
+Was expecting one of the following:
+DATE
+Found string "24/02/2021  VIREMENT ESPECES  VI..." of type INVALID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:837)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:825)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:288)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:55:32 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:55:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 20:55:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 20:55:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-16 20:55:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-07.pdf...
+2021-08-16 20:55:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-19.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-30.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-11.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-18.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-06.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-08.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-12.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-15.pdf...
+2021-08-16 20:55:36 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-19.pdf...
+2021-08-16 20:57:10 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-16 20:57:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-07.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-19.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-04-30.pdf...
+2021-08-16 20:57:13 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-11.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-05-18.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-06.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-08.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-12.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-15.pdf...
+2021-08-16 20:57:14 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-07-19.pdf...
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:57:14 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 20:58:08 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 20:58:10 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 20:58:10 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 20:58:10 ERROR BourseDirectPdfAnalyser:65 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 01/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:133)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:62)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:46)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:177)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:129)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:2:2
+Was expecting one of the following:
+_TOKEN_17
+Found string "01/03/2021" of type DATE
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:893)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:881)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.VirementEspece(BourseDirectPdfParser.java:432)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:333)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:284)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:174)
+	... 15 more
+2021-08-16 20:59:33 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 21:00:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 21:00:34 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 21:00:34 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-16 21:04:35 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 21:05:12 INFO  BourseDirectPdfAnalyser:48 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 23:39:39 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-16 23:47:01 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-16 23:47:02 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-16 23:47:03 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 01/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:179)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:2:2
+Was expecting one of the following:
+_TOKEN_17
+Found string "01/03/2021" of type DATE
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:967)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:955)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.VirementEspece(BourseDirectPdfParser.java:437)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:338)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:286)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 00:01:01 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:03:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:16:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:17:49 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:19:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:19:58 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:22:25 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:22:53 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:27:33 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:28:09 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:31:21 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:31:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:31:43 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 00:31:43 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 01/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: PdfParser text:
+=======================================================
+01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:180)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:4:2
+Was expecting one of the following:
+_TOKEN_17
+Found string "ACHAT" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:1030)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:1018)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.VirementEspece(BourseDirectPdfParser.java:456)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:357)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:303)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 00:53:08 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:53:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 00:53:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 00:53:28 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 01/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:185)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:9:2
+Was expecting one of the following:
+_TOKEN_26
+Found string "Heure" of type WORD
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:1442)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:1430)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.AchatEtranger(BourseDirectPdfParser.java:610)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:369)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:303)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 00:59:45 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 00:59:57 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:00:01 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:00:01 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 01/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+01/03/2021
+ 01/03/2021
+ 01/03/2021
+ ACHAT ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  +45
+ COURS :  +66,219074986  BRUT :  +2 979,86
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,75  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:18:23       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  +20
+ COURS :  +154,176190866  BRUT :  +3 083,52
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +185,6799  TX USD/EUR :  +1,204335760
+ Heure Execution: 21:14:44       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VIREMENT ESPECES  VIRT M. ET/OU MME
+ 2 988,36
+ 3 092,02
+ 2 400,00
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:9:2
+Was expecting one of the following:
+_TOKEN_26
+Found string "Heure" of type WORD
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:1454)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:1442)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.AchatEtranger(BourseDirectPdfParser.java:611)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:376)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:02:27 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:02:33 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:02:34 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:02:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:02:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:02:38 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:02:39 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:02:41 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:41 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:02:42 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 16/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 16/03/2021
+ 16/03/2021
+ VENTE ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  -45
+ COURS :  +66,356440254  BRUT :  +2 986,04
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,2  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:50:11       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VENTE ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ COURS :  +159,364458794  BRUT :  +3 187,29
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +190,2101  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:45:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ 2 977,53
+ 3 178,78
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+16/03/2021
+ 16/03/2021
+ VENTE ETRANGER  US0995021062  BOOZ ALLEN CL.A
+ QUANTITE :  -45
+ COURS :  +66,356440254  BRUT :  +2 986,04
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +79,2  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:50:11       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ VENTE ETRANGER  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ COURS :  +159,364458794  BRUT :  +3 187,29
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +190,2101  TX USD/EUR :  +1,193554080
+ TAXE ETRANG :  +0,01
+ Heure Execution: 19:45:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ 2 977,53
+ 3 178,78
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:3:2
+Was expecting one of the following:
+_TOKEN_18, _TOKEN_19
+Found string "VENTE" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:384)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:07:17 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:07:27 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:07:27 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:07:27 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:07:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:07:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:07:28 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:07:29 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:07:29 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:07:29 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:07:29 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 19/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ ACHAT COMPTANT  FR0013269123  RUBIS
+ QUANTITE :  +120
+ COURS :  +39,9  BRUT :  +4 788,00
+ COURTAGE :  +4,31  TVA :  +0,00
+ Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
+ ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
+ QUANTITE :  +19
+ COURS :  +187,230039236  BRUT :  +3 557,37
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US92936U1097  W.P. CAREY
+ QUANTITE :  +60
+ COURS :  +58,223207176  BRUT :  +3 493,39
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ TAXE TRANSACT FINANCIERES  FR0013269123  TTF
+ 4 792,31
+ 3 565,87
+ 3 501,89
+ 14,36
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+19/03/2021
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ ACHAT COMPTANT  FR0013269123  RUBIS
+ QUANTITE :  +120
+ COURS :  +39,9  BRUT :  +4 788,00
+ COURTAGE :  +4,31  TVA :  +0,00
+ Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
+ ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
+ QUANTITE :  +19
+ COURS :  +187,230039236  BRUT :  +3 557,37
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US92936U1097  W.P. CAREY
+ QUANTITE :  +60
+ COURS :  +58,223207176  BRUT :  +3 493,39
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ TAXE TRANSACT FINANCIERES  FR0013269123  TTF
+ 4 792,31
+ 3 565,87
+ 3 501,89
+ 14,36
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:5:2
+Was expecting one of the following:
+_TOKEN_18, _TOKEN_19, _TOKEN_28
+Found string "ACHAT COMPTANT" of type _TOKEN_16
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:395)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:11:00 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:11:02 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:11:02 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:11:02 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:11:03 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:11:03 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:11:03 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:11:03 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:11:04 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:11:04 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:11:04 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:11:04 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:11:04 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:11:04 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:11:04 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:11:04 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 19/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ ACHAT COMPTANT  FR0013269123  RUBIS
+ QUANTITE :  +120
+ COURS :  +39,9  BRUT :  +4 788,00
+ COURTAGE :  +4,31  TVA :  +0,00
+ Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
+ ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
+ QUANTITE :  +19
+ COURS :  +187,230039236  BRUT :  +3 557,37
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US92936U1097  W.P. CAREY
+ QUANTITE :  +60
+ COURS :  +58,223207176  BRUT :  +3 493,39
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ TAXE TRANSACT FINANCIERES  FR0013269123  TTF
+ 4 792,31
+ 3 565,87
+ 3 501,89
+ 14,36
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+19/03/2021
+ 19/03/2021
+ 19/03/2021
+ 19/03/2021
+ ACHAT COMPTANT  FR0013269123  RUBIS
+ QUANTITE :  +120
+ COURS :  +39,9  BRUT :  +4 788,00
+ COURTAGE :  +4,31  TVA :  +0,00
+ Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
+ ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
+ QUANTITE :  +19
+ COURS :  +187,230039236  BRUT :  +3 557,37
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ ACHAT ETRANGER  US92936U1097  W.P. CAREY
+ QUANTITE :  +60
+ COURS :  +58,223207176  BRUT :  +3 493,39
+ COURTAGE :  +8,50  TVA :  +0,00
+ COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
+ Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
+ TAXE TRANSACT FINANCIERES  FR0013269123  TTF
+ 4 792,31
+ 3 565,87
+ 3 501,89
+ 14,36
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:22:2
+Was expecting one of the following:
+AMOUNT
+Found string "TAXE" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.handleUnexpectedTokenType(BourseDirectPdfParser.java:2051)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.consumeToken(BourseDirectPdfParser.java:2039)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:314)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:17:30 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:17:33 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:17:33 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:17:34 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:17:34 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:17:34 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:17:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:17:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:17:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:17:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:17:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:17:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:17:35 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:17:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:17:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:17:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-17 01:17:36 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 30/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:13
+Was expecting one of the following:
+_TOKEN_16, _TOKEN_24, _TOKEN_25, _TOKEN_28, _TOKEN_30
+Found string "COUPONS" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:417)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:22:44 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:22:47 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:22:48 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:22:48 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:22:48 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:22:49 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:22:49 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:22:49 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:22:49 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:22:49 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:22:49 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:22:49 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:22:50 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:22:50 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:22:50 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-17 01:22:50 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 30/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:13
+Was expecting one of the following:
+_TOKEN_16, _TOKEN_24, _TOKEN_25, _TOKEN_28, _TOKEN_30, COUPONS
+Found string "COUPONS" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:428)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:28:33 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:28:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:28:35 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:28:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:28:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:28:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:28:36 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:28:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:28:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:28:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:28:37 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-17 01:28:37 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 30/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:13
+Was expecting one of the following:
+_TOKEN_16, _TOKEN_24, _TOKEN_25, _TOKEN_28, _TOKEN_30, COUPONS
+Found string "COUPONS" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:428)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more
+2021-08-17 01:32:54 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-24.pdf...
+2021-08-17 01:32:56 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-02-26.pdf...
+2021-08-17 01:32:56 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-01.pdf...
+2021-08-17 01:32:57 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-02.pdf...
+2021-08-17 01:32:57 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-03.pdf...
+2021-08-17 01:32:58 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-08.pdf...
+2021-08-17 01:32:58 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-09.pdf...
+2021-08-17 01:32:58 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-16.pdf...
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 WARN  COSDocument:525 - Warning: You did not close a PDF Document
+2021-08-17 01:32:59 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-18.pdf...
+2021-08-17 01:32:59 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-19.pdf...
+2021-08-17 01:32:59 INFO  BourseDirectPdfAnalyser:49 - Decoding file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf...
+2021-08-17 01:32:59 ERROR BourseDirectPdfAnalyser:66 - Error while reading file: P:\Pascal\Revenu et Dividendes\AvisOperations\BourseDirect\CTO Pascal\2021\boursedirect-2021-03-30.pdf
+com.pascal.bientotrentier.util.BRException: Error when analyzing text:
+##################################################
+Avis d'Opération
+COMPTE N° 508TI00085554410EUR Ordinaire
+MR EMILY PASCAL
+Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
+sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
+salutations distinguées.
+Le 30/03/2021
+MR EMILY PASCAL
+192 ROUTE DE PEGOMAS
+06130  GRASSE
+Date Désignation Débit (€) Crédit (€)
+ 30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
+Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
+1/1
+Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
+
+################################################
+
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:134)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.lambda$start$1(BourseDirectPdfAnalyser.java:63)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1801)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.start(BourseDirectPdfAnalyser.java:47)
+	at com.pascal.bientotrentier.Main.main(Main.java:21)
+Caused by: com.pascal.bientotrentier.util.BRException: Input Text:
+=======================================================
+30/03/2021  COUPONS  US5024311095  L3HARRIS TECHN.
+ QUANTITE :  -20
+ PX UN.BRUT :  +0,86682  BRUT :  +17,34
+ COMMISSION :  +0,00  CRED. IMPOT :  +2,60
+ PRELEVEM. :  +2,21  CONTRI.SOC :  +2,97
+ 9,55
+=======================================================
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:190)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:130)
+	... 14 more
+Caused by: com.pascal.bientotrentier.parsers.bourseDirect.ParseException: 
+Encountered an error at (or somewhere around) input:1:13
+Was expecting one of the following:
+_TOKEN_16, _TOKEN_24, _TOKEN_25, _TOKEN_28, _TOKEN_30, COUPONS
+Found string "COUPONS" of type ID
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Operation(BourseDirectPdfParser.java:428)
+	at com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser.Dataset(BourseDirectPdfParser.java:299)
+	at com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser.analyzePdfText(BourseDirectPdfAnalyser.java:175)
+	... 15 more

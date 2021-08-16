@@ -1,9 +1,12 @@
 package com.pascal.bientotrentier.bourseDirect.transform;
 
 import com.pascal.bientotrentier.bourseDirect.BourseDirectSettings;
-import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectParser;
+import com.pascal.bientotrentier.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser;
+import com.pascal.bientotrentier.parsers.bourseDirect.Dataset;
 import com.pascal.bientotrentier.parsers.bourseDirect.ParseException;
 import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.util.BRException;
 import com.pascal.bientotrentier.util.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -59,7 +62,7 @@ public class BourseDirectPdfAnalyser {
 
                         analyzePdfText(pdfText);
 
-                    } catch (IOException | ParseException e) {
+                    } catch (IOException | BRException e) {
                         logger.error("Error while reading file: "+ p.toFile().getAbsolutePath(), e);
                         throw new RuntimeException(e);
                     }
@@ -119,23 +122,39 @@ Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
 1/1
 Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
      */
-    public BourseDirectVisitorModel analyzePdfText(String text) throws ParseException {
-        BourseDirectVisitorModel model = new BourseDirectVisitorModel();
+
+    public BourseDirectModel analyzePdfText(String text) throws BRException {
+        try {
+            text = StringUtils.clean(text);
+            BourseDirectModel model = new BourseDirectModel();
+            analyzePdfText(text, model);
+            return model;
+        }
+        catch(Exception e){
+            throw new BRException("Error when analyzing text:\n##################################################\n"+text+"\n################################################\n", e);
+        }
+    }
+
+
+    private void analyzePdfText(String text, BourseDirectModel model) {
 
         String section[] = text.split(TEXT_INTRO);
         String accountSection[] = section[0].split("[\\n]");
-        String avisOpereAndAccount = accountSection[0]+"\r"+accountSection[1];
         model.setAccountOwnerName(accountSection[2].trim());
-
-        BourseDirectParser bourseDirectAccountParser = new BourseDirectParser(new StringReader(avisOpereAndAccount));
-        bourseDirectAccountParser.account().jjtAccept(new BD_PdfExtractDataVisitor(), model);
+       /* {
+           String avisOpereAndAccount = accountSection[0]+"\r"+accountSection[1];
+            BourseDirectParser parser = new BourseDirectParser(new StringReader(avisOpereAndAccount));
+            Account account = parser.Account();
+            String id = account.getId();
+            String type = account.getType();
+        }*/
 
         String textDebutTableau = DATE_DÉSIGNATION_DÉBIT;
         String section2[] = section[1].split(Pattern.quote(textDebutTableau));
         String section2Splitted[] = section2[0].split("[\\n]");
         String leDate = section2Splitted[0]; // Le 24/02/2021
-        if (!leDate.startsWith("Le ")){
-            throw new ParseException("Invalid Format detected.");
+        if (!leDate.startsWith("Le ")) {
+            throw new BRException("Invalid Format detected.");
         }
         model.setDateAvisOperation(leDate.substring(3).trim());
 
@@ -147,12 +166,29 @@ Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, 
         model.setDeviseDebit(deviseResearch[0].trim());
         model.setDeviseCredit(deviseResearch[2].trim());
 
-        String prepareDataSet = StringUtils.divide(section2[1], model.getDeviseDebit()+") Crédit ("+model.getDeviseCredit()+")")[1];
-        String dataSet = StringUtils.divide(prepareDataSet, FOOTER)[0].trim();
+        String prepareDataSet = StringUtils.divide(section2[1], model.getDeviseDebit() + ") Crédit (" + model.getDeviseCredit() + ")")[1];
+        String dataSetStr = StringUtils.divide(prepareDataSet, FOOTER)[0].trim();
 
-        BourseDirectParser bourseDirectDataSetParser = new BourseDirectParser(new StringReader(dataSet));
-        bourseDirectDataSetParser.dataset().jjtAccept(new BD_PdfExtractDataVisitor(), model);
+        try {
+            BourseDirectPdfParser parser = new BourseDirectPdfParser(new StringReader(dataSetStr));
+            parser.setTracingEnabled(true);
+            Dataset dataset = parser.Dataset();
+            model.setOperations(dataset.getOperations());
+            model.setDates(dataset.getDates());
+            model.setAmounts(dataset.getAmounts());
 
-        return model;
+            // little check
+            if (model.getDates().size() != model.getOperations().size()){
+                throw new BRException("The number of dates found: "+model.getDates().size()+" do not match the number of operations found: "+model.getOperations().size());
+            }
+            if (model.getAmounts().size() != model.getOperations().size()){
+                throw new BRException("The number of amounts found: "+model.getDates().size()+" do not match the number of operations found: "+model.getOperations().size());
+            }
+
+        }
+        catch(Exception e){
+            throw new BRException("Input Text:\n=======================================================\n"+dataSetStr+"\n=======================================================", e);
+        }
     }
+
 }

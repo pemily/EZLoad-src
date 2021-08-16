@@ -2,7 +2,7 @@ package com.pascal.bientotrentier.parsers.bourseDirect;
 
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser;
-import com.pascal.bientotrentier.bourseDirect.transform.BourseDirectVisitorModel;
+import com.pascal.bientotrentier.bourseDirect.transform.model.BourseDirectModel;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -25,7 +25,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation1() throws ParseException {
         String text = readFile("avisOperation1.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -40,7 +40,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation2() throws ParseException {
         String text = readFile("avisOperation2.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -55,7 +55,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation3() throws ParseException {
         String text = readFile("avisOperation3.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -69,7 +69,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation4() throws ParseException {
         String text = readFile("avisOperation4.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -83,7 +83,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation5() throws ParseException {
         String text = readFile("avisOperation5.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -97,7 +97,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation6() throws ParseException {
         String text = readFile("avisOperation6.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -112,7 +112,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation7() throws ParseException {
         String text = readFile("avisOperation7.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -126,7 +126,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation8() throws ParseException {
         String text = readFile("avisOperation8.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -141,7 +141,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation9() throws ParseException {
         String text = readFile("avisOperation9.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -155,7 +155,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation10() throws ParseException {
         String text = readFile("avisOperation10.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -169,7 +169,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation11() throws ParseException {
         String text = readFile("avisOperation11.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -184,7 +184,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation12() throws ParseException {
         String text = readFile("avisOperation12.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -199,7 +199,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation13() throws ParseException {
         String text = readFile("avisOperation13.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -213,7 +213,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation14() throws ParseException {
         String text = readFile("avisOperation14.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -228,7 +228,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation15() throws ParseException {
         String text = readFile("avisOperation15.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -244,7 +244,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation16() throws ParseException {
         String text = readFile("avisOperation16.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -259,7 +259,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation17() throws ParseException {
         String text = readFile("avisOperation17.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -274,7 +274,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation18() throws ParseException {
         String text = readFile("avisOperation18.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -290,7 +290,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation19() throws ParseException {
         String text = readFile("avisOperation19.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -306,7 +306,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation20() throws ParseException {
         String text = readFile("avisOperation20.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());
@@ -321,7 +321,7 @@ public class BourseDirectParserTest {
     @Test
     public void testAvisOperation21() throws ParseException {
         String text = readFile("avisOperation21.txt");
-        BourseDirectVisitorModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
 
         assertEquals("508TI00085554410EUR", model.getAccountNumber());
         assertEquals("Ordinaire", model.getAccountType());

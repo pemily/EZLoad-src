@@ -2,6 +2,12 @@ package com.pascal.bientotrentier.util;
 
 public class StringUtils {
 
+    public static String clean(String text) {
+        text = text.replace("\r\n", "\n"); // \r\n => \n
+        text = text.replace("\n\r", "\n"); // \n\r => \n
+        text = text.replace("\r", ""); // \r => ""
+        return text;
+    }
 
     public static String[] divide(String text, char... splitChars){
         int index = -1;

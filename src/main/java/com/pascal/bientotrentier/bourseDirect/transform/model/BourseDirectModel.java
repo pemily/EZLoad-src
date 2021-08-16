@@ -1,6 +1,8 @@
-package com.pascal.bientotrentier.bourseDirect.transform;
+package com.pascal.bientotrentier.bourseDirect.transform.model;
 
-public class BourseDirectVisitorModel {
+import java.util.ArrayList;
+
+public class BourseDirectModel {
     private String accountNumber;
     private String accountType;
     private String accountOwnerName;
@@ -8,6 +10,9 @@ public class BourseDirectVisitorModel {
     private String dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
+    private ArrayList<IOperation> operations;
+    private ArrayList<String> dates;
+    private ArrayList<String> amounts;
 
     public String getAccountNumber() {
         return accountNumber;
@@ -63,5 +68,29 @@ public class BourseDirectVisitorModel {
 
     public void setDeviseDebit(String deviseDebit) {
         this.deviseDebit = deviseDebit;
+    }
+
+    public ArrayList<IOperation> getOperations() {
+        return operations;
+    }
+
+    public void setOperations(ArrayList<IOperation> operations) {
+        this.operations = operations;
+    }
+
+    public ArrayList<String> getDates() {
+        return dates;
+    }
+
+    public void setDates(ArrayList<String> dates) {
+        this.dates = dates;
+    }
+
+    public ArrayList<String> getAmounts() {
+        return amounts;
+    }
+
+    public void setAmounts(ArrayList<String> amounts) {
+        this.amounts = amounts;
     }
 }
