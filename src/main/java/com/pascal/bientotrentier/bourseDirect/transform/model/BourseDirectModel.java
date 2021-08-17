@@ -1,5 +1,8 @@
 package com.pascal.bientotrentier.bourseDirect.transform.model;
 
+import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser;
+import com.pascal.bientotrentier.parsers.bourseDirect.Operation;
+
 import java.util.ArrayList;
 
 public class BourseDirectModel {
@@ -10,7 +13,7 @@ public class BourseDirectModel {
     private String dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
-    private ArrayList<IOperation> operations;
+    private ArrayList<Operation> operations;
     private ArrayList<String> dates;
     private ArrayList<String> amounts;
 
@@ -70,11 +73,11 @@ public class BourseDirectModel {
         this.deviseDebit = deviseDebit;
     }
 
-    public ArrayList<IOperation> getOperations() {
+    public ArrayList<Operation> getOperations() {
         return operations;
     }
 
-    public void setOperations(ArrayList<IOperation> operations) {
+    public void setOperations(ArrayList<Operation> operations) {
         this.operations = operations;
     }
 

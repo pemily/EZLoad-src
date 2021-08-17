@@ -25,25 +25,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                    <filesets>
-                        <fileset>
-                            <directory>target</directory>
-                            <followSymlinks>false</followSymlinks>
-                            <useDefaultExcludes>true</useDefaultExcludes>
-                            <excludes>
-                                <exclude>javacc21-compiler/*</exclude>
-                            </excludes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.0.0</version>
                 <executions>
@@ -55,9 +36,9 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${project.build.directory}/javacc21-compiler"></mkdir>
+                                <mkdir dir="javacc21-compiler"></mkdir>
                                 <get src="https://javacc.com/download/javacc-full.jar"
-                                     dest="${project.build.directory}/javacc21-compiler/javacc-full.jar"
+                                     dest="javacc21-compiler/javacc-full.jar"
                                      verbose="on"
                                      usetimestamp="true"
                                      skipexisting="true"
@@ -73,7 +54,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <java jar="${project.build.directory}/javacc21-compiler/javacc-full.jar"
+                                <java jar="javacc21-compiler/javacc-full.jar"
                                       failonerror="true"
                                         fork="true">
                                     <!-- https://github.com/javacc21/javacc21/blob/master/src/java/com/javacc/Main.java -->

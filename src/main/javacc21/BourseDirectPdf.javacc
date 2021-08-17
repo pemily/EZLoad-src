@@ -71,31 +71,28 @@ INJECT Account :
 }
 
 INJECT Operation :
-import com.pascal.bientotrentier.bourseDirect.transform.model.IOperation;
-    implements IOperation
 {
 
 }
 
 Dataset Dataset() : {
-    IOperation op;
+    Operation op;
 }{
     ( <DATE> { CURRENT_NODE.getDates().add(nodeValue()); } )+
-    ( Operation { CURRENT_NODE.getOperations().add((IOperation) peekNode()); } )+
+    ( Operation { CURRENT_NODE.getOperations().add((Operation) peekNode()); } )+
     ( <AMOUNT> { CURRENT_NODE.getAmounts().add(nodeValue()); } )+
     { return CURRENT_NODE; }
 }
 
 INJECT Dataset :
     import java.util.ArrayList;
-    import com.pascal.bientotrentier.bourseDirect.transform.model.IOperation;
 {
   @Property ArrayList<String> dates = new ArrayList<>();
-  @Property ArrayList<IOperation> operations = new ArrayList<>();
+  @Property ArrayList<Operation> operations = new ArrayList<>();
   @Property ArrayList<String> amounts = new ArrayList<>();
 }
 
-IOperation Operation() :
+Operation Operation() :
     (  VirementEspece
      | AchatEtranger
      | VenteEtranger
@@ -150,9 +147,7 @@ VirementEspece VirementEspece() :
 ;
 
 INJECT VirementEspece :
-    import com.pascal.bientotrentier.bourseDirect.transform.model.IVirementEspece;
     extends Operation
-    implements IVirementEspece
 {
     @Property String details;
 }
