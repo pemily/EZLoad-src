@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-30.pdf",
+  "reportDate": "30/03/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US5024311095",
+      "actionName": "L3HARRIS TECHN.",
+      "number": -20,
+      "prixUnitaireBrut": "+0,86682",
+      "commission": "+0,00",
+      "prelevement": "+2,21",
+      "amountBrut": "+17,34",
+      "creditImpot": "+2,60",
+      "contributionSocial": "+2,97",
+      "operationType": "BRCoupons",
+      "date": "30/03/2021",
+      "amount": "9,55"
+    }
+  ]
+}

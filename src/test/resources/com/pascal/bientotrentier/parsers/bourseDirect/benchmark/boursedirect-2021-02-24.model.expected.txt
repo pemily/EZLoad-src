@@ -1,0 +1,20 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-02-24.pdf",
+  "reportDate": "24/02/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "operationType": "BRVirementCptEspece",
+      "date": "24/02/2021",
+      "amount": "2 400,00",
+      "description": "VIRT M. ET/OU MME"
+    }
+  ]
+}

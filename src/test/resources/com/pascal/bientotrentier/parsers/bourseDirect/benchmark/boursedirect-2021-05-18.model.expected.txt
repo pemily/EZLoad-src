@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-05-18.pdf",
+  "reportDate": "18/05/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US00287Y1091",
+      "actionName": "ABBVIE",
+      "number": -34,
+      "prixUnitaireBrut": "+1,07353",
+      "commission": "+0,00",
+      "prelevement": "+4,67",
+      "amountBrut": "+36,50",
+      "creditImpot": "+5,48",
+      "contributionSocial": "+6,26",
+      "operationType": "BRCoupons",
+      "date": "18/05/2021",
+      "amount": "20,08"
+    }
+  ]
+}

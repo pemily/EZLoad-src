@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-05-11.pdf",
+  "reportDate": "11/05/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US57636Q1040",
+      "actionName": "MASTERCARD CL.A",
+      "number": -9,
+      "prixUnitaireBrut": "+0,36528",
+      "commission": "+0,00",
+      "prelevement": "+0,42",
+      "amountBrut": "+3,29",
+      "creditImpot": "+0,49",
+      "contributionSocial": "+0,55",
+      "operationType": "BRCoupons",
+      "date": "11/05/2021",
+      "amount": "1,82"
+    }
+  ]
+}

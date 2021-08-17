@@ -15,7 +15,7 @@ JDK_TARGET = 8;
 DEFAULT_LEXICAL_STATE=DEFAULT;
 
 PARSER_BEGIN(BourseDirectPdfParser)
-import com.pascal.bientotrentier.bourseDirect.transform.model.*;
+import com.pascal.bientotrentier.sources.bourseDirect.transform.model.*;
 
 public class BourseDirectPdfParser{
 
@@ -111,7 +111,7 @@ AchatComptant AchatComptant() :
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
     "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setLieu(nodeValue()); }
 
     { return CURRENT_NODE; }
 ;
@@ -180,7 +180,7 @@ AchatEtranger AchatEtranger() :
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
     "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setLieu(nodeValue()); }
 
     { return CURRENT_NODE; }
 ;
@@ -228,7 +228,7 @@ VenteEtranger VenteEtranger() :
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
     "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setLieu(nodeValue()); }
 
     { return CURRENT_NODE; }
 ;

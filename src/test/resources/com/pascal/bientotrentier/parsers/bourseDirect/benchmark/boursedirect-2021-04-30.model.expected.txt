@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-04-30.pdf",
+  "reportDate": "30/04/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US03027X1000",
+      "actionName": "AMERICAN TOWER",
+      "number": -19,
+      "prixUnitaireBrut": "+1,02347",
+      "commission": "+0,00",
+      "prelevement": "+2,48",
+      "amountBrut": "+19,45",
+      "creditImpot": "+2,92",
+      "contributionSocial": "+3,32",
+      "operationType": "BRCoupons",
+      "date": "30/04/2021",
+      "amount": "10,72"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-02.pdf",
+  "reportDate": "02/03/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "changeRate": "+1,201837760",
+      "coursUSD": "+108,8699",
+      "id": "US00287Y1091",
+      "actionName": "ABBVIE",
+      "number": 34,
+      "cours": "+90,586186941",
+      "amountBrut": "+3 079,93",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRAchatEtranger",
+      "date": "02/03/2021",
+      "amount": "3 088,43",
+      "description": "19:54:20 NEW YORK STOCK EXCHANGE, INC."
+    },
+    {
+      "operationType": "BRVirementCptEspece",
+      "date": "02/03/2021",
+      "amount": "2 400,00",
+      "description": "VIRT M. ET/OU MME"
+    }
+  ]
+}

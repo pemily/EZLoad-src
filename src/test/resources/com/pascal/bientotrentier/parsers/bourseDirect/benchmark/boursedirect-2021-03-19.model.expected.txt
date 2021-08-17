@@ -1,0 +1,64 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-19.pdf",
+  "reportDate": "19/03/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "FR0013269123",
+      "actionName": "RUBIS",
+      "number": 120,
+      "cours": "+39,9",
+      "amountBrut": "+4 788,00",
+      "fraisCourtage": "+4,31",
+      "tva": "+0,00",
+      "operationType": "BRAchat",
+      "date": "19/03/2021",
+      "amount": "4 792,31",
+      "description": "09:01:06 BORSE BERLIN EQUIDUCT TRADING - BERL"
+    },
+    {
+      "changeRate": "+1,190247040",
+      "coursUSD": "+222,85",
+      "id": "US03027X1000",
+      "actionName": "AMERICAN TOWER",
+      "number": 19,
+      "cours": "+187,230039236",
+      "amountBrut": "+3 557,37",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRAchatEtranger",
+      "date": "19/03/2021",
+      "amount": "3 565,87",
+      "description": "14:30:03 NEW YORK STOCK EXCHANGE, INC."
+    },
+    {
+      "changeRate": "+1,190247040",
+      "coursUSD": "+69,3",
+      "id": "US92936U1097",
+      "actionName": "W.P. CAREY",
+      "number": 60,
+      "cours": "+58,223207176",
+      "amountBrut": "+3 493,39",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRAchatEtranger",
+      "date": "19/03/2021",
+      "amount": "3 501,89",
+      "description": "14:30:02 NEW YORK STOCK EXCHANGE, INC."
+    },
+    {
+      "id": "FR0013269123",
+      "operationType": "BRTaxe",
+      "date": "19/03/2021",
+      "amount": "14,36",
+      "description": "TTF"
+    }
+  ]
+}

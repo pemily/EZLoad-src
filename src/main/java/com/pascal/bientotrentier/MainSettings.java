@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier;
 
-import com.pascal.bientotrentier.bourseDirect.BourseDirectSettings;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 
 public class MainSettings {
 

@@ -1,0 +1,44 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-16.pdf",
+  "reportDate": "16/03/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "changeRate": "+1,193554080",
+      "coursUSD": "+79,2",
+      "id": "US0995021062",
+      "actionName": "BOOZ ALLEN CL.A",
+      "number": -45,
+      "cours": "+66,356440254",
+      "amountBrut": "+2 986,04",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRVenteEtranger",
+      "date": "16/03/2021",
+      "amount": "2 977,53",
+      "description": "19:50:11 NEW YORK STOCK EXCHANGE, INC."
+    },
+    {
+      "changeRate": "+1,193554080",
+      "coursUSD": "+190,2101",
+      "id": "US5024311095",
+      "actionName": "L3HARRIS TECHN.",
+      "number": -20,
+      "cours": "+159,364458794",
+      "amountBrut": "+3 187,29",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRVenteEtranger",
+      "date": "16/03/2021",
+      "amount": "3 178,78",
+      "description": "19:45:03 NEW YORK STOCK EXCHANGE, INC."
+    }
+  ]
+}

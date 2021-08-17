@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-07-12.pdf",
+  "reportDate": "12/07/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US11135F1012",
+      "actionName": "BROADCOM INC",
+      "number": -7,
+      "prixUnitaireBrut": "+3,03268",
+      "commission": "+0,00",
+      "prelevement": "+2,71",
+      "amountBrut": "+21,23",
+      "creditImpot": "+3,19",
+      "contributionSocial": "+3,64",
+      "operationType": "BRCoupons",
+      "date": "12/07/2021",
+      "amount": "11,69"
+    }
+  ]
+}

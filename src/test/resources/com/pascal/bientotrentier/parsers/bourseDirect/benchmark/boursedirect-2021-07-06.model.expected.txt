@@ -1,0 +1,20 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-07-06.pdf",
+  "reportDate": "06/07/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "operationType": "BRDroitDeGarde",
+      "date": "06/07/2021",
+      "amount": "0,81",
+      "description": "DDGETG2T21"
+    }
+  ]
+}

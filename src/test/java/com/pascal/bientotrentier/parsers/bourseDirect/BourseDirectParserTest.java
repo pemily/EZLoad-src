@@ -1,334 +1,159 @@
 package com.pascal.bientotrentier.parsers.bourseDirect;
 
 import com.pascal.bientotrentier.MainSettings;
-import com.pascal.bientotrentier.bourseDirect.transform.BourseDirectPdfAnalyser;
-import com.pascal.bientotrentier.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.bientotrentier.model.BRModel;
+import com.pascal.bientotrentier.util.TextReporting;
+import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectProcessor;
+import com.pascal.bientotrentier.util.ModelUtils;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BourseDirectParserTest {
 
-    private String readFile(String file) {
-        String text = new BufferedReader(new InputStreamReader(BourseDirectParserTest.class.getResourceAsStream(file)))
-                .lines().collect(Collectors.joining("\n"));
-        System.out.println("###################################################################");
-        System.out.println(text);
-        System.out.println("###################################################################");
-        return text;
+    @Test
+    public void test1() throws IOException {
+        test("boursedirect-2021-02-24");
     }
 
     @Test
-    public void testAvisOperation1() throws ParseException {
-        String text = readFile("avisOperation1.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("24/02/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation2() throws ParseException {
-        String text = readFile("avisOperation2.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("26/02/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation3() throws ParseException {
-        String text = readFile("avisOperation3.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("01/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test2() throws IOException {
+        test("boursedirect-2021-02-26");
     }
 
     @Test
-    public void testAvisOperation4() throws ParseException {
-        String text = readFile("avisOperation4.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("02/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test3() throws IOException {
+        test("boursedirect-2021-03-01");
     }
 
     @Test
-    public void testAvisOperation5() throws ParseException {
-        String text = readFile("avisOperation5.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("03/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test4() throws IOException {
+        test("boursedirect-2021-03-02");
     }
 
     @Test
-    public void testAvisOperation6() throws ParseException {
-        String text = readFile("avisOperation6.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("08/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation7() throws ParseException {
-        String text = readFile("avisOperation7.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("09/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test5() throws IOException {
+        test("boursedirect-2021-03-03");
     }
 
     @Test
-    public void testAvisOperation8() throws ParseException {
-        String text = readFile("avisOperation8.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("16/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation9() throws ParseException {
-        String text = readFile("avisOperation9.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("18/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test6() throws IOException {
+        test("boursedirect-2021-03-08");
     }
 
     @Test
-    public void testAvisOperation10() throws ParseException {
-        String text = readFile("avisOperation10.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("19/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test7() throws IOException {
+        test("boursedirect-2021-03-09");
     }
 
     @Test
-    public void testAvisOperation11() throws ParseException {
-        String text = readFile("avisOperation11.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("30/03/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation12() throws ParseException {
-        String text = readFile("avisOperation12.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("07/04/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
-    }
-
-
-    @Test
-    public void testAvisOperation13() throws ParseException {
-        String text = readFile("avisOperation13.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("19/04/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test8() throws IOException {
+        test("boursedirect-2021-03-16");
     }
 
     @Test
-    public void testAvisOperation14() throws ParseException {
-        String text = readFile("avisOperation14.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("30/04/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test9() throws IOException {
+        test("boursedirect-2021-03-18");
     }
 
-
     @Test
-    public void testAvisOperation15() throws ParseException {
-        String text = readFile("avisOperation15.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("11/05/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test10() throws IOException {
+        test("boursedirect-2021-03-19");
     }
 
-
-
     @Test
-    public void testAvisOperation16() throws ParseException {
-        String text = readFile("avisOperation16.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("18/05/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test11() throws IOException {
+        test("boursedirect-2021-03-30");
     }
 
-
     @Test
-    public void testAvisOperation17() throws ParseException {
-        String text = readFile("avisOperation17.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("06/07/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test12() throws IOException {
+        test("boursedirect-2021-04-07");
     }
 
-
     @Test
-    public void testAvisOperation18() throws ParseException {
-        String text = readFile("avisOperation18.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("08/07/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test13() throws IOException {
+        test("boursedirect-2021-04-19");
     }
 
-
-
     @Test
-    public void testAvisOperation19() throws ParseException {
-        String text = readFile("avisOperation19.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("12/07/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test14() throws IOException {
+        test("boursedirect-2021-04-30");
     }
 
-
-
     @Test
-    public void testAvisOperation20() throws ParseException {
-        String text = readFile("avisOperation20.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
-
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("15/07/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    public void test15() throws IOException {
+        test("boursedirect-2021-05-11");
     }
 
+    @Test
+    public void test16() throws IOException {
+        test("boursedirect-2021-05-18");
+    }
 
     @Test
-    public void testAvisOperation21() throws ParseException {
-        String text = readFile("avisOperation21.txt");
-        BourseDirectModel model = new BourseDirectPdfAnalyser(new MainSettings()).analyzePdfText(text);
+    public void test17() throws IOException {
+        test("boursedirect-2021-07-06");
+    }
 
-        assertEquals("508TI00085554410EUR", model.getAccountNumber());
-        assertEquals("Ordinaire", model.getAccountType());
-        assertEquals("MR EMILY PASCAL", model.getAccountOwnerName());
-        assertEquals("19/07/2021", model.getDateAvisOperation());
-        assertEquals( "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE", model.getAddress());
-        assertEquals("€", model.getDeviseCredit());
-        assertEquals("€", model.getDeviseDebit());
+    @Test
+    public void test18() throws IOException {
+        test("boursedirect-2021-07-08");
+    }
+
+    @Test
+    public void test19() throws IOException {
+        test("boursedirect-2021-07-12");
+    }
+
+    @Test
+    public void test20() throws IOException {
+        test("boursedirect-2021-07-15");
+    }
+
+    @Test
+    public void test21() throws IOException {
+        test("boursedirect-2021-07-19");
+    }
+
+    private URL getFilePath(String fileName){
+        return BourseDirectParserTest.class.getResource(fileName);
+    }
+
+    private URL getBenchmark(String fileName){
+        return BourseDirectParserTest.class.getResource("benchmark/"+fileName);
+    }
+
+    private void check(String result, String filename) throws IOException {
+        URL file = getBenchmark(filename);
+
+        if (file == null) {
+            System.out.println("GENERATING BENCHMARK for "+filename);
+            // the file does not exists, create the benchmark
+            String filePath = "src/test/resources/"
+                    +(BourseDirectParserTest.class.getPackage().getName().replace('.','/'))
+                    +"/benchmark/"+filename;
+            new File(filePath).getParentFile().mkdirs();
+            FileWriter fileWriter = new FileWriter(filePath);
+            fileWriter.write(result);
+            fileWriter.close();
+            file = new File(filePath).toURI().toURL();
+        }
+
+        String text = new BufferedReader(new FileReader(file.getFile())).lines().collect(Collectors.joining("\n"));
+        assertEquals(result.trim(), text.trim());
+    }
+
+    private void test(String file) throws IOException {
+        TextReporting reporting = new TextReporting();
+        BRModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, getFilePath(file +".pdf").getFile());
+        String jsonBrModel = ModelUtils.toJson(brModel);
+        String report = reporting.getReport();
+        check(jsonBrModel, file +".model.expected.txt");
+        check(report, file +".reporting.expected.txt");
     }
 }

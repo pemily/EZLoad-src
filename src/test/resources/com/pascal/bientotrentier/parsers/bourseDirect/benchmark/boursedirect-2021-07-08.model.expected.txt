@@ -1,0 +1,44 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-07-08.pdf",
+  "reportDate": "08/07/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "FR0013269123",
+      "actionName": "RUBIS",
+      "number": -120,
+      "prixUnitaireBrut": "+1,80000",
+      "commission": "+0,00",
+      "prelevement": "+27,64",
+      "amountBrut": "+216,00",
+      "creditImpot": "+0,00",
+      "contributionSocial": "+37,15",
+      "operationType": "BRCoupons",
+      "date": "08/07/2021",
+      "amount": "0,00"
+    },
+    {
+      "id": "FR0013269123",
+      "actionName": "RUBIS",
+      "number": 6,
+      "cours": "+36,200000000",
+      "operationType": "BRDividendeOptionel",
+      "date": "16/06/2021",
+      "amount": "217,20"
+    },
+    {
+      "id": "FR0013269123",
+      "operationType": "BREspeceSurOST",
+      "date": "16/06/2021",
+      "amount": "151,21",
+      "description": "REINVESTISSEMENT"
+    }
+  ]
+}

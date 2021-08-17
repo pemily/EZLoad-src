@@ -1,0 +1,28 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-04-19.pdf",
+  "reportDate": "19/04/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "id": "US92936U1097",
+      "actionName": "W.P. CAREY",
+      "number": -60,
+      "prixUnitaireBrut": "+0,87650",
+      "commission": "+0,00",
+      "prelevement": "+6,73",
+      "amountBrut": "+52,59",
+      "creditImpot": "+7,90",
+      "contributionSocial": "+9,03",
+      "operationType": "BRCoupons",
+      "date": "19/04/2021",
+      "amount": "28,92"
+    }
+  ]
+}

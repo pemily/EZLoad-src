@@ -1,0 +1,35 @@
+{
+  "source": "BOURSE_DIRECT",
+  "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-09.pdf",
+  "reportDate": "09/03/2021",
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": "€"
+  },
+  "operations": [
+    {
+      "changeRate": "+1,185650720",
+      "coursUSD": "+439,9799",
+      "id": "US11135F1012",
+      "actionName": "BROADCOM INC",
+      "number": 7,
+      "cours": "+371,087279397",
+      "amountBrut": "+2 597,61",
+      "fraisCourtage": "+8,50",
+      "tva": "+0,00",
+      "operationType": "BRAchatEtranger",
+      "date": "09/03/2021",
+      "amount": "2 606,11",
+      "description": "16:05:16 NASDAQ/NGS (GLOBAL SELECT MARKET)"
+    },
+    {
+      "operationType": "BRVirementCptEspece",
+      "date": "09/03/2021",
+      "amount": "600,00",
+      "description": "VIRT M. ET/OU MME"
+    }
+  ]
+}
