@@ -1,12 +1,12 @@
 package com.pascal.bientotrentier;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pascal.bientotrentier.model.BRModel;
-import com.pascal.bientotrentier.util.LoggerReporting;
 import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectProcessor;
+import com.pascal.bientotrentier.util.LoggerReporting;
 import org.apache.log4j.Logger;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -25,8 +25,10 @@ public class Main {
         List<BRModel> allBRModels = new BourseDirectProcessor(mainSettings).start(reporting);
     }
 
-    public static MainSettings loadProps() throws FileNotFoundException {
-        return new Gson().fromJson(new FileReader("src/main/resources/bientotRentier.json"), MainSettings.class);
+    public static MainSettings loadProps() throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        MainSettings settings = mapper.readValue(new FileReader("src/main/resources/bientotRentier.yaml"), MainSettings.class);
+        return settings;
     }
 
 

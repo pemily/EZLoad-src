@@ -1,10 +1,13 @@
 package com.pascal.bientotrentier.sources.bourseDirect.download;
 
 import com.pascal.bientotrentier.MainSettings;
-import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
+import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccount;
-import com.pascal.bientotrentier.util.*;
-import org.apache.log4j.Logger;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
+import com.pascal.bientotrentier.util.BRException;
+import com.pascal.bientotrentier.util.Day;
+import com.pascal.bientotrentier.util.Month;
+import com.pascal.bientotrentier.util.SeleniumUtil;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,13 +20,13 @@ import java.util.stream.Collectors;
 
 public class BourseDirectDownloader extends SeleniumUtil {
 
-    private static final Logger logger = Logger.getLogger(BourseDirectDownloader.class);
-
     private final MainSettings mainSettings;
     private final BourseDirectSettings bourseDirectSettings;
+    private final Reporting reporting;
 
-    public BourseDirectDownloader(MainSettings mainSettings) {
+    public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings) {
         this.mainSettings = mainSettings;
+        this.reporting = reporting;
         this.bourseDirectSettings = mainSettings.getBourseDirect();
     }
 
@@ -36,9 +39,9 @@ public class BourseDirectDownloader extends SeleniumUtil {
         }
         catch(Exception e) {
             if (e instanceof InvalidArgumentException)
-                logger.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
+                reporting.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
             else
-                logger.error(e);
+                reporting.error(e);
 
             if (driver != null)
                 driver.quit();
@@ -46,26 +49,32 @@ public class BourseDirectDownloader extends SeleniumUtil {
     }
 
     private void downloadUpdates(){
-        get("https://www.boursedirect.fr/fr/login");
+        reporting.pushSection("Downloading BourseDirect Reports...");
+        try {
+            get("https://www.boursedirect.fr/fr/login");
 
-        if (bourseDirectSettings.getExtractor().isAutoLogin())
-            findById("bd_auth_login_type_submit").click();
+            if (bourseDirectSettings.getExtractor().isAutoLogin())
+                findById("bd_auth_login_type_submit").click();
 
-        waitUrlIsNot("https://www.boursedirect.fr/fr/login");
+            waitUrlIsNot("https://www.boursedirect.fr/fr/login");
 
-        get("https://www.boursedirect.fr/priv/avis-operes.php");
+            get("https://www.boursedirect.fr/priv/avis-operes.php");
 
-        for (BourseDirectAccount account: bourseDirectSettings.getAccounts()) {
-            logger.info("Extraction started for account: " + account.getName());
+            for (BourseDirectAccount account : bourseDirectSettings.getAccounts()) {
+                reporting.info("Extraction started for account: " + account.getName());
 
-            selectAccount(account);
+                selectAccount(account);
 
-            for (Month nextMonth = extractDateFromPage(); nextMonth != null; nextMonth = clickMoisPrecedent()) {
-               if (extractMonthActivities(account, nextMonth))
-                   break;
+                for (Month nextMonth = extractDateFromPage(); nextMonth != null; nextMonth = clickMoisPrecedent()) {
+                    if (extractMonthActivities(account, nextMonth))
+                        break;
+                }
+
+                reporting.info("Extraction done for account: " + account.getName());
             }
-
-            logger.info("Extraction done for account: " + account.getName());
+        }
+        finally {
+            reporting.popSection();
         }
     }
 
@@ -102,7 +111,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
 
     private void selectAccount(BourseDirectAccount account) {
         WebElement option = findByContainsText("option", account.getNumber());
-        logger.info("Account "+account.getNumber()+" found");
+        reporting.info("Account "+account.getNumber()+" found");
         String cptIndex = option.getAttribute("value");
         Select select = new Select (getParent(option));
         select.selectByValue(cptIndex);
@@ -146,7 +155,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
             }
         }
         if (monthStr == null || year == null){
-            logger.error("Year and Month cannot be extracted from the url: "+currentUrl);
+            reporting.error("Year and Month cannot be extracted from the url: "+currentUrl);
             throw new BRException("Cannot extract month & year from the url: "+currentUrl);
         }
 
@@ -163,7 +172,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
         String downloadUrl = "https://www.boursedirect.fr/priv/releveOpe.php?nc=3&type=RO&year="+d.getYear()+"&month="+month+"&day="+day+"&trash=/avis.pdf&pdf=1";
 
         String newFile = getNewFilename(account, d);
-        logger.info("Downloading file "+newFile);
+        reporting.info("Downloading file "+newFile);
         download(downloadUrl, newFile);
     }
 
