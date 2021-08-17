@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.bourseDirect.transform.model;
 
-import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser;
+
 import com.pascal.bientotrentier.parsers.bourseDirect.Operation;
 
 import java.util.ArrayList;

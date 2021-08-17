@@ -19,8 +19,11 @@ import com.pascal.bientotrentier.bourseDirect.transform.model.*;
 
 public class BourseDirectPdfParser{
 
-    public String nodeValue(){
+    private String nodeValue(){
         return peekNode().toString().trim();
+    }
+    private void stateTo(LexicalState state){
+        token_source.switchTo(state);
     }
 }
 PARSER_END (BourseDirectPdfParser)
@@ -30,45 +33,28 @@ SKIP :
   " " | "\t" | "\n" | "\r"
 ;
 
-TOKEN #Value :
-        <ID: (["A"-"Z","0"-"9"])+> #IdValue
-        | <WORD: (["A"-"Z","a"-"z"])+> #WordValue
-        | <AMOUNT:  (["+","-"])?["0"-"9"](["0"-"9"," "])*(","(["0"-"9"])+)?> #AmountValue
-        | <DATE: ["0"-"9"]["0"-"9"]"/"["0"-"9"]["0"-"9"]"/20"["0"-"2"]["0"-"9"]> #DateValue /* between xx/xx/2000 and xx/xx/2029 */
-        | <HOUR: ["0"-"2"]["0"-"9"]":"["0"-"6"]["0"-"9"]":"["0"-"6"]["0"-"9"]> #HourValue /* between 00:00:00 and 29/69/69 */
-        | <QUELQUECHOSE: "DEIMPROBABLEQUIARRIVERAJAMAISJUSTEPOUREXEMPLE"> : EXAMPLE_BLOC
-;
-
-
-<EXAMPLE_BLOC>
+// in the Default Lexical State
 TOKEN :
-    <EXAMPLE_TOKEN:  ["\n","\r"] (~["\n","\r"])+ > : DEFAULT
+      <DATE: ["0"-"9"]["0"-"9"]"/"["0"-"9"]["0"-"9"]"/20"["0"-"2"]["0"-"9"]> #DateValue /* between xx/xx/2000 and xx/xx/2029 */
+    | <AMOUNT:  (["+","-"])?["0"-"9"](["0"-"9"," "])*(","(["0"-"9"])+)?> #AmountValue
+    | <HOUR: ["0"-"2"]["0"-"9"]":"["0"-"6"]["0"-"9"]":"["0"-"6"]["0"-"9"]> #HourValue /* between 00:00:00 and 29/69/69 */
 ;
+
 
 <TEXT_UNTIL_EOL>
 TOKEN :
-    <TEXT_EOL: (~["\n","\r"])+ > : DEFAULT
+    <TEXT_WAIT_EOL: (~["\n","\r"])+ > : DEFAULT
 ;
 
 <TEXT_UNTIL_FIGURE>
 TOKEN :
-    <TEXT_FIGURE: (~["0"-"9"])+ > : DEFAULT
+    <TEXT_WAIT_FIGURE: (~["0"-"9"])+ > : DEFAULT
 ;
 
-
-Account Account() :
-    "Avis d'Opération"
-    "COMPTE N°"
-     <ID> { CURRENT_NODE.setId(nodeValue()); }
-     <WORD> { CURRENT_NODE.setType(nodeValue()); }
-     { return CURRENT_NODE; }
+<TEXT_UNTIL_SPACE>
+TOKEN :
+    <TEXT_WAIT_SPACE: ([" "])*(~[" "])+ > : DEFAULT
 ;
-
-INJECT Account :
-{
-  @Property String type;
-  @Property String id;
-}
 
 INJECT Operation :
 {
@@ -78,9 +64,9 @@ INJECT Operation :
 Dataset Dataset() : {
     Operation op;
 }{
-    ( <DATE> { CURRENT_NODE.getDates().add(nodeValue()); } )+
-    ( Operation { CURRENT_NODE.getOperations().add((Operation) peekNode()); } )+
-    ( <AMOUNT> { CURRENT_NODE.getAmounts().add(nodeValue()); } )+
+    ( <DATE> { CURRENT_NODE.getDates().add(nodeValue()); } )*
+    ( Operation { CURRENT_NODE.getOperations().add((Operation) peekNode()); } )*
+    ( <AMOUNT> { CURRENT_NODE.getAmounts().add(nodeValue()); } )*
     { return CURRENT_NODE; }
 }
 
@@ -98,16 +84,20 @@ Operation Operation() :
      | VenteEtranger
      | AchatComptant
      | TaxeTransatFinancieres
-     | Coupons)
+     | Coupons
+     | DroitsDeGarde
+     | DividendeOptionnel
+     | EspecesSurOST)
     { return CURRENT_NODE; }
 ;
 
 
 AchatComptant AchatComptant() :
     "ACHAT COMPTANT"
-    <ID> { CURRENT_NODE.setId(nodeValue());
-            token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
     "QUANTITE :"
     <AMOUNT> { CURRENT_NODE.setQuantite(nodeValue()); }
     "COURS :"
@@ -120,8 +110,9 @@ AchatComptant AchatComptant() :
     <AMOUNT> { CURRENT_NODE.setTva(nodeValue()); }
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
-    "Lieu:"  { token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+
     { return CURRENT_NODE; }
 ;
 
@@ -142,7 +133,8 @@ INJECT AchatComptant :
 
 VirementEspece VirementEspece() :
     "VIREMENT ESPECES"
-    { token_source.switchTo(LexicalState.TEXT_UNTIL_FIGURE) ; } <TEXT_FIGURE> { CURRENT_NODE.setDetails(nodeValue()); }
+    { stateTo(LexicalState.TEXT_UNTIL_FIGURE) ; } <TEXT_WAIT_FIGURE> { CURRENT_NODE.setDetails(nodeValue()); }
+
     { return CURRENT_NODE; }
 ;
 
@@ -152,12 +144,25 @@ INJECT VirementEspece :
     @Property String details;
 }
 
+DroitsDeGarde DroitsDeGarde() :
+    "DROITS DE GARDE"
+    { stateTo(LexicalState.TEXT_UNTIL_EOL) ; } <TEXT_WAIT_EOL> { CURRENT_NODE.setDetails(nodeValue()); }
+
+    { return CURRENT_NODE; }
+;
+
+INJECT DroitsDeGarde :
+    extends Operation
+{
+    @Property String details;
+}
 
 AchatEtranger AchatEtranger() :    
-    "ACHAT ETRANGER" 
-    <ID> { CURRENT_NODE.setId(nodeValue()); 
-            token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; } 
-    <TEXT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
+    "ACHAT ETRANGER"
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
     "QUANTITE :"
     <AMOUNT> { CURRENT_NODE.setQuantite(nodeValue()); }
     "COURS :"
@@ -174,8 +179,9 @@ AchatEtranger AchatEtranger() :
     <AMOUNT> { CURRENT_NODE.setTxUSDvsEUR(nodeValue()); }
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
-    "Lieu:"  { token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+
     { return CURRENT_NODE; }
 ;
 
@@ -199,9 +205,10 @@ INJECT AchatEtranger :
 
 VenteEtranger VenteEtranger() :
     "VENTE ETRANGER"
-    <ID> { CURRENT_NODE.setId(nodeValue());
-            token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
     "QUANTITE :"
     <AMOUNT> { CURRENT_NODE.setQuantite(nodeValue()); }
     "COURS :"
@@ -220,8 +227,9 @@ VenteEtranger VenteEtranger() :
     <AMOUNT> { CURRENT_NODE.setTaxeEtrang(nodeValue()); }
     "Heure Execution:"
     <HOUR> { CURRENT_NODE.setHeureExecution(nodeValue()); }
-    "Lieu:"  { token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+    "Lieu:"  { stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setHeureExecution(nodeValue()); }
+
     { return CURRENT_NODE; }
 ;
 
@@ -245,9 +253,10 @@ INJECT VenteEtranger :
 
 TaxeTransatFinancieres TaxeTransatFinancieres() :
     "TAXE TRANSACT FINANCIERES"
-    <ID> { CURRENT_NODE.setId(nodeValue());
-            token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setDetails(nodeValue()); }
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setDetails(nodeValue()); }
     { return CURRENT_NODE; }
 ;
 
@@ -260,10 +269,11 @@ INJECT TaxeTransatFinancieres :
 
 
 Coupons Coupons() :
-    "COUPONS"  // COUPONS is see as an ID
-    <ID> { CURRENT_NODE.setId(nodeValue());
-            token_source.switchTo(LexicalState.TEXT_UNTIL_EOL) ; }
-    <TEXT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
+    "COUPONS"
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
     "QUANTITE :"
     <AMOUNT> { CURRENT_NODE.setQuantite(nodeValue()); }
     "PX UN.BRUT :"
@@ -293,4 +303,44 @@ INJECT Coupons :
     @Property String creditImpot;
     @Property String prelevement;
     @Property String contributionSocial;
+}
+
+
+DividendeOptionnel DividendeOptionnel() :
+    "DIVIDENDE OPTIONNEL"
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setActionName(nodeValue()); }
+    "QUANTITE :"
+    <AMOUNT> { CURRENT_NODE.setQuantite(nodeValue()); }
+    "COURS :"
+    <AMOUNT> { CURRENT_NODE.setCours(nodeValue()); }
+    { return CURRENT_NODE; }
+;
+
+INJECT DividendeOptionnel :
+    extends Operation
+{
+    @Property String id;
+    @Property String actionName;
+    @Property String quantite;
+    @Property String cours;
+}
+
+
+EspecesSurOST EspecesSurOST() :
+    "ESPECES SUR OST"
+    { stateTo(LexicalState.TEXT_UNTIL_SPACE) ; }
+    <TEXT_WAIT_SPACE> { CURRENT_NODE.setId(nodeValue());
+            stateTo(LexicalState.TEXT_UNTIL_EOL) ; }
+    <TEXT_WAIT_EOL> { CURRENT_NODE.setDetails(nodeValue()); }
+    { return CURRENT_NODE; }
+;
+
+INJECT EspecesSurOST :
+    extends Operation
+{
+    @Property String id;
+    @Property String details;
 }

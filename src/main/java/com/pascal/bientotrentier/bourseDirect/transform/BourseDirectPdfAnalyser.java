@@ -2,11 +2,10 @@ package com.pascal.bientotrentier.bourseDirect.transform;
 
 import com.pascal.bientotrentier.bourseDirect.BourseDirectSettings;
 import com.pascal.bientotrentier.bourseDirect.transform.model.BourseDirectModel;
-import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser;
-import com.pascal.bientotrentier.parsers.bourseDirect.Dataset;
-import com.pascal.bientotrentier.parsers.bourseDirect.ParseException;
+import com.pascal.bientotrentier.parsers.bourseDirect.*;
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.util.BRException;
+import com.pascal.bientotrentier.util.BRParsingException;
 import com.pascal.bientotrentier.util.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -46,25 +45,31 @@ public class BourseDirectPdfAnalyser {
                 .filter(Files::isRegularFile)
                 .forEach(p -> {
                     try {
-                        logger.info("Decoding file: "+ p.toFile().getAbsolutePath()+"...");
+                        logger.info("Decoding file: " + p.toFile().getAbsolutePath() + "...");
                         FileInputStream input = new FileInputStream(p.toFile());
 
                         PDDocument document = PDDocument.load(input);
 
-                        PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-                        stripper.setSortByPosition(true);
+                        PDFTextStripper stripper = new PDFTextStripper();
+                        /*stripper.setParagraphStart("@@PStart@@");
+                        stripper.setParagraphEnd("@@PEnd@@");
+                        stripper.setWordSeparator("<@@>");*/
 
-                        PDFTextStripper tStripper = new PDFTextStripper();
-
-                        String pdfText = tStripper.getText(document);
+                        String pdfText = stripper.getText(document);
+                        document.close();
 
                         // generateFileForTest(pdfText);
 
                         analyzePdfText(pdfText);
-
-                    } catch (IOException | BRException e) {
-                        logger.error("Error while reading file: "+ p.toFile().getAbsolutePath(), e);
-                        throw new RuntimeException(e);
+                    }
+                    catch (BRParsingException e){
+                        e.setFilePath(p.toFile().getAbsolutePath());
+                        logger.error(e);
+                    }
+                    catch (IOException | BRException e) {
+                        BRParsingException parsingException = new BRParsingException(e);
+                        parsingException.setFilePath(p.toFile().getAbsolutePath());
+                        logger.error(e);
                     }
                 });
         }
@@ -79,75 +84,30 @@ public class BourseDirectPdfAnalyser {
         w.close();
     }
 
-    /*
-Avis d'Opération
-COMPTE N° 508TI00085554410EUR Ordinaire
-MR EMILY PASCAL
-Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au
-sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos
-salutations distinguées.
-Le 19/03/2021
-MR EMILY PASCAL
-192 ROUTE DE PEGOMAS
-06130  GRASSE
-Date Désignation Débit (€) Crédit (€)
- 19/03/2021
- 19/03/2021
- 19/03/2021
- 19/03/2021
- ACHAT COMPTANT  FR0013269123  RUBIS
- QUANTITE :  +120
- COURS :  +39,9  BRUT :  +4 788,00
- COURTAGE :  +4,31  TVA :  +0,00
- Heure Execution: 09:01:06       Lieu: BORSE BERLIN EQUIDUCT TRADING - BERL
- ACHAT ETRANGER  US03027X1000  AMERICAN TOWER
- QUANTITE :  +19
- COURS :  +187,230039236  BRUT :  +3 557,37
- COURTAGE :  +8,50  TVA :  +0,00
- COURS EN USD :  +222,85  TX USD/EUR :  +1,190247040
- Heure Execution: 14:30:03       Lieu: NEW YORK STOCK EXCHANGE, INC.
- ACHAT ETRANGER  US92936U1097  W.P. CAREY
- QUANTITE :  +60
- COURS :  +58,223207176  BRUT :  +3 493,39
- COURTAGE :  +8,50  TVA :  +0,00
- COURS EN USD :  +69,3  TX USD/EUR :  +1,190247040
- Heure Execution: 14:30:02       Lieu: NEW YORK STOCK EXCHANGE, INC.
- TAXE TRANSACT FINANCIERES  FR0013269123  TTF
- 4 792,31
- 3 565,87
- 3 501,89
- 14,36
-Sous réserve de bonne fin / Ce relevé ne constitue pas une facture
-Les montants des colonnes Débit et Crédit sont stipulés TVA Comprise
-1/1
-Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, Siège Social : 374 rue Saint-Honoré, 75001 Paris -  Groupe VIEL et Cie
-     */
-
-    public BourseDirectModel analyzePdfText(String text) throws BRException {
+    public BourseDirectModel analyzePdfText(String pdfText) throws BRException {
         try {
-            text = StringUtils.clean(text);
+            pdfText = StringUtils.clean(pdfText);
             BourseDirectModel model = new BourseDirectModel();
-            analyzePdfText(text, model);
+            analyzePdfText(pdfText, model);
             return model;
         }
+        catch (BRParsingException e){
+            e.setFileContent(pdfText);
+            throw e;
+        }
         catch(Exception e){
-            throw new BRException("Error when analyzing text:\n##################################################\n"+text+"\n################################################\n", e);
+            BRParsingException parsingException = new BRParsingException(e);
+            parsingException.setFileContent(pdfText);
+            throw  parsingException;
         }
     }
 
 
-    private void analyzePdfText(String text, BourseDirectModel model) {
+    private void analyzePdfText(String pdfText, BourseDirectModel model) {
 
-        String section[] = text.split(TEXT_INTRO);
+        String section[] = pdfText.split(TEXT_INTRO);
         String accountSection[] = section[0].split("[\\n]");
         model.setAccountOwnerName(accountSection[2].trim());
-       /* {
-           String avisOpereAndAccount = accountSection[0]+"\r"+accountSection[1];
-            BourseDirectParser parser = new BourseDirectParser(new StringReader(avisOpereAndAccount));
-            Account account = parser.Account();
-            String id = account.getId();
-            String type = account.getType();
-        }*/
 
         String textDebutTableau = DATE_DÉSIGNATION_DÉBIT;
         String section2[] = section[1].split(Pattern.quote(textDebutTableau));
@@ -171,24 +131,32 @@ Bourse Direct ,  SA au capital de 13.988.845,75 €, R.C.S Paris B 408 790 608, 
 
         try {
             BourseDirectPdfParser parser = new BourseDirectPdfParser(new StringReader(dataSetStr));
-            parser.setTracingEnabled(true);
+            // parser.setTracingEnabled(true);
             Dataset dataset = parser.Dataset();
             model.setOperations(dataset.getOperations());
             model.setDates(dataset.getDates());
             model.setAmounts(dataset.getAmounts());
 
+            long nbOfDroitDeGarde = nbOfDroitsDeGarde(model.getOperations());
+
             // little check
             if (model.getDates().size() != model.getOperations().size()){
-                throw new BRException("The number of dates found: "+model.getDates().size()+" do not match the number of operations found: "+model.getOperations().size());
+                throw new BRException("The number of dates found: "+model.getDates().size()+" do not match the number of operations found: "+model.getOperations().size()+" dates: "+model.getDates()+ " operations: "+model.getOperations());
             }
-            if (model.getAmounts().size() != model.getOperations().size()){
-                throw new BRException("The number of amounts found: "+model.getDates().size()+" do not match the number of operations found: "+model.getOperations().size());
+            if (model.getAmounts().size() != model.getOperations().size() - nbOfDroitDeGarde){
+                throw new BRException("The number of amounts found: "+model.getAmounts().size()+" do not match the number of operations found: "+model.getOperations().size()+" amounts: "+model.getAmounts()+" oerations: "+model.getOperations());
             }
 
         }
         catch(Exception e){
-            throw new BRException("Input Text:\n=======================================================\n"+dataSetStr+"\n=======================================================", e);
+            BRParsingException parsingException = new BRParsingException(e);
+            parsingException.setAnalyzedText(dataSetStr);
+            throw parsingException;
         }
+    }
+
+    private long nbOfDroitsDeGarde(List<Operation> operations){
+        return operations.stream().filter(operation -> operation instanceof DroitsDeGarde).count();
     }
 
 }

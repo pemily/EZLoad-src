@@ -10,7 +10,6 @@ public class BRException extends RuntimeException{
         super(e);
     }
 
-
     public BRException(String msg, Exception e){
         super(msg, e);
     }
