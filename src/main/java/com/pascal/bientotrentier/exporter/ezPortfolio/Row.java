@@ -1,4 +1,4 @@
-package com.pascal.bientotrentier.loader.ezPortfolio;
+package com.pascal.bientotrentier.exporter.ezPortfolio;
 
 import java.util.List;
 

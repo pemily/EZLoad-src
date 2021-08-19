@@ -4,6 +4,8 @@ import com.pascal.bientotrentier.model.*;
 import com.pascal.bientotrentier.parsers.bourseDirect.*;
 import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.sources.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.bientotrentier.util.BRException;
+import com.pascal.bientotrentier.util.DeviseUtil;
 import com.pascal.bientotrentier.util.FinanceTools;
 import com.pascal.bientotrentier.util.ModelUtils;
 
@@ -29,7 +31,8 @@ public class BourseDirect2BRModel {
         brAccount.setAccountNumber(model.getAccountNumber());
         brAccount.setAccountType(model.getAccountType());
         brAccount.setOwnerAdress(model.getAddress());
-        brAccount.setDevise(model.getDeviseDebit());
+        if (!model.getDeviseDebit().equals("€")) throw new BRException("The account is not an Euro account");
+        brAccount.setDevise(DeviseUtil.foundByCode("EUR"));
         brAccount.setOwnerName(model.getAccountOwnerName());
         brModel.setAccount(brAccount);
 
@@ -55,10 +58,12 @@ public class BourseDirect2BRModel {
             VirementEspece op = (VirementEspece) operation;
             if (amount.contains("-")) {
                 BRRetraitFonds brOp = new BRRetraitFonds();
+                brOp.setDevise(brModel.getAccount().getDevise());
                 brOperation = brOp;
             }
             else {
                 BRVersementFonds brOp = new BRVersementFonds();
+                brOp.setDevise(brModel.getAccount().getDevise());
                 brOperation = brOp;
             }
             brOperation.setDescription(op.getDetails());

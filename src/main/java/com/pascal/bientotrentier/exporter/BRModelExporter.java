@@ -1,6 +1,6 @@
-package com.pascal.bientotrentier.loader;
+package com.pascal.bientotrentier.exporter;
 
-import com.pascal.bientotrentier.loader.ezPortfolio.EZPortfolio;
+import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.model.BROperation;
 import com.pascal.bientotrentier.model.BRRetraitFonds;

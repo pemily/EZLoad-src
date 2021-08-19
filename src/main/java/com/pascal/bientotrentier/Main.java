@@ -2,17 +2,16 @@ package com.pascal.bientotrentier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.pascal.bientotrentier.loader.BRModelChecker;
-import com.pascal.bientotrentier.loader.BRModelExporter;
-import com.pascal.bientotrentier.loader.EZPortfolioHandler;
-import com.pascal.bientotrentier.loader.ezPortfolio.EZPortfolio;
+import com.pascal.bientotrentier.exporter.BRModelChecker;
+import com.pascal.bientotrentier.exporter.BRModelExporter;
+import com.pascal.bientotrentier.exporter.EZPortfolioHandler;
+import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectProcessor;
 import com.pascal.bientotrentier.util.LoggerReporting;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 
 

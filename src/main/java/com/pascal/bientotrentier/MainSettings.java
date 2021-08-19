@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier;
 
-import com.pascal.bientotrentier.loader.EZPortfolioSettings;
+import com.pascal.bientotrentier.exporter.EZPortfolioSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 
 public class MainSettings {

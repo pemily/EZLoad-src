@@ -13,8 +13,8 @@ public class FinanceToolsTest {
         BRAction action = FinanceTools.getInstance().get(new LoggerReporting(), "US92936U1097");
         assertNotNull(action);
         assertEquals("US", action.getCountry());
-        assertEquals("USD", action.getCurrencyCode());
-        assertEquals("$", action.getCurrencySymbol());
+        assertEquals("USD", action.getDevise().getCode());
+        assertEquals("$", action.getDevise().getSymbol());
         assertEquals("US92936U1097", action.getIsin());
         assertEquals("XNYS", action.getMarketMic());
         assertEquals("NEW YORK STOCK EXCHANGE, INC.", action.getMarketName());

@@ -62,8 +62,7 @@ public class FinanceTools {
         action.setCountry((String) data.get("Country")); // US
         Map<String, Object> market = (Map<String, Object>) data.get("market");
         Map<String, Object> currency = (Map<String, Object>) data.get("currency");
-        action.setCurrencyCode((String) currency.get("code")); // USD
-        action.setCurrencySymbol((String) currency.get("symbol")); // $
+        action.setDevise(DeviseUtil.foundByCode((String) currency.get("code"))); // code is USD
         action.setMarketMic((String) market.get("mic")); // XNYS
         action.setMarketName((String) market.get("name")); // NEW YORK STOCK EXCHANGE, INC
         return action;

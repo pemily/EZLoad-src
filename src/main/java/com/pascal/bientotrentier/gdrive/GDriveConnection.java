@@ -14,7 +14,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.pascal.bientotrentier.loader.EZPortfolioSettings;
 
 import java.io.FileInputStream;
 import java.io.IOException;

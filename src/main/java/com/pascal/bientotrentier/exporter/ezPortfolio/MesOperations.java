@@ -1,4 +1,4 @@
-package com.pascal.bientotrentier.loader.ezPortfolio;
+package com.pascal.bientotrentier.exporter.ezPortfolio;
 
 import com.pascal.bientotrentier.model.BRAction;
 import com.pascal.bientotrentier.model.BROperation;
@@ -78,7 +78,6 @@ public class MesOperations {
     }
 
     public String format(String value){
-        value = value.replace('\n', ' ');
-        return value == null ? "" : value;
+        return value == null ? "" : value.replace('\n', ' ');
     }
 }

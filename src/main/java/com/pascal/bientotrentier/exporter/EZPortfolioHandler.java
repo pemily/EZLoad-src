@@ -1,10 +1,10 @@
-package com.pascal.bientotrentier.loader;
+package com.pascal.bientotrentier.exporter;
 
 import com.google.api.services.sheets.v4.Sheets;
 import com.pascal.bientotrentier.gdrive.GDriveConnection;
 import com.pascal.bientotrentier.gdrive.GDriveSheets;
-import com.pascal.bientotrentier.loader.ezPortfolio.EZPortfolio;
-import com.pascal.bientotrentier.loader.ezPortfolio.MesOperations;
+import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
+import com.pascal.bientotrentier.exporter.ezPortfolio.MesOperations;
 import com.pascal.bientotrentier.sources.Reporting;
 
 import java.io.IOException;

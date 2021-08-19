@@ -1,4 +1,4 @@
-package com.pascal.bientotrentier.loader;
+package com.pascal.bientotrentier.exporter;
 
 
 import com.pascal.bientotrentier.model.BRAction;

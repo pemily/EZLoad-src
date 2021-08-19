@@ -5,8 +5,7 @@ public class BRAction {
     private String ticker;
     private String isin;
     private String country;
-    private String currencyCode;
-    private String currencySymbol;
+    private BRDevise devise;
     private String marketMic;
     private String marketName;
 
@@ -42,22 +41,6 @@ public class BRAction {
         this.country = country;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
-    public String getCurrencySymbol() {
-        return currencySymbol;
-    }
-
-    public void setCurrencySymbol(String currencySymbol) {
-        this.currencySymbol = currencySymbol;
-    }
-
     public String getMarketMic() {
         return marketMic;
     }
@@ -72,5 +55,13 @@ public class BRAction {
 
     public void setMarketName(String marketName) {
         this.marketName = marketName;
+    }
+
+    public BRDevise getDevise() {
+        return devise;
+    }
+
+    public void setDevise(BRDevise devise) {
+        this.devise = devise;
     }
 }

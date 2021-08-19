@@ -5,7 +5,7 @@ public class BRAccount {
     private String accountType;
     private String ownerName;
     private String ownerAdress;
-    private String devise;
+    private BRDevise devise;
 
     public String getAccountNumber() {
         return accountNumber;
@@ -31,11 +31,11 @@ public class BRAccount {
         this.ownerAdress = ownerAdress;
     }
 
-    public String getDevise() {
+    public BRDevise getDevise() {
         return devise;
     }
 
-    public void setDevise(String devise) {
+    public void setDevise(BRDevise devise) {
         this.devise = devise;
     }
 
