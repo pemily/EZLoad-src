@@ -1,13 +1,20 @@
 package com.pascal.bientotrentier.model;
 
-public class BREspeceSurOST extends BROperation {
-    private String id;
+public class BREspeceSurOST extends BROperation implements IOperationWithAction {
 
-    public String getId() {
-        return id;
+    private BRAction action;
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.DIVIDENDE_VERSE; // ?? Pas sûr de moi ??
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override
+    public BRAction getAction() {
+        return action;
+    }
+
+    public void setAction(BRAction action){
+        this.action = action;
     }
 }

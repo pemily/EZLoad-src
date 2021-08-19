@@ -20,4 +20,10 @@ public class BRAchatEtranger extends BRAchat {
     public void setCoursUSD(String coursUSD) {
         this.coursUSD = coursUSD;
     }
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.ACHAT_TITRES;
+    }
+
 }

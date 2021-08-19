@@ -8,7 +8,7 @@ public class LoggerReporting implements Reporting {
     private static final Logger logger = Logger.getLogger(LoggerReporting.class);
 
     public void pushSection(String sectionTitle) {
-        logger.info("#######################################"+sectionTitle+"#############################");
+        logger.info("####################################### "+sectionTitle+" #############################");
     }
 
     public void error(Throwable error){

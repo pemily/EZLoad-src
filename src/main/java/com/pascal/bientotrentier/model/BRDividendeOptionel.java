@@ -1,26 +1,10 @@
 package com.pascal.bientotrentier.model;
 
-public class BRDividendeOptionel extends BROperation {
-    private String id;
-    private String actionName;
+public class BRDividendeOptionel extends BROperation implements IOperationWithAction {
+
+    private BRAction action;
     private int number;
     private String cours;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getActionName() {
-        return actionName;
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
 
     public int getNumber() {
         return number;
@@ -36,5 +20,19 @@ public class BRDividendeOptionel extends BROperation {
 
     public void setCours(String cours) {
         this.cours = cours;
+    }
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.DIVIDENDE_VERSE;
+    }
+
+    @Override
+    public BRAction getAction() {
+        return action;
+    }
+
+    public void setAction(BRAction action){
+        this.action = action;
     }
 }

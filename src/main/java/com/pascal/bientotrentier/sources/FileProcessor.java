@@ -24,6 +24,7 @@ public class FileProcessor {
         try(Stream<Path> stream = Files.walk(Paths.get(rootDirectory), 5)){
             return stream
                     .filter(Files::isRegularFile)
+                    .sorted()
                     .map(p -> processFile.apply(p.toFile().getAbsolutePath()))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());

@@ -36,7 +36,8 @@ public class BourseDirectProcessor {
             boolean isValid = new BourseDirectModelChecker(reporting).isValid(model);
 
             if (isValid){
-                return new BourseDirect2BRModel(reporting).create(pdfFilePath, model);
+                BRModel brModel = new BourseDirect2BRModel(reporting).create(pdfFilePath, model);
+                return brModel;
             }
         }
         catch (BRParsingException e){

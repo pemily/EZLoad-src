@@ -1,11 +1,13 @@
 package com.pascal.bientotrentier;
 
+import com.pascal.bientotrentier.loader.EZPortfolioSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 
 public class MainSettings {
 
     private BourseDirectSettings bourseDirect;
     private ChromeSettings chrome;
+    private EZPortfolioSettings ezPortfolio;
 
     public BourseDirectSettings getBourseDirect() {
         return bourseDirect;
@@ -21,6 +23,14 @@ public class MainSettings {
 
     public void setChrome(ChromeSettings chrome) {
         this.chrome = chrome;
+    }
+
+    public EZPortfolioSettings getEzPortfolio() {
+        return ezPortfolio;
+    }
+
+    public void setEzPortfolio(EZPortfolioSettings ezPortfolio) {
+        this.ezPortfolio = ezPortfolio;
     }
 
 

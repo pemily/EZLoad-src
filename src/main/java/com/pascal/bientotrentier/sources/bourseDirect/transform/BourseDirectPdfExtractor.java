@@ -4,8 +4,10 @@ import com.pascal.bientotrentier.sources.Reporting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class BourseDirectPdfExtractor {
 
@@ -17,7 +19,7 @@ public class BourseDirectPdfExtractor {
 
     public String getText(String pdfFilePath) throws IOException {
         reporting.info("Reading pdf...");
-        FileInputStream input = new FileInputStream(pdfFilePath);
+        InputStream input = new BufferedInputStream(new FileInputStream(pdfFilePath));
 
         PDDocument document = PDDocument.load(input);
 

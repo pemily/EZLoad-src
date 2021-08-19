@@ -1,8 +1,8 @@
 package com.pascal.bientotrentier.model;
 
-public class BRCoupons extends BROperation {
-    private String id;
-    private String actionName;
+public class BRCoupons extends BROperation implements IOperationWithAction {
+
+    private BRAction action;
     private int number;
     private String prixUnitaireBrut;
     private String commission;
@@ -10,22 +10,6 @@ public class BRCoupons extends BROperation {
     private String amountBrut;
     private String creditImpot;
     private String contributionSocial;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getActionName() {
-        return actionName;
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
 
     public int getNumber() {
         return number;
@@ -81,5 +65,19 @@ public class BRCoupons extends BROperation {
 
     public void setContributionSocial(String contributionSocial) {
         this.contributionSocial = contributionSocial;
+    }
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.DIVIDENDE_VERSE;
+    }
+
+    @Override
+    public BRAction getAction() {
+        return action;
+    }
+
+    public void setAction(BRAction action){
+        this.action = action;
     }
 }
