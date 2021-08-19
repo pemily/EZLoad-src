@@ -19,6 +19,8 @@ public class LoadVirement {
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
             mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
+
+            Mise a jour de ezPortfolio.getMonPortefeuille()
         }
     }
 
@@ -28,6 +30,8 @@ public class LoadVirement {
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
             mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
+
+            Mise a jour de ezPortfolio.getMonPortefeuille()
         }
     }
 
