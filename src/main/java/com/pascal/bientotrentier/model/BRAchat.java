@@ -1,8 +1,8 @@
 package com.pascal.bientotrentier.model;
 
-public class BRAchat extends BROperation {
-    private String id;
-    private String actionName;
+public class BRAchat extends BROperation implements IOperationWithAction {
+
+    private BRAction action;
     private int number;
     private String cours;
     private String amountBrut;
@@ -49,19 +49,18 @@ public class BRAchat extends BROperation {
         this.tva = tva;
     }
 
-    public String getId() {
-        return id;
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.ACHAT_TITRES;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override
+    public BRAction getAction() {
+        return action;
     }
 
-    public String getActionName() {
-        return actionName;
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
+    public void setAction(BRAction action){
+        this.action = action;
     }
 }

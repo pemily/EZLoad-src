@@ -9,7 +9,48 @@ bourseDirect:
     accounts:
         - number: 508TI00085554410EUR
           name: CTO Pascal
-    pdfOutputDir: P:/Pascal/Revenu et Dividendes/AvisOperations/BourseDirect
+    pdfOutputDir: P:/Pascal/Revenu et Dividendes/BientotRentier/BourseDirect
     extractor:
       defaultTimeout: 20
       autoLogin: true
+
+ezPortfolio:
+    gDriveCredentialsFile: P:/Pascal/Revenu et Dividendes/BientotRentier/credentials/creds.json
+    ezPortfolioId: 1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA
+
+# bientotRentier:
+#
+# Step 1
+#    Creer un projet ici: https://console.cloud.google.com/projectcreate
+#    Nom du Project: BientotRentier <= peut etre autre chose?
+#    Zone: [ laisser Aucune Organization ]
+#    Cliquez sur Créer
+# Step 2
+#    https://console.cloud.google.com/apis/credentials?project=bientotrentier
+#    Cliquez sur "Configurer L'écran de consentement"
+#    Selectionnez "Externes"   (Cette application ne sera jamais publié, elle restera en test et seul vous pourrez y acceder)
+#    Puis cliquez sur "Créer"
+#       Nom de l'application: BientotRentier
+#       adresse email d'assistance utilisateur: [ Votre Adresse Email ]
+#       Logo de l'application: [vide]
+#      Domaine de l'application: [Laissez tous les champs vide]
+#      Domaines autoirsés: [Laissez vide]
+#      Coordonnées du développeur: [ Votre adresse email ]
+#      Enregistrer et continuer
+#      Niveaux d'accès: [Ne rien faire]
+#      Enregistrer et continuer
+#      Utilisateurs tests:
+#          Add Users: [ Votre adresse email ] <= je pense qu'il est ajouté a la fin par defaut, pas besoin de le faire
+#      Enregistrer et continuer
+#  Step 3:
+#      https://console.cloud.google.com/apis/credentials?project=bientotrentier
+#      Cliquez sur "Créer des identifiants"
+#      Selectionnez "ID client OAuth"
+#      Type d'application: "Application de bureau"
+#      Nom: BientotRentier_ClientPC
+#      Copiez ID client: 687251957608-sd9040k5c5gqeg8ko7smpkcm2qra7pg9.apps.googleusercontent.com
+#      Copiez code secret client: 1wlvTpsANWcdeSdTvB8YlTqZ
+#      Sur la ligne de BientotRentier_ClientPC (à coté de la poubelle) il y a un boutton download pour telecharger le fichier json
+#  Step 4:
+#       https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=bientotrentier
+#       Activer

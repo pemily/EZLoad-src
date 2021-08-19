@@ -4,6 +4,7 @@ import com.pascal.bientotrentier.model.*;
 import com.pascal.bientotrentier.parsers.bourseDirect.*;
 import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.sources.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.bientotrentier.util.FinanceTools;
 import com.pascal.bientotrentier.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class BourseDirect2BRModel {
     public BRModel create(String sourceFile, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
         BRModel brModel = new BRModel();
-        brModel.setReportDate(ModelUtils.normalizeDate(model.getDateAvisOperation()));
+        brModel.setReportDate(model.getDateAvisOperation());
         brModel.setSource(BRModel.SourceModel.BOURSE_DIRECT);
         brModel.setSourceFile(sourceFile);
 
@@ -38,29 +39,35 @@ public class BourseDirect2BRModel {
         for (int i = 0; i < model.getOperations().size(); i++) {
             if (model.getOperations().get(i) instanceof DroitsDeGarde) {
                 // the last operation is an DroitsDeGarde and the amount is not in the amounts array, it is in the details text
-                brOperations.add(toBROperation(model.getDates().get(i), model.getOperations().get(i), null));
+                brOperations.add(toBROperation(brModel, model.getOperations().get(i), model.getDates().get(i), null));
             } else {
-                brOperations.add(toBROperation(model.getDates().get(i), model.getOperations().get(i), model.getAmounts().get(i)));
+                brOperations.add(toBROperation(brModel, model.getOperations().get(i), model.getDates().get(i), model.getAmounts().get(i)));
             }
         }
+
         reporting.info("Standard Model => ok");
         return brModel;
     }
 
-    private BROperation toBROperation(String date, Operation operation, String amount) {
+    private BROperation toBROperation(BRModel brModel, Operation operation, String date, String amount) {
         BROperation brOperation = null;
         if (operation instanceof VirementEspece){
             VirementEspece op = (VirementEspece) operation;
-            BRVirementCptEspece brOp = new BRVirementCptEspece();
-            brOperation = brOp;
-            brOp.setDescription(op.getDetails());
+            if (amount.contains("-")) {
+                BRRetraitFonds brOp = new BRRetraitFonds();
+                brOperation = brOp;
+            }
+            else {
+                BRVersementFonds brOp = new BRVersementFonds();
+                brOperation = brOp;
+            }
+            brOperation.setDescription(op.getDetails());
         }
         else if (operation instanceof AchatComptant){
             AchatComptant op = (AchatComptant) operation;
             BRAchat brOp = new BRAchat();
             brOperation = brOp;
-            brOp.setActionName(op.getActionName());
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
@@ -72,8 +79,7 @@ public class BourseDirect2BRModel {
             AchatEtranger op = (AchatEtranger) operation;
             BRAchatEtranger brOp = new BRAchatEtranger();
             brOperation = brOp;
-            brOp.setActionName(op.getActionName());
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
@@ -87,8 +93,7 @@ public class BourseDirect2BRModel {
             VenteEtranger op = (VenteEtranger) operation;
             BRVenteEtranger brOp = new BRVenteEtranger();
             brOperation = brOp;
-            brOp.setActionName(op.getActionName());
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
@@ -102,15 +107,14 @@ public class BourseDirect2BRModel {
             TaxeTransatFinancieres op = (TaxeTransatFinancieres) operation;
             BRTaxe brOp = new BRTaxe();
             brOperation = brOp;
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setDescription(op.getDetails());
         }
         else if (operation instanceof Coupons){
             Coupons op = (Coupons) operation;
             BRCoupons brOp = new BRCoupons();
             brOperation = brOp;
-            brOp.setActionName(op.getActionName());
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setPrixUnitaireBrut(ModelUtils.normalizeAmount(op.getPrixUnitBrut()));
             brOp.setCommission(ModelUtils.normalizeAmount(op.getCommission()));
@@ -136,8 +140,7 @@ public class BourseDirect2BRModel {
             DividendeOptionnel op = (DividendeOptionnel) operation;
             BRDividendeOptionel brOp = new BRDividendeOptionel();
             brOperation = brOp;
-            brOp.setActionName(op.getActionName());
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
         }
@@ -145,7 +148,7 @@ public class BourseDirect2BRModel {
             EspecesSurOST op = (EspecesSurOST) operation;
             BREspeceSurOST brOp = new BREspeceSurOST();
             brOperation = brOp;
-            brOp.setId(op.getId());
+            brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setDescription(op.getDetails());
         }
         else {
@@ -154,9 +157,13 @@ public class BourseDirect2BRModel {
 
         if (brOperation != null) {
             brOperation.setAmount(ModelUtils.normalizeAmount(amount));
-            brOperation.setDate(ModelUtils.normalizeDate(date));
-            brOperation.setOperationType(brOperation.getClass().getSimpleName());
+            brOperation.setDate(date);
+            brOperation.setCourtier("Bourse Direct");
+            if (brModel.getAccount().getAccountType().equals("Ordinaire")){
+                brOperation.setCompteType(BROperation.COMPTE_TYPE.COMPTE_TITRES_ORDINAIRE);
+            }
         }
         return brOperation;
     }
+
 }

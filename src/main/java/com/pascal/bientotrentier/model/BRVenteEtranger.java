@@ -20,4 +20,10 @@ public class BRVenteEtranger extends BRVente {
     public void setCoursUSD(String coursUSD) {
         this.coursUSD = coursUSD;
     }
+
+    @Override
+    public BROperationType getOperationType() {
+        return BROperationType.VENTE_TITRES;
+    }
+
 }
