@@ -1,8 +1,10 @@
 package com.pascal.bientotrentier.sources;
 
-public interface Reporting {
+import java.io.Closeable;
 
-     void pushSection(String sectionTitle);
+public interface Reporting extends Closeable {
+
+     Reporting pushSection(String sectionTitle);
 
      void error(Throwable error);
 
@@ -11,4 +13,8 @@ public interface Reporting {
      void info(String info);
 
      void popSection();
+
+     default void close(){
+          popSection();
+     }
 }

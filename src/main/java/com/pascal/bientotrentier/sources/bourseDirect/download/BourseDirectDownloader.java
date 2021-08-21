@@ -49,8 +49,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
     }
 
     private void downloadUpdates(){
-        reporting.pushSection("Downloading BourseDirect Reports...");
-        try {
+        try(Reporting rep = reporting.pushSection("Downloading BourseDirect Reports...")){
             get("https://www.boursedirect.fr/fr/login");
 
             if (bourseDirectSettings.getExtractor().isAutoLogin())
@@ -72,9 +71,6 @@ public class BourseDirectDownloader extends SeleniumUtil {
 
                 reporting.info("Extraction done for account: " + account.getName());
             }
-        }
-        finally {
-            reporting.popSection();
         }
     }
 

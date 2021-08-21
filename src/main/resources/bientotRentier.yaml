@@ -18,6 +18,9 @@ ezPortfolio:
     gDriveCredentialsFile: P:/Pascal/Revenu et Dividendes/BientotRentier/credentials/creds.json
     ezPortfolioId: 1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA
 
+bientotRentier:
+    logsDir: P:/Pascal/Revenu et Dividendes/BientotRentier/logs
+
 # bientotRentier:
 #
 # Step 1

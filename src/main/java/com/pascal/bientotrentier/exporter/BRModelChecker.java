@@ -19,28 +19,20 @@ public class BRModelChecker {
     }
 
     public boolean isActionValid(List<BRModel> allBRModels) {
-        reporting.pushSection("Checking Standard Model");
-        try {
+        try(Reporting rep = reporting.pushSection("Checking Standard Model")){
             return allBRModels.stream().allMatch(this::isActionValid);
-        }
-        finally {
-            reporting.popSection();
         }
     }
 
     private boolean isActionValid(BRModel model){
         boolean result;
-        reporting.pushSection(model.getSourceFile());
-        try {
+        try(Reporting rep = reporting.pushSection(model.getSourceFile())){
             result = ModelUtils.isValidDate(model.getReportDate());
             if (!result) {
                 reporting.info("Date of the report is invalid: "+model.getReportDate());
             }
 
             result |= model.getOperations().stream().allMatch(this::isActionValid);
-        }
-        finally {
-            reporting.popSection();
         }
         return result;
     }
@@ -80,17 +72,16 @@ public class BRModelChecker {
         BRAction action = operation.getAction();
         result = StringUtils.isBlank(action.getName());
         if (!result) {
-            reporting.info("The action name for one operation is not set! "+operation);
+            reporting.error("The action name for one operation is not set! "+operation);
         }
 
         result = StringUtils.isBlank(action.getTicker());
         if (!result) {
-            reporting.info("The ticker action for one operation is not set! "+operation);
+            reporting.error("The ticker action for one operation is not set! "+operation);
         }
 
-
         if (action.getMarketPlace() == null) {
-            reporting.info("The Market Place for one operation is not set! "+operation);
+            reporting.error("The Market Place for one operation is not set! "+operation);
         }
         return result;
     }

@@ -9,9 +9,10 @@ public class TextReporting implements Reporting {
 
     private String tab = "";
 
-    public void pushSection(String sectionTitle) {
+    public Reporting pushSection(String sectionTitle) {
         report.append(tab).append("===== "+sectionTitle+"\n");
         tab+=SECTION_TAB;
+        return this;
     }
 
     public void error(Throwable error){

@@ -8,6 +8,7 @@ public class MainSettings {
     private BourseDirectSettings bourseDirect;
     private ChromeSettings chrome;
     private EZPortfolioSettings ezPortfolio;
+    private BientotRentier bientotRentier;
 
     public BourseDirectSettings getBourseDirect() {
         return bourseDirect;
@@ -31,6 +32,14 @@ public class MainSettings {
 
     public void setEzPortfolio(EZPortfolioSettings ezPortfolio) {
         this.ezPortfolio = ezPortfolio;
+    }
+
+    public BientotRentier getBientotRentier() {
+        return bientotRentier;
+    }
+
+    public void setBientotRentier(BientotRentier bientotRentier) {
+        this.bientotRentier = bientotRentier;
     }
 
 
@@ -74,4 +83,15 @@ public class MainSettings {
         }
     }
 
+    public static class BientotRentier {
+        private String logsDir;
+
+        public String getLogsDir() {
+            return logsDir;
+        }
+
+        public void setLogsDir(String logsDir) {
+            this.logsDir = logsDir;
+        }
+    }
 }

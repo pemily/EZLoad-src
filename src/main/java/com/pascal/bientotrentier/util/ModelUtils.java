@@ -61,7 +61,9 @@ public class ModelUtils {
 
     public static float str2Float(String v) {
         if (v == null) return 0;
-        return Float.parseFloat(v.replace(',','.'));
+        return Float.parseFloat(v.replace(',','.')
+                .replace(' ', ' ') // google drive add some NNBSP as a thousand separator
+                .replace(" ",""));
     }
 
 

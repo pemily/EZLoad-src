@@ -16,10 +16,9 @@ public class BourseDirectModelChecker {
     }
 
     public boolean isValid(BourseDirectModel model){
-        reporting.pushSection("Checking BourseDirect model...");
-        boolean isValid = true;
+        try(Reporting rep = reporting.pushSection("Checking BourseDirect model...")){
+            boolean isValid = true;
 
-        try {
             long nbOfDroitDeGarde = nbOfDroitsDeGarde(model.getOperations());
 
             if (nbOfDroitDeGarde > 1) {
@@ -80,12 +79,9 @@ public class BourseDirectModelChecker {
             if (isValid) {
                 reporting.info("=> No error detected");
             }
-        }
-        finally {
-            reporting.popSection();
-        }
 
-        return isValid;
+            return isValid;
+        }
     }
 
     private long nbOfDroitsDeGarde(List<Operation> operations){

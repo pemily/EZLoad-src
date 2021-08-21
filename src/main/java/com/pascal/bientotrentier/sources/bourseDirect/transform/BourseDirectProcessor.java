@@ -26,9 +26,7 @@ public class BourseDirectProcessor {
     }
 
     public BRModel start(Reporting reporting, String pdfFilePath) {
-        reporting.pushSection(pdfFilePath);
-        try {
-
+        try(Reporting rep = reporting.pushSection(pdfFilePath)){
             String pdfText = new BourseDirectPdfExtractor(reporting).getText(pdfFilePath);
 
             BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
@@ -48,9 +46,6 @@ public class BourseDirectProcessor {
             BRParsingException parsingException = new BRParsingException(e);
             parsingException.setFilePath(pdfFilePath);
             reporting.error(e);
-        }
-        finally {
-            reporting.popSection();
         }
 
         return null;

@@ -26,8 +26,7 @@ public class EZPortfolioHandler {
     }
 
     public EZPortfolio load() throws Exception {
-        reporting.pushSection("Loading EZPortfolio...");
-        try {
+        try(Reporting rep = reporting.pushSection("Loading EZPortfolio...")){
             EZPortfolio ezPortfolio = new EZPortfolio();
 
             List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:J", "MonPortefeuille!A4:L");
@@ -43,14 +42,10 @@ public class EZPortfolioHandler {
             reporting.info(portefeuille.getValues().size()+" rows from MonPortefeuille loaded.");
             return ezPortfolio;
         }
-        finally {
-            reporting.popSection();
-        }
     }
 
     public void save(EZPortfolio ezPortfolio) throws Exception {
-        reporting.pushSection("saving EZPortfolio...");
-        try {
+        try(Reporting rep = reporting.pushSection("saving EZPortfolio...")){
             MesOperations operations = ezPortfolio.getMesOperations();
             int firstFreeRow = operations.getFirstFreeRow()+1; // +1 to add the header
             // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
@@ -58,9 +53,6 @@ public class EZPortfolioHandler {
             sheets.batchUpdate(
                     new SheetValues("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations()),
                     ezPortfolio.getMonPortefeuille().getSheetValues());
-        }
-        finally {
-            reporting.popSection();
         }
     }
 }

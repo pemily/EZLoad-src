@@ -24,14 +24,10 @@ public class BRModelExporter {
      * exports the allBRModels into the EZPortfolio
      */
     public void exportModels(List<BRModel> allBRModels, EZPortfolio ezPortfolio) {
-        reporting.pushSection("Exporting data into EZPortfolio");
-        try{
+        try(Reporting rep = reporting.pushSection("Exporting data into EZPortfolio")){
             allBRModels.forEach(brModel -> {
                 loadOperations(ezPortfolio, brModel.getOperations());
             });
-        }
-        finally {
-            reporting.popSection();
         }
     }
 

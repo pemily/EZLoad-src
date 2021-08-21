@@ -54,7 +54,10 @@ public class GDriveSheets {
 
     public List<SheetValues> batchGet(List<String> ranges) throws Exception {
         return retryOnTimeout(10, () -> {
-            BatchGetValuesResponse resp = service.spreadsheets().values().batchGet(spreadsheetId).setRanges(ranges)
+            BatchGetValuesResponse resp = service.spreadsheets()
+                    .values()
+                    .batchGet(spreadsheetId)
+                    .setRanges(ranges)
                     .execute();
             return resp.getValueRanges().stream().map(vr ->
                 new SheetValues(vr.getRange(),
@@ -68,7 +71,7 @@ public class GDriveSheets {
     }
 
     public int batchUpdate(List<SheetValues> sheetValues) throws Exception {
-        int r = retryOnTimeout(10, () -> {
+        int r = retryOnTimeout(15, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
             buvr.setValueInputOption("USER_ENTERED");
 
@@ -98,11 +101,11 @@ public class GDriveSheets {
                 }
                 reporting.info("Timeout reached, wait a little before retry");
                 try {
-                    Thread.sleep(10 * 1000);
+                    Thread.sleep(60 * 1000);
                 }
                 catch (InterruptedException ie){}
                 reporting.info("Retry n°: "+n);
-                retryOnTimeout(n - 1, fct);
+                return retryOnTimeout(n - 1, fct);
             }
             throw e;
         }
