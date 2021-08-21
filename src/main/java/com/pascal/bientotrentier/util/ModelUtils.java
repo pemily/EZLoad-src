@@ -38,7 +38,16 @@ public class ModelUtils {
         if (amount.startsWith("+")){
             amount = amount.substring(1);
         }
-        return amount.replace('.', ',').replace(" ", "");
+        amount = amount.replace('.', ',').replace(" ", "");
+        if (amount.contains(",")){
+            while (amount.endsWith("0")){
+                amount = amount.substring(0, amount.length()-1);
+            }
+        }
+        if (amount.endsWith(",")){
+            amount = amount.substring(0, amount.length()-1);
+        }
+        return amount;
     }
 
     public static int normalizeNumber(String quantite) {
@@ -48,5 +57,10 @@ public class ModelUtils {
     public static String toJson(BRModel model){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(model);
+    }
+
+    public static float str2Float(String v) {
+        if (v == null) return 0;
+        return Float.parseFloat(v.replace(',','.'));
     }
 }

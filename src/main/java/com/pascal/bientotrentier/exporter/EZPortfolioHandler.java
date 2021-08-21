@@ -1,10 +1,13 @@
 package com.pascal.bientotrentier.exporter;
 
 import com.google.api.services.sheets.v4.Sheets;
+import com.pascal.bientotrentier.exporter.ezPortfolio.MonPortefeuille;
 import com.pascal.bientotrentier.gdrive.GDriveConnection;
 import com.pascal.bientotrentier.gdrive.GDriveSheets;
 import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.exporter.ezPortfolio.MesOperations;
+import com.pascal.bientotrentier.gdrive.Row;
+import com.pascal.bientotrentier.gdrive.SheetValues;
 import com.pascal.bientotrentier.sources.Reporting;
 
 import java.io.IOException;
@@ -27,10 +30,17 @@ public class EZPortfolioHandler {
         try {
             EZPortfolio ezPortfolio = new EZPortfolio();
 
-            List<List<Object>> allOperations = sheets.getCells("MesOperations!A2:J");
-            MesOperations mesOperations = new MesOperations(allOperations);
+            List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:J", "MonPortefeuille!A4:L");
+
+            SheetValues allOperations = ezSheets.get(0);
+            MesOperations mesOperations = new MesOperations(reporting, allOperations);
             ezPortfolio.setMesOperations(mesOperations);
-            reporting.info(allOperations.size()+" operations loaded.");
+            reporting.info(allOperations.getValues().size()+" rows from MesOperations loaded.");
+
+            SheetValues portefeuille = ezSheets.get(1);
+            MonPortefeuille monPortefeuille = new MonPortefeuille(reporting, portefeuille);
+            ezPortfolio.setMonPortefeuille(monPortefeuille);
+            reporting.info(portefeuille.getValues().size()+" rows from MonPortefeuille loaded.");
             return ezPortfolio;
         }
         finally {
@@ -43,7 +53,11 @@ public class EZPortfolioHandler {
         try {
             MesOperations operations = ezPortfolio.getMesOperations();
             int firstFreeRow = operations.getFirstFreeRow()+1; // +1 to add the header
-            sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
+            // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
+
+            sheets.batchUpdate(
+                    new SheetValues("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations()),
+                    ezPortfolio.getMonPortefeuille().getSheetValues());
         }
         finally {
             reporting.popSection();

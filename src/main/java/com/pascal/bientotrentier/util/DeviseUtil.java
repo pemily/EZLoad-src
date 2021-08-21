@@ -8,18 +8,25 @@ import java.util.Optional;
 
 public class DeviseUtil {
 
+    // https://en.wikipedia.org/wiki/Currency
+
     private static List<BRDevise> devises = Arrays.asList(
             new BRDevise("USD", "$"),
             new BRDevise("EUR", "€"),
-            new BRDevise("DKK", "Kr"),
-            new BRDevise("CAD", "$ CA"),
-            new BRDevise("CHF", "Fr"),
+            new BRDevise("JPY", "¥"),
             new BRDevise("GBP", "£"),
-            new BRDevise("JPY", "¥"),
-            new BRDevise("JPY", "¥"),
+            new BRDevise("GBX", "£"), // non present sur le site, mais ezportfolio utilse gbx
+            new BRDevise("AUD", "A$"),
+            new BRDevise("CAD", "C$"),
+            new BRDevise("CHF", "CHF"),
+            new BRDevise("CNY", "元"),
+            new BRDevise("HKD", "HK$"),
+            new BRDevise("NZD", "NZ$"),
+            new BRDevise("SEK", "kr"),
+            new BRDevise("KRW", "₩"),
+            new BRDevise("SGD", "S$"),
             new BRDevise("NOK", "Kr"),
-            new BRDevise("KRW", "₩")
-
+            new BRDevise("DKK", "Kr")
             );
 
 

@@ -83,19 +83,14 @@ public class BRModelChecker {
             reporting.info("The action name for one operation is not set! "+operation);
         }
 
-        result = StringUtils.isBlank(action.getCountry());
-        if (!result) {
-            reporting.info("The country action for one operation is not set! "+operation);
-        }
-
         result = StringUtils.isBlank(action.getTicker());
         if (!result) {
             reporting.info("The ticker action for one operation is not set! "+operation);
         }
 
-        result = StringUtils.isBlank(action.getMarketMic());
-        if (!result) {
-            reporting.info("The Market Mic for one operation is not set! "+operation);
+
+        if (action.getMarketPlace() == null) {
+            reporting.info("The Market Place for one operation is not set! "+operation);
         }
         return result;
     }

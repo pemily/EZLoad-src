@@ -4,10 +4,7 @@ public class BRAction {
     private String name;
     private String ticker;
     private String isin;
-    private String country;
-    private BRDevise devise;
-    private String marketMic;
-    private String marketName;
+    private BRMarketPlace marketPlace;
 
     public String getName() {
         return name;
@@ -33,35 +30,11 @@ public class BRAction {
         this.isin = isin;
     }
 
-    public String getCountry() {
-        return country;
+    public BRMarketPlace getMarketPlace() {
+        return marketPlace;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getMarketMic() {
-        return marketMic;
-    }
-
-    public void setMarketMic(String marketMic) {
-        this.marketMic = marketMic;
-    }
-
-    public String getMarketName() {
-        return marketName;
-    }
-
-    public void setMarketName(String marketName) {
-        this.marketName = marketName;
-    }
-
-    public BRDevise getDevise() {
-        return devise;
-    }
-
-    public void setDevise(BRDevise devise) {
-        this.devise = devise;
+    public void setMarketPlace(BRMarketPlace marketPlace) {
+        this.marketPlace = marketPlace;
     }
 }

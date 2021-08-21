@@ -20,5 +20,15 @@ public class ModelUtilsTest {
     public void normalizeAmount(){
         assertEquals("1235,01", ModelUtils.normalizeAmount("+1 235.01"));
         assertEquals("-1235,01", ModelUtils.normalizeAmount("-1 235.01"));
+        assertEquals("-1235", ModelUtils.normalizeAmount("-1 235.00"));
+        assertEquals("1235", ModelUtils.normalizeAmount("1 235,00000"));
+        assertEquals("1235000", ModelUtils.normalizeAmount("1 235 000"));
+    }
+
+    @Test
+    public void str2Float(){
+        assertEquals(0f, ModelUtils.str2Float(null));
+        assertEquals(2400f, ModelUtils.str2Float("2400,00"));
+        assertEquals(-2400f, ModelUtils.str2Float("-2400,00"));
     }
 }

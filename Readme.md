@@ -8,3 +8,5 @@ du download et du parser
 
 
 
+# DOC
+l'EZPorfolio doit deja avoir une ligne LIQUIDITE dans MonPortefeuille

@@ -2,9 +2,12 @@ package com.pascal.bientotrentier.exporter;
 
 import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.exporter.ezPortfolio.MesOperations;
+import com.pascal.bientotrentier.exporter.ezPortfolio.MonPortefeuille;
 import com.pascal.bientotrentier.model.BRRetraitFonds;
 import com.pascal.bientotrentier.model.BRVersementFonds;
 import com.pascal.bientotrentier.sources.Reporting;
+
+import static com.pascal.bientotrentier.util.ModelUtils.str2Float;
 
 public class LoadVirement {
     private Reporting reporting;
@@ -20,7 +23,8 @@ public class LoadVirement {
             mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
 
-            Mise a jour de ezPortfolio.getMonPortefeuille()
+            MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();
+            portefeuille.updateLiquidite(str2Float(op.getAmount()));
         }
     }
 
@@ -31,7 +35,8 @@ public class LoadVirement {
             mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
 
-            Mise a jour de ezPortfolio.getMonPortefeuille()
+            MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();
+            portefeuille.updateLiquidite(str2Float(op.getAmount()));
         }
     }
 
