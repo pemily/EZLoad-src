@@ -63,4 +63,9 @@ public class ModelUtils {
         if (v == null) return 0;
         return Float.parseFloat(v.replace(',','.'));
     }
+
+
+    public static String float2Str(float v) {
+        return normalizeAmount(v+"");
+    }
 }

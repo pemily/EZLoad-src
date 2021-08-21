@@ -7,6 +7,8 @@ import com.pascal.bientotrentier.util.BRException;
 
 import java.util.Optional;
 
+import static com.pascal.bientotrentier.util.ModelUtils.float2Str;
+
 public class MonPortefeuille {
 
     private final Reporting reporting;
@@ -41,8 +43,8 @@ public class MonPortefeuille {
         Row liquidite = liquiditeOpt.orElseThrow(() -> new BRException(LIQUIDITE + " row not found in MonPortefeuille"));
         float liquide = liquidite.valueFloat(QUANTITE_COL);
         float result = liquide+amount;
-        reporting.info("Update "+LIQUIDITE+" "+liquide+(amount < 0 ? amount : "+"+amount)+"="+result);
-        liquidite.setValue(QUANTITE_COL, result+"");
+        reporting.info("Update "+LIQUIDITE+" "+float2Str(liquide)+(amount < 0 ? float2Str(amount) : "+"+float2Str(amount))+"="+float2Str(result));
+        liquidite.setValue(QUANTITE_COL, float2Str(result));
     }
 
 }
