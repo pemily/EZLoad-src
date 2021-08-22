@@ -5,9 +5,6 @@
 .mg-accordion, .mg-accordion ul{
 	list-style-type: none;
 }
-.mg-accordion .submenu{
-	display: none;
-}
 .my-menu, .mg-flat{
 	width: 90%;
 }
@@ -32,11 +29,11 @@
 	border:1px solid #ccc;
 	background: #eee
 }
-a.openItem{
+a.openedItem{
 	background: #0056b3!important;
 	color: #fff;
 }
-.openItem span{
+.openedItem span{
 	transform: rotate(180deg);
 	color: #fff;
 }
@@ -52,26 +49,20 @@ a.openItem{
     openIcon = '<span class="toggler">+</span>';
     closeIcon = '<span class="toggler">-</span>';
 
-    function updateIcons(obj) {
-        console.log("upd", obj.siblings('.submenu'));
-        if (obj.children('.submenu').first().is(':visible')) {
-            obj.find('span.toggler').replaceWith(openIcon);
+    function updateIcons(objA) {
+        if (objA.hasClass('openedItem')) {
+            objA.find('span.toggler').replaceWith(closeIcon);
         } else {
-            obj.find('span.toggler').replaceWith(closeIcon);
+            objA.find('span.toggler').replaceWith(openIcon);
         }
     }
 
-
-
-    function closeOther(objA) {
+    function closeAll(objA) {
         var items = objA.parent().siblings().find('ul.submenu');
-        objA.addClass('openItem');
         items.each(function () {
-            if ($(this).is(':visible')) {
-                var ul = $(this).slideUp('slow').parent();
-                ul.find('span.toggler').replaceWith(openIcon);
-                ul.find('a').first().removeClass('openItem');
-            }
+            var ul = $(this).slideUp('slow').parent();
+            ul.find('span.toggler').replaceWith(openIcon);
+            ul.find('a').first().removeClass('openedItem');
         });
     }
 
@@ -81,6 +72,7 @@ a.openItem{
         idQueue.push(lastId);
         $('#'+parentId).append("<li class='dropdown'><a href='#'>"+elem+openIcon+"</a><ul class='submenu' id="+lastId+"></ul></li>");
         var a = $('#'+parentId).children("li").last().children("a").first();
+        show(a);
 
         a.bind('click', function (e) {
                                 e.preventDefault();
@@ -91,16 +83,33 @@ a.openItem{
     function openOrClose(objA){
             var leaveOpen = false;
         if (leaveOpen === false) {
-            closeOther(objA);
+            closeAll(objA);
         }
-        objA.siblings('ul.submenu').slideToggle(function () {
-            //$(this).toggleClass('opened', $(this).is(':visible'));
-        });
+
+        if (objA.hasClass('openedItem')) {
+            hide(objA);
+        }
+        else{
+            show(objA);
+        }
+
+        updateIcons(objA);
+    }
+
+    function hide(objA){
+        objA.removeClass('openedItem');
+        objA.siblings('ul').first().slideUp();
+        updateIcons(objA);
+    }
+    function show(objA){
+        objA.addClass('openedItem');
+        objA.siblings('ul').first().slideDown();
         updateIcons(objA);
     }
 
     function popSection(){
         idQueue.pop();
+        hide($('#'+lastId).parent().children('a').first());
     }
 
     function add(elem){
@@ -119,24 +128,22 @@ a.openItem{
     <script>pushSection('add SECTION1')</script>
     <script>add('Sub Simple log')</script>
     <script>add('Sub Simple log')</script>
-    <script>add('Sub Simple log')</script>
-    <script>add('Sub Simple log')</script>
     <script>popSection()</script>
     <script>pushSection('add SECTION2')</script>
     <script>add('Sub Simple log')</script>
     <script>add('Sub Simple log')</script>
     <script>add('Sub Simple log')</script>
-    <script>add('Sub Simple log')</script>
     <script>pushSection('add SUB SECTION1')</script>
-    <script>add('Sub Simple log')</script>
-    <script>add('Sub Simple log')</script>
-    <script>pushSection('add SUB SECTION1')</script>
-    <script>add('Sub Simple log')</script>
-    <script>add('Sub Simple log')</script>
-    <script>pushSection('add SUB SECTION1')</script>
-    <script>add('Sub Simple log')</script>
     <script>add('Sub Simple log')</script>
     <script>popSection()</script>
+    <script>add('Sub Simple log')</script>
+    <script>pushSection('add SUB SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>popSection()</script>
+    <script>add('Sub Simple log')</script>
+    <script>pushSection('add SUB SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
 
 </body>
 </html>
