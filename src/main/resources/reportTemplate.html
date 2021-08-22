@@ -85,19 +85,15 @@ a.openItem{
 
         a.bind('click', function (e) {
                                 e.preventDefault();
-                                doOpen($(this));
+                                var leaveOpen = false;
+                                if (leaveOpen === false) {
+                                    closeOther($(this));
+                                }
+                                $(this).siblings('ul.submenu').slideToggle(function () {
+                                    $(this).toggleClass('closed', $(this).is(':visible'));
+                                });
+                                updateIcons($(this));
                             });
-    }
-
-    function doOpen(objA){
-            var leaveOpen = false;
-        if (leaveOpen === false) {
-            closeOther(objA);
-        }
-        objA.siblings('ul.submenu').slideToggle(function () {
-            objA.toggleClass('closed', objA.is(':visible'));
-        });
-        updateIcons(objA);
     }
 
     function popSection(){
