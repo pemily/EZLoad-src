@@ -33,7 +33,7 @@ public class Main {
             HtmlReporting reporting = new HtmlReporting("Bientot Rentier Report", writer);
             try(MiniHttpServer server = new MiniHttpServer()) {
                 server.start(reportFile, HtmlReporting.END_DOC);
-                Desktop.getDesktop().browse(new URI("http://localhost:8000/bientotRentier"));
+                Desktop.getDesktop().browse(new URI("http://localhost:8000/bientotRentier/report"));
 
                 try(Reporting top = reporting.pushSection("Bientot Rentier Report - "+reportFile.getAbsolutePath())) {
 
@@ -53,10 +53,10 @@ public class Main {
 
                     if (isValid) {
                         try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
-                            EZPortfolioHandler ezPortfolioHandler = new EZPortfolioHandler(reporting, mainSettings.getEzPortfolio());
+                     /*       EZPortfolioHandler ezPortfolioHandler = new EZPortfolioHandler(reporting, mainSettings.getEzPortfolio());
                             EZPortfolio ezPortfolio = ezPortfolioHandler.load();
                             new BRModelExporter(reporting).exportModels(allBRModels, ezPortfolio);
-                            ezPortfolioHandler.save(ezPortfolio);
+                            ezPortfolioHandler.save(ezPortfolio);*/
                         }
                     }
                 }

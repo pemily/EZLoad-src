@@ -21,11 +21,11 @@ public class Tail {
                 } else if (length > filePointer) {
                     RandomAccessFile localRandomAccessFile = new RandomAccessFile(file, "r");
                     localRandomAccessFile.seek(filePointer);
-                    String str = null;
+                    String str;
                     while ((str = localRandomAccessFile.readLine()) != null) {
                         writer.write(str);
                         writer.flush();
-                        if (stopSentence != null && str.equals(stopSentence)){
+                        if (stopSentence != null && str.contains(stopSentence)){
                             running = false;
                         }
                     }

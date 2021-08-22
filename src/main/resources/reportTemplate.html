@@ -1,0 +1,143 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style type="text/css">
+.mg-accordion, .mg-accordion ul{
+	list-style-type: none;
+}
+.mg-accordion .submenu{
+	display: none;
+}
+.my-menu, .mg-flat{
+	width: 90%;
+}
+.justify-items-evenly{
+	justify-content: space-evenly;
+}
+.mg-flat li.dropdown{
+	margin-left: -40px
+}
+.mg-flat .submenu li{
+	margin-left: -20px;
+}
+.mg-flat span.toggler{
+	float: right;
+}
+.mg-flat a{
+	text-decoration: none;
+	display: block;
+}
+.mg-flat li.dropdown a{
+	padding: 10px 5px;
+	border:1px solid #ccc;
+	background: #eee
+}
+a.openItem{
+	background: #0056b3!important;
+	color: #fff;
+}
+.openItem span{
+	transform: rotate(180deg);
+	color: #fff;
+}
+.toggler{
+	transition: all 1s;
+}
+    </style>
+    <script>
+    var idQueue = [];
+    var lastId = 1;
+    idQueue.push(lastId);
+
+    function updateIcons(obj) {
+        if (obj.siblings('.submenu').hasClass('closed')) {
+            obj.find('span.toggler').replaceWith(openIcon);
+        } else {
+            obj.find('span.toggler').replaceWith(closeIcon);
+        }
+    }
+
+
+    function setIcons() {
+        openIcon = '<span class="toggler">+</span>';
+        closeIcon = '<span class="toggler">-</span>';
+    }
+
+    function closeOther(objA) {
+        setIcons();
+        var items = objA.parent().siblings().find('ul.submenu');
+        objA.addClass('openItem');
+        items.each(function () {
+            if ($(this).hasClass('closed')) {
+                var ul = $(this).slideUp('slow').parent();
+                ul.find('span.toggler').replaceWith(openIcon);
+                ul.find('a').first().removeClass('openItem');
+            }
+        });
+    }
+
+    function pushSection(elem){
+        var parentId = idQueue[idQueue.length-1];
+        lastId++;
+        idQueue.push(lastId);
+        $('#'+parentId).append("<li class='dropdown opendItem'><a href='#'>"+elem+"<span class='toggler'>+</span></a><ul class='submenu' id="+lastId+"></ul></li>");
+        var a = $('#'+parentId).children("li").last().children("a").first();
+
+        a.bind('click', function (e) {
+                                e.preventDefault();
+                                doOpen($(this));
+                            });
+    }
+
+    function doOpen(objA){
+            var leaveOpen = false;
+        if (leaveOpen === false) {
+            closeOther(objA);
+        }
+        objA.siblings('ul.submenu').slideToggle(function () {
+            objA.toggleClass('closed', objA.is(':visible'));
+        });
+        updateIcons(objA);
+    }
+
+    function popSection(){
+        idQueue.pop();
+    }
+
+    function add(elem){
+        var parentId = idQueue[idQueue.length-1];
+        $('#'+parentId).append("<li class='dropdown'><a href='#' >"+elem+"</a></li>");
+    }
+    </script>
+
+</head>
+<body>
+
+    <ul id="1" class="mg-accordion mg-flat">
+    </ul>
+
+    <script>add('Simple log')</script>
+    <script>pushSection('add SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>popSection()</script>
+    <script>pushSection('add SECTION2')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>pushSection('add SUB SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>pushSection('add SUB SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>pushSection('add SUB SECTION1')</script>
+    <script>add('Sub Simple log')</script>
+    <script>add('Sub Simple log')</script>
+    <script>popSection()</script>
+
+</body>
+</html>
