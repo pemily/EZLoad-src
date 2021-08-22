@@ -20,7 +20,7 @@ public class EZPortfolioHandler {
     private GDriveSheets sheets;
 
     public EZPortfolioHandler(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
-        Sheets service = GDriveConnection.getService(settings.getgDriveCredentialsFile());
+        Sheets service = GDriveConnection.getService(settings.getGdriveCredsFile());
         sheets = new GDriveSheets(reporting, service, settings.getEzPortfolioId());
         this.reporting = reporting;
     }

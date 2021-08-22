@@ -47,7 +47,7 @@ public class MainSettings {
         private String driverPath;
         private String userDataDir;
         private String profile;
-        private String DownloadDir;
+        private String downloadDir;
 
         public String getUserDataDir() {
             return userDataDir;
@@ -75,11 +75,11 @@ public class MainSettings {
         }
 
         public String getDownloadDir() {
-            return DownloadDir;
+            return downloadDir;
         }
 
         public void setDownloadDir(String downloadDir) {
-            DownloadDir = downloadDir;
+            this.downloadDir = downloadDir;
         }
     }
 

@@ -1,25 +1,25 @@
 
 chrome:
-  driverPath: D:/dev/chromeDriver/v92.0.4515.107/chromedriver.exe
+  driverPath: D:\dev\chromeDriver\v92.0.4515.107\chromedriver.exe
   # C:/Users/Pascal/AppData/Local/Google/Chrome/User Data
-  userDataDir: D:/tmp/chromeDir
+  userDataDir: D:\tmp\chromeDir
   profile: default
 
 bourseDirect:
     accounts:
         - number: 508TI00085554410EUR
           name: CTO Pascal
-    pdfOutputDir: P:/Pascal/Revenu et Dividendes/BientotRentier/BourseDirect
+    pdfOutputDir: P:\Pascal\Revenu et Dividendes\BientotRentier\BourseDirect
     extractor:
       defaultTimeout: 20
       autoLogin: true
 
 ezPortfolio:
-    gDriveCredentialsFile: P:/Pascal/Revenu et Dividendes/BientotRentier/credentials/creds.json
-    ezPortfolioId: 1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA
+  gdriveCredsFile: P:\Pascal\Revenu et Dividendes\BientotRentier\credentials\creds.json
+  ezPortfolioId: 1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA
 
 bientotRentier:
-    logsDir: P:/Pascal/Revenu et Dividendes/BientotRentier/logs
+    logsDir: P:\Pascal\Revenu et Dividendes\BientotRentier\logs
 
 # bientotRentier:
 #

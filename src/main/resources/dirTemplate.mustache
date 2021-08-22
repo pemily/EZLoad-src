@@ -1,0 +1,33 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bientot Rentier</title>
+</head>
+<body>
+<h1>Bientot Rentier</h1>
+<h1>{{dir}}</h1>
+<p>
+    <ul>
+    {{^back}}
+        <li><a href="/home">[back]</a></li>
+    {{/back}}
+    {{#back}}
+        <li><a href="/{{context}}?dir={{back}}">[back]</a></li>
+    {{/back}}
+
+    {{^dirs}}
+        {{^files}}
+            <li>Directory is empty</li>
+        {{/files}}
+    {{/dirs}}
+
+    {{#dirs}}
+        <li><a href="/{{context}}?dir={{currentDir}}/{{name}}">[{{name}}]</a></li>
+    {{/dirs}}
+    {{#files}}
+        <li><a href="/{{context}}?file={{currentDir}}/{{name}}">[{{name}}]</a></li>
+    {{/files}}
+    </ul>
+</p>
+</body>
+</html>

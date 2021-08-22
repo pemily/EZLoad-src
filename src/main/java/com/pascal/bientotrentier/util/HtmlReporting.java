@@ -1,89 +1,68 @@
 package com.pascal.bientotrentier.util;
 
 import com.pascal.bientotrentier.sources.Reporting;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.io.*;
 
 public class HtmlReporting implements Reporting {
-    // https://www.jqueryscript.net/accordion/hierarchical-tree-menu-mg.html
-    public static final String END_DOC = "</body>";
 
     private final Writer writer;
     private final String title;
-    private final Queue<Boolean> isLevelInError = new LinkedList<>();
-    private boolean headerWritten = false;
-    private int levelNumber = 0;
 
     public HtmlReporting(String title, Writer writer){
         this.title = title;
         this.writer = writer;
+        try {
+            IOUtils.copy(new InputStreamReader( getClass().getClassLoader().getResourceAsStream("bientotRentier.html")), writer);
+        } catch (IOException e) {
+            throw new BRException(e);
+        }
     }
 
     @Override
     public void error(Throwable error) {
-        writerHeader();
         StringWriter sw = new StringWriter();
         error.printStackTrace(new PrintWriter(sw));
-        write("<span class='error'>"+esc(sw.toString())+"</span>");
-        isLevelInError.remove(); // remove the current value for this level
-        isLevelInError.offer(true); // and force it to be true
+        write(sw.toString(), true);
     }
 
     @Override
     public void error(String error) {
-        writerHeader();
-        write("<span class='error'>"+esc(error)+"</span>");
-        isLevelInError.remove(); // remove the current value for this level
-        isLevelInError.offer(true); // and force it to be true
+        write(error, true);
     }
 
     @Override
     public void info(String info) {
-        writerHeader();
-        write("<span class='info'>"+esc(info)+"</span>");
+        write(info, false);
     }
 
     @Override
     public HtmlReporting pushSection(String sectionTitle) {
-        writerHeader();
-        write("<li><a class='menuitem submenu'>"+ esc(sectionTitle)+"</li><ul>");
-
-        isLevelInError.offer(false);
-        levelNumber++;
+        try {
+            writer.write("<script>pushSection(\""+esc(sectionTitle)+"\")</script>\n");
+            writer.flush();
+        } catch (IOException e) {
+            throw new BRException(e);
+        }
         return this;
     }
 
     @Override
     public void popSection() {
-        writerHeader();
-        levelNumber--;
-        Boolean hasError = isLevelInError.poll(); // remove the current value for this level
-        if (Boolean.TRUE.equals(hasError))
-            write("<script>$(\"this\").parent().addClass('error')</script>");
-        write("</ul>");
-    }
-
-    private void writerHeader() {
-        if (!headerWritten){
-            write("<html><head>" +
-                    "<link rel='stylesheet' type='text/css' href='file/mgaccordion.css'/>"+
-                    "<script type='text/javascript' src='file/mgaccordion.js'></script>"+
-                    "<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>"+
-                    "<title>"+esc(title)+"</title>" +
-                    "</head><body><div id='menu' class='accordion'><nav class='my-menu'><ul class='my-nav'>");
-            headerWritten = true;
+        try {
+            writer.write("<script>popSection()</script>\n");
+            writer.flush();
+        } catch (IOException e) {
+            throw new BRException(e);
         }
     }
 
-    private void write(String text){
+
+    private void write(String text, boolean isError){
         try {
-            writer.write(text+"\n");
+            writer.write( "<script>add(\""+esc(text)+"\","+isError+")</script>\n");
             writer.flush();
         }
         catch(IOException e){
@@ -92,12 +71,11 @@ public class HtmlReporting implements Reporting {
     }
 
     private String esc(String text){
-        return StringEscapeUtils.escapeHtml4(text).replace("\n", "<br>");
+        return StringEscapeUtils
+                .escapeHtml3(text)
+                .replace("\n", "<br>")
+                .replace("\"", "&quot;")
+                ;
     }
 
-    public void end(){
-        write("</ul></nav></div>" +
-                "<script>$(document).ready(function () { $('.my-nav').mgaccordion(); });</script>" +
-                END_DOC);
-    }
 }

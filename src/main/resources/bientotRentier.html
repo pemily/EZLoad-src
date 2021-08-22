@@ -1,0 +1,135 @@
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<style type="text/css">
+    .br-tree ul{
+        list-style-type: none;
+    }
+    .br-tree{
+        width: 90%;
+    }
+    .justify-items-evenly{
+        justify-content: space-evenly;
+    }
+    .br-tree li.section{
+        margin-left: -40px
+    }
+    .br-tree li.log{
+        margin-left: -40px
+    }
+    .br-tree .submenu li{
+        margin-left: -20px;
+    }
+    .br-tree span.toggler{
+        float: right;
+    }
+    .br-tree a{
+        text-decoration: none;
+        display: block;
+    }
+    .br-tree li.section a{
+        padding: 10px 5px;
+        border:1px solid #ccc;
+        background: #ddd
+    }
+    .br-tree li.log a{
+        padding: 10px 5px;
+        border:1px solid #ccc;
+        background: #eee
+    }
+    a.openedItem{
+        background: #0056b3!important;
+        color: #fff;
+    }
+    a.error{
+        background: #c55959 !important;
+        color: #fff;
+    }
+    .toggler{
+        transition: all 1s;
+    }
+</style>
+<script>
+var idQueue = [];
+var lastId = 1;
+idQueue.push(lastId);
+
+openIcon = '<span class="toggler">+</span>';
+closeIcon = '<span class="toggler">-</span>';
+
+function updateIcons(objA) {
+    if (objA.hasClass('openedItem')) {
+        objA.find('span.toggler').replaceWith(closeIcon);
+    } else {
+        objA.find('span.toggler').replaceWith(openIcon);
+    }
+}
+
+function closeAll(objA) {
+    var items = objA.parent().siblings().find('ul.submenu');
+    items.each(function () {
+        var ul = $(this).slideUp('slow').parent();
+        ul.find('span.toggler').replaceWith(openIcon);
+        ul.find('a').first().removeClass('openedItem');
+    });
+}
+
+function pushSection(elem){
+    var parentId = idQueue[idQueue.length-1];
+    lastId++;
+    idQueue.push(lastId);
+    $('#'+parentId).append("<li class='section'><a href='#'>"+elem+openIcon+"</a><ul class='submenu' id="+lastId+"></ul></li>");
+    var a = $('#'+parentId).children("li").last().children("a").first();
+    show(a);
+
+    a.bind('click', function (e) {
+                            e.preventDefault();
+                            openOrClose($(this));
+                        });
+}
+
+function add(elem, isError){
+    var parentId = idQueue[idQueue.length-1];
+    $('#'+parentId).append("<li class='log'><a href='#' "+(isError? "class='error'" : "")+">"+elem+"</a></li>");
+    if (isError){
+        for (i = 0; i < idQueue.length; i++){
+            $('#'+idQueue[i]).parent().children('a').first().addClass('error');
+        }
+    }
+}
+
+function openOrClose(objA){
+        var leaveOpen = false;
+    if (leaveOpen === false) {
+        closeAll(objA);
+    }
+
+    if (objA.hasClass('openedItem')) {
+        hide(objA);
+    }
+    else{
+        show(objA);
+    }
+
+    updateIcons(objA);
+}
+
+function hide(objA){
+    objA.removeClass('openedItem');
+    objA.siblings('ul').first().slideUp();
+    updateIcons(objA);
+}
+function show(objA){
+    objA.addClass('openedItem');
+    objA.siblings('ul').first().slideDown();
+    updateIcons(objA);
+}
+
+function popSection(){
+    var sectionId = idQueue.pop();
+    hide($('#'+sectionId).parent().children('a').first());
+}
+
+</script>
+
+<hr>
+<ul id="1" class="br-tree">
+</ul>

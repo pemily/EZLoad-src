@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Bientot Rentier</title>
+</head>
+<body>
+<h1>Bientot Rentier</h1>
+
+<a href="/action/start">Start</a> <p>Va télécharger les pdfs de BourseDirect, les analyser et mettre à jour ezPortfolio</p>
+<a href="/action/exit">Exit</a> <p>Stop le logiciel</p>
+<h1>Configuration</h1>
+<p>
+    <ul>
+    <li>identifiant ezPortfolio: <a target="ezportfolio" href="https://docs.google.com/spreadsheets/d/{{ezPortfolio.ezPortfolioId}}">{{ezPortfolio.ezPortfolioId}}</a></li>
+    <li>Répértoire de logs: <a target="logsDir" href="/logs">{{bientotRentier.logsDir}}</a></li>
+    <li>googleDrive certificat: {{ezPortfolio.gdriveCredsFile}}</li>
+    <li>chrome:
+        <ul>
+            <li>driver: {{chrome.driverPath}}</li>
+            <li>repertoire utilisateur: {{chrome.userDataDir}}</li>
+            <li>profile: {{chrome.profile}}</li>
+        </ul>
+    </li>
+    </ul>
+</p>
+<h2><a target="bourseDirect" href="https://www.boursedirect.fr/fr/page/portefeuille">BourseDirect</a></h2>
+<p>
+{{#bourseDirect}}
+    <ul>
+        <li>Répértoire de téléchargement des pdf: <a target="pdfDir" href="/bourseDirectDir">{{bourseDirect.pdfOutputDir}}</a></li>
+    </ul>
+    <p>
+    <h3>Accounts:</h3>
+        <p>
+        <ul>
+        {{#bourseDirect.accounts}}
+            <li>{{number}}: {{name}}</li>
+        {{/bourseDirect.accounts}}
+        </ul>
+        </p>
+    </p>
+{{/bourseDirect}}
+{{^bourseDirect}}
+    No BourseDirect Account
+{{/bourseDirect}}
+</p>
+
+
+</body>
+</html>

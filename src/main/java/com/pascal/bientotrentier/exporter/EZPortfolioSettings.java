@@ -2,17 +2,8 @@ package com.pascal.bientotrentier.exporter;
 
 public class EZPortfolioSettings {
 
-    private String gDriveCredentialsFile;
+    private String gdriveCredsFile;
     private String ezPortfolioId;
-
-
-    public String getgDriveCredentialsFile() {
-        return gDriveCredentialsFile;
-    }
-
-    public void setgDriveCredentialsFile(String gDriveCredentialsFile) {
-        this.gDriveCredentialsFile = gDriveCredentialsFile;
-    }
 
     public String getEzPortfolioId() {
         return ezPortfolioId;
@@ -20,5 +11,13 @@ public class EZPortfolioSettings {
 
     public void setEzPortfolioId(String ezPortfolioId) {
         this.ezPortfolioId = ezPortfolioId;
+    }
+
+    public String getGdriveCredsFile() {
+        return gdriveCredsFile;
+    }
+
+    public void setGdriveCredsFile(String gdriveCredsFile) {
+        this.gdriveCredsFile = gdriveCredsFile;
     }
 }
