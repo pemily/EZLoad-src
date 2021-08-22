@@ -53,7 +53,8 @@ a.openItem{
     closeIcon = '<span class="toggler">-</span>';
 
     function updateIcons(obj) {
-        if (obj.siblings('.submenu').hasClass('opened')) {
+        console.log("upd", obj.siblings('.submenu'));
+        if (obj.children('.submenu').first().is(':visible')) {
             obj.find('span.toggler').replaceWith(openIcon);
         } else {
             obj.find('span.toggler').replaceWith(closeIcon);
@@ -66,7 +67,7 @@ a.openItem{
         var items = objA.parent().siblings().find('ul.submenu');
         objA.addClass('openItem');
         items.each(function () {
-            if ($(this).hasClass('opened')) {
+            if ($(this).is(':visible')) {
                 var ul = $(this).slideUp('slow').parent();
                 ul.find('span.toggler').replaceWith(openIcon);
                 ul.find('a').first().removeClass('openItem');
@@ -78,7 +79,7 @@ a.openItem{
         var parentId = idQueue[idQueue.length-1];
         lastId++;
         idQueue.push(lastId);
-        $('#'+parentId).append("<li class='dropdown'><a href='#'>"+elem+"<span class='toggler'>+</span></a><ul class='submenu' id="+lastId+"></ul></li>");
+        $('#'+parentId).append("<li class='dropdown'><a href='#'>"+elem+openIcon+"</a><ul class='submenu' id="+lastId+"></ul></li>");
         var a = $('#'+parentId).children("li").last().children("a").first();
 
         a.bind('click', function (e) {
@@ -93,7 +94,7 @@ a.openItem{
             closeOther(objA);
         }
         objA.siblings('ul.submenu').slideToggle(function () {
-            $(this).toggleClass('opened', $(this).is(':visible'));
+            //$(this).toggleClass('opened', $(this).is(':visible'));
         });
         updateIcons(objA);
     }
