@@ -49,8 +49,11 @@ a.openItem{
     var lastId = 1;
     idQueue.push(lastId);
 
+    openIcon = '<span class="toggler">+</span>';
+    closeIcon = '<span class="toggler">-</span>';
+
     function updateIcons(obj) {
-        if (obj.siblings('.submenu').hasClass('closed')) {
+        if (obj.siblings('.submenu').hasClass('opened')) {
             obj.find('span.toggler').replaceWith(openIcon);
         } else {
             obj.find('span.toggler').replaceWith(closeIcon);
@@ -58,17 +61,12 @@ a.openItem{
     }
 
 
-    function setIcons() {
-        openIcon = '<span class="toggler">+</span>';
-        closeIcon = '<span class="toggler">-</span>';
-    }
 
     function closeOther(objA) {
-        setIcons();
         var items = objA.parent().siblings().find('ul.submenu');
         objA.addClass('openItem');
         items.each(function () {
-            if ($(this).hasClass('closed')) {
+            if ($(this).hasClass('opened')) {
                 var ul = $(this).slideUp('slow').parent();
                 ul.find('span.toggler').replaceWith(openIcon);
                 ul.find('a').first().removeClass('openItem');
@@ -80,20 +78,24 @@ a.openItem{
         var parentId = idQueue[idQueue.length-1];
         lastId++;
         idQueue.push(lastId);
-        $('#'+parentId).append("<li class='dropdown opendItem'><a href='#'>"+elem+"<span class='toggler'>+</span></a><ul class='submenu' id="+lastId+"></ul></li>");
+        $('#'+parentId).append("<li class='dropdown'><a href='#'>"+elem+"<span class='toggler'>+</span></a><ul class='submenu' id="+lastId+"></ul></li>");
         var a = $('#'+parentId).children("li").last().children("a").first();
 
         a.bind('click', function (e) {
                                 e.preventDefault();
-                                var leaveOpen = false;
-                                if (leaveOpen === false) {
-                                    closeOther($(this));
-                                }
-                                $(this).siblings('ul.submenu').slideToggle(function () {
-                                    $(this).toggleClass('closed', $(this).is(':visible'));
-                                });
-                                updateIcons($(this));
+                                openOrClose($(this));
                             });
+    }
+
+    function openOrClose(objA){
+            var leaveOpen = false;
+        if (leaveOpen === false) {
+            closeOther(objA);
+        }
+        objA.siblings('ul.submenu').slideToggle(function () {
+            $(this).toggleClass('opened', $(this).is(':visible'));
+        });
+        updateIcons(objA);
     }
 
     function popSection(){
