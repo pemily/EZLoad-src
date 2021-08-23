@@ -6,8 +6,8 @@ public class BRParsingException extends BRException {
     private String fileContent;
     private String analyzedText;
 
-    public BRParsingException(Exception e) {
-        super(e);
+    public BRParsingException(Throwable t) {
+        super(t);
     }
 
 
@@ -38,9 +38,9 @@ public class BRParsingException extends BRException {
     @Override
     public String getMessage() {
         return  ifNotNull("Error: ", getCause().getMessage(), false)
-                +ifNotNull("File: ", filePath, false)
-                +ifNotNull("Parsed text: ", analyzedText, true)
-                +ifNotNull("Full File content: ", fileContent, true);
+                +ifNotNull("File: ", filePath, false);
+                // +ifNotNull("Parsed text: ", analyzedText, true)
+                // +ifNotNull("Full File content: ", fileContent, true);
     }
 
     private String ifNotNull(String prefix, String data, boolean useLargeSeparator){

@@ -3,7 +3,7 @@ package com.pascal.bientotrentier.parsers.bourseDirect;
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.util.TextReporting;
-import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectProcessor;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectProcessor;
 import com.pascal.bientotrentier.util.ModelUtils;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BourseDirectParserTest {
+
+    // to regenerate the benchmark, just remove them and relaunch the test
 
     @Test
     public void test1() throws IOException {

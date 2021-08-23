@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 public class BourseDirectPdfExtractor {
 
-    private Reporting reporting;
+    private final Reporting reporting;
 
     public BourseDirectPdfExtractor(Reporting reporting){
         this.reporting = reporting;

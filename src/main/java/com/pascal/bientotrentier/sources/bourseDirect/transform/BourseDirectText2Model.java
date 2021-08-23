@@ -1,5 +1,6 @@
 package com.pascal.bientotrentier.sources.bourseDirect.transform;
 
+import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.parsers.bourseDirect.BourseDirectPdfParser;
 import com.pascal.bientotrentier.parsers.bourseDirect.Dataset;
 import com.pascal.bientotrentier.sources.Reporting;
@@ -9,10 +10,12 @@ import com.pascal.bientotrentier.util.BRParsingException;
 import com.pascal.bientotrentier.util.StringUtils;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class BourseDirectText2Model {
 
@@ -21,10 +24,10 @@ public class BourseDirectText2Model {
             "sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos\n" +
             "salutations distinguées.\n";
 
-    public static final String DATE_DÉSIGNATION_DÉBIT = "Date Désignation Débit (";
+    public static final String DATE_DESIGNATION_DEBIT = "Date Désignation Débit (";
     public static final String FOOTER = "Sous réserve de bonne fin / Ce relevé ne constitue pas une facture";
 
-    private Reporting reporting;
+    private final Reporting reporting;
 
     public BourseDirectText2Model(Reporting reporting){
         this.reporting = reporting;
@@ -59,18 +62,17 @@ public class BourseDirectText2Model {
 
     private void analyzePdfText(String pdfText, BourseDirectModel model) {
 
-        String section[] = pdfText.split(TEXT_INTRO);
-        String accountSection[] = section[0].split("[\\n]");
+        String[] section = pdfText.split(TEXT_INTRO);
+        String[] accountSection = section[0].split("[\\n]");
         model.setAccountOwnerName(accountSection[2].trim());
 
-        String textDebutTableau = DATE_DÉSIGNATION_DÉBIT;
-        String section2[] = section[1].split(Pattern.quote(textDebutTableau));
-        String section2Splitted[] = section2[0].split("[\\n]");
+        String[] section2 = section[1].split(Pattern.quote(DATE_DESIGNATION_DEBIT));
+        String[] section2Splitted = section2[0].split("[\\n]");
         String leDate = section2Splitted[0]; // Le 24/02/2021
         if (!leDate.startsWith("Le ")) {
             throw new BRException("Invalid Format detected.");
         }
-        model.setDateAvisOperation(leDate.substring(3).trim());
+        model.setDateAvisOperation(BRDate.parseFrenchDate(leDate.substring(3).trim(), '/'));
         String [] accountDetails = accountSection[1].split(" ");
         model.setAccountNumber(accountDetails[2]);
         model.setAccountType(accountDetails[3]);
@@ -90,7 +92,8 @@ public class BourseDirectText2Model {
             BourseDirectPdfParser parser = new BourseDirectPdfParser(new StringReader(dataSetStr));
             Dataset dataset = parser.Dataset();
             model.setOperations(dataset.getOperations());
-            model.setDates(dataset.getDates());
+            // the dates in the BourseDirect pdf are french dates: dd/mm/yyyy
+            model.setDates(new ArrayList<>(dataset.getDates().stream().map(d -> BRDate.parseFrenchDate(d, '/')).collect(Collectors.toList())));
             model.setAmounts(dataset.getAmounts());
         }
         catch(Exception e){

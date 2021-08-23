@@ -1,26 +1,28 @@
 package com.pascal.bientotrentier.model;
 
+import com.pascal.bientotrentier.MainSettings;
+
 import java.util.List;
 
 public class BRModel {
 
-    public enum SourceModel { BOURSE_DIRECT }
-
-    private SourceModel source;
+    private EnumBRCourtier source;
 
     private String sourceFile;
 
-    private String reportDate;
+    private BRDate reportDate;
 
     private BRAccount account;
 
+    private MainSettings.AccountDeclaration accountDeclaration;
+
     private List<BROperation> operations;
 
-    public SourceModel getSource() {
+    public EnumBRCourtier getSource() {
         return source;
     }
 
-    public void setSource(SourceModel source) {
+    public void setSource(EnumBRCourtier source) {
         this.source = source;
     }
 
@@ -32,11 +34,11 @@ public class BRModel {
         this.sourceFile = sourceFile;
     }
 
-    public String getReportDate() {
+    public BRDate getReportDate() {
         return reportDate;
     }
 
-    public void setReportDate(String reportDate) {
+    public void setReportDate(BRDate reportDate) {
         this.reportDate = reportDate;
     }
 
@@ -54,5 +56,13 @@ public class BRModel {
 
     public void setOperations(List<BROperation> operations) {
         this.operations = operations;
+    }
+
+    public MainSettings.AccountDeclaration getAccountDeclaration() {
+        return accountDeclaration;
+    }
+
+    public void setAccountDeclaration(MainSettings.AccountDeclaration accountDeclaration) {
+        this.accountDeclaration = accountDeclaration;
     }
 }

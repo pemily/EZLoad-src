@@ -14,8 +14,12 @@ public class HtmlReporting implements Reporting {
     public HtmlReporting(String title, Writer writer){
         this.title = title;
         this.writer = writer;
+    }
+
+    public void writeHeader(){
         try {
             IOUtils.copy(new InputStreamReader( getClass().getClassLoader().getResourceAsStream("bientotRentier.html")), writer);
+            writer.write("<h1><center>"+ escape(title)+"</center></h1>");
         } catch (IOException e) {
             throw new BRException(e);
         }
@@ -41,7 +45,7 @@ public class HtmlReporting implements Reporting {
     @Override
     public HtmlReporting pushSection(String sectionTitle) {
         try {
-            writer.write("<script>pushSection(\""+esc(sectionTitle)+"\")</script>\n");
+            writer.write("<script>pushSection(\""+ escape(sectionTitle)+"\")</script>\n");
             writer.flush();
         } catch (IOException e) {
             throw new BRException(e);
@@ -62,7 +66,7 @@ public class HtmlReporting implements Reporting {
 
     private void write(String text, boolean isError){
         try {
-            writer.write( "<script>add(\""+esc(text)+"\","+isError+")</script>\n");
+            writer.write( "<script>add(\""+ escape(text)+"\","+isError+")</script>\n");
             writer.flush();
         }
         catch(IOException e){
@@ -70,11 +74,12 @@ public class HtmlReporting implements Reporting {
         }
     }
 
-    private String esc(String text){
+    public static String escape(String text){
         return StringEscapeUtils
                 .escapeHtml3(text)
                 .replace("\n", "<br>")
                 .replace("\"", "&quot;")
+                .replace("\\", "&#92;")
                 ;
     }
 

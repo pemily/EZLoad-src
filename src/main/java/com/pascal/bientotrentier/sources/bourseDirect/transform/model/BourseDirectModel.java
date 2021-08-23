@@ -1,6 +1,7 @@
 package com.pascal.bientotrentier.sources.bourseDirect.transform.model;
 
 
+import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.parsers.bourseDirect.Operation;
 
 import java.util.ArrayList;
@@ -10,11 +11,11 @@ public class BourseDirectModel {
     private String accountType;
     private String accountOwnerName;
     private String address;
-    private String dateAvisOperation;
+    private BRDate dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
     private ArrayList<Operation> operations;
-    private ArrayList<String> dates;
+    private ArrayList<BRDate> dates;
     private ArrayList<String> amounts;
 
     public String getAccountNumber() {
@@ -49,11 +50,11 @@ public class BourseDirectModel {
         this.address = address;
     }
 
-    public String getDateAvisOperation() {
+    public BRDate getDateAvisOperation() {
         return dateAvisOperation;
     }
 
-    public void setDateAvisOperation(String dateAvisOperation) {
+    public void setDateAvisOperation(BRDate dateAvisOperation) {
         this.dateAvisOperation = dateAvisOperation;
     }
 
@@ -81,11 +82,11 @@ public class BourseDirectModel {
         this.operations = operations;
     }
 
-    public ArrayList<String> getDates() {
+    public ArrayList<BRDate> getDates() {
         return dates;
     }
 
-    public void setDates(ArrayList<String> dates) {
+    public void setDates(ArrayList<BRDate> dates) {
         this.dates = dates;
     }
 

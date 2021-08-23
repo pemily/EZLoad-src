@@ -24,7 +24,7 @@ public class BourseDirect2BRModel {
         reporting.info("Creating Standard Model...");
         BRModel brModel = new BRModel();
         brModel.setReportDate(model.getDateAvisOperation());
-        brModel.setSource(BRModel.SourceModel.BOURSE_DIRECT);
+        brModel.setSource(EnumBRCourtier.BourseDirect);
         brModel.setSourceFile(sourceFile);
 
         BRAccount brAccount = new BRAccount();
@@ -52,7 +52,7 @@ public class BourseDirect2BRModel {
         return brModel;
     }
 
-    private BROperation toBROperation(BRModel brModel, Operation operation, String date, String amount) {
+    private BROperation toBROperation(BRModel brModel, Operation operation, BRDate date, String amount) {
         BROperation brOperation = null;
         if (operation instanceof VirementEspece){
             VirementEspece op = (VirementEspece) operation;
@@ -157,16 +157,19 @@ public class BourseDirect2BRModel {
             brOp.setDescription(op.getDetails());
         }
         else {
-            reporting.error("Unkown Operation type: "+operation.getClass().getSimpleName());
+            reporting.error("Unknown Operation type: "+operation.getClass().getSimpleName());
         }
 
         if (brOperation != null) {
             brOperation.setAmount(ModelUtils.normalizeAmount(amount));
             brOperation.setDate(date);
-            brOperation.setCourtier("Bourse Direct");
+            brOperation.setCourtier(EnumBRCourtier.BourseDirect);
             if (brModel.getAccount().getAccountType().equals("Ordinaire")){
-                brOperation.setCompteType(BROperation.COMPTE_TYPE.COMPTE_TITRES_ORDINAIRE);
+                brOperation.setCompteType(EnumBRCompteType.COMPTE_TITRES_ORDINAIRE);
             }
+            brOperation.setAccount(brModel.getAccount());
+            brOperation.setAccountDeclaration(brModel.getAccountDeclaration());
+
         }
         return brOperation;
     }

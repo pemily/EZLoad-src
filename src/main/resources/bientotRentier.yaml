@@ -9,6 +9,11 @@ bourseDirect:
     accounts:
         - number: 508TI00085554410EUR
           name: CTO Pascal
+        - number: 508TI00083351215EUR
+          name: PEA Pascal
+        - number: 508TI00083380981EUR
+          name: PEA Stef
+
     pdfOutputDir: P:\Pascal\Revenu et Dividendes\BientotRentier\BourseDirect
     extractor:
       defaultTimeout: 20

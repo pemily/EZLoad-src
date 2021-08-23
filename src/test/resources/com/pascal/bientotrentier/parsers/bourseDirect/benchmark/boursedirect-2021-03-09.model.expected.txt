@@ -1,35 +1,94 @@
 {
-  "source": "BOURSE_DIRECT",
+  "source": "BourseDirect",
   "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-09.pdf",
-  "reportDate": "09/03/2021",
+  "reportDate": {
+    "day": 9,
+    "month": 3,
+    "year": 2021
+  },
   "account": {
     "accountNumber": "508TI00085554410EUR",
     "accountType": "Ordinaire",
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
-    "devise": "€"
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
   },
   "operations": [
     {
-      "changeRate": "+1,185650720",
-      "coursUSD": "+439,9799",
-      "id": "US11135F1012",
-      "actionName": "BROADCOM INC",
+      "changeRate": "1,18565072",
+      "coursUSD": "439,9799",
+      "action": {
+        "name": "Broadcom Inc.",
+        "ticker": "AVGO",
+        "isin": "US11135F1012",
+        "marketPlace": {
+          "stockExchange": "Nasdaq/Ngs",
+          "city": "New York City",
+          "mic": "XNGS",
+          "acronym": "NGS",
+          "country": {
+            "code": "US",
+            "name": "Etats-Unis"
+          },
+          "googleFinanceCode": "NASDAQ",
+          "currency": {
+            "symbol": "$",
+            "code": "USD"
+          }
+        }
+      },
       "number": 7,
-      "cours": "+371,087279397",
-      "amountBrut": "+2 597,61",
-      "fraisCourtage": "+8,50",
-      "tva": "+0,00",
-      "operationType": "BRAchatEtranger",
-      "date": "09/03/2021",
-      "amount": "2 606,11",
-      "description": "16:05:16 NASDAQ/NGS (GLOBAL SELECT MARKET)"
+      "cours": "371,087279397",
+      "amountBrut": "2597,61",
+      "fraisCourtage": "8,5",
+      "tva": "0",
+      "date": {
+        "day": 9,
+        "month": 3,
+        "year": 2021
+      },
+      "amount": "2606,11",
+      "description": "16:05:16 NASDAQ/NGS (GLOBAL SELECT MARKET)",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      }
     },
     {
-      "operationType": "BRVirementCptEspece",
-      "date": "09/03/2021",
-      "amount": "600,00",
-      "description": "VIRT M. ET/OU MME"
+      "devise": {
+        "symbol": "€",
+        "code": "EUR"
+      },
+      "date": {
+        "day": 9,
+        "month": 3,
+        "year": 2021
+      },
+      "amount": "600",
+      "description": "VIRT M. ET/OU MME",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      }
     }
   ]
 }

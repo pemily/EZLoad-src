@@ -1,12 +1,11 @@
 package com.pascal.bientotrentier.exporter;
 
 import com.google.api.services.sheets.v4.Sheets;
+import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
+import com.pascal.bientotrentier.exporter.ezPortfolio.MesOperations;
 import com.pascal.bientotrentier.exporter.ezPortfolio.MonPortefeuille;
 import com.pascal.bientotrentier.gdrive.GDriveConnection;
 import com.pascal.bientotrentier.gdrive.GDriveSheets;
-import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
-import com.pascal.bientotrentier.exporter.ezPortfolio.MesOperations;
-import com.pascal.bientotrentier.gdrive.Row;
 import com.pascal.bientotrentier.gdrive.SheetValues;
 import com.pascal.bientotrentier.sources.Reporting;
 
@@ -14,12 +13,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-public class EZPortfolioHandler {
+public class EZPortfolioManager {
 
     private Reporting reporting;
     private GDriveSheets sheets;
 
-    public EZPortfolioHandler(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
+    public EZPortfolioManager(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
         Sheets service = GDriveConnection.getService(settings.getGdriveCredsFile());
         sheets = new GDriveSheets(reporting, service, settings.getEzPortfolioId());
         this.reporting = reporting;
@@ -29,7 +28,7 @@ public class EZPortfolioHandler {
         try(Reporting rep = reporting.pushSection("Loading EZPortfolio...")){
             EZPortfolio ezPortfolio = new EZPortfolio();
 
-            List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:J", "MonPortefeuille!A4:L");
+            List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:K", "MonPortefeuille!A4:L");
 
             SheetValues allOperations = ezSheets.get(0);
             MesOperations mesOperations = new MesOperations(reporting, allOperations);
@@ -51,7 +50,7 @@ public class EZPortfolioHandler {
             // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
 
             sheets.batchUpdate(
-                    new SheetValues("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations()),
+                    new SheetValues("MesOperations!A"+firstFreeRow+":K", operations.getNewOperations()),
                     ezPortfolio.getMonPortefeuille().getSheetValues());
         }
     }

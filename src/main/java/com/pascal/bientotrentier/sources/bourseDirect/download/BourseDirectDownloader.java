@@ -1,20 +1,20 @@
 package com.pascal.bientotrentier.sources.bourseDirect.download;
 
 import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.sources.Reporting;
-import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccount;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccountDeclaration;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.bientotrentier.util.BRException;
-import com.pascal.bientotrentier.util.Day;
-import com.pascal.bientotrentier.util.Month;
-import com.pascal.bientotrentier.util.SeleniumUtil;
+import com.pascal.bientotrentier.util.*;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -31,6 +31,16 @@ public class BourseDirectDownloader extends SeleniumUtil {
         this.mainSettings = mainSettings;
         this.reporting = reporting;
         this.bourseDirectSettings = mainSettings.getBourseDirect();
+    }
+
+    public static Predicate<File> fileFilter(){
+        return file -> file.getName().startsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_PREFIX)
+                && file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_SUFFIX)
+                && getDateFromPdfFilePath(file.getName()) != null;
+    }
+
+    public static Predicate<File> dirFilter(MainSettings mainSettings){
+        return dir -> mainSettings.getBourseDirect().getAccounts().stream().anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
     public void start() {
@@ -62,7 +72,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
 
             get("https://www.boursedirect.fr/priv/avis-operes.php");
 
-            for (BourseDirectAccount account : bourseDirectSettings.getAccounts()) {
+            for (BourseDirectAccountDeclaration account : bourseDirectSettings.getAccounts()) {
                 reporting.info("Extraction started for account: " + account.getName());
 
                 selectAccount(account);
@@ -79,7 +89,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
 
     // return true if we must stop the download of the previous monthes
     // return false if we should continue
-    private boolean extractMonthActivities(BourseDirectAccount account, Month month) {
+    private boolean extractMonthActivities(BourseDirectAccountDeclaration account, Month month) {
         List<WebElement> allDayActivities = getAllElements("a", "linkE");
 
         List<Day> allDays = allDayActivities.stream()
@@ -108,7 +118,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
         return stop;
     }
 
-    private void selectAccount(BourseDirectAccount account) {
+    private void selectAccount(BourseDirectAccountDeclaration account) {
         WebElement option = findByContainsText("option", account.getNumber());
         reporting.info("Account "+account.getNumber()+" found");
         String cptIndex = option.getAttribute("value");
@@ -165,7 +175,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
     }
 
 
-    private void downloadPdf(BourseDirectAccount account, Day d) {
+    private void downloadPdf(BourseDirectAccountDeclaration account, Day d) {
         String month = leadingZero(d.getMonth());
         String day = leadingZero(d.getDay());
         String downloadUrl = "https://www.boursedirect.fr/priv/releveOpe.php?nc=3&type=RO&year="+d.getYear()+"&month="+month+"&day="+day+"&trash=/avis.pdf&pdf=1";
@@ -175,13 +185,46 @@ public class BourseDirectDownloader extends SeleniumUtil {
         download(downloadUrl, newFile);
     }
 
-    private String getNewFilename(BourseDirectAccount account, Day d){
-        String month = leadingZero(d.getMonth());
-        String day = leadingZero(d.getDay());
-        return bourseDirectSettings.getPdfOutputDir() + File.separator + account.getName() + File.separator + d.getYear() + File.separator + BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX;
-    }
-
     private String leadingZero(int n){
         return n < 10 ? "0"+n : n+"";
     }
+
+    private String getNewFilename(BourseDirectAccountDeclaration account, Day d){
+        String month = leadingZero(d.getMonth());
+        String day = leadingZero(d.getDay());
+        return bourseDirectSettings.getPdfOutputDir()
+                + File.separator + account.getName() // if this change, review the method  getAccountNameFromPdfFilePath
+                + File.separator + d.getYear()
+                + File.separator +
+                BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX; // if this change, review the method getDateFromPdfFilePath
+    }
+
+    public static BRDate getDateFromPdfFilePath(String pdfFilePath) {
+        try {
+            String s = new File(pdfFilePath).getName().substring(BOURSE_DIRECT_PDF_PREFIX.length());
+            String s2 = s.substring(0, s.length() - BOURSE_DIRECT_PDF_SUFFIX.length());
+            String[] elem = s2.split("-");
+            BRDate date = new BRDate(Integer.parseInt(elem[0]), Integer.parseInt(elem[1]), Integer.parseInt(elem[2]));
+            if (date.isValid()) {
+                return date;
+            }
+        }
+        catch(Throwable t) {
+            return null;
+        }
+        return null;
+    }
+
+    public BourseDirectAccountDeclaration getAccountFromPdfFilePath(String pdfFile){
+        String[] section = pdfFile.replace('\\', '/') // for windows
+                                    .split("/");
+        String account = section.length >=3 ? section[section.length-3] : null; // the pdfFile is: /path/AccountDeclarationName/Year/file.pdf => extract the AccountDeclarationName
+        return  mainSettings.getBourseDirect().getAccounts()
+                .stream()
+                .filter(acc -> acc.getName().equals(account))
+                .findFirst()
+                .orElse(null);
+    }
+
+
 }

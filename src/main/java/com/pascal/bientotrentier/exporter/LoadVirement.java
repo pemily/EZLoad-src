@@ -20,7 +20,7 @@ public class LoadVirement {
         MesOperations mesOperations = ezPortfolio.getMesOperations();
         if (!mesOperations.isOperationsExists(op)){
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
-            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
+            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
 
             MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();
@@ -32,7 +32,7 @@ public class LoadVirement {
         MesOperations mesOperations = ezPortfolio.getMesOperations();
         if (!mesOperations.isOperationsExists(op)){
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
-            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), null,
+            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
                     op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
 
             MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();

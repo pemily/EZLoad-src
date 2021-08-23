@@ -6,11 +6,11 @@ public class BRException extends RuntimeException{
         super(msg);
     }
 
-    public BRException(Exception e){
+    public BRException(Throwable e){
         super(e);
     }
 
-    public BRException(String msg, Exception e){
+    public BRException(String msg, Throwable e){
         super(msg, e);
     }
 }

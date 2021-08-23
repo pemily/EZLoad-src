@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public class BourseDirectModelChecker {
-    private Reporting reporting;
+    private final Reporting reporting;
 
     public BourseDirectModelChecker(Reporting reporting){
         this.reporting = reporting;
@@ -71,7 +71,7 @@ public class BourseDirectModelChecker {
                 isValid = false;
             }
 
-            if (StringUtils.isBlank(model.getDateAvisOperation())) {
+            if (model.getDateAvisOperation() == null) {
                 reporting.error("The date of the report is empty");
                 isValid = false;
             }

@@ -1,6 +1,5 @@
 package com.pascal.bientotrentier.util;
 
-import com.pascal.bientotrentier.model.BRDevise;
 import com.pascal.bientotrentier.model.BRMarketPlace;
 
 import java.util.Arrays;
@@ -13,9 +12,17 @@ public class MarketPlaceUtil {
     // and https://www.google.com/googlefinance/disclaimer/
     // http://factiva.com/CP_Developer/ProductHelp/FDK/FDK33/shared_elements/table_exchange.htm
     // Pour la devise, je l'ai remplis moi meme
+
+    // https://www.iotafinance.com/en/Detail-view-MIC-code-XNGS.html
     private static List<BRMarketPlace> markets = Arrays.asList(
             new BRMarketPlace("New York Stock Exchange", "New York City", "XNYS",  "NYSE", "NYSE", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
             new BRMarketPlace("Nasdaq", "New York City", "XNAS", "NASDAQ", "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq/Ngs", "New York City", "XNGS", "NGS", "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq/Ngs (Global Select Market)", "New York City", "XNGS", "NGS", "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq Intermarket", "New York City", "XNIM", null, "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq Fixed Income Trading", "New York City", "XNFI", null, "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq Options Market", "New York City", "XNDQ", null, "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
+            new BRMarketPlace("Nasdaq Capital Market", "New York City", "XNCM", null, "NASDAQ", CountryUtil.foundByCode("US"), DeviseUtil.foundByCode("USD")),
             new BRMarketPlace("Shanghai Stock Exchange", "Shanghai", "XSHG", "SSE", "SHA", CountryUtil.foundByCode("CN"), DeviseUtil.foundByCode("CNY")),
             new BRMarketPlace("Japan Exchange Group", "Tokyo Osaka", "XJPX", "JPX", "TYO", CountryUtil.foundByCode("JP"), DeviseUtil.foundByCode("JPY")),
             new BRMarketPlace("Hong Kong Stock Exchange", "Hong Kong", "XHKG", "HKEX", "HKG", CountryUtil.foundByCode("HK"), DeviseUtil.foundByCode("HKD")),

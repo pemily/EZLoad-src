@@ -7,5 +7,6 @@
         info: => No error detected
     =====
     info: Creating Standard Model...
+    info: More than 1 data found for US0995021062 First one is selected
     info: Standard Model => ok
 =====

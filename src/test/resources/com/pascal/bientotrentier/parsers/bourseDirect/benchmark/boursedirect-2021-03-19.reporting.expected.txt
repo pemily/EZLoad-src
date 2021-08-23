@@ -7,5 +7,8 @@
         info: => No error detected
     =====
     info: Creating Standard Model...
+    info: More than 1 data found for FR0013269123 First one is selected
+    info: More than 1 data found for US03027X1000 First one is selected
+    info: More than 1 data found for US92936U1097 First one is selected
     info: Standard Model => ok
 =====

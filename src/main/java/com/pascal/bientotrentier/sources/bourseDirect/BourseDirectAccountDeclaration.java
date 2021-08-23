@@ -1,6 +1,8 @@
 package com.pascal.bientotrentier.sources.bourseDirect;
 
-public class BourseDirectAccount {
+import com.pascal.bientotrentier.MainSettings;
+
+public class BourseDirectAccountDeclaration implements MainSettings.AccountDeclaration {
 
     private String number;
     private String name;

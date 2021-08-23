@@ -2,9 +2,12 @@ package com.pascal.bientotrentier.server;
 
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.exporter.BRModelChecker;
+import com.pascal.bientotrentier.exporter.BRModelExporter;
+import com.pascal.bientotrentier.exporter.EZPortfolioManager;
+import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.sources.Reporting;
-import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectProcessor;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectProcessor;
 import com.pascal.bientotrentier.util.HtmlReporting;
 import com.pascal.bientotrentier.util.MultiWriter;
 
@@ -12,6 +15,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class StartAction {
     private final MainSettings mainSettings;
@@ -26,42 +30,54 @@ public class StartAction {
     public void start(Writer htmlPageWriter) throws IOException {
         File logsDir = new File(mainSettings.getBientotRentier().getLogsDir());
         logsDir.mkdirs();
-        File reportFile = new File(logsDir + File.separator + REPORT_FILE_PREFIX + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(new Date()) + REPORT_FILE_SUFFIX);
+        Date now = new Date();
+        String reportFileName =  REPORT_FILE_PREFIX + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + REPORT_FILE_SUFFIX;
+        File reportFile = new File(logsDir + File.separator + reportFileName);
 
-        try (Writer reportWriter = new BufferedWriter(new FileWriter(reportFile))) {
-            reportWriter.write("<html><head><meta charset='UTF-8'>\n");
-            try (HtmlReporting reporting = new HtmlReporting("Bientot Rentier Report", new MultiWriter(reportWriter, htmlPageWriter))) {
-                reportWriter.write("</head><body>\n");
+        try (
+                Writer fileWriter = new BufferedWriter(new FileWriter(reportFile));
+                HtmlReporting reporting = new HtmlReporting("Bientot Rentier Report - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(now) , new MultiWriter(fileWriter, htmlPageWriter))
+        ) {
+            fileWriter.write("<html><head><meta charset='UTF-8'>\n");
+            reporting.writeHeader(); // will write into the report & html Page
+            fileWriter.write("</head><body>\n");
 
-                try (Reporting top = reporting.pushSection("Bientot Rentier Report - " + reportFile.getAbsolutePath())) {
 
-                    try (Reporting rep = reporting.pushSection("Extract data from BourseDirect")) {
-                        // new BourseDirectExtractor(mainSettings).start(reporting);
-                    }
+            try {
+                EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings.getEzPortfolio());
+                EZPortfolio ezPortfolio = ezPortfolioManager.load();
 
-                    List<BRModel> allBRModels = null;
-                    try (Reporting rep = reporting.pushSection("Analyze BourseDirect PDF file")) {
-                        allBRModels = new BourseDirectProcessor(mainSettings).start(reporting);
-                    }
+                List<BRModel> allBRModels;
+                try (Reporting rep = reporting.pushSection("Launch BourseDirect Process")) {
+                    allBRModels = new BourseDirectProcessor(mainSettings).start(reporting, ezPortfolio);
+                }
 
-                    boolean isValid = false;
-                    try (Reporting rep = reporting.pushSection("Checking Operations")) {
-                        isValid = new BRModelChecker(reporting).isActionValid(allBRModels);
-                    }
+                boolean isValid;
+                try (Reporting rep = reporting.pushSection("Checking Operations")) {
+                    isValid = new BRModelChecker(reporting).isActionValid(allBRModels);
+                }
 
-                    if (isValid) {
-                        try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
-                     /*       EZPortfolioHandler ezPortfolioHandler = new EZPortfolioHandler(reporting, mainSettings.getEzPortfolio());
-                            EZPortfolio ezPortfolio = ezPortfolioHandler.load();
-                            new BRModelExporter(reporting).exportModels(allBRModels, ezPortfolio);
-                            ezPortfolioHandler.save(ezPortfolio);*/
-                        }
+                if (isValid) {
+                    try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
+                        new BRModelExporter(reporting).exportModels(allBRModels, ezPortfolio);
+                        ezPortfolioManager.save(ezPortfolio);
                     }
                 }
-                reportWriter.write("</body></html>\n");
-                reportWriter.flush();
             }
+            catch(Throwable t){
+                reporting.error(t);
+            }
+
+            fileWriter.write("</body></html>\n");
+            fileWriter.flush();
         }
     }
 
+    public static Predicate<File> fileFilter(){
+        return file -> file.getName().startsWith(StartAction.REPORT_FILE_PREFIX) && file.getName().endsWith(StartAction.REPORT_FILE_SUFFIX);
+    }
+
+    public static Predicate<File> dirFilter(){
+        return file -> false; // there is no subdir for log
+    }
 }

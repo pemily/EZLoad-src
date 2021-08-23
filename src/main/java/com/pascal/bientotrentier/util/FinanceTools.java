@@ -38,27 +38,32 @@ public class FinanceTools {
         URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
-            con.setRequestMethod("GET");
-            InputStream input = new BufferedInputStream(con.getInputStream());
+            try {
+                con.setRequestMethod("GET");
+                InputStream input = new BufferedInputStream(con.getInputStream());
 
-            Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
-            Map<String, Object> instruments = (Map<String, Object>) top.get("instruments");
-            List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
-            if (data.size() == 0) return null;
-            if (data.size() > 1) {
-                reporting.info("More than 1 data found for " + actionCode + " First one is selected");
+                Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
+                Map<String, Object> instruments = (Map<String, Object>) top.get("instruments");
+                List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
+                if (data.size() == 0) return null;
+                if (data.size() > 1) {
+                    reporting.info("More than 1 data found for " + actionCode + " First one is selected");
+                }
+                BRAction action = new BRAction();
+                Map<String, Object> actionData = data.get(0);
+                action.setName((String) actionData.get("name")); // WP CAREY INC
+                action.setTicker((String) actionData.get("ticker")); // WPC
+                action.setIsin((String) actionData.get("isin")); // US92936U1097
+                Map<String, Object> market = (Map<String, Object>) actionData.get("market");
+                Map<String, Object> currency = (Map<String, Object>) actionData.get("currency");
+                    action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
+                if (!currency.get("code").equals(action.getMarketPlace().getCurrency().getCode()))
+                    throw new BRException("The currency declared for this action: "+currency+ " is not the expected currency: "+action.getMarketPlace().getCurrency().getCode());
+                return action;
             }
-            BRAction action = new BRAction();
-            Map<String, Object> actionData = data.get(0);
-            action.setName((String) actionData.get("name")); // WP CAREY INC
-            action.setTicker((String) actionData.get("ticker")); // WPC
-            action.setIsin((String) actionData.get("isin")); // US92936U1097
-            Map<String, Object> market = (Map<String, Object>) actionData.get("market");
-            Map<String, Object> currency = (Map<String, Object>) actionData.get("currency");
-            action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
-            if (!currency.get("code").equals(action.getMarketPlace().getCurrency().getCode()))
-                throw new BRException("The currency declared for this action: "+currency+ " is not the expected currency: "+action.getMarketPlace().getCurrency().getCode());
-            return action;
+            catch(Throwable e){
+                throw new BRException("Error when retrieving information for actionCode: "+actionCode+" url is: "+ url, e);
+            }
         }
         finally {
             con.disconnect();

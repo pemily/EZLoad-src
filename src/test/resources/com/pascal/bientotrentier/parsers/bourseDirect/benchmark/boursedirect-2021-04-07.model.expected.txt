@@ -1,34 +1,89 @@
 {
-  "source": "BOURSE_DIRECT",
+  "source": "BourseDirect",
   "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-04-07.pdf",
-  "reportDate": "07/04/2021",
+  "reportDate": {
+    "day": 7,
+    "month": 4,
+    "year": 2021
+  },
   "account": {
     "accountNumber": "508TI00085554410EUR",
     "accountType": "Ordinaire",
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
-    "devise": "€"
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
   },
   "operations": [
     {
-      "id": "US11135F1012",
-      "actionName": "BROADCOM INC",
+      "action": {
+        "name": "Broadcom Inc.",
+        "ticker": "AVGO",
+        "isin": "US11135F1012",
+        "marketPlace": {
+          "stockExchange": "Nasdaq/Ngs",
+          "city": "New York City",
+          "mic": "XNGS",
+          "acronym": "NGS",
+          "country": {
+            "code": "US",
+            "name": "Etats-Unis"
+          },
+          "googleFinanceCode": "NASDAQ",
+          "currency": {
+            "symbol": "$",
+            "code": "USD"
+          }
+        }
+      },
       "number": -7,
-      "prixUnitaireBrut": "+3,07383",
-      "commission": "+0,00",
-      "prelevement": "+2,75",
-      "amountBrut": "+21,52",
-      "creditImpot": "+3,23",
-      "contributionSocial": "+3,68",
-      "operationType": "BRCoupons",
-      "date": "07/04/2021",
-      "amount": "11,85"
+      "prixUnitaireBrut": "3,07383",
+      "commission": "0",
+      "prelevement": "2,75",
+      "amountBrut": "21,52",
+      "creditImpot": "3,23",
+      "contributionSocial": "3,68",
+      "date": {
+        "day": 7,
+        "month": 4,
+        "year": 2021
+      },
+      "amount": "11,85",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      }
     },
     {
-      "operationType": "BRDroitDeGarde",
-      "date": "07/04/2021",
+      "date": {
+        "day": 7,
+        "month": 4,
+        "year": 2021
+      },
       "amount": "0,22",
-      "description": "DDGETG1T21"
+      "description": "DDGETG1T21",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      }
     }
   ]
 }

@@ -1,28 +1,68 @@
 {
-  "source": "BOURSE_DIRECT",
+  "source": "BourseDirect",
   "sourceFile": "/D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-04-30.pdf",
-  "reportDate": "30/04/2021",
+  "reportDate": {
+    "day": 30,
+    "month": 4,
+    "year": 2021
+  },
   "account": {
     "accountNumber": "508TI00085554410EUR",
     "accountType": "Ordinaire",
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
-    "devise": "€"
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
   },
   "operations": [
     {
-      "id": "US03027X1000",
-      "actionName": "AMERICAN TOWER",
+      "action": {
+        "name": "American Tower Corporation",
+        "ticker": "AMT",
+        "isin": "US03027X1000",
+        "marketPlace": {
+          "stockExchange": "New York Stock Exchange",
+          "city": "New York City",
+          "mic": "XNYS",
+          "acronym": "NYSE",
+          "country": {
+            "code": "US",
+            "name": "Etats-Unis"
+          },
+          "googleFinanceCode": "NYSE",
+          "currency": {
+            "symbol": "$",
+            "code": "USD"
+          }
+        }
+      },
       "number": -19,
-      "prixUnitaireBrut": "+1,02347",
-      "commission": "+0,00",
-      "prelevement": "+2,48",
-      "amountBrut": "+19,45",
-      "creditImpot": "+2,92",
-      "contributionSocial": "+3,32",
-      "operationType": "BRCoupons",
-      "date": "30/04/2021",
-      "amount": "10,72"
+      "prixUnitaireBrut": "1,02347",
+      "commission": "0",
+      "prelevement": "2,48",
+      "amountBrut": "19,45",
+      "creditImpot": "2,92",
+      "contributionSocial": "3,32",
+      "date": {
+        "day": 30,
+        "month": 4,
+        "year": 2021
+      },
+      "amount": "10,72",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      }
     }
   ]
 }

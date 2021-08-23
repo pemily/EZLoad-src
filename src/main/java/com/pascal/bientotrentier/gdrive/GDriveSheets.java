@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GDriveSheets {
-    private String spreadsheetId;
-    private Sheets service;
-    private Reporting reporting;
+    private final String spreadsheetId;
+    private final Sheets service;
+    private final Reporting reporting;
 
     public GDriveSheets(Reporting reporting, Sheets service, String spreadsheetId){
         this.spreadsheetId = spreadsheetId;
@@ -31,8 +31,7 @@ public class GDriveSheets {
         });
         reporting.info("GDrive reading done");
         List<Row> rows = r.stream().map(Row::new).collect(Collectors.toList());
-        SheetValues sv = new SheetValues(range, rows);
-        return sv;
+        return new SheetValues(range, rows);
     }
 
     public int update(String range, List<Row> values) throws Exception {
@@ -71,7 +70,7 @@ public class GDriveSheets {
     }
 
     public int batchUpdate(List<SheetValues> sheetValues) throws Exception {
-        int r = retryOnTimeout(15, () -> {
+        return retryOnTimeout(15, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
             buvr.setValueInputOption("USER_ENTERED");
 
@@ -86,7 +85,6 @@ public class GDriveSheets {
                     .execute();
             return resp.getTotalUpdatedCells();
         });
-        return r;
     }
 
     private <T> T retryOnTimeout(int n,  SupplierWithException<T> fct) throws Exception {

@@ -94,4 +94,8 @@ public class MainSettings {
             this.logsDir = logsDir;
         }
     }
+
+    public interface AccountDeclaration {
+        String getName();
+    }
 }

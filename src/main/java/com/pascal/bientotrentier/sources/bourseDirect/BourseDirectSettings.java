@@ -5,14 +5,14 @@ import java.util.List;
 public class BourseDirectSettings {
 
     private String pdfOutputDir;
-    private List<BourseDirectAccount> accounts;
+    private List<BourseDirectAccountDeclaration> accounts;
     private ExtractSettings extractor;
 
-    public List<BourseDirectAccount> getAccounts() {
+    public List<BourseDirectAccountDeclaration> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<BourseDirectAccount> accounts) {
+    public void setAccounts(List<BourseDirectAccountDeclaration> accounts) {
         this.accounts = accounts;
     }
 

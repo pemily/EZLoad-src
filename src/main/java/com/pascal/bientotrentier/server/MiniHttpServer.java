@@ -36,12 +36,12 @@ public class MiniHttpServer implements Closeable {
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/home", new HomeHandler(mainSettings));
         server.createContext("/logs", new DirHandler("logs", mainSettings.getBientotRentier().getLogsDir(),
-                dir -> false, // no subdir
-                file -> file.getName().startsWith(StartAction.REPORT_FILE_PREFIX) && file.getName().endsWith(StartAction.REPORT_FILE_SUFFIX),
-                "#"));
+                StartAction.dirFilter(),
+                StartAction.fileFilter(),
+                "log"));
         server.createContext("/bourseDirectDir", new DirHandler("bourseDirectDir", mainSettings.getBourseDirect().getPdfOutputDir(),
-                dir -> mainSettings.getBourseDirect().getAccounts().stream().anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName())),
-                file -> file.getName().startsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_PREFIX) && file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_SUFFIX),
+                BourseDirectDownloader.dirFilter(mainSettings),
+                BourseDirectDownloader.fileFilter(),
                 "bourseDirectPdf"));
         server.createContext("/action/start", new StartActionHandler(mainSettings));
         server.createContext("/action/exit", new ExitActionHandler());

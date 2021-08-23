@@ -1,30 +1,23 @@
 package com.pascal.bientotrentier.model;
 
+import com.pascal.bientotrentier.MainSettings;
+
 public abstract class BROperation {
-    public enum COMPTE_TYPE {
-        PEA("PEA"), PEA_PME("PEA-PME"), COMPTE_TITRES_ORDINAIRE("Compte-Titres Ordinaire");
 
-        private String name;
-        COMPTE_TYPE(String name){
-            this.name = name;
-        }
 
-        public String getEZPortfolioName(){
-            return name;
-        }
-    }
-
-    private String date;
+    private BRDate date;
     private String amount;
     private String description;
-    private COMPTE_TYPE compteType;
-    private String courtier;
+    private EnumBRCompteType compteType;
+    private EnumBRCourtier courtier;
+    private BRAccount account;
+    private MainSettings.AccountDeclaration accountDeclaration;
 
-    public String getDate() {
+    public BRDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(BRDate date) {
         this.date = date;
     }
 
@@ -46,20 +39,36 @@ public abstract class BROperation {
 
     public abstract BROperationType getOperationType();
 
-    public COMPTE_TYPE getCompteType() {
+    public EnumBRCompteType getCompteType() {
         return compteType;
     }
 
-    public void setCompteType(COMPTE_TYPE compteType) {
+    public void setCompteType(EnumBRCompteType compteType) {
         this.compteType = compteType;
     }
 
-    public String getCourtier() {
+    public EnumBRCourtier getCourtier() {
         return courtier;
     }
 
-    public void setCourtier(String courtier) {
+    public void setCourtier(EnumBRCourtier courtier) {
         this.courtier = courtier;
+    }
+
+    public BRAccount getAccount() {
+        return account;
+    }
+
+    public void setAccount(BRAccount account) {
+        this.account = account;
+    }
+
+    public MainSettings.AccountDeclaration getAccountDeclaration() {
+        return accountDeclaration;
+    }
+
+    public void setAccountDeclaration(MainSettings.AccountDeclaration accountDeclaration) {
+        this.accountDeclaration = accountDeclaration;
     }
 
     @Override
@@ -69,6 +78,8 @@ public abstract class BROperation {
                 ", amount='" + amount + '\'' +
                 ", description='" + description + '\'' +
                 ", compteType=" + compteType +
+                ", account Name=" + account.getOwnerName() +
+                ", account Number=" + account.getAccountNumber() +
                 ", courtier='" + courtier + '\'' +
                 '}';
     }

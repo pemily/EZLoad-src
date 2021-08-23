@@ -1,5 +1,6 @@
 package com.pascal.bientotrentier.gdrive;
 
+import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.util.ModelUtils;
 
 import java.util.Arrays;
@@ -15,20 +16,23 @@ public class Row {
         this.values = values;
     }
 
-    public Row(Object... values){
+    public Row(String... values){
         this.values = Arrays.asList(values);
     }
-/*
-    public Object value(int colIndex){
-        return colIndex >= values.size() ? null : values.get(colIndex);
-    }*/
 
-    public String valueStr(int colIndex){
-        return colIndex >= values.size() ? null : (String) values.get(colIndex);
+
+    public BRDate valueDate(int colIndex) {
+        String date = valueStr(colIndex);
+        if (date == null) return null;
+        return BRDate.parseFrenchDate(date, '/');
     }
 
     public List<Object> getValues() {
         return values;
+    }
+
+    public String valueStr(int colIndex){
+        return colIndex >= values.size() ? null : (String) values.get(colIndex);
     }
 
     public float valueFloat(int colIndex) {
@@ -37,5 +41,9 @@ public class Row {
 
     public void setValue(int colIndex, String s) {
         values.set(colIndex, s);
+    }
+
+    public void setValue(int colIndex, BRDate d) {
+        values.set(colIndex, d.toEzPortoflioDate());
     }
 }
