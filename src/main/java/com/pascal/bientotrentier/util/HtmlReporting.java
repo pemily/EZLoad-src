@@ -10,16 +10,20 @@ public class HtmlReporting implements Reporting {
 
     private final Writer writer;
     private final String title;
+    private final FileLinkCreator fileLinkCreator;
 
-    public HtmlReporting(String title, Writer writer){
+    public HtmlReporting(String title, FileLinkCreator fileLinkCreator, Writer writer){
         this.title = title;
         this.writer = writer;
+        this.fileLinkCreator = fileLinkCreator;
     }
 
     public void writeHeader(){
         try {
             IOUtils.copy(new InputStreamReader( getClass().getClassLoader().getResourceAsStream("bientotRentier.html")), writer);
-            writer.write("<h1><center>"+ escape(title)+"</center></h1>");
+            writer.write("<h1><center>"+ escape(title)+"</center></h1>\n");
+            writer.write("<ul id='1' class='br-tree'></ul>\n");
+            writer.flush();
         } catch (IOException e) {
             throw new BRException(e);
         }
@@ -54,6 +58,17 @@ public class HtmlReporting implements Reporting {
     }
 
     @Override
+    public HtmlReporting pushSection(TitleWithFileRef sectionTitle) {
+        try {
+            writer.write("<script>pushSection(\""+ sectionTitle.format(this, fileLinkCreator)+"\")</script>\n");
+            writer.flush();
+        } catch (IOException e) {
+            throw new BRException(e);
+        }
+        return this;
+    }
+
+    @Override
     public void popSection() {
         try {
             writer.write("<script>popSection()</script>\n");
@@ -74,9 +89,11 @@ public class HtmlReporting implements Reporting {
         }
     }
 
-    public static String escape(String text){
+    public String escape(String text){
         return StringEscapeUtils
-                .escapeHtml3(text)
+                .escapeHtml4(text)
+                .replace("\t", "&nbsp;&nbsp;")
+                .replace("\r", "")
                 .replace("\n", "<br>")
                 .replace("\"", "&quot;")
                 .replace("\\", "&#92;")

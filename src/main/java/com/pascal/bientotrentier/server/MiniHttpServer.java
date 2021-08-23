@@ -6,6 +6,7 @@ import com.github.mustachejava.MustacheFactory;
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.download.BourseDirectDownloader;
 import com.pascal.bientotrentier.util.BRException;
+import com.pascal.bientotrentier.util.FileLinkCreator;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -23,26 +24,31 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MiniHttpServer implements Closeable {
+    private static final String PDF_BOURSE_DIRECT_CONTEXT = "/bourseDirectDir";
+    private static final String PDF_BOURSE_DIRECT_TARGET = "bourseDirectPdf";
+    private static final String LOGS_CONTEXT = "/logs";
+    private static final String LOGS_TARGET = "log";
+
     private HttpServer server;
-    private MustacheFactory mustacheFactory; // https://www.baeldung.com/mustache
     private Mustache homeTemplateMustache;
     private Mustache dirTemplateMustache;
 
     public int start(MainSettings mainSettings) throws Exception {
-        mustacheFactory = new DefaultMustacheFactory();
+        // https://www.baeldung.com/mustache
+        MustacheFactory mustacheFactory = new DefaultMustacheFactory();
         homeTemplateMustache = mustacheFactory.compile("homeTemplate.mustache");
         dirTemplateMustache = mustacheFactory.compile("dirTemplate.mustache");
 
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/home", new HomeHandler(mainSettings));
-        server.createContext("/logs", new DirHandler("logs", mainSettings.getBientotRentier().getLogsDir(),
+        server.createContext(LOGS_CONTEXT, new DirHandler(LOGS_CONTEXT, mainSettings.getBientotRentier().getLogsDir(),
                 StartAction.dirFilter(),
                 StartAction.fileFilter(),
-                "log"));
-        server.createContext("/bourseDirectDir", new DirHandler("bourseDirectDir", mainSettings.getBourseDirect().getPdfOutputDir(),
+                LOGS_TARGET));
+        server.createContext(PDF_BOURSE_DIRECT_CONTEXT, new DirHandler(PDF_BOURSE_DIRECT_CONTEXT, mainSettings.getBourseDirect().getPdfOutputDir(),
                 BourseDirectDownloader.dirFilter(mainSettings),
                 BourseDirectDownloader.fileFilter(),
-                "bourseDirectPdf"));
+                PDF_BOURSE_DIRECT_TARGET));
         server.createContext("/action/start", new StartActionHandler(mainSettings));
         server.createContext("/action/exit", new ExitActionHandler());
         server.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
@@ -76,7 +82,7 @@ public class MiniHttpServer implements Closeable {
             header.add("Content-Type", "text/html");
             exchange.sendResponseHeaders( 200, 0 );
             Writer os = new OutputStreamWriter(exchange.getResponseBody());
-            new StartAction(mainSettings).start(os);
+            new StartAction(mainSettings).start(os, fileLinkCreator(mainSettings));
             os.close();
         }
     }
@@ -115,10 +121,11 @@ public class MiniHttpServer implements Closeable {
 
 
     private class DirHandler implements HttpHandler {
-        private String dir;
-        private String context;
-        private Predicate<File> dirFilter, fileFilter;
-        private String fileTarget;
+        private final String dir;
+        private final String context;
+        private final Predicate<File> dirFilter;
+        private final Predicate<File> fileFilter;
+        private final String fileTarget;
 
         public DirHandler(String context, String dir, Predicate<File> dirFilter, Predicate<File> fileFilter, String fileTarget) {
             this.dir = dir;
@@ -145,10 +152,12 @@ public class MiniHttpServer implements Closeable {
                         .filter(File::isDirectory)
                         .filter(f -> !f.getName().startsWith("."))
                         .filter(dirFilter)
+                        .sorted()
                         .collect(Collectors.toList());
                 List<File> files = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
                         .filter(File::isFile)
                         .filter(fileFilter)
+                        .sorted(Comparator.comparing(File::getName).reversed())
                         .collect(Collectors.toList());
 
                 Map<String, Object> data = new HashMap<>();
@@ -191,6 +200,24 @@ public class MiniHttpServer implements Closeable {
         } catch (URISyntaxException e) {
             throw new BRException(e);
         }
+    }
 
+
+    public FileLinkCreator fileLinkCreator(MainSettings mainSettings){
+        return (reporting, sourceFile) -> {
+            if (sourceFile.startsWith(mainSettings.getBourseDirect().getPdfOutputDir())){
+                String file = sourceFile.substring(mainSettings.getBourseDirect().getPdfOutputDir().length());
+                file = file.replace('\\', '/'); // pour windows
+                return "<a target='"+PDF_BOURSE_DIRECT_TARGET+"' href='"+PDF_BOURSE_DIRECT_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
+            }
+            else if (sourceFile.startsWith(mainSettings.getBientotRentier().getLogsDir())){
+                String file = sourceFile.substring(mainSettings.getBientotRentier().getLogsDir().length());
+                file = file.replace('\\', '/'); // pour windows
+                return "<a target='"+LOGS_TARGET+"' href='"+LOGS_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
+            }
+            else{
+                return reporting.escape(sourceFile);
+            }
+        };
     }
 }

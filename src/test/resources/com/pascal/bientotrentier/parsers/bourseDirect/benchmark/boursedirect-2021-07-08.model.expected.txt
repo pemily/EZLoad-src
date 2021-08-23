@@ -16,6 +16,9 @@
       "code": "EUR"
     }
   },
+  "accountDeclaration": {
+    "name": "Pascal CTO"
+  },
   "operations": [
     {
       "action": {
@@ -61,6 +64,9 @@
           "symbol": "€",
           "code": "EUR"
         }
+      },
+      "accountDeclaration": {
+        "name": "Pascal CTO"
       }
     },
     {
@@ -102,6 +108,9 @@
           "symbol": "€",
           "code": "EUR"
         }
+      },
+      "accountDeclaration": {
+        "name": "Pascal CTO"
       }
     },
     {
@@ -142,6 +151,9 @@
           "symbol": "€",
           "code": "EUR"
         }
+      },
+      "accountDeclaration": {
+        "name": "Pascal CTO"
       }
     }
   ]

@@ -6,6 +6,7 @@ import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccountDeclaration;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.bientotrentier.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,14 +23,13 @@ public class BourseDirectDownloader extends SeleniumUtil {
 
     private final MainSettings mainSettings;
     private final BourseDirectSettings bourseDirectSettings;
-    private final Reporting reporting;
 
     public static final String BOURSE_DIRECT_PDF_PREFIX = "boursedirect-";
     public static final String BOURSE_DIRECT_PDF_SUFFIX = ".pdf";
 
     public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings) {
+        super(reporting);
         this.mainSettings = mainSettings;
-        this.reporting = reporting;
         this.bourseDirectSettings = mainSettings.getBourseDirect();
     }
 
@@ -44,46 +44,49 @@ public class BourseDirectDownloader extends SeleniumUtil {
     }
 
     public void start() {
-        WebDriver driver = null;
-        try {
-            driver = getLocalhostWebDriver(mainSettings);
-            init(driver, mainSettings.getBourseDirect().getExtractor().getDefaultTimeout(), mainSettings.getChrome().getDownloadDir());
-            downloadUpdates();
-        }
-        catch(Exception e) {
-            if (e instanceof InvalidArgumentException)
-                reporting.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
-            else
-                reporting.error(e);
+        try(Reporting rep = reporting.pushSection("Downloading BourseDirect Reports...")) {
+            WebDriver driver = null;
+            try {
+                driver = getLocalhostWebDriver(mainSettings);
+                init(driver, mainSettings.getBourseDirect().getExtractor().getDefaultTimeout(), mainSettings.getChrome().getDownloadDir());
+                downloadUpdates();
+            } catch (Exception e) {
+                if (e instanceof InvalidArgumentException)
+                    reporting.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
+                else
+                    reporting.error(e);
 
-            if (driver != null)
-                driver.quit();
+                if (driver != null)
+                    driver.quit();
+            }
         }
     }
 
     private void downloadUpdates(){
-        try(Reporting rep = reporting.pushSection("Downloading BourseDirect Reports...")){
-            get("https://www.boursedirect.fr/fr/login");
+        get("https://www.boursedirect.fr/fr/login");
 
-            if (bourseDirectSettings.getExtractor().isAutoLogin())
-                findById("bd_auth_login_type_submit").click();
+        if (bourseDirectSettings.getExtractor().isAutoLogin()) {
+            String login = findById("bd_auth_login_type_login").getText();
 
-            waitUrlIsNot("https://www.boursedirect.fr/fr/login");
+            if (!StringUtils.isBlank(login)) findById("bd_auth_login_type_submit").click();
+            else reporting.info("Please Enter your login/password then click on Connect");
+        }
 
-            get("https://www.boursedirect.fr/priv/avis-operes.php");
+        waitUrlIsNot("https://www.boursedirect.fr/fr/login", mainSettings.getBourseDirect().getExtractor().getDefaultTimeout()*2);
 
-            for (BourseDirectAccountDeclaration account : bourseDirectSettings.getAccounts()) {
-                reporting.info("Extraction started for account: " + account.getName());
+        get("https://www.boursedirect.fr/priv/avis-operes.php");
 
-                selectAccount(account);
+        for (BourseDirectAccountDeclaration account : bourseDirectSettings.getAccounts()) {
+            reporting.info("Extraction started for account: " + account.getName());
 
-                for (Month nextMonth = extractDateFromPage(); nextMonth != null; nextMonth = clickMoisPrecedent()) {
-                    if (extractMonthActivities(account, nextMonth))
-                        break;
-                }
+            selectAccount(account);
 
-                reporting.info("Extraction done for account: " + account.getName());
+            for (Month nextMonth = extractDateFromPage(); nextMonth != null; nextMonth = clickMoisPrecedent()) {
+                if (extractMonthActivities(account, nextMonth))
+                    break;
             }
+
+            reporting.info("Extraction done for account: " + account.getName());
         }
     }
 

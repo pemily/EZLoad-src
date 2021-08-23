@@ -1,5 +1,9 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <style type="text/css">
+    a {color:#000000;}         /* Unvisited link  */
+    a:visited {color:#000000;} /* Visited link    */
+    a:hover {color:#000000;}   /* Mouse over link */
+    a:active {color:#000000;}  /* Selected link   */
     .br-tree ul{
         list-style-type: none;
     }
@@ -21,25 +25,25 @@
     .br-tree span.toggler{
         float: right;
     }
-    .br-tree a{
+    .br-tree div{
         text-decoration: none;
         display: block;
     }
-    .br-tree li.section a{
+    .br-tree li.section div{
         padding: 10px 5px;
         border:1px solid #ccc;
         background: #ddd
     }
-    .br-tree li.log a{
+    .br-tree li.log div{
         padding: 10px 5px;
         border:1px solid #ccc;
         background: #eee
     }
-    a.openedItem{
+    div.openedItem{
         background: #0056b3!important;
         color: #fff;
     }
-    a.error{
+    div.error{
         background: #c55959 !important;
         color: #fff;
     }
@@ -55,16 +59,16 @@ idQueue.push(lastId);
 openIcon = '<span class="toggler">+</span>';
 closeIcon = '<span class="toggler">-</span>';
 
-function updateIcons(objA) {
-    if (objA.hasClass('openedItem')) {
-        objA.find('span.toggler').replaceWith(closeIcon);
+function updateIcons(objDiv) {
+    if (objDiv.hasClass('openedItem')) {
+        objDiv.find('span.toggler').replaceWith(closeIcon);
     } else {
-        objA.find('span.toggler').replaceWith(openIcon);
+        objDiv.find('span.toggler').replaceWith(openIcon);
     }
 }
 
-function closeAll(objA) {
-    var items = objA.parent().siblings().find('ul.submenu');
+function closeAll(objDiv) {
+    var items = objDiv.parent().siblings().find('ul.submenu');
     items.each(function () {
         var ul = $(this).slideUp('slow').parent();
         ul.find('span.toggler').replaceWith(openIcon);
@@ -76,59 +80,57 @@ function pushSection(elem){
     var parentId = idQueue[idQueue.length-1];
     lastId++;
     idQueue.push(lastId);
-    $('#'+parentId).append("<li class='section'><a href='#'>"+elem+openIcon+"</a><ul class='submenu' id="+lastId+"></ul></li>");
-    var a = $('#'+parentId).children("li").last().children("a").first();
+    $('#'+parentId).append("<li class='section'><div href='#'>"+elem+openIcon+"</div><ul class='submenu' id="+lastId+"></ul></li>");
+    var a = $('#'+parentId).children("li").last().children("div").first();
     show(a);
 
     a.bind('click', function (e) {
-                            e.preventDefault();
+                           // e.preventDefault();
                             openOrClose($(this));
                         });
 }
 
 function add(elem, isError){
     var parentId = idQueue[idQueue.length-1];
-    $('#'+parentId).append("<li class='log'><a href='#' "+(isError? "class='error'" : "")+">"+elem+"</a></li>");
+    $('#'+parentId).append("<li class='log'><div href='#' "+(isError? "class='error'" : "")+">"+elem+"</div></li>");
     if (isError){
         for (i = 0; i < idQueue.length; i++){
-            $('#'+idQueue[i]).parent().children('a').first().addClass('error');
+            $('#'+idQueue[i]).parent().children('div').first().addClass('error');
         }
     }
 }
 
-function openOrClose(objA){
+function openOrClose(objDiv){
         var leaveOpen = false;
     if (leaveOpen === false) {
-        closeAll(objA);
+        closeAll(objDiv);
     }
 
-    if (objA.hasClass('openedItem')) {
-        hide(objA);
+    if (objDiv.hasClass('openedItem')) {
+        hide(objDiv);
     }
     else{
-        show(objA);
+        show(objDiv);
     }
 
-    updateIcons(objA);
+    updateIcons(objDiv);
 }
 
-function hide(objA){
-    objA.removeClass('openedItem');
-    objA.siblings('ul').first().slideUp();
-    updateIcons(objA);
+function hide(objDiv){
+    objDiv.removeClass('openedItem');
+    objDiv.siblings('ul').first().slideUp();
+    updateIcons(objDiv);
 }
-function show(objA){
-    objA.addClass('openedItem');
-    objA.siblings('ul').first().slideDown();
-    updateIcons(objA);
+function show(objDiv){
+    objDiv.addClass('openedItem');
+    objDiv.siblings('ul').first().slideDown();
+    updateIcons(objDiv);
 }
 
 function popSection(){
     var sectionId = idQueue.pop();
-    hide($('#'+sectionId).parent().children('a').first());
+    hide($('#'+sectionId).parent().children('div').first());
 }
 
 </script>
 
-<ul id="1" class="br-tree">
-</ul>

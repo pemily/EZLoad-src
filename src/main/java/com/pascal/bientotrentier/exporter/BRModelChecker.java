@@ -6,13 +6,12 @@ import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.model.BROperation;
 import com.pascal.bientotrentier.model.IOperationWithAction;
 import com.pascal.bientotrentier.sources.Reporting;
-import com.pascal.bientotrentier.util.ModelUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 public class BRModelChecker {
-    private Reporting reporting;
+    private final Reporting reporting;
 
     public BRModelChecker(Reporting reporting) {
         this.reporting = reporting;
@@ -25,62 +24,65 @@ public class BRModelChecker {
     }
 
     private boolean isActionValid(BRModel model){
-        boolean isValid;
-        try(Reporting rep = reporting.pushSection("Checking: "+model.getSourceFile())){
-            isValid = model.getReportDate().isValid();
-            if (!isValid) {
+        boolean isValid = true;
+        try(Reporting rep = reporting.pushSection((reporting, lnkCreator) -> reporting.escape("Checking: ") + lnkCreator.createSourceLink(reporting, model.getSourceFile()))){
+            if (!model.getReportDate().isValid()) {
+                isValid = false;
                 reporting.info("Date of the report is invalid: "+model.getReportDate());
             }
 
-            isValid |= model.getOperations().stream().allMatch(this::isActionValid);
+            if (!model.getOperations().stream().allMatch(this::isActionValid))
+                isValid = false;
         }
         return isValid;
     }
 
     private boolean isActionValid(BROperation operation){
-        boolean isValid;
-        isValid = operation.getDate().isValid();
-        if (!isValid) {
+        boolean isValid = true;
+        if (!operation.getDate().isValid()) {
+            isValid = false;
             reporting.info("The date of the operation is invalid. "+operation);
         }
 
-        isValid = operation.getCompteType() != null;
-        if (!isValid) {
+        if (operation.getCompteType() == null) {
+            isValid = false;
             reporting.info("The compte type for one operation is not set! "+operation);
         }
 
-        isValid = operation.getCourtier() != null;
-        if (!isValid) {
+        if (operation.getCourtier() == null) {
+            isValid = false;
             reporting.info("The courtier for one operation is not set! "+operation);
         }
 
-        isValid = !StringUtils.isBlank(operation.getAmount());
-        if (!isValid) {
+        if (StringUtils.isBlank(operation.getAmount())) {
+            isValid = false;
             reporting.info("The amount for one operation is not set! "+operation);
         }
 
         if (operation instanceof IOperationWithAction){
             IOperationWithAction opWithTitre = (IOperationWithAction) operation;
-            isValid = isActionValid(opWithTitre);
+            if (!isActionValid(opWithTitre))
+                isValid = false;
         }
 
         return isValid;
     }
 
     private boolean isActionValid(IOperationWithAction operation) {
-        boolean isValid;
+        boolean isValid = true;
         BRAction action = operation.getAction();
-        isValid = StringUtils.isBlank(action.getName());
-        if (!isValid) {
+        if (StringUtils.isBlank(action.getName())) {
+            isValid = false;
             reporting.error("The action name for one operation is not set! "+operation);
         }
 
-        isValid = StringUtils.isBlank(action.getTicker());
-        if (!isValid) {
+        if (StringUtils.isBlank(action.getTicker())) {
+            isValid = false;
             reporting.error("The ticker action for one operation is not set! "+operation);
         }
 
         if (action.getMarketPlace() == null) {
+            isValid = false;
             reporting.error("The Market Place for one operation is not set! "+operation);
         }
         return isValid;

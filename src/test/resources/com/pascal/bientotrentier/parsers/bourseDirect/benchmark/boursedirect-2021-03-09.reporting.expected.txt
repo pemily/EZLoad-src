@@ -1,4 +1,4 @@
-===== /D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-09.pdf
+===== Working on /D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-09.pdf
     info: Reading pdf...
     info: pdf read => ok
     info: BourseDirect model transformation

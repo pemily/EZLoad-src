@@ -12,7 +12,7 @@
         <li><a href="/home">[back]</a></li>
     {{/back}}
     {{#back}}
-        <li><a href="/{{context}}?dir={{back}}">[back]</a></li>
+        <li><a href="{{context}}?dir={{back}}">[back]</a></li>
     {{/back}}
 
     {{^dirs}}
@@ -22,10 +22,10 @@
     {{/dirs}}
 
     {{#dirs}}
-        <li><a href="/{{context}}?dir={{currentDir}}/{{name}}">[{{name}}]</a></li>
+        <li><a href="{{context}}?dir={{currentDir}}/{{name}}">[{{name}}]</a></li>
     {{/dirs}}
     {{#files}}
-        <li><a target="{{fileTarget}}" href="/{{context}}?file={{currentDir}}/{{name}}">[{{name}}]</a></li>
+        <li><a target="{{fileTarget}}" href="{{context}}?file={{currentDir}}/{{name}}">[{{name}}]</a></li>
     {{/files}}
     </ul>
 </p>

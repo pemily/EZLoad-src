@@ -1,8 +1,8 @@
 package com.pascal.bientotrentier.util;
 
 import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,24 +18,28 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class SeleniumUtil {
-    private static Logger logger = Logger.getLogger(SeleniumUtil.class);
 
+    protected final Reporting reporting;
     private WebDriver driver;
     private String chromeDownloadDir;
-    private int defaultTimeout;
+    private int defaultTimeoutInSec;
 
-    public void init(WebDriver driver, int defaultTimeout, String chromeDownloadDir){
+    protected SeleniumUtil(Reporting reporting){
+        this.reporting = reporting;
+    }
+
+    public void init(WebDriver driver, int defaultTimeoutInSec, String chromeDownloadDir){
         this.driver = driver;
         this.chromeDownloadDir = chromeDownloadDir;
-        this.defaultTimeout = defaultTimeout;
+        this.defaultTimeoutInSec = defaultTimeoutInSec;
         //Specifiying pageLoadTimeout and Implicit wait
-        driver.manage().timeouts().pageLoadTimeout(defaultTimeout, TimeUnit.SECONDS);
-        driver.manage().timeouts().implicitlyWait(defaultTimeout, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(defaultTimeoutInSec, TimeUnit.SECONDS);
     }
 
 
-    public static WebDriver getLocalhostWebDriver(MainSettings mainSettings) throws IOException {
-        logger.info("Chrome driver path: " + mainSettings.getChrome().getDriverPath());
+    public WebDriver getLocalhostWebDriver(MainSettings mainSettings) throws IOException {
+        reporting.info("Chrome driver path: " + mainSettings.getChrome().getDriverPath());
         //Setting system properties of ChromeDriver
         System.setProperty("webdriver.chrome.driver", mainSettings.getChrome().getDriverPath());
 
@@ -43,8 +47,8 @@ public class SeleniumUtil {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("chrome.switches", "--disable-extensions");
 
-        logger.info("Chrome user data dir: " + mainSettings.getChrome().getUserDataDir());
-        logger.info("Chrome Profile: " + mainSettings.getChrome().getProfile());
+        reporting.info("Chrome user data dir: " + mainSettings.getChrome().getUserDataDir());
+        reporting.info("Chrome Profile: " + mainSettings.getChrome().getProfile());
         options.addArguments("user-data-dir="+ mainSettings.getChrome().getUserDataDir());
         if (mainSettings.getChrome().getProfile() != null && !StringUtils.isBlank(mainSettings.getChrome().getProfile()))
             options.addArguments("profile-directory="+ mainSettings.getChrome().getProfile());
@@ -68,7 +72,7 @@ public class SeleniumUtil {
     }
 
     public void get(String url) {
-        logger.info("Get Page "+url);
+        reporting.info("Get Page "+url);
 
         //launching the specified URL
         driver.get(url);
@@ -99,22 +103,26 @@ public class SeleniumUtil {
     }
 
     public WebElement findByHref(String hrefSubstring){
-        logger.info("Find by href: "+hrefSubstring);
+        reporting.info("Find by href: "+hrefSubstring);
         return driver.findElement(By.xpath("//a[contains(@href, '"+hrefSubstring+"')]"));
     }
 
     public void waitUrlIsNot(String url){
-        logger.info("Waiting that url is no more: "+url);
-        new WebDriverWait(driver, defaultTimeout).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+        waitUrlIsNot(url, defaultTimeoutInSec);
+    }
+
+    public void waitUrlIsNot(String url, int timeout){
+        reporting.info("Waiting that url is no more: "+url);
+        new WebDriverWait(driver, timeout).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
     public WebElement findById(String id){
-        logger.info("Find by Id: "+id);
+        reporting.info("Find by Id: "+id);
         return driver.findElement(By.id(id));
     }
 
     public void click(WebElement element){
-        logger.info("Click");
+        reporting.info("Click");
         if (!element.isEnabled())
             throw new SeleniumError("The element is not clickable");
         element.click();

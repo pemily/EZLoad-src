@@ -1,4 +1,4 @@
-===== /D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-01.pdf
+===== Working on /D:/dev/BientotRentier/target/test-classes/com/pascal/bientotrentier/parsers/bourseDirect/boursedirect-2021-03-01.pdf
     info: Reading pdf...
     info: pdf read => ok
     info: BourseDirect model transformation
@@ -7,6 +7,6 @@
         info: => No error detected
     =====
     info: Creating Standard Model...
-    info: More than 1 data found for US0995021062 First one is selected
+    info: More than 1 data found for US0995021062. First one is selected. check: https://www.boursedirect.fr/api/search/US0995021062
     info: Standard Model => ok
 =====

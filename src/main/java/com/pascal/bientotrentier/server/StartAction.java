@@ -8,6 +8,7 @@ import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectProcessor;
+import com.pascal.bientotrentier.util.FileLinkCreator;
 import com.pascal.bientotrentier.util.HtmlReporting;
 import com.pascal.bientotrentier.util.MultiWriter;
 
@@ -27,7 +28,7 @@ public class StartAction {
         this.mainSettings = mainSettings;
     }
 
-    public void start(Writer htmlPageWriter) throws IOException {
+    public void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator) throws IOException {
         File logsDir = new File(mainSettings.getBientotRentier().getLogsDir());
         logsDir.mkdirs();
         Date now = new Date();
@@ -36,7 +37,8 @@ public class StartAction {
 
         try (
                 Writer fileWriter = new BufferedWriter(new FileWriter(reportFile));
-                HtmlReporting reporting = new HtmlReporting("Bientot Rentier Report - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(now) , new MultiWriter(fileWriter, htmlPageWriter))
+                HtmlReporting reporting =
+                        new HtmlReporting("Bientot Rentier Report - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(now), fileLinkCreator, new MultiWriter(fileWriter, htmlPageWriter))
         ) {
             fileWriter.write("<html><head><meta charset='UTF-8'>\n");
             reporting.writeHeader(); // will write into the report & html Page
@@ -80,4 +82,5 @@ public class StartAction {
     public static Predicate<File> dirFilter(){
         return file -> false; // there is no subdir for log
     }
+
 }

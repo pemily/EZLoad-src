@@ -15,6 +15,8 @@ import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectText
 import com.pascal.bientotrentier.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.bientotrentier.util.BRException;
 import com.pascal.bientotrentier.util.BRParsingException;
+import com.pascal.bientotrentier.util.FileLinkCreator;
+import com.pascal.bientotrentier.util.TitleWithFileRef;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,28 +33,28 @@ public class BourseDirectProcessor {
         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
         bourseDirectDownloader.start();
 
-        return new FileProcessor(mainSettings.getBourseDirect().getPdfOutputDir(),
-                BourseDirectDownloader.dirFilter(mainSettings),
-                BourseDirectDownloader.fileFilter())
-            .forEachFiles(pdfFilePath -> {
-                BourseDirectAccountDeclaration account = bourseDirectDownloader.getAccountFromPdfFilePath(pdfFilePath);
-                BRDate pdfDate = BourseDirectDownloader.getDateFromPdfFilePath(pdfFilePath);
-                if (account != null
-                        && pdfDate != null
-                        && !ezPortfolio.getMesOperations().isAlreadyProcessed(EnumBRCourtier.BourseDirect, account, pdfDate)) {
-                    // if the pdf file is valid, and is not yet processed
-                    // start its analysis
-                    BRModel model = start(reporting, pdfFilePath);
-                    model.setAccountDeclaration(account);
-                    return model;
-                }
-                return null;
-            });
+        try(Reporting rep = reporting.pushSection("Analyzing downloaded files...")) {
+            return new FileProcessor(mainSettings.getBourseDirect().getPdfOutputDir(),
+                    BourseDirectDownloader.dirFilter(mainSettings),
+                    BourseDirectDownloader.fileFilter())
+                    .forEachFiles(pdfFilePath -> {
+                        MainSettings.AccountDeclaration accountDeclaration = bourseDirectDownloader.getAccountFromPdfFilePath(pdfFilePath);
+                        BRDate pdfDate = BourseDirectDownloader.getDateFromPdfFilePath(pdfFilePath);
+                        if (accountDeclaration != null
+                                && pdfDate != null
+                                && !ezPortfolio.getMesOperations().isAlreadyProcessed(EnumBRCourtier.BourseDirect, accountDeclaration, pdfDate)) {
+                            // if the pdf file is valid, and is not yet processed
+                            // start its analysis
+                            BRModel model = start(reporting, accountDeclaration, pdfFilePath);
+                            return model;
+                        }
+                        return null;
+                    });
+        }
     }
 
-    public BRModel start(Reporting reporting, String pdfFilePath) {
-
-        try(Reporting rep = reporting.pushSection(pdfFilePath)){
+    public BRModel start(Reporting reporting, MainSettings.AccountDeclaration accountDeclaration, String pdfFilePath) {
+        try(Reporting rep = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Working on ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
             String pdfText = new BourseDirectPdfExtractor(reporting).getText(pdfFilePath);
 
             BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
@@ -60,7 +62,7 @@ public class BourseDirectProcessor {
             boolean isValid = new BourseDirectModelChecker(reporting).isValid(model);
 
             if (isValid){
-                return new BourseDirect2BRModel(reporting).create(pdfFilePath, model);
+                return new BourseDirect2BRModel(reporting).create(pdfFilePath, accountDeclaration, model);
             }
         }
         catch (BRParsingException e){

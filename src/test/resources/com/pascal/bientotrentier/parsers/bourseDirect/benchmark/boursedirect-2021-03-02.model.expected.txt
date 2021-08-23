@@ -16,6 +16,9 @@
       "code": "EUR"
     }
   },
+  "accountDeclaration": {
+    "name": "Pascal CTO"
+  },
   "operations": [
     {
       "changeRate": "1,20183776",
@@ -63,6 +66,9 @@
           "symbol": "€",
           "code": "EUR"
         }
+      },
+      "accountDeclaration": {
+        "name": "Pascal CTO"
       }
     },
     {
@@ -88,6 +94,9 @@
           "symbol": "€",
           "code": "EUR"
         }
+      },
+      "accountDeclaration": {
+        "name": "Pascal CTO"
       }
     }
   ]

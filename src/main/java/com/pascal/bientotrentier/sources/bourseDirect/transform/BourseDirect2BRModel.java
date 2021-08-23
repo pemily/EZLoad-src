@@ -1,5 +1,6 @@
 package com.pascal.bientotrentier.sources.bourseDirect.transform;
 
+import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.model.*;
 import com.pascal.bientotrentier.parsers.bourseDirect.*;
 import com.pascal.bientotrentier.sources.Reporting;
@@ -20,7 +21,7 @@ public class BourseDirect2BRModel {
         this.reporting = reporting;
     }
     
-    public BRModel create(String sourceFile, BourseDirectModel model) {
+    public BRModel create(String sourceFile, MainSettings.AccountDeclaration accountDeclaration, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
         BRModel brModel = new BRModel();
         brModel.setReportDate(model.getDateAvisOperation());
@@ -35,6 +36,7 @@ public class BourseDirect2BRModel {
         brAccount.setDevise(DeviseUtil.foundByCode("EUR"));
         brAccount.setOwnerName(model.getAccountOwnerName());
         brModel.setAccount(brAccount);
+        brModel.setAccountDeclaration(accountDeclaration);
 
         List<BROperation> brOperations = new ArrayList<>();
         brModel.setOperations(brOperations);

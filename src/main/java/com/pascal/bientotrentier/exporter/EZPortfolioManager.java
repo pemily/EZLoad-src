@@ -44,14 +44,15 @@ public class EZPortfolioManager {
     }
 
     public void save(EZPortfolio ezPortfolio) throws Exception {
-        try(Reporting rep = reporting.pushSection("saving EZPortfolio...")){
-            MesOperations operations = ezPortfolio.getMesOperations();
-            int firstFreeRow = operations.getFirstFreeRow()+1; // +1 to add the header
-            // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
+        reporting.info("Saving EZPortfolio...");
+        MesOperations operations = ezPortfolio.getMesOperations();
+        int firstFreeRow = operations.getFirstFreeRow()+1; // +1 to add the header
+        // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
 
-            sheets.batchUpdate(
-                    new SheetValues("MesOperations!A"+firstFreeRow+":K", operations.getNewOperations()),
-                    ezPortfolio.getMonPortefeuille().getSheetValues());
-        }
+        sheets.batchUpdate(
+                new SheetValues("MesOperations!A"+firstFreeRow+":K", operations.getNewOperations()),
+                ezPortfolio.getMonPortefeuille().getSheetValues());
+
+        reporting.info("Save done!");
     }
 }

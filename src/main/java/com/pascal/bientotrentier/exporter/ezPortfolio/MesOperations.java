@@ -68,7 +68,7 @@ public class MesOperations  {
                 }
                 return opResult;
             }
-        ).count() == 1;
+        ).count() > 1;
     }
 
     public void newOperation(BRDate date, EnumBRCompteType compteType, EnumBRCourtier courtier, MainSettings.AccountDeclaration account, String periode, BROperationType operationType, String actionName, String country, String amount, String description) {

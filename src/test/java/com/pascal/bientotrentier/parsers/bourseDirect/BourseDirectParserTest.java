@@ -2,6 +2,7 @@ package com.pascal.bientotrentier.parsers.bourseDirect;
 
 import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.model.BRModel;
+import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccountDeclaration;
 import com.pascal.bientotrentier.util.TextReporting;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectProcessor;
 import com.pascal.bientotrentier.util.ModelUtils;
@@ -152,7 +153,9 @@ public class BourseDirectParserTest {
 
     private void test(String file) throws IOException {
         TextReporting reporting = new TextReporting();
-        BRModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, getFilePath(file +".pdf").getFile());
+        BourseDirectAccountDeclaration bracc = new BourseDirectAccountDeclaration();
+        bracc.setName("Pascal CTO");
+        BRModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
         String jsonBrModel = ModelUtils.toJson(brModel);
         String report = reporting.getReport();
         check(jsonBrModel, file +".model.expected.txt");
