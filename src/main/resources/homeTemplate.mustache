@@ -2,6 +2,22 @@
 <head>
 <meta charset="UTF-8">
 <title>Bientot Rentier</title>
+    <script>
+        window.onload = function() {
+            var pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);
+            if (pieces == null || pieces.length != 5) {
+                return undefined;
+            }
+            pieces = pieces.map(piece => parseInt(piece, 10));
+            version = pieces[1]+"."+ pieces[2]+"."+ pieces[3]+ "."+ pieces[4];
+            var display = document.querySelector('#chromeVersion');
+            display.textContent = version;
+            var v = pieces[1]+"."+ pieces[2]+"."+ pieces[3];
+            var aRefDownload = document.querySelector('#chromeDownload');
+            aRefDownload.href="https://chromedriver.storage.googleapis.com/index.html?path="+v;
+            aRefDownload.textContent = "Téléchargement du driver (si plusieurs versions prendre la plus grande)";
+        }
+    </script>
 </head>
 <body>
 <h1>Bientot Rentier</h1>
@@ -12,11 +28,12 @@
 <p>
     <ul>
     <li>identifiant ezPortfolio: <a target="ezportfolio" href="https://docs.google.com/spreadsheets/d/{{ezPortfolio.ezPortfolioId}}">{{ezPortfolio.ezPortfolioId}}</a></li>
-    <li>Répértoire de logs: <a target="logsDir" href="/logs">{{bientotRentier.logsDir}}</a></li>
+    <li>Répértoire de logs: <a href="/logs">{{bientotRentier.logsDir}}</a></li>
     <li>googleDrive certificat: {{ezPortfolio.gdriveCredsFile}}</li>
     <li>chrome:
         <ul>
-            <li>driver: {{chrome.driverPath}}</li>
+            <li>version: <span id="chromeVersion">&lt;Le navigateur n'est pas chrome&gt;</span></li>
+            <li>driver: {{chrome.driverPath}} <litle><a id="chromeDownload" target="chromeDriver" href="https://chromedriver.chromium.org/downloads">Téléchargement du driver</a></litle></li>
             <li>repertoire utilisateur: {{chrome.userDataDir}}</li>
             <li>profile: {{chrome.profile}}</li>
         </ul>
@@ -27,7 +44,7 @@
 <p>
 {{#bourseDirect}}
     <ul>
-        <li>Répértoire de téléchargement des pdf: <a target="pdfDir" href="/bourseDirectDir">{{bourseDirect.pdfOutputDir}}</a></li>
+        <li>Répértoire de téléchargement des pdf: <a href="/bourseDirectDir">{{bourseDirect.pdfOutputDir}}</a></li>
     </ul>
     <p>
     <h3>Accounts:</h3>

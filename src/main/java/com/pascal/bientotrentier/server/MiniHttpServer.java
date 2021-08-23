@@ -4,6 +4,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.sources.bourseDirect.download.BourseDirectDownloader;
 import com.pascal.bientotrentier.util.BRException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -18,6 +19,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MiniHttpServer implements Closeable {
@@ -33,8 +35,14 @@ public class MiniHttpServer implements Closeable {
 
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/home", new HomeHandler(mainSettings));
-        server.createContext("/logs", new DirHandler("logs", mainSettings.getBientotRentier().getLogsDir()));
-        server.createContext("/bourseDirectDir", new DirHandler("bourseDirectDir", mainSettings.getBourseDirect().getPdfOutputDir()));
+        server.createContext("/logs", new DirHandler("logs", mainSettings.getBientotRentier().getLogsDir(),
+                dir -> false, // no subdir
+                file -> file.getName().startsWith(StartAction.REPORT_FILE_PREFIX) && file.getName().endsWith(StartAction.REPORT_FILE_SUFFIX),
+                "#"));
+        server.createContext("/bourseDirectDir", new DirHandler("bourseDirectDir", mainSettings.getBourseDirect().getPdfOutputDir(),
+                dir -> mainSettings.getBourseDirect().getAccounts().stream().anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName())),
+                file -> file.getName().startsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_PREFIX) && file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_SUFFIX),
+                "bourseDirectPdf"));
         server.createContext("/action/start", new StartActionHandler(mainSettings));
         server.createContext("/action/exit", new ExitActionHandler());
         server.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
@@ -109,10 +117,15 @@ public class MiniHttpServer implements Closeable {
     private class DirHandler implements HttpHandler {
         private String dir;
         private String context;
+        private Predicate<File> dirFilter, fileFilter;
+        private String fileTarget;
 
-        public DirHandler(String context, String dir) {
+        public DirHandler(String context, String dir, Predicate<File> dirFilter, Predicate<File> fileFilter, String fileTarget) {
             this.dir = dir;
             this.context = context;
+            this.dirFilter = dirFilter;
+            this.fileFilter = fileFilter;
+            this.fileTarget = fileTarget;
         }
 
         @Override
@@ -131,10 +144,11 @@ public class MiniHttpServer implements Closeable {
                 List<File> dirs = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
                         .filter(File::isDirectory)
                         .filter(f -> !f.getName().startsWith("."))
+                        .filter(dirFilter)
                         .collect(Collectors.toList());
                 List<File> files = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
                         .filter(File::isFile)
-                        .filter(f -> !f.getName().startsWith("."))
+                        .filter(fileFilter)
                         .collect(Collectors.toList());
 
                 Map<String, Object> data = new HashMap<>();
@@ -143,6 +157,7 @@ public class MiniHttpServer implements Closeable {
                                         .substring(dir.length())
                                             .replace('\\', '/'); // for windows only
                 if ("".equals(back)) back = "/"; // root
+                data.put("fileTarget", fileTarget);
                 data.put("back", back);
                 data.put("currentDir", currentDir);
                 data.put("context", context);

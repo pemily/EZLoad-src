@@ -24,6 +24,9 @@ public class BourseDirectDownloader extends SeleniumUtil {
     private final BourseDirectSettings bourseDirectSettings;
     private final Reporting reporting;
 
+    public static final String BOURSE_DIRECT_PDF_PREFIX = "boursedirect-";
+    public static final String BOURSE_DIRECT_PDF_SUFFIX = ".pdf";
+
     public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings) {
         this.mainSettings = mainSettings;
         this.reporting = reporting;
@@ -175,7 +178,7 @@ public class BourseDirectDownloader extends SeleniumUtil {
     private String getNewFilename(BourseDirectAccount account, Day d){
         String month = leadingZero(d.getMonth());
         String day = leadingZero(d.getDay());
-        return bourseDirectSettings.getPdfOutputDir() + File.separator + account.getName() + File.separator + d.getYear() + File.separator + "boursedirect-"+d.getYear()+"-"+month+"-"+day+".pdf";
+        return bourseDirectSettings.getPdfOutputDir() + File.separator + account.getName() + File.separator + d.getYear() + File.separator + BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX;
     }
 
     private String leadingZero(int n){
