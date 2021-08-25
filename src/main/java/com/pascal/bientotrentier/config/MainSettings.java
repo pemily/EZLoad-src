@@ -1,4 +1,4 @@
-package com.pascal.bientotrentier;
+package com.pascal.bientotrentier.config;
 
 import com.pascal.bientotrentier.exporter.EZPortfolioSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;

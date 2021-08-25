@@ -1,6 +1,7 @@
 package com.pascal.bientotrentier.model;
 
-import com.pascal.bientotrentier.MainSettings;
+
+import com.pascal.bientotrentier.config.MainSettings;
 
 import java.util.List;
 

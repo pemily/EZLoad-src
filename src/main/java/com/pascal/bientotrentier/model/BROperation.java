@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.model;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 
 public abstract class BROperation {
 

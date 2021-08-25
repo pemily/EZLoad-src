@@ -2,6 +2,7 @@ package com.pascal.bientotrentier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.security.AuthManager;
 
 import java.io.FileReader;

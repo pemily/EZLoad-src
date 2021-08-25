@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.parsers.bourseDirect;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.model.BRModel;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccountDeclaration;
 import com.pascal.bientotrentier.util.TextReporting;

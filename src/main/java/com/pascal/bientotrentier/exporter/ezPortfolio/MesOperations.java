@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.exporter.ezPortfolio;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.gdrive.Row;
 import com.pascal.bientotrentier.gdrive.SheetValues;
 import com.pascal.bientotrentier.model.*;

@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.sources.bourseDirect.transform;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.model.*;
 import com.pascal.bientotrentier.parsers.bourseDirect.*;
 import com.pascal.bientotrentier.sources.Reporting;

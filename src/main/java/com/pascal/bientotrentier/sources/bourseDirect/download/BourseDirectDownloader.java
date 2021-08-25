@@ -1,7 +1,7 @@
 package com.pascal.bientotrentier.sources.bourseDirect.download;
 
-import com.pascal.bientotrentier.MainSettings;
 import com.pascal.bientotrentier.SettingsManager;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.model.EnumBRCourtier;

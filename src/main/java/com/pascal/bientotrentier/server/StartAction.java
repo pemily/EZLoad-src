@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.server;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.exporter.BRModelChecker;
 import com.pascal.bientotrentier.exporter.BRModelExporter;
 import com.pascal.bientotrentier.exporter.EZPortfolioManager;

@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.sources.bourseDirect.download;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectAccountDeclaration;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.bientotrentier.util.LoggerReporting;

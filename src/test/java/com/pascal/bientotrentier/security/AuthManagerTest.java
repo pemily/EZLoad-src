@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.security;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.model.EnumBRCourtier;
 import org.junit.jupiter.api.Test;
 

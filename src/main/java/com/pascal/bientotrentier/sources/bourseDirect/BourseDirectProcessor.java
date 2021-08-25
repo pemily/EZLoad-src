@@ -1,6 +1,6 @@
 package com.pascal.bientotrentier.sources.bourseDirect;
 
-import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.config.MainSettings;
 import com.pascal.bientotrentier.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.bientotrentier.model.BRDate;
 import com.pascal.bientotrentier.model.BRModel;
@@ -15,8 +15,6 @@ import com.pascal.bientotrentier.sources.bourseDirect.transform.BourseDirectText
 import com.pascal.bientotrentier.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.bientotrentier.util.BRException;
 import com.pascal.bientotrentier.util.BRParsingException;
-import com.pascal.bientotrentier.util.FileLinkCreator;
-import com.pascal.bientotrentier.util.TitleWithFileRef;
 
 import java.io.IOException;
 import java.util.List;
