@@ -116,9 +116,9 @@
 
             <plugin>
                 <!-- a partir du swagger, genere le code javascript  -->
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>2.4.21</version>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>5.2.1</version>
                 <executions>
                     <execution>
                         <phase>compile</phase>
@@ -126,8 +126,9 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <skipValidateSpec>true</skipValidateSpec>
                             <inputSpec>${project.basedir}/target/swagger/swagger.json</inputSpec>
-                            <language>javascript</language>
+                            <generatorName>javascript</generatorName>
                             <configOptions>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                             </configOptions>
