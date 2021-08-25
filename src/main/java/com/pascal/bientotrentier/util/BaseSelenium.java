@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -17,54 +18,70 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class SeleniumUtil {
+public class BaseSelenium {
 
+    private static final int DOWNLOAD_TIMEOUT_IN_SECONDS = 30;
     protected final Reporting reporting;
     private WebDriver driver;
-    private String chromeDownloadDir;
     private int defaultTimeoutInSec;
+    private String chromeDownloadDir;
 
-    protected SeleniumUtil(Reporting reporting){
+    protected BaseSelenium(Reporting reporting){
         this.reporting = reporting;
     }
 
-    public void init(WebDriver driver, int defaultTimeoutInSec, String chromeDownloadDir){
-        this.driver = driver;
-        this.chromeDownloadDir = chromeDownloadDir;
+    public void init(MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws IOException {
         this.defaultTimeoutInSec = defaultTimeoutInSec;
+        this.chromeDownloadDir = Files.createTempDirectory("BientotRentier-Tmp").toFile().getAbsolutePath();
+
+        reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
+        //Setting system properties of ChromeDriver
+        System.setProperty("webdriver.chrome.driver", chromeSettings.getDriverPath());
+
+        //Creating an object of ChromeDriver
+        ChromeOptions options = new ChromeOptions();
+
+        reporting.info("Chrome user data dir: " + chromeSettings.getUserDataDir());
+        reporting.info("Chrome download dir: " + chromeDownloadDir);
+
+        options.addArguments("user-data-dir="+ chromeSettings.getUserDataDir());
+        options.addArguments("profile-directory=Default"); // only Default works to change the download.default_directory
+  //      options.addArguments("--enable-automation"); // sinon les creds service mache pas
+
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("download.default_directory", chromeDownloadDir); //ok
+        prefs.put("download.prompt_for_download", false); // ok
+        prefs.put("directory_upgrade", true); // ok
+//        prefs.put("credentials_enable_service", true);
+//        prefs.put("profile.password_manager_enabled", true);
+        prefs.put("profile.name", "BientotRentier");
+        prefs.put("profile.using_default_name", false);
+/*        prefs.put("autofill.enabled", true);
+        prefs.put("autofill.profile_enabled", true);
+
+        prefs.put("browser.clear_data.cookies_basic", false);
+        prefs.put("browser.clear_data.cookies", false);
+        prefs.put("browser.clear_data.passwords", false);
+        prefs.put("profile.content_settings.enable_quiet_permission_ui_enabling_method.notification", 1);
+        prefs.put("profile.password_account_storage_exists", true);
+        prefs.put("was_auto_sign_in_first_run_experience_shown", true);
+*/
+        prefs.put("useAutomationExtension", false);  // desactive la baniere: "chrome is controller by an automated test software"
+
+        // prefs.put("deleteDataPostSession", false);
+
+//        prefs.put("profile.default_content_settings.popups", 1);
+
+        options.setExperimentalOption("prefs", prefs);
+
+        driver = new ChromeDriver(options);
         //Specifiying pageLoadTimeout and Implicit wait
         driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(defaultTimeoutInSec, TimeUnit.SECONDS);
     }
 
-
-    public WebDriver getLocalhostWebDriver(MainSettings mainSettings) throws IOException {
-        reporting.info("Chrome driver path: " + mainSettings.getChrome().getDriverPath());
-        //Setting system properties of ChromeDriver
-        System.setProperty("webdriver.chrome.driver", mainSettings.getChrome().getDriverPath());
-
-        //Creating an object of ChromeDriver
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("chrome.switches", "--disable-extensions");
-
-        reporting.info("Chrome user data dir: " + mainSettings.getChrome().getUserDataDir());
-        reporting.info("Chrome Profile: " + mainSettings.getChrome().getProfile());
-        options.addArguments("user-data-dir="+ mainSettings.getChrome().getUserDataDir());
-        if (mainSettings.getChrome().getProfile() != null && !StringUtils.isBlank(mainSettings.getChrome().getProfile()))
-            options.addArguments("profile-directory="+ mainSettings.getChrome().getProfile());
-
-        Map<String, Object> prefs = new HashMap<>();
-        if (mainSettings.getChrome().getDownloadDir() == null || StringUtils.isBlank(mainSettings.getChrome().getDownloadDir())){
-            mainSettings.getChrome().setDownloadDir(Files.createTempDirectory("BientotRentier-Tmp").toFile().getAbsolutePath());
-        }
-        prefs.put("download.default_directory", mainSettings.getChrome().getDownloadDir());
-        prefs.put("download.prompt_for_download", false);
-        options.setExperimentalOption("prefs", prefs);
-
-
-        WebDriver driver = new ChromeDriver(options);
-
-        return driver;
+    protected void closeChrome(){
+        if (driver != null) driver.close();
     }
 
     public WebDriver getDriver(){
@@ -80,6 +97,10 @@ public class SeleniumUtil {
 
     public List<WebElement> getAllElements(String element, String className){
         return driver.findElements(By.xpath("//"+element+"[@class='"+className+"']"));
+    }
+
+    public List<WebElement> getAllSubElements(WebElement elemnt, String className){
+        return elemnt.findElements(new By.ByClassName(className));
     }
 
     public WebElement findByContainsText(String htmlElement, String text){
@@ -108,12 +129,8 @@ public class SeleniumUtil {
     }
 
     public void waitUrlIsNot(String url){
-        waitUrlIsNot(url, defaultTimeoutInSec);
-    }
-
-    public void waitUrlIsNot(String url, int timeout){
         reporting.info("Waiting that url is no more: "+url);
-        new WebDriverWait(driver, timeout).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+        new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
     public WebElement findById(String id){
@@ -140,9 +157,10 @@ public class SeleniumUtil {
         Set<String> oldFiles = new HashSet<>(Arrays.asList(downloadDir.list()));
         getDriver().get(downloadUrl);
 
-        sleep(3);
+        Sleep.wait(3);
         // search for the name of the new file in the downloaded directory (ignore the tmp file)
         String downloadFilename = null;
+        long time = Sleep.time();
         do{
             Set<String> newFiles = new HashSet<>(Arrays.asList(downloadDir.list()));
             if (newFiles.size() > oldFiles.size()) {
@@ -154,26 +172,20 @@ public class SeleniumUtil {
                 if (downloadFilename.endsWith(".tmp") || downloadFilename.endsWith(".crdownload"))
                     downloadFilename = null;
             }
-            sleep(1);
+            Sleep.wait(1);
         }
-        while(downloadFilename == null);
+        while(downloadFilename == null && Sleep.isBelow(time, DOWNLOAD_TIMEOUT_IN_SECONDS)); // seconds max to download
 
-        sleep(1);
+        if (downloadFilename == null) throw new BRException("Not able to download file: "+downloadUrl);
+
+        Sleep.wait(1);
 
         File downloadedFile = new File(downloadDir + File.separator + downloadFilename);
         File destFile = new File(outputFile);
         destFile.getParentFile().mkdirs();
-        if (!downloadedFile.renameTo(destFile)){
+        if (!downloadedFile.renameTo(destFile))
             throw new BRException("Problem when moving "+ downloadedFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
-        }
 
-    }
-
-    public void sleep(int seconds) {
-        try {
-            Thread.sleep(seconds*1000);
-        } catch (InterruptedException e) {
-        }
     }
 
 }

@@ -3,6 +3,8 @@ package com.pascal.bientotrentier;
 import com.pascal.bientotrentier.exporter.EZPortfolioSettings;
 import com.pascal.bientotrentier.sources.bourseDirect.BourseDirectSettings;
 
+import java.util.Map;
+
 public class MainSettings {
 
     private BourseDirectSettings bourseDirect;
@@ -46,9 +48,15 @@ public class MainSettings {
     public static class ChromeSettings {
         private String driverPath;
         private String userDataDir;
-        private String profile;
-        private String downloadDir;
+        private int defaultTimeout;
 
+        public int getDefaultTimeout() {
+            return defaultTimeout;
+        }
+
+        public void setDefaultTimeout(int defaultTimeout) {
+            this.defaultTimeout = defaultTimeout;
+        }
         public String getUserDataDir() {
             return userDataDir;
         }
@@ -56,15 +64,6 @@ public class MainSettings {
         public void setUserDataDir(String userDataDir) {
             this.userDataDir = userDataDir;
         }
-
-        public String getProfile() {
-            return profile;
-        }
-
-        public void setProfile(String profile) {
-            this.profile = profile;
-        }
-
 
         public String getDriverPath() {
             return driverPath;
@@ -74,17 +73,12 @@ public class MainSettings {
             this.driverPath = driverPath;
         }
 
-        public String getDownloadDir() {
-            return downloadDir;
-        }
-
-        public void setDownloadDir(String downloadDir) {
-            this.downloadDir = downloadDir;
-        }
     }
 
     public static class BientotRentier {
         private String logsDir;
+        private String passPhrase;
+        private String courtierCredsFile;
 
         public String getLogsDir() {
             return logsDir;
@@ -93,9 +87,46 @@ public class MainSettings {
         public void setLogsDir(String logsDir) {
             this.logsDir = logsDir;
         }
+
+        public String getPassPhrase() {
+            return passPhrase;
+        }
+
+        public void setPassPhrase(String passPhrase) {
+            this.passPhrase = passPhrase;
+        }
+
+        public String getCourtierCredsFile() {
+            return courtierCredsFile;
+        }
+
+        public void setCourtierCredsFile(String courtierCredsFile) {
+            this.courtierCredsFile = courtierCredsFile;
+        }
     }
 
     public interface AccountDeclaration {
         String getName();
+    }
+
+    public static class AuthInfo {
+        private String username;
+        private String password;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }

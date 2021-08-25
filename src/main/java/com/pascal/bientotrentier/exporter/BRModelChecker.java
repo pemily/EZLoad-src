@@ -17,13 +17,18 @@ public class BRModelChecker {
         this.reporting = reporting;
     }
 
-    public boolean isActionValid(List<BRModel> allBRModels) {
+    public boolean generateReport(List<BRModel> allBRModels) {
         try(Reporting rep = reporting.pushSection("Checking Standard Model")){
-            return allBRModels.stream().allMatch(this::isActionValid);
+            boolean allActionsValid = true;
+            for (BRModel model : allBRModels){
+                if (!generateReport(model))
+                    allActionsValid = false;
+            }
+            return allActionsValid;
         }
     }
 
-    private boolean isActionValid(BRModel model){
+    private boolean generateReport(BRModel model){
         boolean isValid = true;
         try(Reporting rep = reporting.pushSection((reporting, lnkCreator) -> reporting.escape("Checking: ") + lnkCreator.createSourceLink(reporting, model.getSourceFile()))){
             if (!model.getReportDate().isValid()) {
@@ -31,13 +36,15 @@ public class BRModelChecker {
                 reporting.info("Date of the report is invalid: "+model.getReportDate());
             }
 
-            if (!model.getOperations().stream().allMatch(this::isActionValid))
-                isValid = false;
+            for (BROperation op : model.getOperations()) {
+                if (!generateReport(op))
+                    isValid = false;
+            }
         }
         return isValid;
     }
 
-    private boolean isActionValid(BROperation operation){
+    private boolean generateReport(BROperation operation){
         boolean isValid = true;
         if (!operation.getDate().isValid()) {
             isValid = false;
@@ -61,14 +68,14 @@ public class BRModelChecker {
 
         if (operation instanceof IOperationWithAction){
             IOperationWithAction opWithTitre = (IOperationWithAction) operation;
-            if (!isActionValid(opWithTitre))
+            if (!generateReport(opWithTitre))
                 isValid = false;
         }
 
         return isValid;
     }
 
-    private boolean isActionValid(IOperationWithAction operation) {
+    private boolean generateReport(IOperationWithAction operation) {
         boolean isValid = true;
         BRAction action = operation.getAction();
         if (StringUtils.isBlank(action.getName())) {

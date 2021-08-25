@@ -4,6 +4,9 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.pascal.bientotrentier.MainSettings;
+import com.pascal.bientotrentier.SettingsManager;
+import com.pascal.bientotrentier.model.EnumBRCourtier;
+import com.pascal.bientotrentier.security.AuthManager;
 import com.pascal.bientotrentier.sources.bourseDirect.download.BourseDirectDownloader;
 import com.pascal.bientotrentier.util.BRException;
 import com.pascal.bientotrentier.util.FileLinkCreator;
@@ -13,12 +16,16 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.protocol.HTTP;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,6 +48,7 @@ public class MiniHttpServer implements Closeable {
 
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/home", new HomeHandler(mainSettings));
+        server.createContext("/createCreds", new CreateCredentialsHandler(mainSettings));
         server.createContext(LOGS_CONTEXT, new DirHandler(LOGS_CONTEXT, mainSettings.getBientotRentier().getLogsDir(),
                 StartAction.dirFilter(),
                 StartAction.fileFilter(),
@@ -77,12 +85,13 @@ public class MiniHttpServer implements Closeable {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             Headers header = exchange.getResponseHeaders();
+            String simulation = getValue(exchange, "simulation");
             header.add("Connection", "Keep-Alive");
             header.add("Keep-Alive", "timeout=30 max=100");
             header.add("Content-Type", "text/html");
-            exchange.sendResponseHeaders( 200, 0 );
+            exchange.sendResponseHeaders( HttpStatus.SC_OK, 0 );
             Writer os = new OutputStreamWriter(exchange.getResponseBody());
-            new StartAction(mainSettings).start(os, fileLinkCreator(mainSettings));
+            new StartAction(mainSettings).start(os, fileLinkCreator(mainSettings), Boolean.parseBoolean(simulation));
             os.close();
         }
     }
@@ -92,7 +101,7 @@ public class MiniHttpServer implements Closeable {
         public void handle(HttpExchange exchange) throws IOException {
             Headers header = exchange.getResponseHeaders();
             header.add("Content-Type", "text/html");
-            exchange.sendResponseHeaders( 200, 0 );
+            exchange.sendResponseHeaders( HttpStatus.SC_OK, 0 );
             Writer os = new OutputStreamWriter(exchange.getResponseBody());
             os.write("<h1>Bientot Rentier</h1>");
             os.write("à Bientôt");
@@ -112,7 +121,7 @@ public class MiniHttpServer implements Closeable {
         public void handle(HttpExchange exchange) throws IOException {
             Headers header = exchange.getResponseHeaders();
             header.add("Content-Type", "text/html");
-            exchange.sendResponseHeaders( 200, 0 );
+            exchange.sendResponseHeaders( HttpStatus.SC_OK, 0 );
             Writer os = new OutputStreamWriter(exchange.getResponseBody());
             homeTemplateMustache.execute(os, mainSettings);
             os.close();
@@ -145,7 +154,7 @@ public class MiniHttpServer implements Closeable {
 
             if (StringUtils.isBlank(file)) {
                 header.add("Content-Type", "text/html");
-                exchange.sendResponseHeaders( 200, 0 );
+                exchange.sendResponseHeaders( HttpStatus.SC_OK, 0 );
                 Writer os = new OutputStreamWriter(exchange.getResponseBody());
 
                 List<File> dirs = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
@@ -179,7 +188,7 @@ public class MiniHttpServer implements Closeable {
             else{
                 String contentType = file.toLowerCase(Locale.ROOT).endsWith("pdf") ? "application/pdf" : "text/html";
                 header.add("Content-Type", contentType);
-                exchange.sendResponseHeaders( 200, 0 );
+                exchange.sendResponseHeaders( HttpStatus.SC_OK, 0 );
                 OutputStream os = exchange.getResponseBody();
 
                 IOUtils.copy(new FileInputStream(dir+file), os);
@@ -219,5 +228,48 @@ public class MiniHttpServer implements Closeable {
                 return reporting.escape(sourceFile);
             }
         };
+    }
+
+    private class CreateCredentialsHandler implements HttpHandler {
+        private MainSettings mainSettings;
+
+        public CreateCredentialsHandler(MainSettings mainSettings) {
+            this.mainSettings = mainSettings;
+        }
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            Map<String, String> params = getPostParams(exchange);
+            String user = params.get("username");
+            String password = params.get("password");
+            String courtier = params.get("courtier");
+            if (!StringUtils.isBlank(user) && !StringUtils.isBlank(password) && !StringUtils.isBlank(courtier)){
+                MainSettings.AuthInfo authInfo = new MainSettings.AuthInfo();
+                authInfo.setPassword(password);
+                authInfo.setUsername(user);
+                try {
+                    SettingsManager.getAuthManager(mainSettings)
+                            .addAuthInfo(EnumBRCourtier.valueOf(courtier), authInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            exchange.getResponseHeaders().set("Location", "/home");
+            exchange.sendResponseHeaders(HttpStatus.SC_SEE_OTHER, 0 );
+            exchange.getResponseBody().close();
+        }
+    }
+
+    private Map<String, String> getPostParams(HttpExchange exchange) throws IOException {
+        InputStreamReader isr =  new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(isr);
+        String params = br.readLine();
+        String[] allParams = params.split("&");
+        Map<String, String> result = new HashMap<>();
+        for (String allParam : allParams) {
+            String[] nameValue = allParam.split("=");
+            result.put(URLDecoder.decode(nameValue[0], StandardCharsets.UTF_8.toString()), URLDecoder.decode(nameValue[1], StandardCharsets.UTF_8.toString()));
+        }
+        return result;
     }
 }

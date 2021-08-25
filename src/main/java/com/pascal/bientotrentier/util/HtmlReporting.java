@@ -9,19 +9,17 @@ import java.io.*;
 public class HtmlReporting implements Reporting {
 
     private final Writer writer;
-    private final String title;
     private final FileLinkCreator fileLinkCreator;
 
-    public HtmlReporting(String title, FileLinkCreator fileLinkCreator, Writer writer){
-        this.title = title;
+    public HtmlReporting(FileLinkCreator fileLinkCreator, Writer writer){
         this.writer = writer;
         this.fileLinkCreator = fileLinkCreator;
     }
 
-    public void writeHeader(){
+    public void writeHeader(String escapedTitle){
         try {
             IOUtils.copy(new InputStreamReader( getClass().getClassLoader().getResourceAsStream("bientotRentier.html")), writer);
-            writer.write("<h1><center>"+ escape(title)+"</center></h1>\n");
+            writer.write("<h1><center>"+ escapedTitle+"</center></h1>\n");
             writer.write("<ul id='1' class='br-tree'></ul>\n");
             writer.flush();
         } catch (IOException e) {

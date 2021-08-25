@@ -1,7 +1,7 @@
 package com.pascal.bientotrentier.model;
 
 public enum EnumBRCourtier {
-    BourseDirect("BourseDirect");
+    BourseDirect("Bourse Direct");
 
     private String displayName;
 
@@ -9,7 +9,7 @@ public enum EnumBRCourtier {
         this.displayName = displayName;
     }
 
-    public String getDisplayName(){
+    public String getEzPortfolioName(){
         return displayName;
     }
 }

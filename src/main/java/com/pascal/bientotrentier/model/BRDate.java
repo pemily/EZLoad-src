@@ -73,8 +73,8 @@ public class BRDate {
         return toDate('/').compareTo(d.toDate('/')) <= 0;
     }
 
-    private String leadingZero(int i){
-        return i < 9 ? "0"+i : ""+i;
+    public static String leadingZero(int i){
+        return i <= 9 ? "0"+i : ""+i;
     }
 
     @Override

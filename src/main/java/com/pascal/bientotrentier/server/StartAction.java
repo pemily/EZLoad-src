@@ -28,7 +28,7 @@ public class StartAction {
         this.mainSettings = mainSettings;
     }
 
-    public void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator) throws IOException {
+    public void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
         File logsDir = new File(mainSettings.getBientotRentier().getLogsDir());
         logsDir.mkdirs();
         Date now = new Date();
@@ -37,11 +37,13 @@ public class StartAction {
 
         try (
                 Writer fileWriter = new BufferedWriter(new FileWriter(reportFile));
-                HtmlReporting reporting =
-                        new HtmlReporting("Bientot Rentier Report - " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(now), fileLinkCreator, new MultiWriter(fileWriter, htmlPageWriter))
+                HtmlReporting reporting = new HtmlReporting(fileLinkCreator, new MultiWriter(fileWriter, htmlPageWriter))  // will write into the report & html Page
         ) {
             fileWriter.write("<html><head><meta charset='UTF-8'>\n");
-            reporting.writeHeader(); // will write into the report & html Page
+            reporting.writeHeader(reporting.escape("Bientot Rentier Report")
+                    + (readOnly ? "<br>(Simulation)" : "")
+                    + "<br>"
+                    + reporting.escape(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(now)));
             fileWriter.write("</head><body>\n");
 
 
@@ -50,19 +52,21 @@ public class StartAction {
                 EZPortfolio ezPortfolio = ezPortfolioManager.load();
 
                 List<BRModel> allBRModels;
-                try (Reporting rep = reporting.pushSection("Launch BourseDirect Process")) {
+                try (Reporting ignored = reporting.pushSection("Launch BourseDirect Process")) {
                     allBRModels = new BourseDirectProcessor(mainSettings).start(reporting, ezPortfolio);
                 }
 
                 boolean isValid;
-                try (Reporting rep = reporting.pushSection("Checking Operations")) {
-                    isValid = new BRModelChecker(reporting).isActionValid(allBRModels);
+                try (Reporting ignored = reporting.pushSection("Checking Operations")) {
+                    isValid = new BRModelChecker(reporting).generateReport(allBRModels);
                 }
 
                 if (isValid) {
-                    try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
-                        new BRModelExporter(reporting).exportModels(allBRModels, ezPortfolio);
-                        ezPortfolioManager.save(ezPortfolio);
+                    new BRModelExporter(reporting).exportModels(allBRModels, ezPortfolio);
+                    if (!readOnly) {
+                        try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
+                            ezPortfolioManager.save(ezPortfolio);
+                        }
                     }
                 }
             }

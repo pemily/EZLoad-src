@@ -1,9 +1,26 @@
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Bientot Rentier</title>
+    <meta charset="UTF-8">
+    <title>Bientot Rentier</title>
+    <style type="text/css">
+    #popupbox{
+        margin: 0;
+        margin-left: 40%;
+        margin-right: 40%;
+        margin-top: 50px;
+        padding-top: 10px;
+        width: 20%;
+        height: 150px;
+        position: absolute;
+        background: #FBFBF0;
+        border: solid #000000 2px;
+        z-index: 9;
+        font-family: arial;
+        visibility: hidden;
+    }
+    </style>
     <script>
-        window.onload = function() {
+        function initChromeVersion(){
             var pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);
             if (pieces == null || pieces.length != 5) {
                 return undefined;
@@ -17,18 +34,44 @@
             aRefDownload.href="https://chromedriver.storage.googleapis.com/index.html?path="+v;
             aRefDownload.textContent = "Téléchargement du driver (si plusieurs versions prendre la plus grande)";
         }
+        function loginPopup(showhide, brCourtierName){
+            if(showhide == "show"){
+                document.getElementById('loginCourtier').value = brCourtierName;
+                document.getElementById('popupbox').style.visibility="visible";
+            }else if(showhide == "hide"){
+                document.getElementById('popupbox').style.visibility="hidden";
+            }
+        }
+        window.onload = function() {
+            initChromeVersion();
+        }
     </script>
 </head>
 <body>
 <h1><center>Bientot Rentier</center></h1>
 
-<a href="/action/start">Start</a> <p>Va télécharger les pdfs de BourseDirect, les analyser et mettre à jour ezPortfolio</p>
-<a href="/action/exit">Exit</a> <p>Stop le logiciel</p>
+<a href="/action/start">Démarre</a> <p>Va télécharger les pdfs de BourseDirect, les analyser, génère un rapport et met à jour ezPortfolio</p>
+<a href="/action/start?simulation=true">Démarre en lecture seule</a> <p>Pareil mais ne mets pas à jour ezPortfolio</p>
+<a href="/action/exit">Quitter</a> <p>Stop le logiciel</p>
 <h1>Configuration</h1>
+
+<div id="popupbox">
+    <form action="/createCreds" method="post">
+        <input id="loginCourtier" type="hidden" name="courtier" value=""/>
+        <center>Username:</center>
+        <center><input name="username" size="14" /></center>
+        <center>Password:</center>
+        <center><input name="password" type="password" size="14" /></center>
+        <center><input type="submit" name="submit" value="login" /></center>
+    </form>
+    <br />
+    <center><a href="javascript:loginPopup('hide');">close</a></center>
+</div>
 <p>
     <ul>
     <li>identifiant ezPortfolio: <a target="ezportfolio" href="https://docs.google.com/spreadsheets/d/{{ezPortfolio.ezPortfolioId}}">{{ezPortfolio.ezPortfolioId}}</a></li>
     <li>Répértoire de logs: <a href="/logs">{{bientotRentier.logsDir}}</a></li>
+    <li>Phrase d'encryption: {{bientotRentier.passPhrase}}</li>
     <li>googleDrive certificat: {{ezPortfolio.gdriveCredsFile}}</li>
     <li>chrome:
         <ul>
@@ -45,6 +88,7 @@
 {{#bourseDirect}}
     <ul>
         <li>Répértoire de téléchargement des pdf: <a href="/bourseDirectDir">{{bourseDirect.pdfOutputDir}}</a></li>
+        <li>Info de Connection: <a href="javascript:loginPopup('show', 'BourseDirect');">créer</a></li>
     </ul>
     <p>
     <h3>Accounts:</h3>
@@ -62,6 +106,46 @@
 {{/bourseDirect}}
 </p>
 
+
+<!--
+
+ bientotRentier:
+
+ Step 1
+    Creer un projet ici: https://console.cloud.google.com/projectcreate
+    Nom du Project: BientotRentier <= peut etre autre chose?
+    Zone: [ laisser Aucune Organization ]
+    Cliquez sur Créer
+ Step 2
+    https://console.cloud.google.com/apis/credentials?project=bientotrentier
+    Cliquez sur "Configurer L'écran de consentement"
+    Selectionnez "Externes"   (Cette application ne sera jamais publié, elle restera en test et seul vous pourrez y acceder)
+    Puis cliquez sur "Créer"
+       Nom de l'application: BientotRentier
+       adresse email d'assistance utilisateur: [ Votre Adresse Email ]
+       Logo de l'application: [vide]
+      Domaine de l'application: [Laissez tous les champs vide]
+      Domaines autoirsés: [Laissez vide]
+      Coordonnées du développeur: [ Votre adresse email ]
+      Enregistrer et continuer
+      Niveaux d'accès: [Ne rien faire]
+      Enregistrer et continuer
+      Utilisateurs tests:
+          Add Users: [ Votre adresse email ] <= je pense qu'il est ajouté a la fin par defaut, pas besoin de le faire
+      Enregistrer et continuer
+  Step 3:
+      https://console.cloud.google.com/apis/credentials?project=bientotrentier
+      Cliquez sur "Créer des identifiants"
+      Selectionnez "ID client OAuth"
+      Type d'application: "Application de bureau"
+      Nom: BientotRentier_ClientPC
+      Copiez ID client: 687251957608-sd9040k5c5gqeg8ko7smpkcm2qra7pg9.apps.googleusercontent.com
+      Copiez code secret client: 1wlvTpsANWcdeSdTvB8YlTqZ
+      Sur la ligne de BientotRentier_ClientPC (à coté de la poubelle) il y a un boutton download pour telecharger le fichier json
+  Step 4:
+       https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=bientotrentier
+       Activer
+-->
 
 </body>
 </html>

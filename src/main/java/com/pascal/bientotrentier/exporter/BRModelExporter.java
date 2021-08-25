@@ -24,7 +24,7 @@ public class BRModelExporter {
      * exports the allBRModels into the EZPortfolio
      */
     public void exportModels(List<BRModel> allBRModels, EZPortfolio ezPortfolio) {
-        try(Reporting rep = reporting.pushSection("Preparing data for EZPortfolio export")){
+        try(Reporting rep = reporting.pushSection("Rapport EZPortfolio")){
             allBRModels.forEach(brModel -> loadOperations(ezPortfolio, brModel.getOperations()));
         }
     }
@@ -41,6 +41,8 @@ public class BRModelExporter {
             case RETRAIT_FONDS:
                 new LoadVirement(reporting).load(ezPortfolio, (BRRetraitFonds) operation);
                 break;
+            default:
+                // Generate exception
         }
     }
 }

@@ -13,7 +13,7 @@ public class Tail {
 
         try {
             while (running) {
-                Thread.sleep(updateInterval);
+                Sleep.wait(updateInterval);
                 long length = file.length();
                 if (length < filePointer) {
                     // Log file was reset. Restarting logging from start of file.
@@ -33,7 +33,7 @@ public class Tail {
                     localRandomAccessFile.close();
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 }

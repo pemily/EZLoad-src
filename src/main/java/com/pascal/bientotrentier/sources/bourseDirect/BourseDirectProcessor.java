@@ -31,9 +31,9 @@ public class BourseDirectProcessor {
 
     public List<BRModel> start(final Reporting reporting, EZPortfolio ezPortfolio) throws IOException {
         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
-        bourseDirectDownloader.start();
+        bourseDirectDownloader.start(ezPortfolio);
 
-        try(Reporting rep = reporting.pushSection("Analyzing downloaded files...")) {
+        try(Reporting ignored = reporting.pushSection("Analyzing downloaded files...")) {
             return new FileProcessor(mainSettings.getBourseDirect().getPdfOutputDir(),
                     BourseDirectDownloader.dirFilter(mainSettings),
                     BourseDirectDownloader.fileFilter())
@@ -54,7 +54,7 @@ public class BourseDirectProcessor {
     }
 
     public BRModel start(Reporting reporting, MainSettings.AccountDeclaration accountDeclaration, String pdfFilePath) {
-        try(Reporting rep = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Working on ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
+        try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Working on ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
             String pdfText = new BourseDirectPdfExtractor(reporting).getText(pdfFilePath);
 
             BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);

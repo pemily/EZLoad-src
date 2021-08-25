@@ -31,7 +31,7 @@ public class FileProcessor {
                     .filter(Files::isRegularFile)
                     .filter(f -> dirFilter.test(f.toFile().getParentFile()))
                     .filter(f -> fileFiter.test(f.toFile()))
-                    .sorted()
+                    .sorted() // sort the files per date (use the name for that, it contains the date yyy/mm/dd)
                     .map(p -> processFile.apply(p.toFile().getAbsolutePath()))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());

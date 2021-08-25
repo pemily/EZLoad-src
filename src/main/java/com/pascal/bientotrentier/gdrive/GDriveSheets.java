@@ -4,6 +4,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.pascal.bientotrentier.sources.Reporting;
 import com.pascal.bientotrentier.util.BRException;
+import com.pascal.bientotrentier.util.Sleep;
 import com.pascal.bientotrentier.util.SupplierWithException;
 
 import java.util.Arrays;
@@ -22,20 +23,20 @@ public class GDriveSheets {
     }
 
     public SheetValues getCells(final String range) throws Exception {
-        reporting.info("GDrive reading data: "+range);
+        reporting.info("Google Drive reading data: "+range);
         List<List<Object>> r = retryOnTimeout(10, () -> {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
             return response.getValues();
         });
-        reporting.info("GDrive reading done");
+        reporting.info("Google Drive reading done");
         List<Row> rows = r.stream().map(Row::new).collect(Collectors.toList());
         return new SheetValues(range, rows);
     }
 
     public int update(String range, List<Row> values) throws Exception {
-        reporting.info("GDrive sheet updating: "+range);
+        reporting.info("Google Drive sheet updating: "+range);
         List<List<Object>> objValues = values.stream().map(Row::getValues).collect(Collectors.toList());
         int r = retryOnTimeout(10, () -> {
             UpdateValuesResponse resp = service.spreadsheets().values().update(spreadsheetId, range, new ValueRange().setValues(objValues))
@@ -43,7 +44,7 @@ public class GDriveSheets {
                     .execute();
             return resp.getUpdatedCells();
         });
-        reporting.info("GDrive sheet updated");
+        reporting.info("Google Drive sheet updated");
         return r;
     }
 
@@ -95,13 +96,10 @@ public class GDriveSheets {
             if ("Read timed out".equals(e.getMessage())){
                 if (n == 0){
                     reporting.info("max retry reached");
-                    throw new BRException("Google Drive not accessible, please retry later");
+                    throw new BRException("Google Drive API not accessible, please retry later");
                 }
                 reporting.info("Timeout reached, wait a little before retry");
-                try {
-                    Thread.sleep(60 * 1000);
-                }
-                catch (InterruptedException ie){}
+                Sleep.wait(60);
                 reporting.info("Retry n°: "+n);
                 return retryOnTimeout(n - 1, fct);
             }

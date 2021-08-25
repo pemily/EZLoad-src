@@ -26,6 +26,7 @@ public class EZPortfolioManager {
 
     public EZPortfolio load() throws Exception {
         try(Reporting rep = reporting.pushSection("Loading EZPortfolio...")){
+            reporting.info("Getting data from Google Drive API...");
             EZPortfolio ezPortfolio = new EZPortfolio();
 
             List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:K", "MonPortefeuille!A4:L");

@@ -8,6 +8,7 @@ import com.pascal.bientotrentier.sources.Reporting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MesOperations  {
@@ -53,7 +54,7 @@ public class MesOperations  {
                         BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
                         && operation.getDate().equals(row.valueDate(DATE_COL))
                         && operation.getAmount().equals(row.valueStr(AMOUNT_COL))
-                        && operation.getCourtier().getDisplayName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
+                        && operation.getCourtier().getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
                         && operation.getCompteType().getEZPortfolioName().equals(row.valueStr(COMPTE_TYPE_COL))
                         && operation.getAccountDeclaration().getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL))
                         && operation.getDescription().equals(row.valueStr(INFORMATION_COL))
@@ -72,7 +73,7 @@ public class MesOperations  {
     }
 
     public void newOperation(BRDate date, EnumBRCompteType compteType, EnumBRCourtier courtier, MainSettings.AccountDeclaration account, String periode, BROperationType operationType, String actionName, String country, String amount, String description) {
-        newOperations.add(new Row(date.toEzPortoflioDate(), compteType.getEZPortfolioName(), courtier.getDisplayName(), format(periode),
+        newOperations.add(new Row(date.toEzPortoflioDate(), compteType.getEZPortfolioName(), courtier.getEzPortfolioName(), format(periode),
                         operationType.getEZPortfolioName(), format(actionName), format(country), format(amount), format(description), format(account.getName()), BIENTOT_RENTIER_OPERATION));
     }
 
@@ -82,16 +83,19 @@ public class MesOperations  {
 
 
     public boolean isAlreadyProcessed(EnumBRCourtier courtier, MainSettings.AccountDeclaration accountDeclaration, BRDate pdfDate) {
+        return getLastOperationDate(courtier, accountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(pdfDate)).orElse(false);
+    }
+
+    public Optional<BRDate> getLastOperationDate(EnumBRCourtier courtier, MainSettings.AccountDeclaration accountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
                 .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
-                        && courtier.getDisplayName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
+                        && courtier.getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
                         && accountDeclaration.getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL)))
                 .collect(Collectors.toList());
-
-        if (courtierOps.isEmpty()) return false;
+        if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);
-        BRDate lastOperationDate = latestRow.valueDate(DATE_COL);
-        return lastOperationDate.isBeforeOrEquals(pdfDate);
+        return Optional.of(latestRow.valueDate(DATE_COL));
+
     }
 
 }

@@ -16,7 +16,7 @@ public class BourseDirectModelChecker {
     }
 
     public boolean isValid(BourseDirectModel model){
-        try(Reporting rep = reporting.pushSection("Checking BourseDirect model...")){
+        try(Reporting ignored = reporting.pushSection("Checking BourseDirect model...")){
             boolean isValid = true;
 
             long nbOfDroitDeGarde = nbOfDroitsDeGarde(model.getOperations());
