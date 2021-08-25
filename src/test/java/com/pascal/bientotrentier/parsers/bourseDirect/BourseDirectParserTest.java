@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -131,7 +132,7 @@ public class BourseDirectParserTest {
         return BourseDirectParserTest.class.getResource("benchmark/"+fileName);
     }
 
-    private void check(String result, String filename) throws IOException {
+    private void check(String filename, String result) throws IOException {
         URL file = getBenchmark(filename);
 
         if (file == null) {
@@ -147,8 +148,8 @@ public class BourseDirectParserTest {
             file = new File(filePath).toURI().toURL();
         }
 
-        String text = new BufferedReader(new FileReader(file.getFile())).lines().collect(Collectors.joining("\n"));
-        assertEquals(result.trim(), text.trim());
+        String text = new BufferedReader(new InputStreamReader(new FileInputStream(file.getFile()), StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
+        assertEquals(text.trim(), result.trim());
     }
 
     private void test(String file) throws IOException {
@@ -158,7 +159,8 @@ public class BourseDirectParserTest {
         BRModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
         String jsonBrModel = ModelUtils.toJson(brModel);
         String report = reporting.getReport();
-        check(jsonBrModel, file +".model.expected.txt");
-        check(report, file +".reporting.expected.txt");
+
+         check(file +".model.expected.txt", jsonBrModel);
+         check( file +".reporting.expected.txt", report);
     }
 }

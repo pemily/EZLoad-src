@@ -70,8 +70,6 @@
                 </executions>
             </plugin>
 
-
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -87,6 +85,53 @@
                               <!-- ajoute les sources generés de javacc dans le classpath pour intellij -->
                                <source>${project.build.directory}/generated-sources/javacc</source>
                             </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- lit les annotation jaxrs et genere un fichier openapi -->
+            <plugin>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>2.1.10</version>
+                <configuration>
+                    <resourcePackages>
+                        <package>com.pascal.bientotrentier.server.handler</package>
+                    </resourcePackages>
+                    <outputPath>${basedir}/target/swagger</outputPath>
+                    <outputFileName>swagger</outputFileName>
+                    <outputFormat>JSONANDYAML</outputFormat>
+                    <prettyPrint>true</prettyPrint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>resolve</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <!-- a partir du swagger, genere le code javascript  -->
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.4.21</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/target/swagger/swagger.json</inputSpec>
+                            <language>javascript</language>
+                            <configOptions>
+                                <sourceFolder>src/gen/java/main</sourceFolder>
+                            </configOptions>
+                            <output>${project.basedir}/target</output>
                         </configuration>
                     </execution>
                 </executions>
