@@ -4,13 +4,13 @@
 const { generateApi } = require('swagger-typescript-api');
 const path = require("path");
 const fs = require("fs");
-var file = "../../../../server/target/swagger/swagger.json";
+var swaggerFile = "../server/target/swagger/swagger.json";
 
 /* NOTE: all fields are optional expect one of `output`, `url`, `spec` */
 generateApi({
   name: "BientotRentierApi.ts",
   output:  path.resolve(process.cwd(), "generated/client"),
-  input: path.resolve(process.cwd(), file),
+  input: path.resolve(process.cwd(), swaggerFile),
   httpClientType: "axios", // "axios" or "fetch"
   prettier: {
     printWidth: 120,
