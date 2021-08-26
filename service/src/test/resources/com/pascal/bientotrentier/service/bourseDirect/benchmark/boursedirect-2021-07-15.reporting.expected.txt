@@ -1,0 +1,11 @@
+===== Working on /D:/dev/BientotRentier/service/target/test-classes/com/pascal/bientotrentier/service/bourseDirect/boursedirect-2021-07-15.pdf
+    info: Reading pdf...
+    info: pdf read => ok
+    info: BourseDirect model transformation
+    info: BourseDirect model transformation => ok
+    ===== Checking BourseDirect model...
+        info: => No error detected
+    =====
+    info: Creating Standard Model...
+    info: Standard Model => ok
+=====

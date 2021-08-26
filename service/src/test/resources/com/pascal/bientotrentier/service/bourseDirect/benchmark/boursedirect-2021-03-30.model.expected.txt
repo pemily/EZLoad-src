@@ -1,0 +1,74 @@
+{
+  "source": "BourseDirect",
+  "sourceFile": "/D:/dev/BientotRentier/service/target/test-classes/com/pascal/bientotrentier/service/bourseDirect/boursedirect-2021-03-30.pdf",
+  "reportDate": {
+    "day": 30,
+    "month": 3,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "BRAccountDeclaration": {
+    "name": "Pascal CTO"
+  },
+  "operations": [
+    {
+      "action": {
+        "name": "L3 HARRIS TECHNOLOGIES INC",
+        "ticker": "LHX",
+        "isin": "US5024311095",
+        "marketPlace": {
+          "stockExchange": "New York Stock Exchange",
+          "city": "New York City",
+          "mic": "XNYS",
+          "acronym": "NYSE",
+          "country": {
+            "code": "US",
+            "name": "Etats-Unis"
+          },
+          "googleFinanceCode": "NYSE",
+          "currency": {
+            "symbol": "$",
+            "code": "USD"
+          }
+        }
+      },
+      "number": -20,
+      "prixUnitaireBrut": "0,86682",
+      "commission": "0",
+      "prelevement": "2,21",
+      "amountBrut": "17,34",
+      "creditImpot": "2,6",
+      "contributionSocial": "2,97",
+      "date": {
+        "day": 30,
+        "month": 3,
+        "year": 2021
+      },
+      "amount": "9,55",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "BRAccountDeclaration": {
+        "name": "Pascal CTO"
+      }
+    }
+  ]
+}

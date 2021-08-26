@@ -5,7 +5,7 @@
     <groupId>com.pascal</groupId>
     <artifactId>BientotRentier</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
 
     <properties>
@@ -15,6 +15,11 @@
         <java.version>1.8</java.version>
     </properties>
 
+    <modules>
+        <module>service</module>
+        <module>server</module>
+        <module>client</module>
+    </modules>
 
     <build>
         <plugins>
@@ -22,123 +27,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                  <execution>
-                        <id>download-javacc21</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <mkdir dir="javacc21-compiler"></mkdir>
-                                <get src="https://javacc.com/download/javacc-full.jar"
-                                     dest="javacc21-compiler/javacc-full.jar"
-                                     verbose="on"
-                                     usetimestamp="true"
-                                     skipexisting="true"
-                                />
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile-javacc21</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <java jar="javacc21-compiler/javacc-full.jar"
-                                      failonerror="true"
-                                        fork="true">
-                                    <!-- https://github.com/javacc21/javacc21/blob/master/src/java/com/javacc/Main.java -->
-                                    <arg value="-n"/> <!-- no check if new version exists -->
-                                    <arg value="-jdk8"/>
-                                    <arg value="-d"/>
-                                    <arg value="${project.build.directory}/generated-sources/javacc"/>
-                                    <arg value="src/main/javacc21/BourseDirectPdf.javacc"/>
-                                </java>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                              <!-- ajoute les sources generés de javacc dans le classpath pour intellij -->
-                               <source>${project.build.directory}/generated-sources/javacc</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- lit les annotation jaxrs et genere un fichier openapi -->
-            <plugin>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-maven-plugin</artifactId>
-                <version>2.1.10</version>
-                <configuration>
-                    <resourcePackages>
-                        <package>com.pascal.bientotrentier.server.handler</package>
-                    </resourcePackages>
-                    <outputPath>${basedir}/target/swagger</outputPath>
-                    <outputFileName>swagger</outputFileName>
-                    <outputFormat>JSONANDYAML</outputFormat>
-                    <prettyPrint>true</prettyPrint>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>resolve</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <!-- a partir du swagger, genere le code javascript  -->
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <skipValidateSpec>true</skipValidateSpec>
-                            <inputSpec>${project.basedir}/target/swagger/swagger.json</inputSpec>
-                            <generatorName>javascript</generatorName>
-                            <configOptions>
-                                <sourceFolder>src/gen/java/main</sourceFolder>
-                            </configOptions>
-                            <output>${project.basedir}/target</output>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -146,132 +37,6 @@
             <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>3.141.59</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.11.2</version>
-        </dependency>
-
-        <!-- to decode pdf -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>2.0.24</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-
-        <!-- google drive -->
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-sheets</artifactId>
-            <version>v4-rev612-1.25.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.32.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.31.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
-        </dependency>
-
-        <dependency>
-            <!-- pour generer les pages web -->
-            <groupId>com.github.spullara.mustache.java</groupId>
-            <artifactId>compiler</artifactId>
-            <version>0.9.10</version>
-        </dependency>
-
-        <!-- jetty / jersey / jaxrs -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-jetty-http</artifactId>
-            <version>2.25</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>9.4.0.v20161208</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>2.25</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-            <version>2.25</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>9.4.0.v20161208</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.4.0.v20161208</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
-        </dependency>
     </dependencies>
-
 
 </project>
