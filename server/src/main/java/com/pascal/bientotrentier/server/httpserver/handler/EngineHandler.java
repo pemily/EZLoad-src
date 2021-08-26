@@ -1,5 +1,6 @@
-package com.pascal.bientotrentier.server.httpserver;
+package com.pascal.bientotrentier.server.httpserver.handler;
 
+import com.pascal.bientotrentier.server.httpserver.BRHttpServer;
 import com.pascal.bientotrentier.service.config.MainSettings;
 import com.pascal.bientotrentier.service.exporter.BRModelChecker;
 import com.pascal.bientotrentier.service.exporter.BRModelExporter;
@@ -12,23 +13,39 @@ import com.pascal.bientotrentier.service.util.FileLinkCreator;
 import com.pascal.bientotrentier.service.util.HtmlReporting;
 import com.pascal.bientotrentier.service.util.MultiWriter;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 
-public class StartAction {
-    private final MainSettings mainSettings;
+@Path("engine")
+public class EngineHandler {
 
     public static final String REPORT_FILE_PREFIX =  "bientotRentier-report-";
     public static final String REPORT_FILE_SUFFIX =  ".html";
 
-    StartAction(MainSettings mainSettings) {
-        this.mainSettings = mainSettings;
+    @Context
+    private HttpServletResponse context;
+
+    @Inject
+    private MainSettings mainSettings;
+
+    @Inject
+    private BRHttpServer httpServer;
+
+    @GET
+    public void start(@NotNull @QueryParam("simulation") boolean simulation) throws Exception {
+        start(context.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
     }
 
-    public void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
+    private void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
         File logsDir = new File(mainSettings.getBientotRentier().getLogsDir());
         logsDir.mkdirs();
         Date now = new Date();
@@ -77,14 +94,6 @@ public class StartAction {
             fileWriter.write("</body></html>\n");
             fileWriter.flush();
         }
-    }
-
-    public static Predicate<File> fileFilter(){
-        return file -> file.getName().startsWith(StartAction.REPORT_FILE_PREFIX) && file.getName().endsWith(StartAction.REPORT_FILE_SUFFIX);
-    }
-
-    public static Predicate<File> dirFilter(){
-        return file -> false; // there is no subdir for log
     }
 
 }

@@ -20,7 +20,7 @@
                 <version>2.1.10</version>
                 <configuration>
                     <resourcePackages>
-                        <package>com.pascal.com.pascal.bientotrentier.server.handler</package>
+                        <package>com.pascal.bientotrentier.server.httpserver.handler</package>
                     </resourcePackages>
                     <outputPath>${basedir}/target/swagger</outputPath>
                     <outputFileName>swagger</outputFileName>
@@ -37,29 +37,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <!-- a partir du swagger, genere le code javascript  -->
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <skipValidateSpec>true</skipValidateSpec>
-                            <inputSpec>${project.basedir}/target/swagger/swagger.json</inputSpec>
-                            <generatorName>javascript</generatorName>
-                            <configOptions>
-                                <sourceFolder>webfiles/js</sourceFolder>
-                            </configOptions>
-                            <output>${project.build.directory}/classes</output> <!-- to have the webfiles/js dir inside the classpath resource -->
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -125,6 +102,7 @@
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
         </dependency>
+
     </dependencies>
 
 </project>

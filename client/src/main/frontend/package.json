@@ -1,0 +1,15 @@
+{
+  "name": "bientot-rentier-front",
+  "version": "1.0.0",
+  "description": "Frontend for BientotRentier",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gen-client-api": "node gen-client-api-config.js"
+  },
+  "author": "Pascal",
+  "dependencies": {},
+  "devDependencies": {
+    "swagger-typescript-api": "^9.2.0"
+  }
+}

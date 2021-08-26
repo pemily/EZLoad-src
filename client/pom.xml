@@ -11,6 +11,59 @@
 
     <artifactId>client</artifactId>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.9.1</version>
 
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
 
+                    <execution>
+                        <id>Install required modules</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>Generate Client API js files</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>run gen-client-api</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <nodeVersion>v16.8.0</nodeVersion>
+                    <workingDirectory>src/main/frontend</workingDirectory>
+                    <installDirectory>target</installDirectory>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nodejs-in-mvn</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

@@ -1,6 +1,8 @@
 package com.pascal.bientotrentier.server.httpserver;
 
-import com.pascal.bientotrentier.server.httpserver.handler.ExitHandler;
+import com.pascal.bientotrentier.server.httpserver.handler.HomeHandler;
+import com.pascal.bientotrentier.service.config.MainSettings;
+import com.pascal.bientotrentier.service.util.FileLinkCreator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -17,6 +19,11 @@ import java.net.InetSocketAddress;
 
 public class BRHttpServer {
     private Server server;
+
+    private static final String PDF_BOURSE_DIRECT_CONTEXT = "/bourseDirectDir";
+    private static final String PDF_BOURSE_DIRECT_TARGET = "bourseDirectPdf";
+    private static final String LOGS_CONTEXT = "/logs";
+    private static final String LOGS_TARGET = "log";
 
     public int start(AbstractBinder configBinder) throws Exception {
         InetSocketAddress address = new InetSocketAddress(0);
@@ -39,7 +46,7 @@ public class BRHttpServer {
 
         ResourceConfig config = new ResourceConfig();
         config.register(configBinder);
-        config.packages(ExitHandler.class.getPackage().getName());
+        config.packages(HomeHandler.class.getPackage().getName());
 
         ServletHolder serHol = new ServletHolder(new ServletContainer(config));
         servletHandler.addServlet(serHol, "/api/*");
@@ -54,6 +61,25 @@ public class BRHttpServer {
 
     public void stop() throws Exception {
         server.stop();
+    }
+
+
+    public FileLinkCreator fileLinkCreator(MainSettings mainSettings){
+        return (reporting, sourceFile) -> {
+            if (sourceFile.startsWith(mainSettings.getBourseDirect().getPdfOutputDir())){
+                String file = sourceFile.substring(mainSettings.getBourseDirect().getPdfOutputDir().length());
+                file = file.replace('\\', '/'); // pour windows
+                return "<a target='"+PDF_BOURSE_DIRECT_TARGET+"' href='"+PDF_BOURSE_DIRECT_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
+            }
+            else if (sourceFile.startsWith(mainSettings.getBientotRentier().getLogsDir())){
+                String file = sourceFile.substring(mainSettings.getBientotRentier().getLogsDir().length());
+                file = file.replace('\\', '/'); // pour windows
+                return "<a target='"+LOGS_TARGET+"' href='"+LOGS_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
+            }
+            else{
+                return reporting.escape(sourceFile);
+            }
+        };
     }
 
 }
