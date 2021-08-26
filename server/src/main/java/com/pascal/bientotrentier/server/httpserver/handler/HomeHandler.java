@@ -41,6 +41,12 @@ public class HomeHandler {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public MainSettings getSettings(){
+        return mainSettings;
+    }
+
+    @GET
     public void exit() throws Exception {
         server.stop();
     }

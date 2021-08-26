@@ -1,15 +1,64 @@
 {
-  "name": "bientot-rentier-front",
-  "version": "1.0.0",
-  "description": "Frontend for BientotRentier",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "gen-client-api": "node gen-client-api-config.js"
+  "name": "BientotRentier",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.6.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.20.21",
+    "@types/react": "^16.14.14",
+    "@types/react-dom": "^16.9.14",
+    "@types/react-redux": "^7.1.18",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.6",
+    "grommet": "^2.17.5",
+    "grommet-controls": "^3.0.2",
+    "grommet-icons": "^4.6.2",
+    "i18next": "^20.4.0",
+    "i18next-browser-languagedetector": "^6.1.2",
+    "i18next-xhr-backend": "^3.2.0",
+    "tslint": "^5.20.1"
   },
-  "author": "Pascal",
-  "dependencies": {},
+  "scripts": {
+    "npx": "node node/node_modules/npm/bin/npx-cli.js",
+    "gen-client-api": "node gen-client-api-config.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "i18n": "node i18n/i18next-cmd.js"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
   "devDependencies": {
+    "@types/i18next-xhr-backend": "^1.4.2",
+    "i18next-json-sync": "^2.3.1",
+    "i18next-parser": "4.4.0",
+    "redux-devtools-extension": "^2.13.9",
     "swagger-typescript-api": "^9.2.0"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

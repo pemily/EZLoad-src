@@ -21,17 +21,13 @@
                 <executions>
                     <execution>
                         <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
+                        <goals><goal>install-node-and-npm</goal></goals>
                         <phase>generate-resources</phase>
                     </execution>
 
                     <execution>
                         <id>Install required modules</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
+                        <goals><goal>npm</goal></goals>
                         <phase>generate-resources</phase>
                         <configuration>
                             <arguments>install</arguments>
@@ -40,9 +36,7 @@
 
                     <execution>
                         <id>Generate Client API js files</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
+                        <goals><goal>npm</goal></goals>
                         <phase>generate-resources</phase>
                         <configuration>
                             <arguments>run gen-client-api</arguments>
@@ -52,8 +46,8 @@
 
                 <configuration>
                     <nodeVersion>v16.8.0</nodeVersion>
-                    <workingDirectory>src/main/frontend</workingDirectory>
-                    <installDirectory>target</installDirectory>
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                    <installDirectory>${project.build.directory}/node-16.8.0</installDirectory>
                 </configuration>
             </plugin>
 
