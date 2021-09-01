@@ -34,12 +34,12 @@ export function App(){
                 <Box direction="row" align="center" gap="small" fill={true}>
                     <Heading level="3" self-align="center">EZLoad</Heading>
                 </Box>
-                <Button color="blue" label="Config" onClick={onConfigOpen} alignSelf="end"/>
+                <Button color="blue" label="Configuration" onClick={onConfigOpen} alignSelf="end"/>
             </Header>
             {mainSettings && configVisible && (
                 <Layer animation="slide" full={true} onEsc={onConfigClose} onClickOutside={onConfigClose}>
-                    <Config mainSettings={mainSettings}/>
-                    <Button label="Close" onClick={onConfigClose}/>
+                    <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}/>
+                    <Button label="Fermer" onClick={onConfigClose}/>
                 </Layer>
             )}
 

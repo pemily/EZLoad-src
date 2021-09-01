@@ -72,7 +72,9 @@ public class Main {
 
         MainSettings.ChromeSettings chromeSettings = new MainSettings.ChromeSettings();
         chromeSettings.setUserDataDir(ezHome+File.separator+"chrome-datadir");
+        chromeSettings.setDefaultTimeout(20);
         mainSettings.setChrome(chromeSettings);
+
 
         EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
         mainSettings.setEzPortfolio(ezPortfolioSettings);
