@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>BientotRentier</artifactId>
+        <artifactId>EZLoad</artifactId>
         <groupId>com.pascal</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -20,7 +20,7 @@
                 <version>2.1.10</version>
                 <configuration>
                     <resourcePackages>
-                        <package>com.pascal.bientotrentier.server.httpserver.handler</package>
+                        <package>com.pascal.ezload.server.httpserver.handler</package>
                     </resourcePackages>
                     <outputPath>${basedir}/target/swagger</outputPath>
                     <outputFileName>swagger</outputFileName>
@@ -55,6 +55,27 @@
         </dependency>
 
         <!-- jetty / jersey / jaxrs -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.12.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>2.25</version>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-jetty-http</artifactId>

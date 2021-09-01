@@ -1,0 +1,74 @@
+{
+  "source": "BourseDirect",
+  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-07-19.pdf",
+  "reportDate": {
+    "day": 19,
+    "month": 7,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "BRAccountDeclaration": {
+    "name": "Pascal CTO"
+  },
+  "operations": [
+    {
+      "action": {
+        "name": "WP CAREY INC",
+        "ticker": "WPC",
+        "isin": "US92936U1097",
+        "marketPlace": {
+          "stockExchange": "New York Stock Exchange",
+          "city": "New York City",
+          "mic": "XNYS",
+          "acronym": "NYSE",
+          "country": {
+            "code": "US",
+            "name": "Etats-Unis"
+          },
+          "googleFinanceCode": "NYSE",
+          "currency": {
+            "symbol": "$",
+            "code": "USD"
+          }
+        }
+      },
+      "number": -60,
+      "prixUnitaireBrut": "0,89015",
+      "commission": "0",
+      "prelevement": "6,83",
+      "amountBrut": "53,41",
+      "creditImpot": "8,03",
+      "contributionSocial": "9,17",
+      "date": {
+        "day": 19,
+        "month": 7,
+        "year": 2021
+      },
+      "amount": "29,38",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "BRAccountDeclaration": {
+        "name": "Pascal CTO"
+      }
+    }
+  ]
+}

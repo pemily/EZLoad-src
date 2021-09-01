@@ -12,8 +12,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="BientotRentier" target="1.8" />
       <module name="client" target="1.8" />
+      <module name="EZLoad" target="1.8" />
       <module name="server" target="1.8" />
       <module name="service" target="1.8" />
     </bytecodeTargetLevel>

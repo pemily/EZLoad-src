@@ -8,8 +8,8 @@ var swaggerFile = "../server/target/swagger/swagger.json";
 
 /* NOTE: all fields are optional expect one of `output`, `url`, `spec` */
 generateApi({
-  name: "BientotRentierApi.ts",
-  output:  path.resolve(process.cwd(), "generated/client"),
+  name: "EZLoadApi.ts",
+  output:  path.resolve(process.cwd(), "src/api/gen-api"),
   input: path.resolve(process.cwd(), swaggerFile),
   httpClientType: "axios", // "axios" or "fetch"
   prettier: {
@@ -26,7 +26,7 @@ generateApi({
   extractRequestParams: true,
   extractRequestBody: true,
   defaultResponseType: "void",
-  singleHttpClient: true,
+  singleHttpClient: false,
   cleanOutput: true,
   enumNamesAsValues: true,
   moduleNameFirstTag: true,

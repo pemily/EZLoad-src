@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pascal</groupId>
-    <artifactId>BientotRentier</artifactId>
+    <artifactId>EZLoad</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 

@@ -1,0 +1,160 @@
+{
+  "source": "BourseDirect",
+  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-07-08.pdf",
+  "reportDate": {
+    "day": 8,
+    "month": 7,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "BRAccountDeclaration": {
+    "name": "Pascal CTO"
+  },
+  "operations": [
+    {
+      "action": {
+        "name": "Rubis",
+        "ticker": "RUI",
+        "isin": "FR0013269123",
+        "marketPlace": {
+          "stockExchange": "Euronext",
+          "city": "Paris",
+          "mic": "XPAR",
+          "country": {
+            "code": "FR",
+            "name": "France"
+          },
+          "googleFinanceCode": "EPA",
+          "currency": {
+            "symbol": "€",
+            "code": "EUR"
+          }
+        }
+      },
+      "number": -120,
+      "prixUnitaireBrut": "1,8",
+      "commission": "0",
+      "prelevement": "27,64",
+      "amountBrut": "216",
+      "creditImpot": "0",
+      "contributionSocial": "37,15",
+      "date": {
+        "day": 8,
+        "month": 7,
+        "year": 2021
+      },
+      "amount": "0",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "BRAccountDeclaration": {
+        "name": "Pascal CTO"
+      }
+    },
+    {
+      "action": {
+        "name": "Rubis",
+        "ticker": "RUI",
+        "isin": "FR0013269123",
+        "marketPlace": {
+          "stockExchange": "Euronext",
+          "city": "Paris",
+          "mic": "XPAR",
+          "country": {
+            "code": "FR",
+            "name": "France"
+          },
+          "googleFinanceCode": "EPA",
+          "currency": {
+            "symbol": "€",
+            "code": "EUR"
+          }
+        }
+      },
+      "number": 6,
+      "cours": "36,2",
+      "date": {
+        "day": 16,
+        "month": 6,
+        "year": 2021
+      },
+      "amount": "217,2",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "BRAccountDeclaration": {
+        "name": "Pascal CTO"
+      }
+    },
+    {
+      "action": {
+        "name": "Rubis",
+        "ticker": "RUI",
+        "isin": "FR0013269123",
+        "marketPlace": {
+          "stockExchange": "Euronext",
+          "city": "Paris",
+          "mic": "XPAR",
+          "country": {
+            "code": "FR",
+            "name": "France"
+          },
+          "googleFinanceCode": "EPA",
+          "currency": {
+            "symbol": "€",
+            "code": "EUR"
+          }
+        }
+      },
+      "date": {
+        "day": 16,
+        "month": 6,
+        "year": 2021
+      },
+      "amount": "151,21",
+      "description": "REINVESTISSEMENT",
+      "compteType": "COMPTE_TITRES_ORDINAIRE",
+      "courtier": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "BRAccountDeclaration": {
+        "name": "Pascal CTO"
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "BientotRentier",
+  "name": "EZLoad",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,18 +12,21 @@
     "@types/react": "^16.14.14",
     "@types/react-dom": "^16.9.14",
     "@types/react-redux": "^7.1.18",
+    "grommet": "^2.17.5",
+    "grommet-controls": "^3.0.2",
+    "grommet-icons": "^4.6.2",
+    "grommet-theme-hpe": "^2.2.0",
+    "grommet-v2": "^2.0.0-alpha.11",
+    "i18next": "^20.4.0",
+    "i18next-browser-languagedetector": "^6.1.2",
+    "i18next-xhr-backend": "^3.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.4",
     "react-scripts": "4.0.3",
-    "typescript": "^4.1.6",
-    "grommet": "^2.17.5",
-    "grommet-controls": "^3.0.2",
-    "grommet-icons": "^4.6.2",
-    "i18next": "^20.4.0",
-    "i18next-browser-languagedetector": "^6.1.2",
-    "i18next-xhr-backend": "^3.2.0",
-    "tslint": "^5.20.1"
+    "styled-components": "^5.3.1",
+    "tslint": "^5.20.1",
+    "typescript": "^4.1.6"
   },
   "scripts": {
     "npx": "node node/node_modules/npm/bin/npx-cli.js",
@@ -33,21 +36,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "i18n": "node i18n/i18next-cmd.js"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "devDependencies": {
-    "@types/i18next-xhr-backend": "^1.4.2",
-    "i18next-json-sync": "^2.3.1",
-    "i18next-parser": "4.4.0",
-    "redux-devtools-extension": "^2.13.9",
-    "swagger-typescript-api": "^9.2.0"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -60,5 +48,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/i18next-xhr-backend": "^1.4.2",
+    "i18next-json-sync": "^2.3.1",
+    "i18next-parser": "4.4.0",
+    "redux-devtools-extension": "^2.13.9",
+    "swagger-typescript-api": "^9.2.0"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
   }
 }

@@ -1,0 +1,23 @@
+---
+bourseDirect:
+  pdfOutputDir: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\BourseDirect"
+  accounts:
+  - number: "508TI00085554410EUR"
+    name: "CTO Pascal"
+  - number: "508TI00083351215EUR"
+    name: "PEA Pascal"
+  - number: "508TI00083380981EUR"
+    name: "PEA Stef"
+chrome:
+  driverPath: "D:\\dev\\chromeDriver\\v92.0.4515.107\\chromedriver.exe"
+  userDataDir: "D:\\tmp\\chromeDir"
+  defaultTimeout: 20
+ezPortfolio:
+  gdriveCredsFile: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\credentials\\\
+    creds.json"
+  ezPortfolioId: "1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA"
+bientotRentier:
+  logsDir: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\logs"
+  passPhrase: "dPrjTOZjnDDTaFHXFm7JC+H54QPA11LKBk7REqUTmrc="
+  courtierCredsFile: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\credentials\\\
+    courtierCreds.json"
