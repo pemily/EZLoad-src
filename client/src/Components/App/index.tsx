@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, Header, Heading, Footer, Main, Anchor, Layer } from "grommet";
+import { Button, Box, Header, Heading, Footer, Main, Anchor, Layer, Tabs, Tab } from "grommet";
 import { Counter } from '../../features/counter/Counter';
 import { AllCourtiers } from '../Courtiers/AllCourtiers';
 import { Config } from '../Config';
@@ -9,7 +9,6 @@ import { MainSettings } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
 
-    const [configVisible, setConfigVisible] = useState(false);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
 
     useEffect(() => {
@@ -24,38 +23,33 @@ export function App(){
         });
     }, []);
 
-    const onConfigOpen = () => setConfigVisible(true);
-    const onConfigClose = () => setConfigVisible(false);
 
     return (
-        <Main>
-            <Header background="brand" margin="none" pad="none" justify="between" border={{ size: 'xsmall' }}>
-                <Box fill={true}/>
-                <Box direction="row" align="center" gap="small" fill={true}>
-                    <Heading level="3" self-align="center">EZLoad</Heading>
-                </Box>
-                <Button color="blue" label="Configuration" onClick={onConfigOpen} alignSelf="end"/>
+        <Box fill>
+            <Header direction="column" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
+                <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
             </Header>
-            {mainSettings && configVisible && (
-                <Layer animation="slide" full={true} onEsc={onConfigClose} onClickOutside={onConfigClose}>
-                    <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}/>
-                    <Button label="Fermer" onClick={onConfigClose}/>
-                </Layer>
-            )}
-
-            <AllCourtiers/>
-            <Box>
-            Analyzer<br/>
-                generate report
-            EZPortfolio<br/>
-                Load
+            <Box fill>
+                <Tabs justify="center" flex>
+                    <Tab title="Actions">
+                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                        <AllCourtiers/>
+                            <p>Analyzer
+                            generate report
+                        EZPortfolio
+                            Load
+                            </p>
+                        </Box>
+                    </Tab>
+                    <Tab title="Configuration">
+                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                            {mainSettings && (
+                                    <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}/>
+                            )}
+                        </Box>
+                    </Tab>
+                </Tabs>
             </Box>
-            <Box fill={true}/>
-            <Footer background="brand" direction="column" pad="small" >
-                <p>
-                  Cecit est le texte du footer <a target='grom' href="http://grommet.io">Grommet</a>!
-                </p>
-            </Footer>
-        </Main>
+        </Box>
     );
 }

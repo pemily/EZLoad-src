@@ -6,7 +6,7 @@ import { BourseDirect } from '../BourseDirect';
 export function AllCourtiers() {
     return (
         <Box margin="none" pad="xsmall" >
-            <Heading margin="none" level="4">Courtiers</Heading>
+            <Heading level="4">Courtiers</Heading>
             <BourseDirect/>
         </Box>
     );

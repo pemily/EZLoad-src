@@ -4,6 +4,7 @@ import { Box, Heading, Anchor, Form, FormField, TextInput, Button } from "gromme
 
 import { ezApi } from '../../../ez-api';
 import { MainSettings } from '../../../ez-api/gen-api/EZLoadApi';
+import { HelpOption } from 'grommet-icons';
 
 export interface ConfigTextFieldProps {
   onChange: (newValue: string) => void;
@@ -12,15 +13,18 @@ export interface ConfigTextFieldProps {
   id: string;
   label: string;
   description?: string;
+  isRequired?: boolean;
 }
+//                 validate={(newVal, field) => props && props.validate ? props.validate(newVal) : null}>
 
 export function ConfigTextField(props: ConfigTextFieldProps) {
     return (
-              <Box direction="column" pad="xsmall">
+              <Box direction="column" pad="none" margin="xsmall" fill>
                 <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
-                 validate={(newVal, field) => props && props.validate ? props.validate(newVal) : null}>
+                      required={props.isRequired}>
                 <TextInput id={props.id}
                            value={ props.value }
+                           placeholder={props.isRequired ? "à remplir" : ""}
                            onChange={(event) => props.onChange(event.target.value)}/>
                </FormField>
               </Box>
