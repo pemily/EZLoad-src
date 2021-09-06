@@ -6,8 +6,8 @@ import { HelpOption, CircleInformation } from 'grommet-icons';
 
 export interface HelpProps {
   title: string;
-  children: React.ElementType | string;
   isInfo?: boolean;
+  children: React.ReactNode;
 }
 
 export function Help(props: HelpProps) {

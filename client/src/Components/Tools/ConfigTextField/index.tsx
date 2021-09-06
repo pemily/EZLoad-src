@@ -14,6 +14,7 @@ export interface ConfigTextFieldProps {
   label: string;
   description?: string;
   isRequired?: boolean;
+  isPassword?: boolean;
 }
 //                 validate={(newVal, field) => props && props.validate ? props.validate(newVal) : null}>
 
@@ -23,8 +24,10 @@ export function ConfigTextField(props: ConfigTextFieldProps) {
                 <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
                       required={props.isRequired}>
                 <TextInput id={props.id}
+                           name={props.id}
                            value={ props.value }
                            placeholder={props.isRequired ? "à remplir" : ""}
+                           type={props.isPassword ? "password" : "text"}
                            onChange={(event) => props.onChange(event.target.value)}/>
                </FormField>
               </Box>

@@ -1,5 +1,6 @@
 package com.pascal.ezload.server.httpserver.handler;
 
+import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumBRCourtier;
@@ -7,9 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 @Path("security")
 public class SecurityHandler {
@@ -24,7 +24,7 @@ public class SecurityHandler {
             @NotNull @QueryParam("password") String password,
             @NotNull @QueryParam("courtier") EnumBRCourtier courtier){
         if (!StringUtils.isBlank(user) && !StringUtils.isBlank(password) && courtier != null){
-            MainSettings.AuthInfo authInfo = new MainSettings.AuthInfo();
+            AuthInfo authInfo = new AuthInfo();
             authInfo.setPassword(password);
             authInfo.setUsername(user);
             try {
@@ -34,5 +34,12 @@ public class SecurityHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    @GET
+    @Path("/info")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthInfo getAuthLowInfo( @NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
+        return SettingsManager.getAuthManager(mainSettings).getAuthLowInfo(courtier);
     }
 }

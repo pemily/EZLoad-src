@@ -9,7 +9,7 @@ var swaggerFile = "../server/target/swagger/swagger.json";
 /* NOTE: all fields are optional expect one of `output`, `url`, `spec` */
 generateApi({
   name: "EZLoadApi.ts",
-  output:  path.resolve(process.cwd(), "src/api/gen-api"),
+  output:  path.resolve(process.cwd(), "src/ez-api/gen-api"),
   input: path.resolve(process.cwd(), swaggerFile),
   httpClientType: "axios", // "axios" or "fetch"
   prettier: {

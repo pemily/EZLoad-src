@@ -5,11 +5,12 @@ import { AllCourtiers } from '../Courtiers/AllCourtiers';
 import { Config } from '../Config';
 
 import { ezApi } from '../../ez-api';
-import { MainSettings } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
 
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
+    const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
 
     useEffect(() => {
         // will be executed on the load
@@ -20,6 +21,15 @@ export function App(){
         })
         .catch((error) => {
             console.log("Error while loading MainSettings.", error);
+        });
+
+        console.log("Loading BourseDirect Username...");
+        ezApi.security.getAuthLowInfo({courtier: "BourseDirect"}).then(resp => {
+            console.log("BourseDirect authInfo loaded: ", resp.data);
+            setBourseDirectAuthInfo(resp.data);
+        })
+        .catch((error) => {
+            console.log("Error while loading BourseDirect Username", error);
         });
     }, []);
 
@@ -44,7 +54,10 @@ export function App(){
                     <Tab title="Configuration">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             {mainSettings && (
-                                    <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}/>
+                                <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}
+                                        bourseDirectAuthInfo={bourseDirectAuthInfo}
+                                        bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
+                                        />
                             )}
                         </Box>
                     </Tab>

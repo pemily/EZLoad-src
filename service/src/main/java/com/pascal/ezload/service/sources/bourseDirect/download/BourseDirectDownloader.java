@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.download;
 
+import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
@@ -78,7 +79,7 @@ public class BourseDirectDownloader extends BaseSelenium {
         WebElement login = findById("bd_auth_login_type_login");
         WebElement password = findById("bd_auth_login_type_password");
 
-        MainSettings.AuthInfo authInfo = SettingsManager.getAuthManager(mainSettings).getAuthInfo(EnumBRCourtier.BourseDirect);
+        AuthInfo authInfo = SettingsManager.getAuthManager(mainSettings).getAuthInfo(EnumBRCourtier.BourseDirect);
         if (StringUtils.isBlank(login.getText())){
             login.sendKeys(authInfo.getUsername());
             password.sendKeys(authInfo.getPassword());
