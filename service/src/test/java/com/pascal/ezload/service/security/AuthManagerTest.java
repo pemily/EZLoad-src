@@ -1,7 +1,6 @@
 package com.pascal.ezload.service.security;
 
 import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 import org.junit.jupiter.api.Test;
 
@@ -15,10 +14,14 @@ public class AuthManagerTest {
         AuthInfo login = new AuthInfo();
         login.setUsername("pascal");
         login.setPassword("motdepasse");
-        authManager.addAuthInfo(EnumBRCourtier.BourseDirect, login);
+        authManager.saveAuthInfo(EnumBRCourtier.BourseDirect, login);
 
         login = authManager.getAuthInfo(EnumBRCourtier.BourseDirect);
         assertEquals("pascal", login.getUsername());
         assertEquals("motdepasse", login.getPassword());
+
+        login = authManager.getAuthWithDummyPassword(EnumBRCourtier.BourseDirect);
+        assertEquals("pascal", login.getUsername());
+        assertEquals("dummyPassword", login.getPassword());
     }
 }

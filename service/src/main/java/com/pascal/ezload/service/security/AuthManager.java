@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumBRCourtier;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,31 +28,32 @@ public class AuthManager {
         this.authFilePath = authFilePath;
     }
 
-    public AuthInfo getAuthLowInfo(EnumBRCourtier courtier) throws Exception {
+    public AuthInfo getAuthWithDummyPassword(EnumBRCourtier courtier) throws Exception {
         Data data = loadFile(authFilePath);
-        AuthInfo info = data.getInfo().get(courtier.name());
+        AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
         AuthInfo result = new AuthInfo();
-        result.setUsername(decryptPassword(info.getUsername(), passPhrase));
+        result.setUsername(info.getUsername());
+        result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : "dummyPassword"); // to send it to the browser
         return result;
     }
 
     public AuthInfo getAuthInfo(EnumBRCourtier courtier) throws Exception {
         Data data = loadFile(authFilePath);
-        AuthInfo info = data.getInfo().get(courtier.name());
+        AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
         AuthInfo result = new AuthInfo();
         result.setPassword(decryptPassword(info.getPassword(), passPhrase));
-        result.setUsername(decryptPassword(info.getUsername(), passPhrase));
+        result.setUsername(info.getUsername());
         return result;
     }
 
-    public void addAuthInfo(EnumBRCourtier courtier, AuthInfo authInfo) throws Exception {
+    public void saveAuthInfo(EnumBRCourtier courtier, AuthInfo authInfo) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo encrypted = new AuthInfo();
         encrypted.setPassword(encryptPassword(authInfo.getPassword(), passPhrase));
-        encrypted.setUsername(encryptPassword(authInfo.getUsername(), passPhrase));
-        data.getInfo().put(courtier.name(), encrypted);
+        encrypted.setUsername(authInfo.getUsername());
+        data.getInfo().put(courtier, encrypted);
         saveFile(authFilePath, data);
     }
 
@@ -111,13 +113,13 @@ public class AuthManager {
     }
 
     private static class Data {
-        private Map<String, AuthInfo> info = new HashMap<>();
+        private Map<EnumBRCourtier, AuthInfo> info = new HashMap<>();
 
-        public Map<String, AuthInfo> getInfo() {
+        public Map<EnumBRCourtier, AuthInfo> getInfo() {
             return info;
         }
 
-        public void setInfo(Map<String, AuthInfo> info) {
+        public void setInfo(Map<EnumBRCourtier, AuthInfo> info) {
             this.info = info;
         }
     }

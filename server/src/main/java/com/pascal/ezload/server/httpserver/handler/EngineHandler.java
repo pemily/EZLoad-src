@@ -1,7 +1,9 @@
 package com.pascal.ezload.server.httpserver.handler;
 
+import com.pascal.ezload.server.Main;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.BRModelChecker;
 import com.pascal.ezload.service.exporter.BRModelExporter;
 import com.pascal.ezload.service.exporter.EZPortfolioManager;
@@ -17,6 +19,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -35,18 +38,16 @@ public class EngineHandler {
     private HttpServletResponse context;
 
     @Inject
-    private MainSettings mainSettings;
-
-    @Inject
     private EZHttpServer httpServer;
 
-    @GET
+    @PUT
     @Path("/start")
     public void start(@NotNull @QueryParam("simulation") boolean simulation) throws Exception {
-        start(context.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
+        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+        start(mainSettings, context.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
     }
 
-    private void start(Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
+    private void start(MainSettings mainSettings, Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
         File logsDir = new File(mainSettings.getEZLoad().getLogsDir());
         logsDir.mkdirs();
         Date now = new Date();

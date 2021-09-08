@@ -1,7 +1,5 @@
-import React from "react";
-
 import { Box, Heading, Anchor, Form, FormField, TextInput, Button, Text } from "grommet";
-import { ezApi } from '../../ez-api';
+import { ezApi, saveSettings } from '../../ez-api';
 import { MainSettings, AuthInfo } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
 import { Help } from '../Tools/Help';
@@ -23,10 +21,10 @@ export function Config(props: ConfigProps) {
                     <Box direction="column" margin="small">
                         <ConfigTextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezload!.downloadDir}
                             isRequired={true}
-                             onChange={newValue  => props.mainSettingsSetter(
+                             onChange={newValue  => saveSettings(
                                 { ...props.mainSettings,
                                       ezload: { ...props.mainSettings.ezload, downloadDir: newValue }
-                               })}/>
+                               }, props.mainSettingsSetter)}/>
                         <Box margin="none" pad="none" direction="row">
                             <ConfigTextField id="chromeDriver" label="Fichier du driver chrome" value={props.mainSettings!.chrome!.driverPath }
                                  isRequired={true}

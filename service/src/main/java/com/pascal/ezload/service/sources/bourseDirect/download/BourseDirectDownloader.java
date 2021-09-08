@@ -79,7 +79,7 @@ public class BourseDirectDownloader extends BaseSelenium {
         WebElement login = findById("bd_auth_login_type_login");
         WebElement password = findById("bd_auth_login_type_password");
 
-        AuthInfo authInfo = SettingsManager.getAuthManager(mainSettings).getAuthInfo(EnumBRCourtier.BourseDirect);
+        AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumBRCourtier.BourseDirect);
         if (StringUtils.isBlank(login.getText())){
             login.sendKeys(authInfo.getUsername());
             password.sendKeys(authInfo.getPassword());

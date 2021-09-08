@@ -4,48 +4,32 @@ import com.github.mustachejava.Mustache;
 import com.pascal.ezload.server.Main;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import org.apache.http.HttpHeaders;
+import org.w3c.dom.Document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 @Path("home")
 public class HomeHandler {
-    @Inject
-    @Named(value= Main.MUSTACHE_HOME_TEMPLATE)
-    private Mustache homeTemplateMustache;
-
     @Context
     private HttpServletResponse context;
 
     @Inject
-    private MainSettings mainSettings;
-
-    @Inject
     EZHttpServer server;
-
-
-    @GET
-    @Path("/home")
-    public void home() throws Exception {
-        context.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_TYPE.withCharset(StandardCharsets.UTF_8.name()).toString());
-        Writer writer = context.getWriter();
-        homeTemplateMustache.execute(writer, mainSettings);
-        writer.close();
-    }
-
 
     @GET
     @Path("/ping")
-    @Produces(MediaType.TEXT_PLAIN)
     public String ping(){
         return "pong";
     }
@@ -54,12 +38,27 @@ public class HomeHandler {
     @GET
     @Path("/settings")
     @Produces(MediaType.APPLICATION_JSON)
-    public MainSettings getSettings(){
-        return mainSettings;
+    public MainSettings getSettings() throws Exception {
+        return SettingsManager.getInstance().loadProps();
+    }
+
+    @POST
+    @Path("/saveSettingsOk")
+    public void saveSettingsOk(String mainSettings) throws IOException {
+        System.out.println("MainSettings4 "+mainSettings);
     }
 
 
-    @GET
+    @POST
+    @Path("/saveSettings4")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void saveSettings4(MainSettings mainSettings) throws IOException {
+        System.out.println("MainSettings4 "+mainSettings);
+    }
+
+
+
+    @POST
     @Path("/exit")
     public void exit() throws Exception {
         server.stop();

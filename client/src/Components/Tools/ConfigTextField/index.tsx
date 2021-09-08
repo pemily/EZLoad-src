@@ -25,7 +25,7 @@ export function ConfigTextField(props: ConfigTextFieldProps) {
                       required={props.isRequired}>
                 <TextInput id={props.id}
                            name={props.id}
-                           value={ props.value }
+                           value={ props.value == null ? undefined : props.value }
                            placeholder={props.isRequired ? "à remplir" : ""}
                            type={props.isPassword ? "password" : "text"}
                            onChange={(event) => props.onChange(event.target.value)}/>

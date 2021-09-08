@@ -24,7 +24,7 @@ export function App(){
         });
 
         console.log("Loading BourseDirect Username...");
-        ezApi.security.getAuthLowInfo({courtier: "BourseDirect"}).then(resp => {
+        ezApi.security.getAuthWithDummyPassword({courtier: "BourseDirect"}).then(resp => {
             console.log("BourseDirect authInfo loaded: ", resp.data);
             setBourseDirectAuthInfo(resp.data);
         })

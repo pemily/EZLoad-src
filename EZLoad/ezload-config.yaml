@@ -1,0 +1,15 @@
+---
+bourseDirect:
+  accounts: null
+chrome:
+  driverPath: null
+  userDataDir: "D:\\dev\\src\\EZLoad\\EZLoad\\chrome-datadir"
+  defaultTimeout: 20
+ezPortfolio:
+  gdriveCredsFile: null
+  ezPortfolioId: null
+ezload:
+  downloadDir: "D:\\dev\\src\\EZLoad\\EZLoad\\courtiers"
+  logsDir: "D:\\dev\\src\\EZLoad\\EZLoad\\logs"
+  passPhrase: "Q5zcgZbGDv1vKXNsjkH98fhBltyj3xTWsNcEezqwvZ"
+  courtierCredsFile: "D:\\dev\\src\\EZLoad\\EZLoad\\ezCreds.json"

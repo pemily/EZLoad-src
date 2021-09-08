@@ -1,13 +1,15 @@
 package com.pascal.ezload.server.httpserver.handler;
 
 
-import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import org.apache.commons.io.IOUtils;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -27,9 +29,6 @@ public class DirHandler {
     @Context
     private HttpServletResponse context;
 
-    @Inject
-    private MainSettings mainSettings;
-
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/file/{file}")
@@ -45,8 +44,8 @@ public class DirHandler {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/dir/{currentDir}")
-    public List<String> list(@NotNull @PathParam("currentDir") String currentDir) throws IOException {
-            String dir = mainSettings.getEZLoad().getLogsDir();
+    public List<String> list(@NotNull @PathParam("currentDir") String currentDir) throws Exception {
+            String dir = SettingsManager.getInstance().loadProps().getEZLoad().getLogsDir();
             List<File> dirs = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
                     .filter(File::isDirectory)
                     .filter(f -> !f.getName().startsWith("."))
