@@ -9,6 +9,7 @@ import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class SettingsManager {
@@ -49,7 +50,7 @@ public class SettingsManager {
         return mainSettings.getEZLoad().getDownloadDir()+ File.separator+brCourtier.getDirName();
     }
 
-    private static String getConfigFilePath(){
+    public static String getConfigFilePath(){
         String configFile = System.getProperty("ezloadfile");
         if (configFile == null) configFile = System.getenv("ezloadfile");
         if (configFile == null){
@@ -90,6 +91,7 @@ public class SettingsManager {
         mainSettings.setEzPortfolio(ezPortfolioSettings);
 
         BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
+        bourseDirectSettings.setAccounts(new LinkedList<>());
         mainSettings.setBourseDirect(bourseDirectSettings);
 
         return mainSettings;

@@ -4,8 +4,9 @@ import com.pascal.ezload.service.model.BRAccountDeclaration;
 
 public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
 
-    private String number;
     private String name;
+    private String number;
+    private boolean active;
 
     public String getNumber() {
         return number;
@@ -21,5 +22,13 @@ public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

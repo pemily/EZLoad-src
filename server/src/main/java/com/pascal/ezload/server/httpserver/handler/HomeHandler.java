@@ -5,16 +5,14 @@ import com.pascal.ezload.server.Main;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.http.HttpHeaders;
 import org.w3c.dom.Document;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import java.io.IOException;
 import java.io.Writer;
@@ -43,20 +41,11 @@ public class HomeHandler {
     }
 
     @POST
-    @Path("/saveSettingsOk")
-    public void saveSettingsOk(String mainSettings) throws IOException {
-        System.out.println("MainSettings4 "+mainSettings);
-    }
-
-
-    @POST
-    @Path("/saveSettings4")
+    @Path("/saveSettings")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveSettings4(MainSettings mainSettings) throws IOException {
-        System.out.println("MainSettings4 "+mainSettings);
+    public void saveSettings(MainSettings mainSettings) throws IOException {
+        SettingsManager.getInstance().saveConfigFile(mainSettings);
     }
-
-
 
     @POST
     @Path("/exit")

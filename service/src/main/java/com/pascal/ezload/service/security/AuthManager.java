@@ -34,7 +34,10 @@ public class AuthManager {
         if (info == null) return null;
         AuthInfo result = new AuthInfo();
         result.setUsername(info.getUsername());
-        result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : "dummyPassword"); // to send it to the browser
+        String dummyPassword = "";
+        if (info != null)
+            for (int i = 0; i < decryptPassword(info.getPassword(),passPhrase).length(); i++) dummyPassword += "@";
+        result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : dummyPassword); // to send it to the browser
         return result;
     }
 

@@ -1,9 +1,9 @@
 package com.pascal.ezload.server.httpserver.handler;
 
-import javax.validation.Path;
-import javax.ws.rs.container.*;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.container.*;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.Provider;
+
 import java.io.IOException;
 
 @Provider

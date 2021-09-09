@@ -4,11 +4,11 @@ import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 import com.pascal.ezload.service.security.AuthManager;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 @Path("security")
 public class SecurityHandler {
@@ -26,9 +26,8 @@ public class SecurityHandler {
             authManager.saveAuthInfo(courtier, authParam);
         }
         else {
-            if (!StringUtils.isBlank(authParam.getUsername())) {
-                authInfo.setUsername(authParam.getUsername());
-            }
+            authInfo.setUsername(authParam.getUsername());
+
             if (!StringUtils.isBlank(authParam.getPassword())){
                 authInfo.setPassword(authParam.getPassword());
             }

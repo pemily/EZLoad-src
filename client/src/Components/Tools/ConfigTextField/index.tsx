@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { clearTimeout, setTimeout } from 'timers';
 
 import { Box, Heading, Anchor, Form, FormField, TextInput, Button } from "grommet";
 
@@ -16,19 +17,26 @@ export interface ConfigTextFieldProps {
   isRequired?: boolean;
   isPassword?: boolean;
 }
-//                 validate={(newVal, field) => props && props.validate ? props.validate(newVal) : null}>
 
 export function ConfigTextField(props: ConfigTextFieldProps) {
+    const [value, setValue] = useState<string|undefined>(props.value ? props.value : '');
+
+    const onChange = useCallback((event) => {
+                         const { value: newValue } = event.target;
+                         setValue(newValue);
+                       }, []);
+
     return (
               <Box direction="column" pad="none" margin="xsmall" fill>
                 <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
                       required={props.isRequired}>
                 <TextInput id={props.id}
                            name={props.id}
-                           value={ props.value == null ? undefined : props.value }
-                           placeholder={props.isRequired ? "à remplir" : ""}
+                           value={ value }
+                           placeholder={props.isRequired ? "Champ Obligatoire" : ""}
                            type={props.isPassword ? "password" : "text"}
-                           onChange={(event) => props.onChange(event.target.value)}/>
+                           onChange={onChange}
+                           onBlur={evt => props.onChange(evt.target.value)}/>
                </FormField>
               </Box>
           );

@@ -1,5 +1,6 @@
 import { Box, Heading, Anchor, Form, FormField, TextInput, Button, Text } from "grommet";
-import { ezApi, saveSettings } from '../../ez-api';
+import { Add } from 'grommet-icons';
+import { ezApi, saveSettings, savePassword } from '../../ez-api';
 import { MainSettings, AuthInfo } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
 import { Help } from '../Tools/Help';
@@ -28,10 +29,10 @@ export function Config(props: ConfigProps) {
                         <Box margin="none" pad="none" direction="row">
                             <ConfigTextField id="chromeDriver" label="Fichier du driver chrome" value={props.mainSettings!.chrome!.driverPath }
                                  isRequired={true}
-                                 onChange={newValue  => props.mainSettingsSetter(
+                                 onChange={newValue  => saveSettings(
                                     { ...props.mainSettings,
                                           chrome: { ...props.mainSettings.chrome, driverPath: newValue }
-                                   })}/>
+                                   }, props.mainSettingsSetter)}/>
                             <Help title="Comment obtenir le fichier de driver chrome?">
                                 <Box border={{ color: 'brand', size: 'large' }} pad="medium">
                                     <Heading level="4">Aide</Heading>
@@ -70,11 +71,23 @@ export function Config(props: ConfigProps) {
                     </Box>
                     <Box direction="row" margin="small">
                         <ConfigTextField id="bourseDirectLogin" label="Identifiant de votre compte BourseDirect" value={props!.bourseDirectAuthInfo!.username}
-                             onChange={newValue => props.bourseDirectAuthInfoSetter({ username: newValue, password: undefined})}/>
+                             onChange={newValue => savePassword('BourseDirect', newValue, undefined, props.bourseDirectAuthInfoSetter)}/>
                         <ConfigTextField id="bourseDirectPasswd" label="Mot de passe" isPassword={true} value={props!.bourseDirectAuthInfo!.password}
-                             onChange={newValue => props.bourseDirectAuthInfoSetter({ username: props.bourseDirectAuthInfo!.username, password: newValue})}/>
+                             onChange={newValue => savePassword('BourseDirect', props!.bourseDirectAuthInfo!.username, newValue, props.bourseDirectAuthInfoSetter)}/>
                     </Box>
-                    TODO list des comptes!!!
+                    <Box>
+                        <Text>Selection des comptes à traiter:</Text>
+                        {
+                            props.mainSettings!.bourseDirect!.accounts!.map((account, index) => {
+                                return (
+                                 <Box direction="row" margin="small">
+                                 <ConfigTextField id={'BourseDirectAccount'+index} label='Nom' value={account.name} onChange={newValue => console.log(newValue)}/>
+                                 </Box>
+                                 )
+                            })
+                        }
+                        <Button icon={<Add />} label="Nouveau" onClick={() => {}} />
+                    </Box>
 
                     <Heading level="5" >EZPortfolio</Heading>
                     <Box direction="column" margin="small">
