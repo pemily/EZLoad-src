@@ -1,4 +1,4 @@
-import { Box, Heading, Anchor, Form, FormField, TextInput, Button, Text } from "grommet";
+import { Box, Heading, Anchor, Form, FormField, TextInput, Button, Text, CheckBox } from "grommet";
 import { Add } from 'grommet-icons';
 import { ezApi, saveSettings, savePassword } from '../../ez-api';
 import { MainSettings, AuthInfo } from '../../ez-api/gen-api/EZLoadApi';
@@ -75,18 +75,26 @@ export function Config(props: ConfigProps) {
                         <ConfigTextField id="bourseDirectPasswd" label="Mot de passe" isPassword={true} value={props!.bourseDirectAuthInfo!.password}
                              onChange={newValue => savePassword('BourseDirect', props!.bourseDirectAuthInfo!.username, newValue, props.bourseDirectAuthInfoSetter)}/>
                     </Box>
-                    <Box>
+                    <Box align="start">
                         <Text>Selection des comptes à traiter:</Text>
                         {
                             props.mainSettings!.bourseDirect!.accounts!.map((account, index) => {
                                 return (
                                  <Box direction="row" margin="small">
                                  <ConfigTextField id={'BourseDirectAccount'+index} label='Nom' value={account.name} onChange={newValue => console.log(newValue)}/>
+                                 <ConfigTextField id={'BourseDirectNumber'+index} label='Numéro de compte' value={account.number} onChange={newValue => console.log(newValue)}/>
+                                 <CheckBox reverse checked={account.active} onChange={newValue => console.log(newValue)} label="Actif"/>
                                  </Box>
                                  )
                             })
                         }
-                        <Button icon={<Add />} label="Nouveau" onClick={() => {}} />
+                        <Button size="small" icon={<Add />} label="Nouveau" onClick={() => props.mainSettingsSetter(
+                            {...props.mainSettings,
+                                bourseDirect: { ...props.mainSettings!.bourseDirect,
+                                    accounts: props.mainSettings!.bourseDirect!.accounts === undefined ?
+                                            [{name: '', number: '', active: false}] : [...props.mainSettings!.bourseDirect!.accounts, {name: '', number: '', active: false}]
+                                }}
+                        )} />
                     </Box>
 
                     <Heading level="5" >EZPortfolio</Heading>

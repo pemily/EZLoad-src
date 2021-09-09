@@ -22,6 +22,6 @@ public class AuthManagerTest {
 
         login = authManager.getAuthWithDummyPassword(EnumBRCourtier.BourseDirect);
         assertEquals("pascal", login.getUsername());
-        assertEquals("dummyPassword", login.getPassword());
+        assertEquals("@@@@@@@@@@", login.getPassword());
     }
 }
