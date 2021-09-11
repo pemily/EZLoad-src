@@ -1,19 +1,21 @@
 package com.pascal.ezload.service.bourseDirect;
 
-import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.model.BRModel;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
-import com.pascal.ezload.service.util.TextReporting;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectProcessor;
-import com.pascal.ezload.service.util.ModelUtils;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.util.TextReporting;
+
+import org.junit.jupiter.api.Test;
 
 public class BourseDirectParserTest {
 

@@ -3,8 +3,6 @@ package com.pascal.ezload.service.config;
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 
-import java.util.Map;
-
 public class MainSettings {
 
     private BourseDirectSettings bourseDirect;

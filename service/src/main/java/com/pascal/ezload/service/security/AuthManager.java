@@ -1,14 +1,13 @@
 package com.pascal.ezload.service.security;
 
-import com.google.gson.Gson;
-import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.model.EnumBRCourtier;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +16,15 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.google.gson.Gson;
+import com.pascal.ezload.service.config.AuthInfo;
+import com.pascal.ezload.service.model.EnumBRCourtier;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class AuthManager {
 

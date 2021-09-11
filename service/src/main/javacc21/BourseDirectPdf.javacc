@@ -15,7 +15,6 @@ JDK_TARGET = 8;
 DEFAULT_LEXICAL_STATE=DEFAULT;
 
 PARSER_BEGIN(BourseDirectPdfParser)
-import com.pascal.ezload.service.sources.bourseDirect.transform.model.*;
 
 public class BourseDirectPdfParser{
 

@@ -1,6 +1,14 @@
 package com.pascal.ezload.server.httpserver.handler;
 
-import com.pascal.ezload.server.Main;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -14,6 +22,7 @@ import com.pascal.ezload.service.sources.bourseDirect.BourseDirectProcessor;
 import com.pascal.ezload.service.util.FileLinkCreator;
 import com.pascal.ezload.service.util.HtmlReporting;
 import com.pascal.ezload.service.util.MultiWriter;
+
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
@@ -21,11 +30,6 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
-
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 @Path("engine")
 public class EngineHandler {

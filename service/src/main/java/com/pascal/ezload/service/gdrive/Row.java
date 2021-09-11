@@ -1,12 +1,11 @@
 package com.pascal.ezload.service.gdrive;
 
-import com.pascal.ezload.service.model.BRDate;
-import com.pascal.ezload.service.util.ModelUtils;
+import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.pascal.ezload.service.util.ModelUtils.str2Float;
+import com.pascal.ezload.service.model.BRDate;
 
 public class Row {
 

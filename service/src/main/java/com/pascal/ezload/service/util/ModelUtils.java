@@ -2,9 +2,7 @@ package com.pascal.ezload.service.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pascal.ezload.service.model.BRDate;
 import com.pascal.ezload.service.model.BRModel;
-import org.apache.commons.lang3.StringUtils;
 
 public class ModelUtils {
 

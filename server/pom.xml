@@ -29,7 +29,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>default</phase>
                         <goals>
                             <goal>resolve</goal>
                         </goals>
