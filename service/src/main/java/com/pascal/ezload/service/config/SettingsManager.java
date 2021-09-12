@@ -92,6 +92,7 @@ public class SettingsManager {
 
         EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
         mainSettings.setEzPortfolio(ezPortfolioSettings);
+        ezPortfolioSettings.setGdriveCredsFile(ezHome+File.separator+"gdrive-access.json");
 
         BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
         bourseDirectSettings.setAccounts(new LinkedList<>());

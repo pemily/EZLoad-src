@@ -21,7 +21,7 @@ export function Help(props: HelpProps) {
                 <Anchor label={props.title} onClick={onHelpOpen}  icon={props.isInfo ?  <CircleInformation size="medium" /> : <HelpOption size="medium" />}/>
                 { helpVisible &&
                     (
-                    <Layer animation="slide" onEsc={onHelpClose} onClickOutside={onHelpClose}>
+                    <Layer animation="slide" onEsc={onHelpClose} onClickOutside={onHelpClose} >
                         { props.children }
                     </Layer>
                     )

@@ -6,30 +6,36 @@ import { Box, Heading, Anchor, Form, FormField, TextInput, Button } from "gromme
 import { ezApi } from '../../../ez-api';
 import { MainSettings } from '../../../ez-api/gen-api/EZLoadApi';
 import { HelpOption } from 'grommet-icons';
+import { setConstantValue } from "typescript";
 
 export interface ConfigTextFieldProps {
   onChange: (newValue: string) => void;
   validate?: (newValue: string) => string|null;
   value: string|undefined;
   id: string;
-  label: string;
+  label?: string;
   description?: string;
   isRequired?: boolean;
   isPassword?: boolean;
 }
 
 export function ConfigTextField(props: ConfigTextFieldProps) {
-    const [value, setValue] = useState<string|undefined>(props.value ? props.value : '');
+    const [value, setValue] = useState<string|undefined>(props.value);
 
+    useEffect(() => {
+      setValue(props.value); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
+    }, [props.value]);
+    
+    
     const onChange = useCallback((event) => {
                          const { value: newValue } = event.target;
                          setValue(newValue);
                        }, []);
 
-    return (
+                       return (          
               <Box direction="column" pad="none" margin="xsmall" fill>
                 <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
-                      required={props.isRequired}>
+                      required={props.isRequired} margin="none">
                 <TextInput id={props.id}
                            name={props.id}
                            value={ value }

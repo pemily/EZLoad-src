@@ -54,7 +54,7 @@ export function App(){
                     <Tab title="Configuration">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             {mainSettings && (
-                                <Config mainSettings={mainSettings} mainSettingsSetter={setMainSettings}
+                                <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
                                         bourseDirectAuthInfo={bourseDirectAuthInfo}
                                         bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
                                         />
