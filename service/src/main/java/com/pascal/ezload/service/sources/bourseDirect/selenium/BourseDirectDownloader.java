@@ -1,6 +1,5 @@
-package com.pascal.ezload.service.sources.bourseDirect.download;
+package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
-import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
@@ -8,9 +7,7 @@ import com.pascal.ezload.service.model.BRDate;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.*;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
@@ -23,18 +20,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
-public class BourseDirectDownloader extends BaseSelenium {
-
-    private final MainSettings mainSettings;
-    private final BourseDirectSettings bourseDirectSettings;
+public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
     public static final String BOURSE_DIRECT_PDF_PREFIX = "boursedirect-";
     public static final String BOURSE_DIRECT_PDF_SUFFIX = ".pdf";
 
     public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings) {
-        super(reporting);
-        this.mainSettings = mainSettings;
-        this.bourseDirectSettings = mainSettings.getBourseDirect();
+        super(reporting, mainSettings);
     }
 
     public static Predicate<File> fileFilter(){
@@ -44,14 +36,15 @@ public class BourseDirectDownloader extends BaseSelenium {
     }
 
     public static Predicate<File> dirFilter(MainSettings mainSettings){
-        return dir -> mainSettings.getBourseDirect().getAccounts().stream().anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
+        return dir -> mainSettings.getBourseDirect().getAccounts()
+                .stream()
+                .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
     public void start(EZPortfolio ezPortfolio) {
         try(Reporting ignored = reporting.pushSection("Downloading BourseDirect Reports...")) {
 
             try {
-                init(mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
                 downloadUpdates(ezPortfolio);
             } catch (Exception e) {
                 if (e instanceof InvalidArgumentException)
@@ -66,42 +59,9 @@ public class BourseDirectDownloader extends BaseSelenium {
     }
 
     private void downloadUpdates(EZPortfolio ezPortfolio) throws Exception {
-        get("https://www.boursedirect.fr/fr/login");
+        login();
 
-        try {
-            // reject cookies
-            findById("didomi-notice-disagree-button").click();
-            Sleep.wait(1);
-            reporting.info("Cookies Rejected");
-        }
-        catch (NoSuchElementException ignored){}
-
-        WebElement login = findById("bd_auth_login_type_login");
-        WebElement password = findById("bd_auth_login_type_password");
-
-        AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumBRCourtier.BourseDirect);
-        if (StringUtils.isBlank(login.getText())){
-            login.sendKeys(authInfo.getUsername());
-            password.sendKeys(authInfo.getPassword());
-            Sleep.wait(1);
-            findById("bd_auth_login_type_submit").click();
-        }
-        else if (!StringUtils.isBlank(login.getText())){
-            findById("bd_auth_login_type_submit").click();
-        }
-        else reporting.info("Please Enter your login/password then click on Connect");
-
-        boolean connected = false;
-        do {
-            try {
-                waitUrlIsNot("https://www.boursedirect.fr/fr/login");
-                connected =  true;
-            } catch (TimeoutException t) {
-                Sleep.wait(1);
-            }
-        }while(!connected);
-
-        get("https://www.boursedirect.fr/priv/avis-operes.php");
+        goToAvisOperes();
 
         for (BourseDirectBRAccountDeclaration account : bourseDirectSettings.getAccounts()) {
             try(Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
@@ -276,7 +236,7 @@ public class BourseDirectDownloader extends BaseSelenium {
         String[] section = pdfFile.replace('\\', '/') // for windows
                                     .split("/");
         String account = section.length >=3 ? section[section.length-3] : null; // the pdfFile is: /path/AccountDeclarationName/Year/file.pdf => extract the AccountDeclarationName
-        return  mainSettings.getBourseDirect().getAccounts()
+        return  bourseDirectSettings.getAccounts()
                 .stream()
                 .filter(acc -> acc.getName().equals(account))
                 .findFirst()

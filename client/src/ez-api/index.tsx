@@ -2,12 +2,10 @@ import { Api, MainSettings, AuthInfo } from './gen-api/EZLoadApi';
 
 export const ezApi = new Api({baseURL:"http://localhost:8080/EZLoad/api"});
 
-export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){
-    console.log("AAAAAAA", settings);
+export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){    
     ezApi.home.saveSettings(settings)
-    .then(r => {
-        console.log("BBBB3", settings)
-        updModel(settings);
+    .then(r => {        
+        updModel(r.data);
     })
     .catch(e => console.log(e));
 }
@@ -17,4 +15,9 @@ export function savePassword(courtier: 'BourseDirect', username: string|undefine
     ezApi.security.createUserPassword({courtier}, newAuth)
     .then(r => updModel(newAuth))
     .catch(e => console.log(e));
+}
+
+export function searchAccounts(courtier: 'BourseDirect'){
+    ezApi.home.searchAccounts({courtier})
+        .then()
 }

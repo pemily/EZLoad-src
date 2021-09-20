@@ -12,21 +12,39 @@ public class MultiWriter extends Writer {
     }
 
     @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-        for (Writer w : writers)
-            w.write(cbuf, off, len);
+    public void write(char[] cbuf, int off, int len){
+        for (Writer w : writers) {
+            try {
+                w.write(cbuf, off, len);
+            }
+            catch (IOException e){
+                // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            }
+        }
     }
 
     @Override
-    public void flush() throws IOException {
-        for (Writer w : writers)
-            w.flush();
+    public void flush() {
+        for (Writer w : writers) {
+            try {
+                w.flush();
+            }
+            catch (IOException e){
+                // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            }
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        for (Writer w : writers)
-            w.close();
+    public void close() {
+        for (Writer w : writers) {
+            try {
+                w.close();
+            }
+            catch (IOException e){
+                // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            }
+        }
     }
 
 };

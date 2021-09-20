@@ -20,7 +20,7 @@
                 <version>2.1.10</version>
                 <configuration>
                     <resourcePackages>
-                        <package>com.pascal.ezload.server.httpserver.handler</package>
+                        <package>com.pascal.ezload.server</package>
                     </resourcePackages>
                     <outputPath>${basedir}/target/swagger</outputPath>
                     <outputFileName>swagger</outputFileName>
@@ -29,7 +29,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>default</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>resolve</goal>
                         </goals>
@@ -45,13 +45,6 @@
             <groupId>com.pascal</groupId>
             <artifactId>service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <!-- pour generer les pages web -->
-            <groupId>com.github.spullara.mustache.java</groupId>
-            <artifactId>compiler</artifactId>
-            <version>0.9.10</version>
         </dependency>
 
         <!-- jetty / jersey / jaxrs -->

@@ -1,11 +1,15 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
 import com.pascal.ezload.service.model.BRAccountDeclaration;
+import com.pascal.ezload.service.util.Checkable;
+import com.pascal.ezload.service.util.StringValue;
 
-public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
+public class BourseDirectBRAccountDeclaration extends Checkable implements BRAccountDeclaration {
 
-    private String name;
-    private String number;
+    public enum Field{name, number}
+
+    private String name = null;
+    private String number = null;
     private boolean active;
 
     public String getNumber() {
@@ -13,7 +17,7 @@ public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
     }
 
     public void setNumber(String number) {
-        this.number = number;
+        this.number = number == null ? null : number.trim();
     }
 
     public String getName() {
@@ -21,7 +25,7 @@ public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name == null ? null : name;
     }
 
     public boolean isActive() {
@@ -31,4 +35,10 @@ public class BourseDirectBRAccountDeclaration implements BRAccountDeclaration {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public void validate(){
+        new StringValue(true).validate(this, Field.name.name(), name);
+        new StringValue(true).validate(this, Field.number.name(), number);
+    }
+
 }

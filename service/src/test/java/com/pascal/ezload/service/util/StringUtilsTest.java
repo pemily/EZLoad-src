@@ -31,6 +31,8 @@ public class StringUtilsTest {
         Assertions.assertEquals("", StringUtils.divide("a first test", "first test")[1]);
         Assertions.assertEquals("", StringUtils.divide("a first test", "a first test")[0]);
         Assertions.assertEquals("", StringUtils.divide("a first test", "a first test")[1]);
+        Assertions.assertEquals("a", StringUtils.divide("a first test", " ")[0]);
+        Assertions.assertEquals("first test", StringUtils.divide("a first test", " ")[1]);
         assertNull(StringUtils.divide("a first test", " pas trouvé"));
     }
 

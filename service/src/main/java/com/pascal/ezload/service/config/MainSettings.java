@@ -2,6 +2,7 @@ package com.pascal.ezload.service.config;
 
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
+import com.pascal.ezload.service.util.*;
 
 public class MainSettings {
 
@@ -42,8 +43,24 @@ public class MainSettings {
         this.bientotRentier = bientotRentier;
     }
 
+    public MainSettings validate(){
+        bourseDirect.validate();
+        chrome.validate();
+        ezPortfolio.validate();
+        bientotRentier.validate();
+        return this;
+    }
 
-    public static class ChromeSettings {
+    public void clearErrors(){
+        bourseDirect.clearErrors();
+        chrome.clearErrors();
+        ezPortfolio.clearErrors();
+        bientotRentier.clearErrors();
+    }
+
+    public static class ChromeSettings extends Checkable {
+
+        enum Field {driverPath, userDataDir}
         private String driverPath;
         private String userDataDir;
         private int defaultTimeout;
@@ -60,7 +77,7 @@ public class MainSettings {
         }
 
         public void setUserDataDir(String userDataDir) {
-            this.userDataDir = userDataDir;
+            this.userDataDir = userDataDir == null ? null : userDataDir.trim();
         }
 
         public String getDriverPath() {
@@ -68,12 +85,20 @@ public class MainSettings {
         }
 
         public void setDriverPath(String driverPath) {
-            this.driverPath = driverPath;
+            this.driverPath = driverPath == null ? null : driverPath.trim();
+        }
+
+        @Override
+        public void validate() {
+            new FileValue(true).validate(this, Field.driverPath.name(), driverPath);
+            new DirValue(true).validate(this, Field.userDataDir.name(), userDataDir);
         }
 
     }
 
-    public static class EZLoad {
+    public static class EZLoad extends Checkable {
+        enum Field {downloadDir, logsDir, passPhrase, courtierCredFile}
+
         private String downloadDir;
         private String logsDir;
         private String passPhrase;
@@ -84,7 +109,7 @@ public class MainSettings {
         }
 
         public void setLogsDir(String logsDir) {
-            this.logsDir = logsDir;
+            this.logsDir = logsDir == null ? null : logsDir.trim();
         }
 
         public String getPassPhrase() {
@@ -92,7 +117,7 @@ public class MainSettings {
         }
 
         public void setPassPhrase(String passPhrase) {
-            this.passPhrase = passPhrase;
+            this.passPhrase = passPhrase == null ? null : passPhrase.trim();
         }
 
         public String getCourtierCredsFile() {
@@ -100,7 +125,7 @@ public class MainSettings {
         }
 
         public void setCourtierCredsFile(String courtierCredsFile) {
-            this.courtierCredsFile = courtierCredsFile;
+            this.courtierCredsFile = courtierCredsFile == null ? null : courtierCredsFile.trim();
         }
 
         public String getDownloadDir() {
@@ -108,8 +133,17 @@ public class MainSettings {
         }
 
         public void setDownloadDir(String downloadDir) {
-            this.downloadDir = downloadDir;
+            this.downloadDir = downloadDir == null ? null : downloadDir.trim();
         }
+
+        @Override
+        public void validate() {
+            new FileValue(true).validate(this, Field.courtierCredFile.name(), courtierCredsFile);
+            new DirValue(true).validate(this, Field.downloadDir.name(), downloadDir);
+            new DirValue(true).validate(this, Field.logsDir.name(), logsDir);
+            new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
+        }
+
     }
 
 }

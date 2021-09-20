@@ -9,7 +9,7 @@ import com.pascal.ezload.service.model.BRModel;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 import com.pascal.ezload.service.sources.FileProcessor;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.sources.bourseDirect.download.BourseDirectDownloader;
+import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2BRModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectPdfExtractor;

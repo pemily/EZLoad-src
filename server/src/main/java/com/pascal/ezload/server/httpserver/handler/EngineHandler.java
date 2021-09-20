@@ -38,7 +38,7 @@ public class EngineHandler {
     public static final String REPORT_FILE_SUFFIX =  ".html";
 
     @Context
-    private HttpServletResponse context;
+    private HttpServletResponse response;
 
     @Inject
     private EZHttpServer httpServer;
@@ -47,19 +47,18 @@ public class EngineHandler {
     @Path("/start")
     public void start(@NotNull @QueryParam("simulation") boolean simulation) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        start(mainSettings, context.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
+        start(mainSettings, response.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
     }
 
     private void start(MainSettings mainSettings, Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
         File logsDir = new File(mainSettings.getEZLoad().getLogsDir());
-        logsDir.mkdirs();
         Date now = new Date();
         String reportFileName =  REPORT_FILE_PREFIX + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + REPORT_FILE_SUFFIX;
         File reportFile = new File(logsDir + File.separator + reportFileName);
 
         try (
-                Writer fileWriter = new BufferedWriter(new FileWriter(reportFile));
-                HtmlReporting reporting = new HtmlReporting(fileLinkCreator, new MultiWriter(fileWriter, htmlPageWriter))  // will write into the report & html Page
+            Writer fileWriter = new BufferedWriter(new FileWriter(reportFile));
+            HtmlReporting reporting = new HtmlReporting(fileLinkCreator, new MultiWriter(fileWriter, htmlPageWriter))  // will write into the report & html Page
         ) {
             fileWriter.write("<html><head><meta charset='UTF-8'>\n");
             reporting.writeHeader(reporting.escape("Bientot Rentier Report")

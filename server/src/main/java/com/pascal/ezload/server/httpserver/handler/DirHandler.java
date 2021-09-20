@@ -5,12 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -53,13 +48,15 @@ public class DirHandler {
     @Path("/dir/{currentDir}")
     public List<String> list(@NotNull @PathParam("currentDir") String currentDir) throws Exception {
             String dir = SettingsManager.getInstance().loadProps().getEZLoad().getLogsDir();
-            List<File> dirs = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
+            File listFiles[] = new File(dir + currentDir).listFiles();
+            List<File> allFiles =  listFiles == null ? new ArrayList<>() : Arrays.asList(listFiles);
+            List<File> dirs = allFiles.stream()
                     .filter(File::isDirectory)
                     .filter(f -> !f.getName().startsWith("."))
                     .filter(dirFilter())
                     .sorted()
                     .collect(Collectors.toList());
-            List<File> files = Arrays.asList(new File(dir + currentDir).listFiles()).stream()
+            List<File> files = allFiles.stream()
                     .filter(File::isFile)
                     .filter(fileFilter())
                     .sorted(Comparator.comparing(File::getName).reversed())

@@ -24,6 +24,8 @@ import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 
+import com.pascal.ezload.service.util.FileValue;
+import com.pascal.ezload.service.util.StringValue;
 import org.apache.commons.lang3.StringUtils;
 
 public class AuthManager {
@@ -31,7 +33,7 @@ public class AuthManager {
     private final String authFilePath;
     private final String passPhrase;
 
-    public AuthManager(String passPhrase , String authFilePath){
+    public AuthManager(String passPhrase, String authFilePath){
         this.passPhrase = passPhrase;
         this.authFilePath = authFilePath;
     }
@@ -43,7 +45,7 @@ public class AuthManager {
         AuthInfo result = new AuthInfo();
         result.setUsername(info.getUsername());
         String dummyPassword = "";
-        if (info != null)
+        if (passPhrase != null)
             for (int i = 0; i < decryptPassword(info.getPassword(),passPhrase).length(); i++) dummyPassword += "@";
         result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : dummyPassword); // to send it to the browser
         return result;
@@ -69,11 +71,15 @@ public class AuthManager {
     }
 
     private Data loadFile(String authFilePath) throws IOException {
-        if (!new File(authFilePath).exists()) return new Data();
-        Reader reader = new BufferedReader(new FileReader(authFilePath));
-        Data map = new Gson().fromJson(reader, Data.class);
-        reader.close();
-        return map;
+        try {
+            Reader reader = new BufferedReader(new FileReader(authFilePath));
+            Data map = new Gson().fromJson(reader, Data.class);
+            reader.close();
+            return map;
+        }
+        catch(IOException e){
+            return new Data();
+        }
     }
 
     private void saveFile(String authFilePath, Data data) throws IOException {
