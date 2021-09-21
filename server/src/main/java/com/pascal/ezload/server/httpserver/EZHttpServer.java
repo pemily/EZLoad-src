@@ -1,7 +1,6 @@
 package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
-import com.pascal.ezload.server.httpserver.handler.HomeHandler;
 import com.pascal.ezload.server.httpserver.handler.HttpMethodOverrideEnabler;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -10,10 +9,8 @@ import com.pascal.ezload.service.util.FileLinkCreator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ErrorHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;

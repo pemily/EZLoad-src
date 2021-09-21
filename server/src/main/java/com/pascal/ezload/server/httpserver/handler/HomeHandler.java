@@ -56,7 +56,7 @@ public class HomeHandler {
 
     @GET
     @Path("/searchAccounts")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.TEXT_HTML)
     public void searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
         if (courtier != EnumBRCourtier.BourseDirect) {
             HtmlReporting htmlReporting = new HtmlReporting(null, context.getWriter());
@@ -67,18 +67,23 @@ public class HomeHandler {
             MainSettings mainSettings = SettingsManager.getInstance().loadProps();
             if (processManager.createNewRunningProcess(ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"))) {
                 try (HttpProcessRunner processLogger = new HttpProcessRunner(processManager.getLatestProcess(), context.getWriter(), server.fileLinkCreator(mainSettings))) {
-                    List<BourseDirectBRAccountDeclaration> accountsExtracted = new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract();
-                    // copy the accounts into the main settings
-                    List<BourseDirectBRAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
-                    accountsExtracted.stream()
-                            .filter(acc ->
-                                    !accountsDefined
-                                            .stream()
-                                            .anyMatch(accDefined -> accDefined.getNumber().equals(acc.getNumber())))
-                            .forEach(newAccount ->
-                                    mainSettings.getBourseDirect().getAccounts().add(newAccount)
-                            );
-                    SettingsManager.getInstance().saveConfigFile(mainSettings);
+                    try {
+                        List<BourseDirectBRAccountDeclaration> accountsExtracted = new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract();
+                        // copy the accounts into the main settings
+                        List<BourseDirectBRAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
+                        accountsExtracted.stream()
+                                .filter(acc ->
+                                        !accountsDefined
+                                                .stream()
+                                                .anyMatch(accDefined -> accDefined.getNumber().equals(acc.getNumber())))
+                                .forEach(newAccount ->
+                                        mainSettings.getBourseDirect().getAccounts().add(newAccount)
+                                );
+                        SettingsManager.getInstance().saveConfigFile(mainSettings);
+                    }
+                    catch(Exception e){
+                        processLogger.getReporting().error(e);
+                    }
                 }
             } else {
                 HtmlReporting htmlReporting = new HtmlReporting(null, context.getWriter());

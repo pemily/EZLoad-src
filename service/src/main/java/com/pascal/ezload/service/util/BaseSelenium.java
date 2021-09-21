@@ -29,13 +29,24 @@ public class BaseSelenium {
         this.reporting = reporting;
     }
 
-    public void init(MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws IOException {
+    public void init(MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
         this.defaultTimeoutInSec = defaultTimeoutInSec;
         this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
 
         reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
-        //Setting system properties of ChromeDriver
-        System.setProperty("webdriver.chrome.driver", chromeSettings.getDriverPath());
+        if (chromeSettings.getDriverPath().toLowerCase(Locale.ROOT).endsWith(".zip")){
+            String dir = new File(chromeSettings.getDriverPath()).getParentFile().getAbsolutePath();
+
+            ZipFileCompressUtils zipFileCompressUtils = new ZipFileCompressUtils();
+
+            String extractedDriver = zipFileCompressUtils.extractOneFile(chromeSettings.getDriverPath(), dir);
+            reporting.info("zip file detected, unzip it and use driver: "+extractedDriver);
+            System.setProperty("webdriver.chrome.driver", extractedDriver);
+        }
+        else {
+            //Setting system properties of ChromeDriver
+            System.setProperty("webdriver.chrome.driver", chromeSettings.getDriverPath());
+        }
 
         //Creating an object of ChromeDriver
         ChromeOptions options = new ChromeOptions();
@@ -108,14 +119,6 @@ public class BaseSelenium {
 
     public WebElement getParent(WebElement childElement){
         return childElement.findElement(By.xpath("./.."));
-    }
-
-    public WebElement nextSibling(WebElement element, int n){
-        WebElement elem = element;
-        for (int i = 0; i < n; i++){
-            elem = elem.findElement(By.xpath("./next-sibling"));
-        }
-        return elem;
     }
 
     public List<WebElement> getChildren(WebElement element, String tag) {

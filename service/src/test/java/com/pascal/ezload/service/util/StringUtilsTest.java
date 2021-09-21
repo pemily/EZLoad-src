@@ -19,6 +19,8 @@ public class StringUtilsTest {
         Assertions.assertEquals("", StringUtils.divide("a first testz", 'z')[1]);
         assertNull(StringUtils.divide("a first test", 'x'));
         assertNull(StringUtils.divide("", 'x'));
+        Assertions.assertEquals("Mon Compte ", StringUtils.divide("Mon Compte (PEA)", '(', ')')[0]);
+        Assertions.assertEquals("PEA)", StringUtils.divide("Mon Compte (PEA)", '(', ')')[1]);
     }
 
     @Test
