@@ -74,13 +74,15 @@ const genSecurityFile = (gdriverAccessPath: string|undefined|null) : String =>  
 export function Config(props: ConfigProps) {    
     return (
             <Box  margin="none" pad="xsmall">
-                {props.readOnly && (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}
-                <Form validate="change">
+                <Form validate="change">           
+                    {props.readOnly && 
+                        (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                            Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}
                 <Heading level="5" >EZPortfolio</Heading>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
-                            <ConfigTextField id="ezPortfolioId" label="Identifiant ezPortfolio" value={props.mainSettings!.ezPortfolio!.ezPortfolioId}
-                                errorMsg={props.mainSettings!.ezPortfolio!.field2ErrorMsg!.ezPortfolio}
+                            <ConfigTextField id="ezPortfolioId" label="Identifiant ezPortfolio" value={props.mainSettings?.ezPortfolio?.ezPortfolioId}
+                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.ezPortfolio}
                                 readOnly={props.readOnly}
                                 onChange={newValue  => props.mainSettingsStateSetter(
                                 { ...props.mainSettings,
@@ -96,8 +98,8 @@ export function Config(props: ConfigProps) {
                         </Box>
 
                         <Box margin="none" pad="none" direction="row">
-                            <ConfigTextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.mainSettings!.ezPortfolio!.gdriveCredsFile}
-                                errorMsg={props.mainSettings!.ezPortfolio!.field2ErrorMsg!.gdriveCredsFile}
+                            <ConfigTextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.mainSettings?.ezPortfolio?.gdriveCredsFile}
+                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.gdriveCredsFile}
                                 readOnly={props.readOnly}
                                 onChange={newValue  => props.mainSettingsStateSetter(
                                     { ...props.mainSettings,
@@ -105,7 +107,7 @@ export function Config(props: ConfigProps) {
                                    })}/>
                            <Help title="Comment obtenir son fichier de sécurité?">
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
-                                <Markdown>{genSecurityFile(props.mainSettings!.ezPortfolio!.gdriveCredsFile)}</Markdown>
+                                <Markdown>{genSecurityFile(props.mainSettings?.ezPortfolio?.gdriveCredsFile)}</Markdown>
                                </Box>
                            </Help>
                        </Box>                        
@@ -113,16 +115,16 @@ export function Config(props: ConfigProps) {
 
                     <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">
-                        <ConfigTextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezload!.downloadDir}
-                            isRequired={true} errorMsg={props.mainSettings.ezload!.field2ErrorMsg!.downloadDir}
+                        <ConfigTextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezload?.downloadDir}
+                            isRequired={true} errorMsg={props.mainSettings.ezload?.field2ErrorMsg?.downloadDir}
                             readOnly={props.readOnly}
                             onChange={newValue  => saveSettings(
                                 { ...props.mainSettings,
                                       ezload: { ...props.mainSettings.ezload, downloadDir: newValue }
                                }, props.mainSettingsStateSetter)}/>
                         <Box margin="none" pad="none" direction="row">
-                            <ConfigTextField id="chromeDriver" label="Fichier du driver chrome" value={props.mainSettings!.chrome!.driverPath }
-                                 isRequired={true}  errorMsg={props.mainSettings!.chrome!.field2ErrorMsg!.driverPath}
+                            <ConfigTextField id="chromeDriver" label="Fichier du driver chrome" value={props.mainSettings?.chrome?.driverPath }
+                                 isRequired={true}  errorMsg={props.mainSettings?.chrome?.field2ErrorMsg?.driverPath}
                                  readOnly={props.readOnly}
                                  onChange={newValue  => saveSettings(
                                     { ...props.mainSettings,
@@ -163,12 +165,12 @@ export function Config(props: ConfigProps) {
                             </Help>
                         </Box>
                         <Box direction="row" margin={{left:'medium', top:'none', bottom: 'none'}}>
-                            <ConfigTextField id="bourseDirectLogin" label="Identifiant de votre compte BourseDirect" value={props!.bourseDirectAuthInfo!.username}                                
+                            <ConfigTextField id="bourseDirectLogin" label="Identifiant de votre compte BourseDirect" value={props?.bourseDirectAuthInfo?.username}                                
                                 readOnly={props.readOnly}
                                 onChange={newValue => savePassword('BourseDirect', newValue, undefined, props.bourseDirectAuthInfoSetter)}/>
-                            <ConfigTextField id="bourseDirectPasswd" label="Mot de passe" isPassword={true} value={props!.bourseDirectAuthInfo!.password}
+                            <ConfigTextField id="bourseDirectPasswd" label="Mot de passe" isPassword={true} value={props?.bourseDirectAuthInfo?.password}
                                 readOnly={props.readOnly}
-                                onChange={newValue => savePassword('BourseDirect', props!.bourseDirectAuthInfo!.username, newValue, props.bourseDirectAuthInfoSetter)}/>
+                                onChange={newValue => savePassword('BourseDirect', props?.bourseDirectAuthInfo?.username, newValue, props.bourseDirectAuthInfoSetter)}/>
                         </Box>
                         <Box align="start" margin={{left: 'large', top:'none', bottom: 'medium'}}>                           
                             <Text size="small">Selection des comptes à traiter:</Text>
@@ -183,20 +185,20 @@ export function Config(props: ConfigProps) {
                                 </TableHeader>
                                 <TableBody>
                             {                                                                
-                                props.mainSettings!.bourseDirect!.accounts!.map((account, index) =>                                     
+                                props.mainSettings?.bourseDirect?.accounts?.map((account, index) =>                                     
                                     <TableRow key={"BD"+index} >
                                     <TableCell scope="row" pad="xsmall" margin="none">
                                     <ConfigTextField key={"nameBD"+index} isRequired={true} id={'BourseDirectAccount'+index} value={account.name}
                                      readOnly={props.readOnly}
-                                     errorMsg={account.field2ErrorMsg!.name}
+                                     errorMsg={account.field2ErrorMsg?.name}
                                      onChange={newValue => 
                                          saveSettings(
                                             { ...props.mainSettings,
                                                   bourseDirect: {
                                                       ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props!.mainSettings!.bourseDirect!.accounts!.slice(0,index),
+                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, name: newValue},
-                                                                ...props!.mainSettings!.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
                                            }, props.mainSettingsStateSetter)
@@ -205,15 +207,15 @@ export function Config(props: ConfigProps) {
                                     <TableCell scope="row" pad="xsmall" margin="none">
                                     <ConfigTextField key={"numberBD"+index} isRequired={true} id={'BourseDirectNumber'+index} value={account.number}
                                      readOnly={props.readOnly}
-                                     errorMsg={account.field2ErrorMsg!.number}
+                                     errorMsg={account.field2ErrorMsg?.number}
                                      onChange={newValue => 
                                          saveSettings(
                                             { ...props.mainSettings,
                                                   bourseDirect: {
                                                       ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props!.mainSettings!.bourseDirect!.accounts!.slice(0,index),
+                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, number: newValue},
-                                                                ...props!.mainSettings!.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
                                            }, props.mainSettingsStateSetter)                                    
@@ -227,9 +229,9 @@ export function Config(props: ConfigProps) {
                                             { ...props.mainSettings,
                                                   bourseDirect: {
                                                       ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props!.mainSettings!.bourseDirect!.accounts!.slice(0,index),
+                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, active: evt.target.checked},
-                                                                ...props!.mainSettings!.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
                                            }, props.mainSettingsStateSetter)     
@@ -250,8 +252,8 @@ export function Config(props: ConfigProps) {
                                                         { ...props.mainSettings,
                                                               bourseDirect: {
                                                                   ...props.mainSettings.bourseDirect,
-                                                                        accounts: [ ...props!.mainSettings!.bourseDirect!.accounts!.slice(0,index),                                                                            
-                                                                            ...props!.mainSettings!.bourseDirect!.accounts!.slice(index+1)
+                                                                        accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),                                                                            
+                                                                            ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1)
                                                                         ]
                                                                 }
                                                        }, props.mainSettingsStateSetter)                                                         
@@ -275,9 +277,9 @@ export function Config(props: ConfigProps) {
                                     disabled={props.readOnly}
                                     label="Nouveau" onClick={() => saveSettings(
                                     {...props.mainSettings,
-                                        bourseDirect: { ...props.mainSettings!.bourseDirect,
-                                            accounts: props.mainSettings!.bourseDirect!.accounts === undefined ?
-                                                    [{name: '', number: '', active: false}] : [...props.mainSettings!.bourseDirect!.accounts, {name: '', number: '', active: false}]
+                                        bourseDirect: { ...props.mainSettings?.bourseDirect,
+                                            accounts: props.mainSettings?.bourseDirect?.accounts === undefined ?
+                                                    [{name: '', number: '', active: false}] : [...props.mainSettings?.bourseDirect?.accounts, {name: '', number: '', active: false}]
                                         }}, props.mainSettingsStateSetter
                                 )} />
                                 <Box margin="small" pad="none"></Box>

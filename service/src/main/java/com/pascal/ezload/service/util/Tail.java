@@ -6,10 +6,11 @@ import java.io.Writer;
 
 public class Tail {
 
-    public static void tail(File file, Writer writer, boolean startFromBegining, String stopSentence) {
+    public static void tail(File file, Writer writer, String startFromSentence, String stopSentence) {
         boolean running = true;
         int updateInterval = 500;
-        long filePointer = startFromBegining ? 0 : file.length();
+        long filePointer = 0; // If I want to skip n char from the start of the file
+        boolean startSentenceDetected = false;
 
         try {
             while (running) {
@@ -23,11 +24,16 @@ public class Tail {
                     localRandomAccessFile.seek(filePointer);
                     String str;
                     while ((str = localRandomAccessFile.readLine()) != null) {
+                        if (!startSentenceDetected){
+                          if (str.equals(startFromSentence)) startSentenceDetected = true;
+                          continue;
+                        }
+                        if (str.equals(stopSentence)){
+                            running = false;
+                            break;
+                        }
                         writer.write(str);
                         writer.flush();
-                        if (stopSentence != null && str.contains(stopSentence)){
-                            running = false;
-                        }
                     }
                     filePointer = localRandomAccessFile.getFilePointer();
                     localRandomAccessFile.close();

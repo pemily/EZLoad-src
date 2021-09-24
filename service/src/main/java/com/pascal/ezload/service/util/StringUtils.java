@@ -13,8 +13,8 @@ public class StringUtils {
         int index = -1;
         for (int i = 0; i < text.length(); i++) {
             int c = text.charAt(i);
-            for (int j=0; j< splitChars.length; j++) {
-                if (c == splitChars[j]){
+            for (char splitChar : splitChars) {
+                if (c == splitChar) {
                     index = i;
                     break;
                 }

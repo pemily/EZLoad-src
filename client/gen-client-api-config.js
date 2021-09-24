@@ -3,7 +3,6 @@
 
 const { generateApi } = require('swagger-typescript-api');
 const path = require("path");
-const fs = require("fs");
 var swaggerFile = "../server/target/swagger/swagger.json";
 
 /* NOTE: all fields are optional expect one of `output`, `url`, `spec` */
@@ -11,14 +10,13 @@ generateApi({
   name: "EZLoadApi.ts",
   output:  path.resolve(process.cwd(), "src/ez-api/gen-api"),
   input: path.resolve(process.cwd(), swaggerFile),
-  httpClientType: "axios", // "axios" or "fetch"
+  httpClientType: "fetch", // "axios" or "fetch"
   prettier: {
     printWidth: 120,
     tabWidth: 2,
     trailingComma: "all",
     parser: "typescript",
-  },
-  httpClientType: "axios", // or "fetch"
+  },  
   defaultResponseAsSuccess: false,
   generateRouteTypes: true,
   generateResponses: true,
