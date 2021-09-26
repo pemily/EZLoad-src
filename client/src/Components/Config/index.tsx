@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { Box, Heading, Anchor, Form, FormField, TextInput, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
+import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
 import { Add, Trash } from 'grommet-icons';
-import {  saveSettings, savePassword, searchAccounts } from '../../ez-api';
-import { MainSettings, AuthInfo } from '../../ez-api/gen-api/EZLoadApi';
+import {  saveSettings, savePassword, jsonCall, ezApi } from '../../ez-api/tools';
+import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
 import { Help } from '../Tools/Help';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -16,6 +15,7 @@ export interface ConfigProps {
   bourseDirectAuthInfo: AuthInfo|undefined;
   bourseDirectAuthInfoSetter: (authInfo: AuthInfo) => void;
   readOnly: boolean;
+  followProcess: (process: EzProcess|undefined) => void;
 }        
 
 const loginPasswordInfo = `L'identifiant & le mot de passe de votre compte BourseDirect **sont optionels**.  
@@ -284,7 +284,13 @@ export function Config(props: ConfigProps) {
                                 )} />
                                 <Box margin="small" pad="none"></Box>
                                 <Button
-                                    disabled={props.readOnly} onClick={() => searchAccounts('BourseDirect')}
+                                    disabled={props.readOnly} onClick={() =>
+                                        jsonCall(ezApi.home.test2()) // searchAccounts('BourseDirect')
+                                        .then(process => {
+                                            console.log("PROCESS: ", process);
+                                            props.followProcess(process);
+                                        })
+                                    }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>
                         </Box>

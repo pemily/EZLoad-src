@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Text } from "grommet";
+import { useState, useEffect } from "react";
+import { Box, Header, Heading, Tabs, Tab } from "grommet";
 import { AllCourtiers } from '../Courtiers/AllCourtiers';
 import { Config } from '../Config';
-import { ezApi, jsonCall } from '../../ez-api';
+import { Message } from '../Tools/Message';
+import { ViewLog } from '../Tools/ViewLog';
+import { ezApi, jsonCall } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
-
+    const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
  
+    const followProcess = (process: EzProcess|undefined) => {
+        if (process) {            
+            setProcessLaunchFail(false);
+            setLastProcess(process);
+        }
+        else setProcessLaunchFail(true);
+    }
+
     useEffect(() => {
         // will be executed on the load
         console.log("Loading Data...");
@@ -41,6 +51,7 @@ export function App(){
             <Header direction="column" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
                 <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
             </Header>
+            <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             <Box fill>
                 <Tabs justify="center" flex>
                     <Tab title="Actions">
@@ -54,16 +65,13 @@ export function App(){
                         </Box>
                     </Tab>
                     <Tab title="Execution">
-                        { (lastProcess === undefined) && (<Text>Aucune tâche</Text>)}
-                        { (lastProcess !== undefined && lastProcess.running) && (<Text>Il n'y a pas de tâche en cours d'execution</Text>)}
-                        { (lastProcess !== undefined && !lastProcess.running) && (
-                            <Text>Dernière tâche: {lastProcess.logFile}</Text>
-                        )}
+                        <ViewLog process={lastProcess}/>
                     </Tab>                    
                     <Tab title="Configuration">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             {mainSettings && (
                                 <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
+                                        followProcess={followProcess}
                                         bourseDirectAuthInfo={bourseDirectAuthInfo}
                                         bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
                                         readOnly={lastProcess!==undefined && lastProcess.running ? true : false}

@@ -1,8 +1,6 @@
-import axios from "axios";
-import { Api, MainSettings, AuthInfo, HttpResponse, WebData } from './gen-api/EZLoadApi';
-const Transform = require('stream').Transform;
+import { Api, MainSettings, AuthInfo, HttpResponse } from '../gen-api/EZLoadApi';
 
-export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"});
+export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"}); // TODO update => remove the 8080 before the production, the port is dynamically computed
 
 export function jsonCall(promise: Promise<HttpResponse<any, any>>) {
     return promise.then(httpResponse => httpResponse.json())
@@ -15,11 +13,15 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     .then(response => response.body)
     .then(body => {
         const reader = body?.getReader();
+        console.log("aaaaaaaa");
         return new ReadableStream({
             start() {
+              console.log("bbbbbb");
               // The following function handles each data chunk
               function push() {
+                console.log("ddddddd");
                 reader?.read().then( ({done, value}) => {
+                  console.log("value:", value);
                   // If there is no more data to read
                   if (done) onDone();                        
                   else{
@@ -29,6 +31,7 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
                 })
               }        
               push();
+              console.log("ccccc");
             }
           });
     })
@@ -49,12 +52,5 @@ export function savePassword(courtier: 'BourseDirect', username: string|undefine
     .catch(e => console.log("Save Password Error: ", e));
 }
 
-export function searchAccounts(courtier: 'BourseDirect'){    
-    // ezApi.home.searchAccounts({courtier})
-    stream(ezApi.home.test2(), t => console.log(t), () => console.log('DONE'));
-si le retour est true => aller voir le process en cours
-avec l'appel viewLogProcess si c'est false => dire désolé un autre process est en cours:
-https://storybook.grommet.io/?path=/story/layout-layer-notification--notification-layer
-}
 
  

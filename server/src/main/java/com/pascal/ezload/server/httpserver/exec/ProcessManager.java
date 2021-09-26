@@ -4,15 +4,14 @@ import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.util.Tail;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.ext.Provider;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,7 +40,7 @@ public class ProcessManager {
         void run(HttpProcessRunner processRunner) throws Exception;
     }
 
-    public synchronized boolean createNewRunningProcess(MainSettings mainSettings, String logFile, RunnableWithException runnable) throws IOException {
+    public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String logFile, RunnableWithException runnable) throws IOException {
         EzProcess latestProcess = getLatestProcess();
         if (latestProcess == null || !latestProcess.isRunning()){
             EzProcess p = new EzProcess(logFile);
@@ -59,22 +58,29 @@ public class ProcessManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                finally{
+                    p.setRunning(false);
+                }
             });
-            return true;
+            return p;
         }
-        return false;
+        return null;
     }
 
     // the log can be closed or running
-    public void viewLogProcess(String logFile, Writer htmlPageWriter) throws IOException {
+    public void viewLogProcess(Writer htmlPageWriter) throws IOException {
         EzProcess latestProcess = getLatestProcess();
-        File file = new File(logFile);
-        if (latestProcess == null || (!file.exists() && !file.isFile())){
+        if (latestProcess == null){
             htmlPageWriter.close();
             return;
         }
-        if (latestProcess.getLogFile().equals(logFile) && latestProcess.isRunning()) {
-            Tail.tail(new File(logFile), htmlPageWriter, HttpProcessRunner.FILE_HEADER, HttpProcessRunner.FILE_FOOTER);
+        File logFile = new File(latestProcess.getLogFile());
+        if ((!logFile.exists() && !logFile.isFile())){
+            htmlPageWriter.close();
+            return;
+        }
+        if (latestProcess.isRunning()) {
+            Tail.tail(logFile, htmlPageWriter, HttpProcessRunner.FILE_HEADER, HttpProcessRunner.FILE_FOOTER);
         }
         else{
             BufferedReader logReader = new BufferedReader(new FileReader(logFile));

@@ -1,28 +1,11 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import { Provider } from "react-redux";
-import * as serviceWorker from './serviceWorker';
-
+import ReactDOM from 'react-dom'; 
 
 import { Grommet } from "grommet";
 import { grommet } from 'grommet/themes';
 import { deepMerge } from 'grommet/utils';
-import { hpe } from 'grommet-theme-hpe';
 import { App } from "./Components/App";
-import { store } from "./store/store";
 
-
-const colors = {
-  'background-contrast': '#000000FF',
-  text: '#444444',
-  'text-strong': '#000000',
-  'text-weak': '#BBBBBB',
-  border: '#999999',
-  'border-strong': '#666666',
-  'border-weak': '#BBBBBB',
-  'active-background': 'background-contrast',
-  'active-text': 'text',
-};
 
 const customTheme = deepMerge(grommet, {
     heading: {
@@ -89,14 +72,7 @@ const GrommetApp = () => (
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <GrommetApp />
-    </Provider>
+    <GrommetApp />
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();

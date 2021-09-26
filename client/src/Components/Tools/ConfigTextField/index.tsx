@@ -1,12 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { clearTimeout, setTimeout } from 'timers';
+import { useState, useCallback, useEffect } from "react";
+import { Box, FormField, TextInput } from "grommet";
 
-import { Box, Heading, Anchor, Form, FormField, TextInput, Button } from "grommet";
-
-import { ezApi } from '../../../ez-api';
-import { MainSettings } from '../../../ez-api/gen-api/EZLoadApi';
-import { HelpOption } from 'grommet-icons';
-import { setConstantValue } from "typescript";
 
 export interface ConfigTextFieldProps {
   onChange: (newValue: string) => void;

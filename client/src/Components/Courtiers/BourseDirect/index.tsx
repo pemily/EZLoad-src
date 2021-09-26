@@ -1,6 +1,4 @@
-import React from "react";
-
-import { Box, Heading, Anchor } from "grommet";
+import { Box, Anchor } from "grommet";
 
 
 export function BourseDirect(){

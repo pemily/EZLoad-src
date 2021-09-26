@@ -2,6 +2,7 @@ package com.pascal.ezload.server.httpserver.handler;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.server.httpserver.WebData;
+import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -9,6 +10,7 @@ import com.pascal.ezload.service.model.EnumBRCourtier;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -54,7 +56,8 @@ public class HomeHandler {
 
     @GET
     @Path("/searchAccounts")
-    public boolean searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
         if (courtier != EnumBRCourtier.BourseDirect) {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
@@ -88,18 +91,19 @@ public class HomeHandler {
         server.stop();
     }
 
+
     @GET
     @Path("/viewProcess")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public void viewLogProcess(@NotNull @QueryParam("log") String log) throws IOException {
-        processManager.viewLogProcess(log, response.getWriter());
+    public void viewLogProcess() throws IOException {
+        processManager.viewLogProcess(response.getWriter());
     }
 
 
     @GET
     @Path("/test1")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public boolean test1() throws Exception {
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess test1() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         return processManager.createNewRunningProcess(mainSettings, ProcessManager.getLog(mainSettings, "test1", "-searchAccount.log"),
                 (processLogger) -> {
@@ -113,8 +117,8 @@ public class HomeHandler {
 
     @GET
     @Path("/test2")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public boolean test2() throws Exception {
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess test2() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         return processManager.createNewRunningProcess(mainSettings, ProcessManager.getLog(mainSettings, "test2", "-searchAccount.log"),
                 (processLogger) -> {
