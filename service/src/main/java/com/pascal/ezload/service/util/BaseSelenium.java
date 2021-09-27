@@ -11,8 +11,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -159,7 +157,7 @@ public class BaseSelenium {
         Set<String> oldFiles = new HashSet<>(Arrays.asList(downloadDir.list()));
         getDriver().get(downloadUrl);
 
-        Sleep.wait(3);
+        Sleep.waitSeconds(3);
         // search for the name of the new file in the downloaded directory (ignore the tmp file)
         String downloadFilename = null;
         long time = Sleep.time();
@@ -174,13 +172,13 @@ public class BaseSelenium {
                 if (downloadFilename.endsWith(".tmp") || downloadFilename.endsWith(".crdownload"))
                     downloadFilename = null;
             }
-            Sleep.wait(1);
+            Sleep.waitSeconds(1);
         }
         while(downloadFilename == null && Sleep.isBelow(time, DOWNLOAD_TIMEOUT_IN_SECONDS)); // seconds max to download
 
         if (downloadFilename == null) throw new BRException("Not able to download file: "+downloadUrl);
 
-        Sleep.wait(1);
+        Sleep.waitSeconds(1);
 
         File downloadedFile = new File(downloadDir + File.separator + downloadFilename);
         File destFile = new File(outputFile);

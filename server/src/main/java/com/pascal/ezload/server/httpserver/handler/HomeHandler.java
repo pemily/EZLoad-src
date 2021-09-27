@@ -53,6 +53,9 @@ public class HomeHandler {
         SettingsManager.getInstance().saveConfigFile(mainSettings);
         return mainSettings.validate();
     }
+// export LATEST_CHROME_RELEASE_MAJOR=`google-chrome --version | sed -e "s/Google Chrome //" -e "s/\..*//"`
+// export LATEST_CHROME_RELEASE=$(wget -q https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$LATEST_CHROME_RELEASE_MAJOR -O -)
+//            - wget https://chromedriver.storage.googleapis.com/$LATEST_CHROME_RELEASE/chromedriver_linux64.zip -O /tmp/chromedriver.zip
 
     @GET
     @Path("/searchAccounts")
@@ -63,7 +66,9 @@ public class HomeHandler {
         }
         else {
             MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-            return processManager.createNewRunningProcess(mainSettings, ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"),
+            return processManager.createNewRunningProcess(mainSettings,
+                    "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
+                    ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"),
                 (processLogger) -> {
                     List<BourseDirectBRAccountDeclaration> accountsExtracted = new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract();
                     // copy the accounts into the main settings
@@ -105,7 +110,7 @@ public class HomeHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public EzProcess test1() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        return processManager.createNewRunningProcess(mainSettings, ProcessManager.getLog(mainSettings, "test1", "-searchAccount.log"),
+        return processManager.createNewRunningProcess(mainSettings, "Test1", ProcessManager.getLog(mainSettings, "test1", "-searchAccount.log"),
                 (processLogger) -> {
                     for (int i = 0; i < 20; i++) {
                         processLogger.getReporting().info("Bonjour " + i + "\n");
@@ -120,7 +125,7 @@ public class HomeHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public EzProcess test2() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        return processManager.createNewRunningProcess(mainSettings, ProcessManager.getLog(mainSettings, "test2", "-searchAccount.log"),
+        return processManager.createNewRunningProcess(mainSettings, "Test2", ProcessManager.getLog(mainSettings, "test2", "-searchAccount.log"),
                 (processLogger) -> {
                     for (int i = 0; i < 60; i++) {
                         processLogger.getReporting().info("Bonjour " + i + "\n");

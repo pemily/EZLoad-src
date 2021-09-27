@@ -37,8 +37,6 @@ public class EZHttpServer {
         servletHandler.setContextPath("/EZLoad");
         HandlerList handlers = new HandlerList();
 
-        configBinder.bind(ProcessManager.class).to(ProcessManager.class);
-
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(false);
         resource_handler.setWelcomeFiles(new String[]{"index.html"});

@@ -5,7 +5,6 @@ import com.google.api.services.sheets.v4.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.BRException;
 import com.pascal.ezload.service.util.Sleep;
-import com.pascal.ezload.service.util.StringValue;
 import com.pascal.ezload.service.util.SupplierWithException;
 
 import java.util.Arrays;
@@ -100,7 +99,7 @@ public class GDriveSheets {
                     throw new BRException("Google Drive API not accessible, please retry later");
                 }
                 reporting.info("Timeout reached, wait a little before retry");
-                Sleep.wait(60);
+                Sleep.waitSeconds(60);
                 reporting.info("Retry n°: "+n);
                 return retryOnTimeout(n - 1, fct);
             }

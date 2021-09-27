@@ -31,7 +31,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
         try {
             // reject cookies
             findById("didomi-notice-disagree-button").click();
-            Sleep.wait(1);
+            Sleep.waitSeconds(1);
             reporting.info("Cookies Rejected");
         }
         catch (NoSuchElementException ignored){}
@@ -43,7 +43,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
         if (StringUtils.isBlank(login.getText())){
             login.sendKeys(authInfo.getUsername());
             password.sendKeys(authInfo.getPassword());
-            Sleep.wait(1);
+            Sleep.waitSeconds(1);
             findById("bd_auth_login_type_submit").click();
         }
         else if (!StringUtils.isBlank(login.getText())){
@@ -57,7 +57,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
                 waitUrlIsNot("https://www.boursedirect.fr/fr/login");
                 connected =  true;
             } catch (TimeoutException t) {
-                Sleep.wait(1);
+                Sleep.waitSeconds(1);
             }
         }while(!connected);
     }

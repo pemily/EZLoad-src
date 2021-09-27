@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Provider
 public class ProcessManager {
 
-    @Inject
-    EZHttpServer server;
+    private final EZHttpServer server;
+
+    public ProcessManager(EZHttpServer server){
+        this.server = server;
+    }
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private List<EzProcess> ezProcesses = new ArrayList<>();
@@ -40,10 +42,10 @@ public class ProcessManager {
         void run(HttpProcessRunner processRunner) throws Exception;
     }
 
-    public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String logFile, RunnableWithException runnable) throws IOException {
+    public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String title, String logFile, RunnableWithException runnable) throws IOException {
         EzProcess latestProcess = getLatestProcess();
         if (latestProcess == null || !latestProcess.isRunning()){
-            EzProcess p = new EzProcess(logFile);
+            EzProcess p = new EzProcess(title, logFile);
             p.setRunning(true);
             ezProcesses.add(p);
             Writer fileWriter = new BufferedWriter(new FileWriter(logFile));
@@ -51,6 +53,7 @@ public class ProcessManager {
             executor.submit(() -> {
                 try (HttpProcessRunner processLogger = new HttpProcessRunner(p, fileWriter, server.fileLinkCreator(mainSettings))) {
                     try {
+                        processLogger.header(processLogger.getReporting().escape(title));
                         runnable.run(processLogger);
                     } catch (Exception e) {
                         processLogger.getReporting().error(e);

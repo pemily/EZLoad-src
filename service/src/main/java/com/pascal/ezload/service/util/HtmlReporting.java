@@ -8,6 +8,9 @@ import java.io.*;
 
 public class HtmlReporting implements Reporting {
 
+    private static final String EZ_LOAD_HEADER_REPORTING_JS = "ezLoadHeaderReporting.js";
+    private static final String EZ_LOAD_HEADER_REPORTING_CSS = "ezLoadHeaderReporting.css";
+
     private final Writer writer;
     private final FileLinkCreator fileLinkCreator;
 
@@ -18,13 +21,27 @@ public class HtmlReporting implements Reporting {
 
     public void writeHeader(String escapedTitle){
         try {
-            IOUtils.copy(new InputStreamReader( getClass().getClassLoader().getResourceAsStream("bientotRentier.html")), writer);
+            writer.write("<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>");
+            writer.write("<script>");
+            try(Reader r = new InputStreamReader(asStream(EZ_LOAD_HEADER_REPORTING_JS))) {
+                IOUtils.copy(r, writer);
+            }
+            writer.write("</script>");
+            writer.write("<style type='text/css'>");
+            try(Reader r = new InputStreamReader(asStream(EZ_LOAD_HEADER_REPORTING_CSS))) {
+                IOUtils.copy(r, writer);
+            }
+            writer.write("</style>");
             writer.write("<h1><center>"+ escapedTitle+"</center></h1>\n");
             writer.write("<ul id='1' class='br-tree'></ul>\n");
             writer.flush();
         } catch (IOException e) {
-            // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            // Ignore exception if the log file cannot be written (html page is perhaps lost)
         }
+    }
+
+    public InputStream asStream(String fileName) {
+        return getClass().getClassLoader().getResourceAsStream(fileName);
     }
 
     @Override

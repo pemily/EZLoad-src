@@ -4,9 +4,16 @@ import java.util.Date;
 
 public class Sleep {
 
-    public static void wait(int seconds) {
+    public static void waitSeconds(int seconds) {
         try {
             Thread.sleep(seconds * 1000L);
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    public static void waitMillisecs(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
         } catch (InterruptedException ignored) {
         }
     }

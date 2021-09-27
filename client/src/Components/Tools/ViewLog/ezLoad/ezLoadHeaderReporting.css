@@ -1,0 +1,50 @@
+a {color:#000000;}         /* Unvisited link  */
+a:visited {color:#000000;} /* Visited link    */
+a:hover {color:#000000;}   /* Mouse over link */
+a:active {color:#000000;}  /* Selected link   */
+.br-tree ul{
+    list-style-type: none;
+}
+.br-tree{
+    width: 90%;
+}
+.justify-items-evenly{
+    justify-content: space-evenly;
+}
+.br-tree li.section{
+    margin-left: -40px
+}
+.br-tree li.log{
+    margin-left: -40px
+}
+.br-tree .submenu li{
+    margin-left: -20px;
+}
+.br-tree span.toggler{
+    float: right;
+}
+.br-tree div{
+    text-decoration: none;
+    display: block;
+}
+.br-tree li.section div{
+    padding: 10px 5px;
+    border:1px solid #ccc;
+    background: #ddd
+}
+.br-tree li.log div{
+    padding: 10px 5px;
+    border:1px solid #ccc;
+    background: #eee
+}
+div.openedItem{
+    background: #0056b3!important;
+    color: #fff;
+}
+div.error{
+    background: #c55959 !important;
+    color: #fff;
+}
+.toggler{
+    transition: all 1s;
+}

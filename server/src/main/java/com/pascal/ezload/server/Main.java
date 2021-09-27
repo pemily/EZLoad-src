@@ -1,6 +1,7 @@
 package com.pascal.ezload.server;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
+import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.SettingsManager;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
@@ -17,6 +18,7 @@ public class Main {
             @Override
             protected void configure() {
                 bind(server).to(EZHttpServer.class);
+                bind(new ProcessManager(server)).to(ProcessManager.class);
             }
         });
         String homePage = "http://localhost:"+port+"/EZLoad/api/home";

@@ -13,15 +13,11 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     .then(response => response.body)
     .then(body => {
         const reader = body?.getReader();
-        console.log("aaaaaaaa");
         return new ReadableStream({
             start() {
-              console.log("bbbbbb");
               // The following function handles each data chunk
               function push() {
-                console.log("ddddddd");
                 reader?.read().then( ({done, value}) => {
-                  console.log("value:", value);
                   // If there is no more data to read
                   if (done) onDone();                        
                   else{
@@ -31,7 +27,6 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
                 })
               }        
               push();
-              console.log("ccccc");
             }
           });
     })
