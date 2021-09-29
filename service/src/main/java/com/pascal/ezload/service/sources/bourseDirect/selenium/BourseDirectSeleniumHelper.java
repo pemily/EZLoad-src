@@ -13,6 +13,8 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.util.function.Consumer;
+
 public class BourseDirectSeleniumHelper extends BaseSelenium {
 
     protected final MainSettings mainSettings;
@@ -24,8 +26,8 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
         this.bourseDirectSettings = mainSettings.getBourseDirect();
     }
 
-    public void login() throws Exception {
-        super.init(mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
+    public void login(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
+        super.init(currentChromeVersion, newDriverPathSaver, mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
         get("https://www.boursedirect.fr/fr/login");
 
         try {

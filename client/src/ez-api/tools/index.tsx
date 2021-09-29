@@ -2,13 +2,22 @@ import { Api, MainSettings, AuthInfo, HttpResponse } from '../gen-api/EZLoadApi'
 
 export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"}); // TODO update => remove the 8080 before the production, the port is dynamically computed
 
+export function valued(v: string|undefined|null) : string {
+  return v ? v : "";
+}
+
+
 export function jsonCall(promise: Promise<HttpResponse<any, any>>) {
-    return promise.then(httpResponse => httpResponse.json())
-    .catch(e => {console.log(e); throw e});
+    return promise.then(httpResponse => {
+      if (httpResponse.status === 204) return null; // no content for 204
+      return httpResponse.json();
+    } )
+    .catch(e => {console.log("Promise error: ", e); throw e});
 }
 
  
-export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => void, onDone: () => void){    
+// onText return true if it wants to stop the streaming
+export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void){    
     promise
     .then(response => response.body)
     .then(body => {
@@ -21,8 +30,12 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
                   // If there is no more data to read
                   if (done) onDone();                        
                   else{
-                    onText(new TextDecoder().decode(value));
-                    push();
+                    if (!onText(new TextDecoder().decode(value))){
+                      push();
+                    }
+                    else{
+                      reader.cancel();                      
+                    }
                   }
                 })
               }        

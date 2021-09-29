@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Box, Text } from "grommet";
-import { stream, ezApi } from '../../../ez-api/tools';
-import {  EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
+import { stream, ezApi, valued } from '../../../ez-api/tools';
+import { EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
 import './ezLoad/ezLoadHeaderReporting.css';
 
-var { pushSection, popSection, add } = require( './ezLoad/ezLoadHeaderReporting.js');
+var { DynamicLogger } = require( './ezLoad/ezLoadHeaderReporting.js');
 
 export interface ViewLogProps {
     ezProcess: EzProcess|undefined;
@@ -13,44 +13,48 @@ export interface ViewLogProps {
 
 export function ViewLog(props: ViewLogProps) {    
 
-    const [isStreaming, setStreaming] = useState(false);
-    const [lastProcess, setLastProcess] = useState<undefined|EzProcess>(undefined);
-    const [loadedLog, setLoadedLog] = useState<string>("");
+    function showLog(){                   
+        if (props.ezProcess !== undefined){
+            const dynLogger = new DynamicLogger();
 
-    useEffect(() => {        
-        showLog();
-    })
+            function add(s: string){
+                dynLogger.add(s);
+            }
+            function popSection(){
+                dynLogger.popSection();
+            }
+            function pushSection(s: string){
+                dynLogger.pushSection(s);
+            }
 
-    function showLog(){
-        if (!isStreaming){
-            let launchStreaming: boolean = true;
-            console.log("COMPARE", lastProcess, props.ezProcess);
-            if (lastProcess && lastProcess!.logFile === props.ezProcess?.logFile) {
-                launchStreaming = false;            
-            }
-            if (props.ezProcess === undefined){
-                launchStreaming = false;
-            }
-            if (launchStreaming){
-                setStreaming(true);
-                setLastProcess(props.ezProcess);
-                setLoadedLog("");
-                stream(ezApi.home.viewLogProcess(), (update) => { 
+            stream(ezApi.home.viewLogProcess(), (update) => { 
+                if (!dynLogger.isStopped()){
                     const newCommand = update.replaceAll('<script>', '').replaceAll('</script>', ';');
-                    setLoadedLog(loadedLog+newCommand);                    
-                }, () => {
-                    setStreaming(false);
-                    props.processFinished();
-                });
-            }
+                    eval(newCommand);           
+                    return false; // do not stop the streaming
+                }
+                return true; // stop the streaming
+            }, () => {
+                props.processFinished();
+            }); 
+
+            return function cleanup(){
+                dynLogger.stop();
+            };
         }
-        console.log("EVAL", loadedLog);
-        eval(loadedLog);
     }
-            
+
+    useEffect(showLog, []) // Le [] fait que le useEffect ne sera appelé qu'une fois apres le 1er rendu
+
+    
     return (<Box id="ProcessOutput" pad="medium" >
-            <Fragment>
+            <Text size="xlarge" alignSelf="center">{valued(props.ezProcess?.title)}</Text>
+            <Text>{valued(props.ezProcess?.logFile)}</Text>
+            { (props.ezProcess === "") && (
+                <Text>Pas de tâche en cours</Text>
+              )}                        
+              <Fragment>
                 <ul id='1' className='br-tree'></ul>
-            </Fragment>            
+              </Fragment>
         </Box>);
 }

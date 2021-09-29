@@ -286,11 +286,8 @@ export function Config(props: ConfigProps) {
                                 <Box margin="small" pad="none"></Box>
                                 <Button
                                     disabled={props.readOnly} onClick={() =>
-                                        jsonCall(ezApi.home.test2()) // searchAccounts('BourseDirect')
-                                        .then(process => {
-                                            console.log("PROCESS: ", process);
-                                            props.followProcess(process);
-                                        })
+                                        jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect"}))
+                                        .then(process => props.followProcess(process)) // TODO QUAND C4EST FINIT RELOAD POUR VOIR LE RESULTAT
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>

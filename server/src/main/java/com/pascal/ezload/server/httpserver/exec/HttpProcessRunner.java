@@ -12,12 +12,10 @@ public class HttpProcessRunner implements Closeable {
     public static final String FILE_HEADER = "<!-- END OF FILE HEADER -->";
     public static final String FILE_FOOTER = "<!-- START OF FILE FOOTER -->";
 
-    private final EzProcess process;
     private final HtmlReporting reporting;
-    private Writer logFileWriter;
+    private final Writer logFileWriter;
 
-    public HttpProcessRunner(EzProcess process, Writer logFileWriter, FileLinkCreator linkCreator){
-        this.process = process;
+    public HttpProcessRunner(Writer logFileWriter, FileLinkCreator linkCreator){
         this.reporting = new HtmlReporting(linkCreator, logFileWriter);
         this.logFileWriter = logFileWriter;
     }
@@ -38,6 +36,5 @@ public class HttpProcessRunner implements Closeable {
         logFileWriter.write("\n"+FILE_FOOTER+"\n</body></html>\n");
         logFileWriter.flush();
         logFileWriter.close();
-        process.setRunning(false);
     }
 }

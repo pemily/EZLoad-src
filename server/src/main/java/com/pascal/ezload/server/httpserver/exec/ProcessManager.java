@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 public class ProcessManager {
 
     private final EZHttpServer server;
+    private boolean processRunning = false;
 
     public ProcessManager(EZHttpServer server){
         this.server = server;
@@ -38,20 +39,24 @@ public class ProcessManager {
         return ezProcesses.size() > 0 ? ezProcesses.get(ezProcesses.size()-1) : null;
     }
 
+    public boolean isProcessRunning() {
+        return processRunning;
+    }
+
     public interface RunnableWithException {
         void run(HttpProcessRunner processRunner) throws Exception;
     }
 
     public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String title, String logFile, RunnableWithException runnable) throws IOException {
         EzProcess latestProcess = getLatestProcess();
-        if (latestProcess == null || !latestProcess.isRunning()){
+        if (latestProcess == null || !processRunning){
             EzProcess p = new EzProcess(title, logFile);
-            p.setRunning(true);
+            processRunning = true;
             ezProcesses.add(p);
             Writer fileWriter = new BufferedWriter(new FileWriter(logFile));
 
             executor.submit(() -> {
-                try (HttpProcessRunner processLogger = new HttpProcessRunner(p, fileWriter, server.fileLinkCreator(mainSettings))) {
+                try (HttpProcessRunner processLogger = new HttpProcessRunner(fileWriter, server.fileLinkCreator(mainSettings))) {
                     try {
                         processLogger.header(processLogger.getReporting().escape(title));
                         runnable.run(processLogger);
@@ -62,7 +67,7 @@ public class ProcessManager {
                     e.printStackTrace();
                 }
                 finally{
-                    p.setRunning(false);
+                    processRunning = false;
                 }
             });
             return p;
@@ -74,15 +79,13 @@ public class ProcessManager {
     public void viewLogProcess(Writer htmlPageWriter) throws IOException {
         EzProcess latestProcess = getLatestProcess();
         if (latestProcess == null){
-            htmlPageWriter.close();
             return;
         }
         File logFile = new File(latestProcess.getLogFile());
         if ((!logFile.exists() && !logFile.isFile())){
-            htmlPageWriter.close();
             return;
         }
-        if (latestProcess.isRunning()) {
+        if (processRunning) {
             Tail.tail(logFile, htmlPageWriter, HttpProcessRunner.FILE_HEADER, HttpProcessRunner.FILE_FOOTER);
         }
         else{
@@ -95,8 +98,8 @@ public class ProcessManager {
                 }
                 if (line.equals(HttpProcessRunner.FILE_FOOTER)) break;
                 htmlPageWriter.write(line);
+                htmlPageWriter.flush();
             }
-
         }
     }
 
@@ -109,9 +112,9 @@ public class ProcessManager {
 
     public void kill() {
         EzProcess latestProcess = getLatestProcess();
-        if (latestProcess != null && latestProcess.isRunning()){
+        if (latestProcess != null && processRunning){
             executor.shutdownNow();
-            latestProcess.setRunning(false);
+            processRunning = false;
         }
     }
 }

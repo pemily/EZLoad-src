@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -72,6 +73,20 @@ public class SettingsManager {
         SettingsManager settingsManager = new SettingsManager(configFilePath);
         settingsManager.saveConfigFile(getInitialSettings(configFilePath));
         return settingsManager;
+    }
+
+    public static Consumer<String> saveNewChromeDriver(){
+        return newChromeDriver -> {
+            try {
+                SettingsManager manager = getInstance();
+                MainSettings mainSettings = manager.loadProps();
+                mainSettings.getChrome().setDriverPath(newChromeDriver);
+                manager.saveConfigFile(mainSettings);
+            }
+            catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     private static MainSettings getInitialSettings(String configFilePath) throws IOException {

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -41,11 +42,11 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
-    public void start(EZPortfolio ezPortfolio) {
+    public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolio ezPortfolio) {
         try(Reporting ignored = reporting.pushSection("Downloading BourseDirect Reports...")) {
 
             try {
-                downloadUpdates(ezPortfolio);
+                downloadUpdates(currentChromeVersion, newDriverPathSaver, ezPortfolio);
             } catch (Exception e) {
                 if (e instanceof InvalidArgumentException)
                     reporting.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
@@ -58,8 +59,8 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         }
     }
 
-    private void downloadUpdates(EZPortfolio ezPortfolio) throws Exception {
-        login();
+    private void downloadUpdates(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolio ezPortfolio) throws Exception {
+        login(currentChromeVersion, newDriverPathSaver);
 
         goToAvisOperes();
 

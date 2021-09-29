@@ -4,10 +4,8 @@ public class EzProcess {
 
     private String logFile;
     private String title;
-    private transient boolean isRunning;
 
     public EzProcess(String title, String logFile) {
-        this.isRunning = false;
         this.logFile = logFile;
         this.title = title;
     }
@@ -18,14 +16,6 @@ public class EzProcess {
 
     public void setLogFile(String logFile) {
         this.logFile = logFile;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public void setRunning(boolean running) {
-        isRunning = running;
     }
 
     public String getTitle() {

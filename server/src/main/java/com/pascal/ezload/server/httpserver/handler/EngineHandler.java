@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
@@ -45,12 +46,14 @@ public class EngineHandler {
 
     @PUT
     @Path("/start")
-    public void start(@NotNull @QueryParam("simulation") boolean simulation) throws Exception {
+    public void start(@NotNull @QueryParam("simulation") boolean simulation,
+                      @NotNull @QueryParam("chromeVersion") String chromeVersion) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        start(mainSettings, response.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
+        start(chromeVersion, mainSettings,
+                response.getWriter(), httpServer.fileLinkCreator(mainSettings), simulation);
     }
 
-    private void start(MainSettings mainSettings, Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
+    private void start(String currentChromeVersion, MainSettings mainSettings, Writer htmlPageWriter, FileLinkCreator fileLinkCreator, boolean readOnly) throws IOException {
         File logsDir = new File(mainSettings.getEZLoad().getLogsDir());
         Date now = new Date();
         String reportFileName =  REPORT_FILE_PREFIX + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + REPORT_FILE_SUFFIX;
@@ -74,7 +77,7 @@ public class EngineHandler {
 
                 List<BRModel> allBRModels;
                 try (Reporting ignored = reporting.pushSection("Launch BourseDirect Process")) {
-                    allBRModels = new BourseDirectProcessor(mainSettings).start(reporting, ezPortfolio);
+                    allBRModels = new BourseDirectProcessor(mainSettings).start(reporting, currentChromeVersion, SettingsManager.saveNewChromeDriver(), ezPortfolio);
                 }
 
                 boolean isValid;

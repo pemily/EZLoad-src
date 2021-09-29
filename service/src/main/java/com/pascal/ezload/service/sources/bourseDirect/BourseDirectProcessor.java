@@ -20,6 +20,7 @@ import com.pascal.ezload.service.util.BRParsingException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class BourseDirectProcessor {
 
@@ -29,9 +30,11 @@ public class BourseDirectProcessor {
         this.mainSettings = mainSettings;
     }
 
-    public List<BRModel> start(final Reporting reporting, EZPortfolio ezPortfolio) throws IOException {
+    public List<BRModel> start(final Reporting reporting,
+                               String currentChromeVersion, Consumer<String> newDriverPathSaver,
+                               EZPortfolio ezPortfolio) throws IOException {
         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
-        bourseDirectDownloader.start(ezPortfolio);
+        bourseDirectDownloader.start(currentChromeVersion, newDriverPathSaver, ezPortfolio);
 
         try(Reporting ignored = reporting.pushSection("Analyzing downloaded files...")) {
             return new FileProcessor(SettingsManager.getDownloadDir(mainSettings, EnumBRCourtier.BourseDirect),

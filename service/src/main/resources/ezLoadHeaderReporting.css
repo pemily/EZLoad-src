@@ -11,6 +11,9 @@ a:active {color:#000000;}  /* Selected link   */
 .justify-items-evenly{
     justify-content: space-evenly;
 }
+.br-tree li {
+    list-style-type: none;    
+}
 .br-tree li.section{
     margin-left: -40px
 }

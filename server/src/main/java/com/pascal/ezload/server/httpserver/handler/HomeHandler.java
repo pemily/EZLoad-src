@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 @Path("home")
@@ -42,7 +43,9 @@ public class HomeHandler {
     @Path("/main")
     @Produces(MediaType.APPLICATION_JSON)
     public WebData getMainData() throws Exception {
-        return new WebData(SettingsManager.getInstance().loadProps().validate(), processManager.getLatestProcess());
+        return new WebData(SettingsManager.getInstance().loadProps().validate(),
+                            processManager.getLatestProcess(),
+                            processManager.isProcessRunning());
     }
 
     @POST
@@ -60,7 +63,8 @@ public class HomeHandler {
     @GET
     @Path("/searchAccounts")
     @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
+    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier,
+                                    @NotNull @QueryParam("chromeVersion") String chromeVersion) throws Exception {
         if (courtier != EnumBRCourtier.BourseDirect) {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
@@ -70,7 +74,8 @@ public class HomeHandler {
                     "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
                     ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"),
                 (processLogger) -> {
-                    List<BourseDirectBRAccountDeclaration> accountsExtracted = new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract();
+                    List<BourseDirectBRAccountDeclaration> accountsExtracted =
+                            new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract(chromeVersion, SettingsManager.saveNewChromeDriver());
                     // copy the accounts into the main settings
                     List<BourseDirectBRAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
                     processLogger.getReporting().info(accountsDefined.size()+" Compte(s) trouvé(s)");
@@ -101,7 +106,9 @@ public class HomeHandler {
     @Path("/viewProcess")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public void viewLogProcess() throws IOException {
-        processManager.viewLogProcess(response.getWriter());
+        Writer writer = response.getWriter();
+        processManager.viewLogProcess(writer);
+        writer.close();
     }
 
 

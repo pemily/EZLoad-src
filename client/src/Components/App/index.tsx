@@ -4,19 +4,23 @@ import { AllCourtiers } from '../Courtiers/AllCourtiers';
 import { Config } from '../Config';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
-import { ezApi, jsonCall } from '../../ez-api/tools';
+import { ezApi, jsonCall, valued } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
+    const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
+    const [processRunning, setProcessRunning] = useState<boolean>(false);
  
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {            
             setProcessLaunchFail(false);
             setLastProcess(process);
+            setProcessRunning(true);
+            setActiveIndex(1); //switch to the execution tab
         }
         else setProcessLaunchFail(true);
     }
@@ -27,8 +31,9 @@ export function App(){
         jsonCall(ezApi.home.getMainData())
            .then(r =>  {            
              console.log("Data loaded: ", r);
-             setMainSettings(r.mainSettings);             
-             setLastProcess(r.latestEzProcess === null ? undefined : r.latestEzProcess);
+             setMainSettings(r.mainSettings);                          
+             setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);
+             setProcessRunning(r.processRunning);
           })
         .catch((error) => {
             console.log("Error while loading Data.", error);
@@ -53,7 +58,7 @@ export function App(){
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             <Box fill>
-                <Tabs justify="center" flex>
+                <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Actions">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                         <AllCourtiers/>
@@ -65,7 +70,11 @@ export function App(){
                         </Box>
                     </Tab>
                     <Tab title="Execution">
-                        <ViewLog ezProcess={lastProcess} processFinished={() => {setLastProcess({...lastProcess, running: false})}}/>
+                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                            <ViewLog 
+                                    ezProcess={lastProcess}                                     
+                                    processFinished={() => {setProcessRunning(false)}}/>
+                        </Box>
                     </Tab>                    
                     <Tab title="Configuration">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
@@ -74,7 +83,7 @@ export function App(){
                                         followProcess={followProcess}
                                         bourseDirectAuthInfo={bourseDirectAuthInfo}
                                         bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
-                                        readOnly={lastProcess!==undefined && lastProcess.running ? true : false}
+                                        readOnly={processRunning}
                                         />
                             )}
                         </Box>

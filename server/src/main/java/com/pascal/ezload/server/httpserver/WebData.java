@@ -7,10 +7,12 @@ public class WebData {
 
     private MainSettings mainSettings;
     private EzProcess latestEzProcess;
+    private boolean processRunning;
 
-    public WebData(MainSettings mainSettings, EzProcess latestEzProcess){
+    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning){
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
+        this.processRunning = processRunning;
     }
 
     public MainSettings getMainSettings() {
@@ -27,5 +29,13 @@ public class WebData {
 
     public void setLatestProcess(EzProcess latestEzProcess) {
         this.latestEzProcess = latestEzProcess;
+    }
+
+    public boolean isProcessRunning() {
+        return processRunning;
+    }
+
+    public void setProcessRunning(boolean processRunning) {
+        this.processRunning = processRunning;
     }
 }

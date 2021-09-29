@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class BaseSelenium {
 
@@ -27,24 +28,12 @@ public class BaseSelenium {
         this.reporting = reporting;
     }
 
-    public void init(MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
+    public void init(String currentChromeVersion, Consumer<String> newDriverPathSaver, MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
         this.defaultTimeoutInSec = defaultTimeoutInSec;
         this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
 
         reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
-        if (chromeSettings.getDriverPath().toLowerCase(Locale.ROOT).endsWith(".zip")){
-            String dir = new File(chromeSettings.getDriverPath()).getParentFile().getAbsolutePath();
-
-            ZipFileCompressUtils zipFileCompressUtils = new ZipFileCompressUtils();
-
-            String extractedDriver = zipFileCompressUtils.extractOneFile(chromeSettings.getDriverPath(), dir);
-            reporting.info("zip file detected, unzip it and use driver: "+extractedDriver);
-            System.setProperty("webdriver.chrome.driver", extractedDriver);
-        }
-        else {
-            //Setting system properties of ChromeDriver
-            System.setProperty("webdriver.chrome.driver", chromeSettings.getDriverPath());
-        }
+        ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath());
 
         //Creating an object of ChromeDriver
         ChromeOptions options = new ChromeOptions();
@@ -82,7 +71,17 @@ public class BaseSelenium {
 
         options.setExperimentalOption("prefs", prefs);
 
-        driver = new ChromeDriver(options);
+        try {
+            driver = new ChromeDriver(options);
+        }
+        catch(Exception e){
+            reporting.info("Error when using chrome driver: "+e.getMessage());
+            String newChromeDriver = new File(chromeSettings.getDriverPath()).getParent().concat(File.separator+"chromeDriver-"+currentChromeVersion+".zip");
+            ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, newChromeDriver);
+            ChromeDriverTools.setup(reporting, newChromeDriver);
+            driver = new ChromeDriver(options);
+            newDriverPathSaver.accept(newChromeDriver);
+        }
         //Specifiying pageLoadTimeout and Implicit wait
         driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(defaultTimeoutInSec, TimeUnit.SECONDS);

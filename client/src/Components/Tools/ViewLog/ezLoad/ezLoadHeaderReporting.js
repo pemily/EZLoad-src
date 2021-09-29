@@ -1,85 +1,98 @@
 //window.$ = window.jQuery = require('jquery');
 import $ from "jquery";
 
-var idQueue = [];
-var lastId = 1;
-idQueue.push(lastId);
-
-const openIcon = '<span class="toggler">+</span>';
-const closeIcon = '<span class="toggler">-</span>';
-
-function updateIcons(objDiv) {
-    if (objDiv.hasClass('openedItem')) {
-        objDiv.find('span.toggler').replaceWith(closeIcon);
-    } else {
-        objDiv.find('span.toggler').replaceWith(openIcon);
+export class DynamicLogger {
+    constructor(){
+        this.idQueue = [];
+        this.lastId = 1;
+        this.idQueue.push(this.lastId);
+        this.stopped = false;
     }
-}
 
-function closeAll(objDiv) {
-    var items = objDiv.parent().siblings().find('ul.submenu');
-    items.each(function () {
-        var ul = $(this).slideUp('slow').parent();
-        ul.find('span.toggler').replaceWith(openIcon);
-        ul.find('a').first().removeClass('openedItem');
-    });
-}
+    openIcon = '<span class="toggler">+</span>';
+    closeIcon = '<span class="toggler">-</span>';
 
-export function pushSection(elem){
-    var parentId = idQueue[idQueue.length-1];
-    lastId++;
-    idQueue.push(lastId);
-    $('#'+parentId).append("<li class='section'><div href='#'>"+elem+openIcon+"</div><ul class='submenu' id="+lastId+"></ul></li>");
-    var a = $('#'+parentId).children("li").last().children("div").first();
-    show(a);
+    isStopped(){
+        return this.stopped;
+    }
 
-    a.bind('click', function (e) {
-                           // e.preventDefault();
-                            openOrClose($(this));
-                        });
-}
+    stop(){
+        this.stopped = true;
+    }
 
-
-export function add(elem, isError){
-    var parentId = idQueue[idQueue.length-1];
-    $('#'+parentId).append("<li class='log'><div href='#' "+(isError? "class='error'" : "")+">"+elem+"</div></li>");
-    if (isError){
-        for (let i = 0; i < idQueue.length; i++){
-            $('#'+idQueue[i]).parent().children('div').first().addClass('error');
+    updateIcons(objDiv) {
+        if (objDiv.hasClass('openedItem')) {
+            objDiv.find('span.toggler').replaceWith(this.closeIcon);
+        } else {
+            objDiv.find('span.toggler').replaceWith(this.openIcon);
         }
     }
-}
 
-function openOrClose(objDiv){
-        var leaveOpen = false;
-    if (leaveOpen === false) {
-        closeAll(objDiv);
+    closeAll(objDiv) {
+        var items = objDiv.parent().siblings().find('ul.submenu');
+        items.each(function () {
+            var ul = $(this).slideUp('slow').parent();
+            ul.find('span.toggler').replaceWith(this.openIcon);
+            ul.find('a').first().removeClass('openedItem');
+        });
     }
 
-    if (objDiv.hasClass('openedItem')) {
-        hide(objDiv);
+    pushSection(elem){
+        var parentId = this.idQueue[this.idQueue.length-1];
+        this.lastId++;
+        this.idQueue.push(this.lastId);
+        $('#'+parentId).append("<li class='section'><div href='#'>"+elem+this.openIcon+"</div><ul class='submenu' id="+this.lastId+"></ul></li>");
+        var a = $('#'+parentId).children("li").last().children("div").first();
+        this.show(a);
+
+        a.bind('click', function (e) {
+                            // e.preventDefault();
+                                this.openOrClose($(this));
+                            });
     }
-    else{
-        show(objDiv);
+
+
+    add(elem, isError){
+        var parentId = this.idQueue[this.idQueue.length-1];
+        $('#'+parentId).append("<li class='log'><div href='#' "+(isError? "class='error'" : "")+">"+elem+"</div></li>");
+        if (isError){
+            for (let i = 0; i < this.idQueue.length; i++){
+                $('#'+this.idQueue[i]).parent().children('div').first().addClass('error');
+            }
+        }
     }
 
-    updateIcons(objDiv);
-}
+    openOrClose(objDiv){
+            var leaveOpen = false;
+        if (leaveOpen === false) {
+            this.closeAll(objDiv);
+        }
 
-function hide(objDiv){
-    objDiv.removeClass('openedItem');
-    objDiv.siblings('ul').first().slideUp();
-    updateIcons(objDiv);
-}
+        if (objDiv.hasClass('openedItem')) {
+            this.hide(objDiv);
+        }
+        else{
+            this.show(objDiv);
+        }
 
-function show(objDiv){
-    objDiv.addClass('openedItem');
-    objDiv.siblings('ul').first().slideDown();
-    updateIcons(objDiv);
-}
+        this.updateIcons(objDiv);
+    }
 
-export function popSection(){
-    var sectionId = idQueue.pop();
-    hide($('#'+sectionId).parent().children('div').first());
-}
+    hide(objDiv){
+        objDiv.removeClass('openedItem');
+        objDiv.siblings('ul').first().slideUp();
+        this.updateIcons(objDiv);
+    }
 
+    show(objDiv){
+        objDiv.addClass('openedItem');
+        objDiv.siblings('ul').first().slideDown();
+        this.updateIcons(objDiv);
+    }
+
+    popSection(){
+        var sectionId = this.idQueue.pop();
+        this.hide($('#'+sectionId).parent().children('div').first());
+    }
+
+}

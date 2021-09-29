@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
@@ -18,9 +19,9 @@ public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
     }
 
     // the devise and owner address will not be filled
-    public List<BourseDirectBRAccountDeclaration> extract() throws Exception {
+    public List<BourseDirectBRAccountDeclaration> extract(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
         try {
-            login();
+            login(currentChromeVersion, newDriverPathSaver);
             goToAvisOperes();
             WebElement label = findByContainsText("label", "Sélectionnez votre compte :");
             WebElement parent = getParent(label);
