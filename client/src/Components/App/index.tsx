@@ -65,7 +65,7 @@ export function App(){
                         </Box>
                     </Tab>
                     <Tab title="Execution">
-                        <ViewLog process={lastProcess}/>
+                        <ViewLog ezProcess={lastProcess} processFinished={() => {setLastProcess({...lastProcess, running: false})}}/>
                     </Tab>                    
                     <Tab title="Configuration">
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>

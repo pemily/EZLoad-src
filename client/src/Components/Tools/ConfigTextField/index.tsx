@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+
 import { Box, FormField, TextInput } from "grommet";
 
 
@@ -15,11 +16,16 @@ export interface ConfigTextFieldProps {
   readOnly: boolean;
 }
 
+function val(v: string|undefined|null) : string {
+  return v ? v : "";
+}
+
+
 export function ConfigTextField(props: ConfigTextFieldProps) {
-    const [value, setValue] = useState<string|undefined|null>(props.value);
+    const [value, setValue] = useState<string>(val(props.value));
 
     useEffect(() => {
-      setValue(props.value); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
+      setValue(val(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
     }, [props.value]);
     
     const onChange = useCallback((event) => {
