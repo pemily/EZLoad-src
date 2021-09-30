@@ -29,30 +29,36 @@ public class BaseSelenium {
     }
 
     public void init(String currentChromeVersion, Consumer<String> newDriverPathSaver, MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
-        this.defaultTimeoutInSec = defaultTimeoutInSec;
-        this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
+        try(Reporting rep = reporting.pushSection("Initialization")) {
+            this.defaultTimeoutInSec = defaultTimeoutInSec;
+            this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
 
-        reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
-        ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath());
+            reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
+            if (!new File(chromeSettings.getDriverPath()).exists()) {
+                // if the driver does not exists, start to download it
+                String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
+                newDriverPathSaver.accept(newChromeDriver);
+            }
+            ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath());
 
-        //Creating an object of ChromeDriver
-        ChromeOptions options = new ChromeOptions();
+            //Creating an object of ChromeDriver
+            ChromeOptions options = new ChromeOptions();
 
-        reporting.info("Chrome user data dir: " + chromeSettings.getUserDataDir());
-        reporting.info("Chrome download dir: " + chromeDownloadDir);
+            reporting.info("Chrome user data dir: " + chromeSettings.getUserDataDir());
+            reporting.info("Chrome download dir: " + chromeDownloadDir);
 
-        options.addArguments("user-data-dir="+ chromeSettings.getUserDataDir());
-        options.addArguments("profile-directory=Default"); // only Default works to change the download.default_directory
-  //      options.addArguments("--enable-automation"); // sinon les creds service mache pas
+            options.addArguments("user-data-dir=" + chromeSettings.getUserDataDir());
+            options.addArguments("profile-directory=Default"); // only Default works to change the download.default_directory
+            //      options.addArguments("--enable-automation"); // sinon les creds service mache pas
 
-        Map<String, Object> prefs = new HashMap<>();
-        prefs.put("download.default_directory", chromeDownloadDir); //ok
-        prefs.put("download.prompt_for_download", false); // ok
-        prefs.put("directory_upgrade", true); // ok
+            Map<String, Object> prefs = new HashMap<>();
+            prefs.put("download.default_directory", chromeDownloadDir); //ok
+            prefs.put("download.prompt_for_download", false); // ok
+            prefs.put("directory_upgrade", true); // ok
 //        prefs.put("credentials_enable_service", true);
 //        prefs.put("profile.password_manager_enabled", true);
-        prefs.put("profile.name", "EZLoad");
-        prefs.put("profile.using_default_name", false);
+            prefs.put("profile.name", "EZLoad");
+            prefs.put("profile.using_default_name", false);
 /*        prefs.put("autofill.enabled", true);
         prefs.put("autofill.profile_enabled", true);
 
@@ -63,28 +69,28 @@ public class BaseSelenium {
         prefs.put("profile.password_account_storage_exists", true);
         prefs.put("was_auto_sign_in_first_run_experience_shown", true);
 */
-        prefs.put("useAutomationExtension", false);  // desactive la baniere: "chrome is controller by an automated test software"
+            prefs.put("useAutomationExtension", false);  // desactive la baniere: "chrome is controller by an automated test software"
 
-        // prefs.put("deleteDataPostSession", false);
+            // prefs.put("deleteDataPostSession", false);
 
 //        prefs.put("profile.default_content_settings.popups", 1);
 
-        options.setExperimentalOption("prefs", prefs);
+            options.setExperimentalOption("prefs", prefs);
 
-        try {
-            driver = new ChromeDriver(options);
+            try {
+                driver = new ChromeDriver(options);
+            } catch (Exception e) {
+                reporting.info("Error when using chrome driver: " + e.getMessage());
+                reporting.info("A new version of chrome has been installed, try to download the latest driver");
+                String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
+                ChromeDriverTools.setup(reporting, newChromeDriver);
+                driver = new ChromeDriver(options);
+                newDriverPathSaver.accept(newChromeDriver);
+            }
+            //Specifiying pageLoadTimeout and Implicit wait
+            driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(defaultTimeoutInSec, TimeUnit.SECONDS);
         }
-        catch(Exception e){
-            reporting.info("Error when using chrome driver: "+e.getMessage());
-            String newChromeDriver = new File(chromeSettings.getDriverPath()).getParent().concat(File.separator+"chromeDriver-"+currentChromeVersion+".zip");
-            ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, newChromeDriver);
-            ChromeDriverTools.setup(reporting, newChromeDriver);
-            driver = new ChromeDriver(options);
-            newDriverPathSaver.accept(newChromeDriver);
-        }
-        //Specifiying pageLoadTimeout and Implicit wait
-        driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
-        driver.manage().timeouts().implicitlyWait(defaultTimeoutInSec, TimeUnit.SECONDS);
     }
 
     protected void closeChrome(){

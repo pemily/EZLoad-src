@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.exporter;
 
 import com.google.api.services.sheets.v4.Sheets;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.ezload.service.exporter.ezPortfolio.MesOperations;
 import com.pascal.ezload.service.exporter.ezPortfolio.MonPortefeuille;
@@ -8,6 +9,7 @@ import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.StringUtils;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -20,7 +22,10 @@ public class EZPortfolioManager {
 
     public EZPortfolioManager(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
         Sheets service = GDriveConnection.getService(settings.getGdriveCredsFile());
-        sheets = new GDriveSheets(reporting, service, settings.getEzPortfolioId());
+        String url = settings.getEzPortfolioUrl();
+        String next = url.substring(SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX.length());
+        String ezPortfolioId = StringUtils.divide(next, '/')[0];
+        sheets = new GDriveSheets(reporting, service, ezPortfolioId);
         this.reporting = reporting;
     }
 

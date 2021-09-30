@@ -12,10 +12,10 @@ import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.model.EnumBRCourtier;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.ezload.service.util.StringValue;
 
 public class SettingsManager {
     private final String configFile;
+    public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
 
     private SettingsManager(String configFile){
         this.configFile = configFile;
@@ -106,13 +106,17 @@ public class SettingsManager {
         mainSettings.setEZLoad(ezLoad);
 
         MainSettings.ChromeSettings chromeSettings = new MainSettings.ChromeSettings();
-        chromeSettings.setUserDataDir(ezHome+File.separator+"chrome-datadir");
+        chromeSettings.setUserDataDir(ezHome+File.separator+"chrome"+File.separator+"data");
+        // chromeDriver is a file that does not exists, so next time it will be downloaded
+        chromeSettings.setDriverPath(ezHome+File.separator+"chrome"+File.separator+"driver"+File.separator+"chromedriver");
         chromeSettings.setDefaultTimeout(20);
         new File(chromeSettings.getUserDataDir()).mkdirs();
+        new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
         mainSettings.setChrome(chromeSettings);
 
         EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
         mainSettings.setEzPortfolio(ezPortfolioSettings);
+        ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
         ezPortfolioSettings.setGdriveCredsFile(ezHome+File.separator+"gdrive-access.json");
         output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile());
         output.write("{}".getBytes(StandardCharsets.UTF_8));

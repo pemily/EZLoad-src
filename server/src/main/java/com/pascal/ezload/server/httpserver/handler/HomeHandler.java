@@ -56,9 +56,6 @@ public class HomeHandler {
         SettingsManager.getInstance().saveConfigFile(mainSettings);
         return mainSettings.validate();
     }
-// export LATEST_CHROME_RELEASE_MAJOR=`google-chrome --version | sed -e "s/Google Chrome //" -e "s/\..*//"`
-// export LATEST_CHROME_RELEASE=$(wget -q https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$LATEST_CHROME_RELEASE_MAJOR -O -)
-//            - wget https://chromedriver.storage.googleapis.com/$LATEST_CHROME_RELEASE/chromedriver_linux64.zip -O /tmp/chromedriver.zip
 
     @GET
     @Path("/searchAccounts")

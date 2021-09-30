@@ -7,10 +7,10 @@ export class DynamicLogger {
         this.lastId = 1;
         this.idQueue.push(this.lastId);
         this.stopped = false;
+        this.openIcon = '<span class="toggler">+</span>';
+        this.closeIcon = '<span class="toggler">-</span>';    
     }
 
-    openIcon = '<span class="toggler">+</span>';
-    closeIcon = '<span class="toggler">-</span>';
 
     isStopped(){
         return this.stopped;
@@ -43,12 +43,12 @@ export class DynamicLogger {
         this.idQueue.push(this.lastId);
         $('#'+parentId).append("<li class='section'><div href='#'>"+elem+this.openIcon+"</div><ul class='submenu' id="+this.lastId+"></ul></li>");
         var a = $('#'+parentId).children("li").last().children("div").first();
-        this.show(a);
-
-        a.bind('click', function (e) {
-                            // e.preventDefault();
-                                this.openOrClose($(this));
-                            });
+        this.show(a);               
+        var self = this;
+        function handler(){
+            self.openOrClose(a);
+        } 
+        a.click(handler);
     }
 
 
@@ -63,7 +63,7 @@ export class DynamicLogger {
     }
 
     openOrClose(objDiv){
-            var leaveOpen = false;
+        var leaveOpen = false;
         if (leaveOpen === false) {
             this.closeAll(objDiv);
         }
