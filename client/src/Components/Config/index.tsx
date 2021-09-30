@@ -1,13 +1,12 @@
 import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
 import { Add, Trash } from 'grommet-icons';
-import {  saveSettings, savePassword, jsonCall, ezApi } from '../../ez-api/tools';
+import {  saveSettings, savePassword, jsonCall, ezApi, getChromeVersion } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
 import { Help } from '../Tools/Help';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
-var tools = require("../../tools.js");
 
 export interface ConfigProps {
   mainSettings: MainSettings;
@@ -79,33 +78,27 @@ export function Config(props: ConfigProps) {
                     {props.readOnly && 
                         (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                             Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}
-                <Heading level="5" >EZPortfolio</Heading>
+                    <Heading level="5" >EZPortfolio</Heading>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
-                            <ConfigTextField id="ezPortfolioId" label="Identifiant ezPortfolio" value={props.mainSettings?.ezPortfolio?.ezPortfolioId}
-                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.ezPortfolio}
+                            <ConfigTextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.mainSettings?.ezPortfolio?.ezPortfolioUrl}
+                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
                                 readOnly={props.readOnly}
-                                onChange={newValue  => props.mainSettingsStateSetter(
-                                { ...props.mainSettings,
-                                      ezPortfolio: { ...props.mainSettings.ezPortfolio, ezPortfolioId: newValue }
-                               })}/>
-                            <Help title="Comment obtenir son identifiant?">
-                                <Box border={{ color: 'brand', size: 'large' }} pad="medium">
-                                    <Text>Aller sur </Text><Anchor target="ezportfolio" href="https://docs.google.com"> Google Drive</Anchor>
-                                    Ouvrir le logiciel EZPortfolio et extraire de l'url la partie suivante (avec les XXX):
-                                    https://docs.google.com/spreadsheets/d/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/edit#gid=12315498                                    
-                                </Box>
-                            </Help>
+                                onChange={newValue  => 
+                                saveSettings({ ...props.mainSettings,
+                                      ezPortfolio: { ...props.mainSettings.ezPortfolio, ezPortfolioUrl: newValue }
+                               }, props.mainSettingsStateSetter)
+                               }/>
                         </Box>
 
                         <Box margin="none" pad="none" direction="row">
                             <ConfigTextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.mainSettings?.ezPortfolio?.gdriveCredsFile}
                                 errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.gdriveCredsFile}
                                 readOnly={props.readOnly}
-                                onChange={newValue  => props.mainSettingsStateSetter(
+                                onChange={newValue  => saveSettings(
                                     { ...props.mainSettings,
                                           ezPortfolio: { ...props.mainSettings.ezPortfolio, gdriveCredsFile: newValue }
-                                   })}/>
+                                   }, props.mainSettingsStateSetter)}/>
                            <Help title="Comment obtenir son fichier de sécurité?">
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
                                 <Markdown>{genSecurityFile(props.mainSettings?.ezPortfolio?.gdriveCredsFile)}</Markdown>
@@ -123,38 +116,6 @@ export function Config(props: ConfigProps) {
                                 { ...props.mainSettings,
                                       ezload: { ...props.mainSettings.ezload, downloadDir: newValue }
                                }, props.mainSettingsStateSetter)}/>
-                        <Box margin="none" pad="none" direction="row">
-                            <ConfigTextField id="chromeDriver" label="Fichier du driver chrome" value={props.mainSettings?.chrome?.driverPath }
-                                 isRequired={true}  errorMsg={props.mainSettings?.chrome?.field2ErrorMsg?.driverPath}
-                                 readOnly={props.readOnly}
-                                 onChange={newValue  => saveSettings(
-                                    { ...props.mainSettings,
-                                          chrome: { ...props.mainSettings.chrome, driverPath: newValue }
-                                   }, props.mainSettingsStateSetter)}/>
-                            <Help title="Comment obtenir le fichier de driver chrome?">
-                                <Box border={{ color: 'brand', size: 'large' }} pad="medium">
-                                    <Text weight="bold">Pour pouvoir télécharger les fichiers de votre courtier, EZLoad a besoin du driver de chrome</Text>
-                                    <Box pad="medium">
-                                        <Text>Vous trouverez dans le lien ci dessous le site pour le télécharger.</Text>
-                                        <Text>Il faudra sélectionner la version qui corresponde au chrome installé sur votre ordinateur.</Text>
-                                        <Text>Ensuite vous devez renseigner ce champ avec le chemin complet du fichier téléchargé</Text>
-                                        {
-                                        tools.getChromeVersion() === undefined ?
-                                            (
-                                                <Anchor target="chromedriver" href="https://chromedriver.chromium.org/downloads">Site de téléchargement</Anchor>
-                                            )
-                                            : (
-                                                <Box direction="column" pad="small" margin="small">
-                                                    <Text>Votre version de chrome est:</Text> <Text weight="bold">{tools.getChromeVersion().fullVersion}</Text>
-                                                    <Anchor target="chromedriver" href={"https://chromedriver.storage.googleapis.com/index.html?path="+tools.getChromeVersion().version}>Lien de téléchargement</Anchor>
-                                                    <Text size="small">(si plusieurs versions prendre la plus grande en dessous de "Parent Directory")</Text>
-                                                </Box>
-                                            )
-                                        }
-                                    </Box>
-                                </Box>
-                            </Help>
-                       </Box>
                     </Box>
                     <Box>
                         <Box direction="row" justify="start">
@@ -193,7 +154,7 @@ export function Config(props: ConfigProps) {
                                      readOnly={props.readOnly}
                                      errorMsg={account.field2ErrorMsg?.name}
                                      onChange={newValue => 
-                                         saveSettings(
+                                        saveSettings(
                                             { ...props.mainSettings,
                                                   bourseDirect: {
                                                       ...props.mainSettings.bourseDirect,
@@ -286,7 +247,7 @@ export function Config(props: ConfigProps) {
                                 <Box margin="small" pad="none"></Box>
                                 <Button
                                     disabled={props.readOnly} onClick={() =>
-                                        jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect"}))
+                                        jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect", chromeVersion: getChromeVersion()}))
                                         .then(process => props.followProcess(process)) // TODO QUAND C4EST FINIT RELOAD POUR VOIR LE RESULTAT
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>

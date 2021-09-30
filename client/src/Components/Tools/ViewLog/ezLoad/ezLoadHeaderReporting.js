@@ -44,11 +44,8 @@ export class DynamicLogger {
         $('#'+parentId).append("<li class='section'><div href='#'>"+elem+this.openIcon+"</div><ul class='submenu' id="+this.lastId+"></ul></li>");
         var a = $('#'+parentId).children("li").last().children("div").first();
         this.show(a);
-
-        a.bind('click', function (e) {
-                            // e.preventDefault();
-                                this.openOrClose($(this));
-                            });
+        var self = this;
+        a.bind('click', (e) => self.openOrClose($(this)));
     }
 
 

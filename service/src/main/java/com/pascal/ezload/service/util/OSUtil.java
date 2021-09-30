@@ -2,7 +2,16 @@ package com.pascal.ezload.service.util;
 
 public class OSUtil {
     public enum OS {
-        WINDOWS, LINUX, MAC, SOLARIS, OTHER
+        WINDOWS("win"), LINUX("nix"), MAC("mac"), SOLARIS("sol"), OTHER("undef");
+
+        private String name;
+        OS(String name){
+            this.name = name;
+        }
+
+        public String getName(){
+            return name;
+        }
     };
 
     private static OS os = null;

@@ -33,6 +33,11 @@ public class BaseSelenium {
         this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
 
         reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
+        if (!new File(chromeSettings.getDriverPath()).exists()) {
+            // if the driver does not exists, start to download it
+            String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
+            newDriverPathSaver.accept(newChromeDriver);
+        }
         ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath());
 
         //Creating an object of ChromeDriver
@@ -76,8 +81,8 @@ public class BaseSelenium {
         }
         catch(Exception e){
             reporting.info("Error when using chrome driver: "+e.getMessage());
-            String newChromeDriver = new File(chromeSettings.getDriverPath()).getParent().concat(File.separator+"chromeDriver-"+currentChromeVersion+".zip");
-            ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, newChromeDriver);
+            reporting.info("A new version of chrome has been installed, try to download the latest driver");
+            String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
             ChromeDriverTools.setup(reporting, newChromeDriver);
             driver = new ChromeDriver(options);
             newDriverPathSaver.accept(newChromeDriver);

@@ -5,7 +5,6 @@ import { valued } from '../../../ez-api/tools';
 
 export interface ConfigTextFieldProps {
   onChange: (newValue: string) => void;
-  validate?: (newValue: string) => string|null;
   value: string|undefined|null;
   id: string;
   label?: string;
@@ -24,7 +23,7 @@ export function ConfigTextField(props: ConfigTextFieldProps) {
       setValue(valued(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
     }, [props.value]);
     
-    const onChange = useCallback((event) => {
+    const onChangeLocal = useCallback((event) => {
                          const { value: newValue } = event.target;
                          setValue(newValue);
                        }, []);
@@ -38,7 +37,7 @@ export function ConfigTextField(props: ConfigTextFieldProps) {
                            value={ value === null ? undefined : value}
                            placeholder={props.isRequired ? "Champ Obligatoire" : ""}
                            type={props.isPassword ? "password" : "text"}
-                           onChange={onChange}
+                           onChange={onChangeLocal}
                            onBlur={evt => props.onChange(evt.target.value)}
                            disabled={props.readOnly}/>
                </FormField>

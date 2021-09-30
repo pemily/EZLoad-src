@@ -4,7 +4,7 @@ import { AllCourtiers } from '../Courtiers/AllCourtiers';
 import { Config } from '../Config';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
-import { ezApi, jsonCall, valued } from '../../ez-api/tools';
+import { ezApi, jsonCall } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
@@ -25,8 +25,7 @@ export function App(){
         else setProcessLaunchFail(true);
     }
 
-    useEffect(() => {
-        // will be executed on the load
+    function reloadAllData(){
         console.log("Loading Data...");
         jsonCall(ezApi.home.getMainData())
            .then(r =>  {            
@@ -48,6 +47,11 @@ export function App(){
         .catch((error) => {
             console.log("Error while loading BourseDirect Username", error);
         });
+    }
+
+    useEffect(() => {
+        // will be executed on the load
+        reloadAllData();
     }, []);
 
 
@@ -73,7 +77,7 @@ export function App(){
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             <ViewLog 
                                     ezProcess={lastProcess}                                     
-                                    processFinished={() => {setProcessRunning(false)}}/>
+                                    processFinished={() => {reloadAllData()}}/>
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration">

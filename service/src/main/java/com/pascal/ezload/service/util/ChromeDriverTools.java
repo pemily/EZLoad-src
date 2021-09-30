@@ -1,12 +1,9 @@
 package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.sources.Reporting;
-import com.sun.tools.javac.platform.PlatformUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Locale;
 
 public class ChromeDriverTools {
@@ -27,17 +24,22 @@ public class ChromeDriverTools {
         }
     }
 
-    public static void downloadChromeDriver(Reporting reporting, String chromeVersion, String outFile) throws IOException {
+    public static String downloadChromeDriver(Reporting reporting, String chromeVersion, String currentChromeDriverPath) throws IOException {
+        String newDir = new File(currentChromeDriverPath).getParent().concat(File.separator+chromeVersion);
+        new File(newDir).mkdirs();
+        String newChromeDriver = newDir+File.separator+"chromeDriver.zip";
+
         try(Reporting rep = reporting.pushSection("Download Chrome Driver for version "+chromeVersion)) {
             String majorVersion = StringUtils.divide(chromeVersion, '.')[0];
             reporting.info("Major Version: "+majorVersion);
             String version = HttpUtil.urlContent("https://chromedriver.storage.googleapis.com/LATEST_RELEASE_" + majorVersion);
             reporting.info("Latest Release: "+version);
             reporting.info("OS is: "+getOsName());
-            reporting.info("Downloading into: "+outFile);
+            reporting.info("Downloading into: "+newChromeDriver);
             HttpUtil.download("https://chromedriver.storage.googleapis.com/" + version + "/chromedriver_" + getOsName() + ".zip",
-                    new File(outFile));
+                    new File(newChromeDriver));
         }
+        return newChromeDriver;
     }
 
     private static String getOsName(){

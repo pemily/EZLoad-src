@@ -15,7 +15,6 @@ chrome:
 ezPortfolio:
   gdriveCredsFile: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\credentials\\\
     creds.json"
-  ezPortfolioId: "1zuMHTc-3CpuThgHca7NQGDtuD9tEDaO0O1BNuhq2jgA"
 bientotRentier:
   logsDir: "P:\\Pascal\\Revenu et Dividendes\\EZLoad\\logs"
   passPhrase: "dPrjTOZjnDDTaFHXFm7JC+H54QPA11LKBk7REqUTmrc="

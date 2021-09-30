@@ -1,22 +1,23 @@
 package com.pascal.ezload.service.exporter;
 
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.FileValue;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.service.util.HttpValue;
 
 public class EZPortfolioSettings extends Checkable {
 
-    public enum Field {gdriveCredsFile, ezPortfolioId}
+    public enum Field {gdriveCredsFile, ezPortfolioUrl}
 
     private String gdriveCredsFile;
-    private String ezPortfolioId;
+    private String ezPortfolioUrl;
 
-    public String getEzPortfolioId() {
-        return ezPortfolioId;
+    public String getEzPortfolioUrl() {
+        return ezPortfolioUrl;
     }
 
-    public void setEzPortfolioId(String ezPortfolioId) {
-        this.ezPortfolioId = ezPortfolioId == null ? null : ezPortfolioId.trim();
+    public void setEzPortfolioUrl(String ezPortfolioUrl) {
+        this.ezPortfolioUrl = ezPortfolioUrl == null ? null : ezPortfolioUrl.trim();
     }
 
     public String getGdriveCredsFile() {
@@ -30,7 +31,7 @@ public class EZPortfolioSettings extends Checkable {
     @Override
     public void validate() {
         new FileValue(true).validate(this, Field.gdriveCredsFile.name(), gdriveCredsFile);
-        new StringValue(true).validate(this, Field.ezPortfolioId.name(), ezPortfolioId);
+        new HttpValue(true, SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX).validate(this, Field.ezPortfolioUrl.name(), ezPortfolioUrl);
     }
 
 }

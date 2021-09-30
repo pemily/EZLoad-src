@@ -48,7 +48,8 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
 
 
 export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){    
-    jsonCall(ezApi.home.saveSettings(settings))
+  console.log("Saving settings", settings);
+  jsonCall(ezApi.home.saveSettings(settings))
     .then(r => updModel(r))
     .catch(e => console.log("Save Settings Error: ", e));
 }
@@ -61,4 +62,14 @@ export function savePassword(courtier: 'BourseDirect', username: string|undefine
 }
 
 
- 
+export function getChromeVersion() : string {
+  let pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);
+  if (pieces == null || pieces.length !== 5) {
+      return "";
+  }
+  let pieces2 = pieces.map(piece => parseInt(piece, 10));
+  return pieces2[1]+"."+ pieces2[2]+"."+ pieces2[3]+ "."+ pieces2[4];  
+}
+
+
+
