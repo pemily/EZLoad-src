@@ -30,9 +30,10 @@ export class DynamicLogger {
 
     closeAll(objDiv) {
         var items = objDiv.parent().siblings().find('ul.submenu');
+        var self = this;
         items.each(function () {
             var ul = $(this).slideUp('slow').parent();
-            ul.find('span.toggler').replaceWith(this.openIcon);
+            ul.find('span.toggler').replaceWith(self.openIcon);
             ul.find('a').first().removeClass('openedItem');
         });
     }
@@ -63,7 +64,7 @@ export class DynamicLogger {
     }
 
     openOrClose(objDiv){
-        var leaveOpen = false;
+        var leaveOpen = false; // set it to true to not close all others div when clicking
         if (leaveOpen === false) {
             this.closeAll(objDiv);
         }
