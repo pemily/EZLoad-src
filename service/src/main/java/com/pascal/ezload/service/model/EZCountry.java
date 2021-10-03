@@ -1,10 +1,10 @@
 package com.pascal.ezload.service.model;
 
-public class BRCountry {
+public class EZCountry {
     private String code;
     private String name;
 
-    public BRCountry(String code, String name) {
+    public EZCountry(String code, String name) {
         this.code = code;
         this.name = name;
     }

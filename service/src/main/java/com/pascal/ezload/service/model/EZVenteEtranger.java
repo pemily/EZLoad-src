@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.model;
 
-public class BRVenteEtranger extends BRVente {
+public class EZVenteEtranger extends EZVente {
 
     private String changeRate;
     private String coursUSD;
@@ -22,8 +22,8 @@ public class BRVenteEtranger extends BRVente {
     }
 
     @Override
-    public BROperationType getOperationType() {
-        return BROperationType.VENTE_TITRES;
+    public EZOperationType getOperationType() {
+        return EZOperationType.VENTE_TITRES;
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
-import com.pascal.ezload.service.model.EnumBRCourtier;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 
@@ -49,7 +49,7 @@ public class SettingsManager {
         return new AuthManager(mainSettings.getEZLoad().getPassPhrase(), mainSettings.getEZLoad().getCourtierCredsFile());
     }
 
-    public static String getDownloadDir(MainSettings mainSettings, EnumBRCourtier brCourtier){
+    public static String getDownloadDir(MainSettings mainSettings, EnumEZCourtier brCourtier){
         return mainSettings.getEZLoad().getDownloadDir()+ File.separator+brCourtier.getDirName();
     }
 

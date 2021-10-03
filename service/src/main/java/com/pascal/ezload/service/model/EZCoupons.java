@@ -1,8 +1,8 @@
 package com.pascal.ezload.service.model;
 
-public class BRCoupons extends BROperation implements IOperationWithAction {
+public class EZCoupons extends EZOperation implements IOperationWithAction {
 
-    private BRAction action;
+    private EZAction action;
     private int number;
     private String prixUnitaireBrut;
     private String commission;
@@ -68,16 +68,16 @@ public class BRCoupons extends BROperation implements IOperationWithAction {
     }
 
     @Override
-    public BROperationType getOperationType() {
-        return BROperationType.DIVIDENDE_VERSE;
+    public EZOperationType getOperationType() {
+        return EZOperationType.DIVIDENDE_VERSE;
     }
 
     @Override
-    public BRAction getAction() {
+    public EZAction getAction() {
         return action;
     }
 
-    public void setAction(BRAction action){
+    public void setAction(EZAction action){
         this.action = action;
     }
 }

@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.util;
 
-import com.pascal.ezload.service.model.BRDate;
+import com.pascal.ezload.service.model.EZDate;
 
 public class Month {
     private int month;
@@ -11,7 +11,7 @@ public class Month {
         this.month = month;
     }
 
-    public Month(BRDate date){
+    public Month(EZDate date){
         this.year = date.getYear();
         this.month = date.getMonth();
     }

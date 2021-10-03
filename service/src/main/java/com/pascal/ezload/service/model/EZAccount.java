@@ -1,11 +1,11 @@
 package com.pascal.ezload.service.model;
 
-public class BRAccount {
+public class EZAccount {
     private String accountNumber;
     private String accountType;
     private String ownerName;
     private String ownerAdress;
-    private BRDevise devise;
+    private EZDevise devise;
 
     public String getAccountNumber() {
         return accountNumber;
@@ -31,11 +31,11 @@ public class BRAccount {
         this.ownerAdress = ownerAdress;
     }
 
-    public BRDevise getDevise() {
+    public EZDevise getDevise() {
         return devise;
     }
 
-    public void setDevise(BRDevise devise) {
+    public void setDevise(EZDevise devise) {
         this.devise = devise;
     }
 

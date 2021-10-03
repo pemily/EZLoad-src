@@ -1,7 +1,7 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform.model;
 
 
-import com.pascal.ezload.service.model.BRDate;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.parsers.bourseDirect.Operation;
 
 import java.util.ArrayList;
@@ -11,11 +11,11 @@ public class BourseDirectModel {
     private String accountType;
     private String accountOwnerName;
     private String address;
-    private BRDate dateAvisOperation;
+    private EZDate dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
     private ArrayList<Operation> operations;
-    private ArrayList<BRDate> dates;
+    private ArrayList<EZDate> dates;
     private ArrayList<String> amounts;
 
     public String getAccountNumber() {
@@ -50,11 +50,11 @@ public class BourseDirectModel {
         this.address = address;
     }
 
-    public BRDate getDateAvisOperation() {
+    public EZDate getDateAvisOperation() {
         return dateAvisOperation;
     }
 
-    public void setDateAvisOperation(BRDate dateAvisOperation) {
+    public void setDateAvisOperation(EZDate dateAvisOperation) {
         this.dateAvisOperation = dateAvisOperation;
     }
 
@@ -82,11 +82,11 @@ public class BourseDirectModel {
         this.operations = operations;
     }
 
-    public ArrayList<BRDate> getDates() {
+    public ArrayList<EZDate> getDates() {
         return dates;
     }
 
-    public void setDates(ArrayList<BRDate> dates) {
+    public void setDates(ArrayList<EZDate> dates) {
         this.dates = dates;
     }
 

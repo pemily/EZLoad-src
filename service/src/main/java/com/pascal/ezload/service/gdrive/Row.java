@@ -5,7 +5,7 @@ import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 import java.util.Arrays;
 import java.util.List;
 
-import com.pascal.ezload.service.model.BRDate;
+import com.pascal.ezload.service.model.EZDate;
 
 public class Row {
 
@@ -20,10 +20,10 @@ public class Row {
     }
 
 
-    public BRDate valueDate(int colIndex) {
+    public EZDate valueDate(int colIndex) {
         String date = valueStr(colIndex);
         if (date == null) return null;
-        return BRDate.parseFrenchDate(date, '/');
+        return EZDate.parseFrenchDate(date, '/');
     }
 
     public List<Object> getValues() {
@@ -42,7 +42,7 @@ public class Row {
         values.set(colIndex, s);
     }
 
-    public void setValue(int colIndex, BRDate d) {
+    public void setValue(int colIndex, EZDate d) {
         values.set(colIndex, d.toEzPortoflioDate());
     }
 }

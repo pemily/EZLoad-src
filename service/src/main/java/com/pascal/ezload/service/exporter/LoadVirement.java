@@ -3,8 +3,8 @@ package com.pascal.ezload.service.exporter;
 import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
 import com.pascal.ezload.service.exporter.ezPortfolio.MesOperations;
 import com.pascal.ezload.service.exporter.ezPortfolio.MonPortefeuille;
-import com.pascal.ezload.service.model.BRRetraitFonds;
-import com.pascal.ezload.service.model.BRVersementFonds;
+import com.pascal.ezload.service.model.EZRetraitFonds;
+import com.pascal.ezload.service.model.EZVersementFonds;
 import com.pascal.ezload.service.sources.Reporting;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
@@ -16,7 +16,7 @@ public class LoadVirement {
         this.reporting = reporting;
     }
 
-    public void load(EZPortfolio ezPortfolio, BRVersementFonds op){
+    public void load(EZPortfolio ezPortfolio, EZVersementFonds op){
         MesOperations mesOperations = ezPortfolio.getMesOperations();
         if (!mesOperations.isOperationsExists(op)){
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
@@ -28,7 +28,7 @@ public class LoadVirement {
         }
     }
 
-    public void load(EZPortfolio ezPortfolio, BRRetraitFonds op){
+    public void load(EZPortfolio ezPortfolio, EZRetraitFonds op){
         MesOperations mesOperations = ezPortfolio.getMesOperations();
         if (!mesOperations.isOperationsExists(op)){
             reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());

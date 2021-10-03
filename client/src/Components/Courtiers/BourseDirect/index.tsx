@@ -1,13 +1,26 @@
-import { Box, Anchor } from "grommet";
+import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
+import { Download, Trash } from 'grommet-icons';
+import { MainSettings, AuthInfo, EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
+import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 
+export interface BourseDirectProps {
+    mainSettings: MainSettings;
+    bourseDirectAuthInfo: AuthInfo|undefined;
+    readOnly: boolean;
+    followProcess: (process: EzProcess|undefined) => void;
+}      
 
-export function BourseDirect(){
+export function BourseDirect(props: BourseDirectProps){
     return (
-        <Box margin="small" justify="stretch">
+        <Box margin="small" >
           <Anchor target="BourseDirect" href="http://www.boursedirect.com" label="BourseDirect" />
-
-          Actions:
-            Download latest
+            
+          <Button alignSelf="start" margin="medium"
+                disabled={props.readOnly} onClick={() => 
+                    jsonCall(ezApi.engine.downloadAndAnalyze({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
+                    .then(process => props.followProcess(process))
+                }
+                size="small" icon={<Download size='small'/>} label="Lancer la récupérations des opérations et l'analyse"/>            
         </Box>
     );
 }

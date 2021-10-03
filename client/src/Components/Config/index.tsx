@@ -1,6 +1,6 @@
 import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
 import { Add, Trash } from 'grommet-icons';
-import {  saveSettings, savePassword, jsonCall, ezApi, getChromeVersion } from '../../ez-api/tools';
+import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
 import { Help } from '../Tools/Help';
@@ -140,7 +140,7 @@ export function Config(props: ConfigProps) {
                                 <TableHeader>
                                     <TableRow>
                                         <TableCell scope="row" border="bottom">Nom du compte</TableCell>
-                                        <TableCell scope="row" border="bottom">Numéro du compte (XXXXXXXXXXXXXXXXEUR)</TableCell>
+                                        <TableCell scope="row" border="bottom">Numéro du compte</TableCell>
                                         <TableCell scope="row" border="bottom">Actif</TableCell>
                                         <TableCell scope="row" border="bottom"></TableCell>
                                     </TableRow>                                        
@@ -248,7 +248,7 @@ export function Config(props: ConfigProps) {
                                 <Button
                                     disabled={props.readOnly} onClick={() =>
                                         jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect", chromeVersion: getChromeVersion()}))
-                                        .then(process => props.followProcess(process)) // TODO QUAND C4EST FINIT RELOAD POUR VOIR LE RESULTAT
+                                        .then(process => props.followProcess(process))
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>

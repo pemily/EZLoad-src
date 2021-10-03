@@ -5,13 +5,13 @@ import java.util.List;
 
 public class BourseDirectSettings  {
 
-    private List<BourseDirectBRAccountDeclaration> accounts = new LinkedList<>();
+    private List<BourseDirectEZAccountDeclaration> accounts = new LinkedList<>();
 
-    public List<BourseDirectBRAccountDeclaration> getAccounts() {
+    public List<BourseDirectEZAccountDeclaration> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<BourseDirectBRAccountDeclaration> accounts) {
+    public void setAccounts(List<BourseDirectEZAccountDeclaration> accounts) {
         this.accounts = accounts;
     }
 

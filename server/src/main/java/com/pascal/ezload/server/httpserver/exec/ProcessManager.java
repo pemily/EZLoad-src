@@ -3,9 +3,6 @@ package com.pascal.ezload.server.httpserver.exec;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.util.Tail;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import jakarta.ws.rs.ext.Provider;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

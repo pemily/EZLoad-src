@@ -12,11 +12,11 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "€",
+      "symbol": "ï¿½",
       "code": "EUR"
     }
   },
-  "BRAccountDeclaration": {
+  "EZAccountDeclaration": {
     "name": "Pascal CTO"
   },
   "operations": [
@@ -35,7 +35,7 @@
           },
           "googleFinanceCode": "EPA",
           "currency": {
-            "symbol": "€",
+            "symbol": "ï¿½",
             "code": "EUR"
           }
         }
@@ -61,11 +61,11 @@
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "€",
+          "symbol": "ï¿½",
           "code": "EUR"
         }
       },
-      "BRAccountDeclaration": {
+      "EZAccountDeclaration": {
         "name": "Pascal CTO"
       }
     },
@@ -84,7 +84,7 @@
           },
           "googleFinanceCode": "EPA",
           "currency": {
-            "symbol": "€",
+            "symbol": "ï¿½",
             "code": "EUR"
           }
         }
@@ -105,11 +105,11 @@
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "€",
+          "symbol": "ï¿½",
           "code": "EUR"
         }
       },
-      "BRAccountDeclaration": {
+      "EZAccountDeclaration": {
         "name": "Pascal CTO"
       }
     },
@@ -128,7 +128,7 @@
           },
           "googleFinanceCode": "EPA",
           "currency": {
-            "symbol": "€",
+            "symbol": "ï¿½",
             "code": "EUR"
           }
         }
@@ -148,11 +148,11 @@
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "€",
+          "symbol": "ï¿½",
           "code": "EUR"
         }
       },
-      "BRAccountDeclaration": {
+      "EZAccountDeclaration": {
         "name": "Pascal CTO"
       }
     }

@@ -1,7 +1,7 @@
 package com.pascal.ezload.service.util;
 
 import com.google.api.client.json.gson.GsonFactory;
-import com.pascal.ezload.service.model.BRAction;
+import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.*;
@@ -21,10 +21,10 @@ public class FinanceTools {
         return instance;
     }
 
-    private Map<String, BRAction> actionCode2BRAction = new HashMap<>();
+    private Map<String, EZAction> actionCode2BRAction = new HashMap<>();
 
 
-    public BRAction get(Reporting reporting, String actionCode){
+    public EZAction get(Reporting reporting, String actionCode){
         return actionCode2BRAction.computeIfAbsent(actionCode, code -> {
             try {
                 return searchActionFromBourseDirect(reporting, code);
@@ -34,7 +34,7 @@ public class FinanceTools {
         });
     }
 
-    public BRAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
+    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
         URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
@@ -49,7 +49,7 @@ public class FinanceTools {
                 if (data.size() > 1) {
                     reporting.info("More than 1 data found for " + actionCode + ". First one is selected. check: "+url);
                 }
-                BRAction action = new BRAction();
+                EZAction action = new EZAction();
                 Map<String, Object> actionData = data.get(0);
                 action.setName((String) actionData.get("name")); // WP CAREY INC
                 action.setTicker((String) actionData.get("ticker")); // WPC
@@ -70,7 +70,7 @@ public class FinanceTools {
         }
     }
 
-    public BRAction searchActionFromYahooFinance(Reporting reporting, String actionCode) throws IOException{
+    public EZAction searchActionFromYahooFinance(Reporting reporting, String actionCode) throws IOException{
         URL url = new URL("https://query1.finance.yahoo.com/v1/finance/search?q="+actionCode+"&lang=en-US&region=US&quotesCount=6&newsCount=2&listsCount=2&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&enableResearchReports=true&researchReportsCount=2");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
@@ -83,7 +83,7 @@ public class FinanceTools {
             if (quotes.size() > 1) {
                 reporting.info("More than 1 data found for " + actionCode + " First one is selected. check: "+url);
             }
-            BRAction action = new BRAction();
+            EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
             action.setName((String) actionData.get("longname")); // WP CAREY INC
             action.setTicker((String) actionData.get("symbol")); // WPC
@@ -97,7 +97,7 @@ public class FinanceTools {
 
     }
 
-    public BRAction searchActionFromMarketstack(Reporting reporting, String actionTicker) throws IOException{
+    public EZAction searchActionFromMarketstack(Reporting reporting, String actionTicker) throws IOException{
         URL url = new URL("https://marketstack.com/stock_api.php?offset=0&exchange=&search="+actionTicker);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
@@ -110,7 +110,7 @@ public class FinanceTools {
             if (quotes.size() > 1) {
                 reporting.info("More than 1 data found for " + actionTicker + " First one is selected. check: "+url);
             }
-            BRAction action = new BRAction();
+            EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
             action.setName((String) actionData.get("name")); // WP CAREY INC
             action.setTicker((String) actionData.get("symbol")); // WPC

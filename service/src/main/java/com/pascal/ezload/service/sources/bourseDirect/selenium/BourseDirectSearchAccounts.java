@@ -2,9 +2,8 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.StringUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
     }
 
     // the devise and owner address will not be filled
-    public List<BourseDirectBRAccountDeclaration> extract(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
+    public List<BourseDirectEZAccountDeclaration> extract(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
         try {
             login(currentChromeVersion, newDriverPathSaver);
             goToAvisOperes();
@@ -31,7 +30,7 @@ public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
                         String text = option.getText();
                         String tmp[] = StringUtils.divide(text, '(');
                         if (tmp.length == 2) {
-                            BourseDirectBRAccountDeclaration account = new BourseDirectBRAccountDeclaration();
+                            BourseDirectEZAccountDeclaration account = new BourseDirectEZAccountDeclaration();
                             String accountType = tmp[1].trim();
                             String tmp2[] = StringUtils.divide(tmp[0], " ");
                             if (tmp2.length == 2) {
@@ -39,6 +38,7 @@ public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
                                 if (type.length > 0) {
                                     account.setNumber(tmp2[0].trim());
                                     account.setName(tmp2[1].trim() + " " + type[0]);
+                                    account.setActive(true);
                                     return account;
                                 }
                             }

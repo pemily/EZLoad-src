@@ -1,16 +1,16 @@
 package com.pascal.ezload.service.model;
 
-public class BRMarketPlace {
+public class EZMarketPlace {
 
     private String stockExchange;
     private String city;
     private String mic;
     private String acronym;
-    private BRCountry country;
+    private EZCountry country;
     private String googleFinanceCode;
-    private BRDevise currency;
+    private EZDevise currency;
 
-    public BRMarketPlace(String stockExchange, String city, String mic, String acronym, String googleFinanceCode, BRCountry country, BRDevise currency) {
+    public EZMarketPlace(String stockExchange, String city, String mic, String acronym, String googleFinanceCode, EZCountry country, EZDevise currency) {
         this.stockExchange = stockExchange;
         this.city = city;
         this.mic = mic;
@@ -36,11 +36,11 @@ public class BRMarketPlace {
         return acronym;
     }
 
-    public BRCountry getCountry() {
+    public EZCountry getCountry() {
         return country;
     }
 
-    public BRDevise getCurrency() {
+    public EZDevise getCurrency() {
         return currency;
     }
 

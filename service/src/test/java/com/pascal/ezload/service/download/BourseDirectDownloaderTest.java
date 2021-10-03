@@ -1,7 +1,7 @@
 package com.pascal.ezload.service.download;
 
 import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.util.LoggerReporting;
@@ -24,11 +24,11 @@ public class BourseDirectDownloaderTest {
     public void getAccountFromPdfFilePathTest(){
         MainSettings mainSettings = new MainSettings();
         BourseDirectSettings bourseDircectSettings = new BourseDirectSettings();
-        BourseDirectBRAccountDeclaration aaaa = new BourseDirectBRAccountDeclaration();
+        BourseDirectEZAccountDeclaration aaaa = new BourseDirectEZAccountDeclaration();
         aaaa.setName("AAAA");
-        BourseDirectBRAccountDeclaration aaa = new BourseDirectBRAccountDeclaration();
+        BourseDirectEZAccountDeclaration aaa = new BourseDirectEZAccountDeclaration();
         aaa.setName("AAA");
-        BourseDirectBRAccountDeclaration aaaaa = new BourseDirectBRAccountDeclaration();
+        BourseDirectEZAccountDeclaration aaaaa = new BourseDirectEZAccountDeclaration();
         aaaaa.setName("AAAAA");
         bourseDircectSettings.setAccounts(Arrays.asList(aaaa,aaa,aaaaa));
         mainSettings.setBourseDirect(bourseDircectSettings);

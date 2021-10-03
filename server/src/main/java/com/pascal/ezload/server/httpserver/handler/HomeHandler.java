@@ -6,11 +6,11 @@ import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EnumBRCourtier;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -60,9 +60,9 @@ public class HomeHandler {
     @GET
     @Path("/searchAccounts")
     @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumBRCourtier courtier,
+    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumEZCourtier courtier,
                                     @NotNull @QueryParam("chromeVersion") String chromeVersion) throws Exception {
-        if (courtier != EnumBRCourtier.BourseDirect) {
+        if (courtier != EnumEZCourtier.BourseDirect) {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
         else {
@@ -71,18 +71,19 @@ public class HomeHandler {
                     "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
                     ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"),
                 (processLogger) -> {
-                    List<BourseDirectBRAccountDeclaration> accountsExtracted =
-                            new BourseDirectSearchAccounts(mainSettings, processLogger.getReporting()).extract(chromeVersion, SettingsManager.saveNewChromeDriver());
+                    Reporting reporting = processLogger.getReporting();
+                    List<BourseDirectEZAccountDeclaration> accountsExtracted =
+                            new BourseDirectSearchAccounts(mainSettings, reporting).extract(chromeVersion, SettingsManager.saveNewChromeDriver());
                     // copy the accounts into the main settings
-                    List<BourseDirectBRAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
-                    processLogger.getReporting().info(accountsDefined.size()+" Compte(s) trouvé(s)");
+                    List<BourseDirectEZAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
+                    reporting.info(accountsDefined.size()+" Compte(s) trouvé(s)");
                     accountsExtracted.stream()
                             .filter(acc ->
                                     accountsDefined
                                             .stream()
                                             .noneMatch(accDefined -> accDefined.getNumber().equals(acc.getNumber())))
                             .forEach(newAccount -> {
-                                        processLogger.getReporting().info("Ajout du compte: "+newAccount.getNumber()+" de "+newAccount.getName());
+                                        reporting.info("Ajout du compte: "+newAccount.getNumber()+" de "+newAccount.getName());
                                         mainSettings.getBourseDirect().getAccounts().add(newAccount);
                                     });
                     SettingsManager.getInstance().saveConfigFile(mainSettings);

@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab } from "grommet";
-import { AllCourtiers } from '../Courtiers/AllCourtiers';
+import { Box, Header, Heading, Tabs, Tab, Button, Anchor } from "grommet";
+import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert } from 'grommet-icons';
+import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
-import { ezApi, jsonCall } from '../../ez-api/tools';
+import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
+    const OPERATIONS_TAB_INDEX = 1;
+    const EXECUTION_TAB_INDEX = 2;
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
@@ -16,13 +19,13 @@ export function App(){
     const [processRunning, setProcessRunning] = useState<boolean>(false);
  
     const followProcess = (process: EzProcess|undefined) => {
-        if (process) {            
+        if (process) {   
             setProcessLaunchFail(false);
             setLastProcess(process);
             setProcessRunning(true);
-            setActiveIndex(1); //switch to the execution tab
         }
         else setProcessLaunchFail(true);
+        setActiveIndex(EXECUTION_TAB_INDEX); //switch to the execution tab
     }
 
     function reloadAllData(){
@@ -63,24 +66,41 @@ export function App(){
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             <Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
-                    <Tab title="Actions">
+                    <Tab title="Actions" icon={<Command size='small'/>}>
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
-                        <AllCourtiers/>
-                            <p>Analyzer
-                            generate report
-                        EZPortfolio
-                            Load
-                            </p>
+                            {(mainSettings === undefined || mainSettings == null) && (
+                                <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
+                            )}            
+                            {mainSettings &&
+                            (<>
+                                <Box margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
+                                    <Heading level="4">Courtiers</Heading>
+                                    <BourseDirect mainSettings={mainSettings}
+                                                followProcess={followProcess}
+                                                bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
+                                                readOnly={processRunning}/>                                
+                                </Box>                        
+                                <Anchor label="Vérifier les opérations et Corriger" margin="medium" onClick={() => setActiveIndex(OPERATIONS_TAB_INDEX)}  icon={<UserExpert size="medium" />}/>
+                                <Button alignSelf="start" margin="medium" disabled={processRunning} onClick={() =>
+console.log("TODO")
+                                    }
+                                    size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>       
+                            </>)}
                         </Box>
                     </Tab>
-                    <Tab title="Execution">
+                    <Tab title="Operations" icon={<DocumentStore size='small'/>}>
+                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                           
+                        </Box>
+                    </Tab>                       
+                    <Tab title="Execution" icon={<Clipboard size='small'/>}>
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             <ViewLog 
                                     ezProcess={lastProcess}                                     
                                     processFinished={() => {reloadAllData()}}/>
                         </Box>
                     </Tab>                    
-                    <Tab title="Configuration">
+                    <Tab title="Configuration" icon={<Configure size='small'/>}>
                         <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
                             {mainSettings && (
                                 <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}

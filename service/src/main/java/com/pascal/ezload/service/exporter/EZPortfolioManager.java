@@ -21,7 +21,14 @@ public class EZPortfolioManager {
     private GDriveSheets sheets;
 
     public EZPortfolioManager(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
-        Sheets service = GDriveConnection.getService(settings.getGdriveCredsFile());
+        Sheets service;
+        try {
+            service = GDriveConnection.getService(settings.getGdriveCredsFile());
+        }
+        catch(Exception e){
+            reporting.error("Impossible de se connecter à Google Drive. Vérifiez votre fichier de sécurité Google Drive");
+            throw e;
+        }
         String url = settings.getEzPortfolioUrl();
         String next = url.substring(SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX.length());
         String ezPortfolioId = StringUtils.divide(next, '/')[0];
@@ -56,7 +63,7 @@ public class EZPortfolioManager {
         // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
 
         sheets.batchUpdate(
-                new SheetValues("MesOperations!A"+firstFreeRow+":K", operations.getNewOperations()),
+                new SheetValues("MesOperations!A"+firstFreeRow+":", operations.getNewOperations()),
                 ezPortfolio.getMonPortefeuille().getSheetValues());
 
         reporting.info("Save done!");

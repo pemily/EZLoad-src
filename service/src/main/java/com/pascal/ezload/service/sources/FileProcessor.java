@@ -1,7 +1,5 @@
 package com.pascal.ezload.service.sources;
 
-import com.pascal.ezload.service.model.BRModel;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +23,7 @@ public class FileProcessor {
         this.fileFiter = fileFiter;
     }
 
-    public List<BRModel> forEachFiles(Function<String, BRModel> processFile) throws IOException {
+    public <FileResult> List<FileResult> forEachFiles(Function<String, FileResult> processFile) throws IOException {
         try(Stream<Path> stream = Files.walk(Paths.get(rootDirectory), 5)){
             return stream
                     .filter(Files::isRegularFile)

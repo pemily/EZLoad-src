@@ -1,22 +1,22 @@
 package com.pascal.ezload.service.model;
 
 
-public abstract class BROperation {
+public abstract class EZOperation {
 
 
-    private BRDate date;
+    private EZDate date;
     private String amount;
     private String description;
-    private EnumBRCompteType compteType;
-    private EnumBRCourtier courtier;
-    private BRAccount account;
-    private com.pascal.ezload.service.model.BRAccountDeclaration BRAccountDeclaration;
+    private EnumEZCompteType compteType;
+    private EnumEZCourtier courtier;
+    private EZAccount account;
+    private EZAccountDeclaration EZAccountDeclaration;
 
-    public BRDate getDate() {
+    public EZDate getDate() {
         return date;
     }
 
-    public void setDate(BRDate date) {
+    public void setDate(EZDate date) {
         this.date = date;
     }
 
@@ -36,43 +36,43 @@ public abstract class BROperation {
         this.description = description;
     }
 
-    public abstract BROperationType getOperationType();
+    public abstract EZOperationType getOperationType();
 
-    public EnumBRCompteType getCompteType() {
+    public EnumEZCompteType getCompteType() {
         return compteType;
     }
 
-    public void setCompteType(EnumBRCompteType compteType) {
+    public void setCompteType(EnumEZCompteType compteType) {
         this.compteType = compteType;
     }
 
-    public EnumBRCourtier getCourtier() {
+    public EnumEZCourtier getCourtier() {
         return courtier;
     }
 
-    public void setCourtier(EnumBRCourtier courtier) {
+    public void setCourtier(EnumEZCourtier courtier) {
         this.courtier = courtier;
     }
 
-    public BRAccount getAccount() {
+    public EZAccount getAccount() {
         return account;
     }
 
-    public void setAccount(BRAccount account) {
+    public void setAccount(EZAccount account) {
         this.account = account;
     }
 
-    public com.pascal.ezload.service.model.BRAccountDeclaration getAccountDeclaration() {
-        return BRAccountDeclaration;
+    public EZAccountDeclaration getAccountDeclaration() {
+        return EZAccountDeclaration;
     }
 
-    public void setAccountDeclaration(com.pascal.ezload.service.model.BRAccountDeclaration BRAccountDeclaration) {
-        this.BRAccountDeclaration = BRAccountDeclaration;
+    public void setAccountDeclaration(EZAccountDeclaration EZAccountDeclaration) {
+        this.EZAccountDeclaration = EZAccountDeclaration;
     }
 
     @Override
     public String toString() {
-        return "BROperation{" +
+        return "EZOperation{" +
                 "date='" + date + '\'' +
                 ", amount='" + amount + '\'' +
                 ", description='" + description + '\'' +

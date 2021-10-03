@@ -1,9 +1,9 @@
 package com.pascal.ezload.service.exporter;
 
 
-import com.pascal.ezload.service.model.BRAction;
-import com.pascal.ezload.service.model.BRModel;
-import com.pascal.ezload.service.model.BROperation;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZModel;
+import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.model.IOperationWithAction;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +17,10 @@ public class BRModelChecker {
         this.reporting = reporting;
     }
 
-    public boolean generateReport(List<BRModel> allBRModels) {
+    public boolean generateReport(List<EZModel> allEZModels) {
         try(Reporting rep = reporting.pushSection("Checking Standard Model")){
             boolean allActionsValid = true;
-            for (BRModel model : allBRModels){
+            for (EZModel model : allEZModels){
                 if (!generateReport(model))
                     allActionsValid = false;
             }
@@ -28,7 +28,7 @@ public class BRModelChecker {
         }
     }
 
-    private boolean generateReport(BRModel model){
+    private boolean generateReport(EZModel model){
         boolean isValid = true;
         try(Reporting rep = reporting.pushSection((reporting, lnkCreator) -> reporting.escape("Checking: ") + lnkCreator.createSourceLink(reporting, model.getSourceFile()))){
             if (!model.getReportDate().isValid()) {
@@ -36,7 +36,7 @@ public class BRModelChecker {
                 reporting.info("Date of the report is invalid: "+model.getReportDate());
             }
 
-            for (BROperation op : model.getOperations()) {
+            for (EZOperation op : model.getOperations()) {
                 if (!generateReport(op))
                     isValid = false;
             }
@@ -44,7 +44,7 @@ public class BRModelChecker {
         return isValid;
     }
 
-    private boolean generateReport(BROperation operation){
+    private boolean generateReport(EZOperation operation){
         boolean isValid = true;
         if (!operation.getDate().isValid()) {
             isValid = false;
@@ -77,7 +77,7 @@ public class BRModelChecker {
 
     private boolean generateReport(IOperationWithAction operation) {
         boolean isValid = true;
-        BRAction action = operation.getAction();
+        EZAction action = operation.getAction();
         if (StringUtils.isBlank(action.getName())) {
             isValid = false;
             reporting.error("The action name for one operation is not set! "+operation);

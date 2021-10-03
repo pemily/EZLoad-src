@@ -3,10 +3,10 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
-import com.pascal.ezload.service.model.BRDate;
-import com.pascal.ezload.service.model.EnumBRCourtier;
+import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
@@ -64,15 +64,22 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
         goToAvisOperes();
 
-        for (BourseDirectBRAccountDeclaration account : bourseDirectSettings.getAccounts()) {
+        EnumEZCourtier courtier = EnumEZCourtier.BourseDirect;
+        for (BourseDirectEZAccountDeclaration account : bourseDirectSettings.getAccounts()) {
             try(Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
 
-                Optional<BRDate> fromDateOpt = ezPortfolio.getMesOperations().getLastOperationDate(EnumBRCourtier.BourseDirect, account);
-                BRDate fromDate;
+                Optional<EZDate> fromDateOpt = ezPortfolio.getMesOperations().getLastOperationDate(EnumEZCourtier.BourseDirect, account);
+                if (fromDateOpt.isPresent()) {
+                    reporting.info("Dernière date chargé dans EZPortfolio par EZLoad pour le compte " + courtier.getEzPortfolioName() + ":" + account.getName() + "=> " + fromDateOpt.get().toEzPortoflioDate());
+                } else {
+                    reporting.info("Aucune opération chargé par EZLoad dans le compte " + courtier.getEzPortfolioName() + ":" + account.getName());
+                }
+
+                EZDate fromDate;
                 if (!fromDateOpt.isPresent()) {
                     // BourseDirect fournit le relevé jusqu'a un an en arriere
                     LocalDate currentdate = LocalDate.now();
-                    fromDate = new BRDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
+                    fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
                 } else fromDate = fromDateOpt.get();
 
                 String cptIndex = selectAccount(account);
@@ -107,16 +114,16 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
     // return true if we must stop the download of the previous monthes
     // return false if we should continue
-    private void extractMonthActivities(BourseDirectBRAccountDeclaration account, String cptIndex, Month month) {
+    private void extractMonthActivities(BourseDirectEZAccountDeclaration account, String cptIndex, Month month) {
         reporting.info("Checking all days to find files to download...");
         List<WebElement> allDayActivities = getAllElements("a", "linkE");
 
-        List<BRDate> allDays = allDayActivities.stream()
-                .map(webElt -> new BRDate(month.getYear(), month.getMonth(), Integer.parseInt(webElt.getText())))
+        List<EZDate> allDays = allDayActivities.stream()
+                .map(webElt -> new EZDate(month.getYear(), month.getMonth(), Integer.parseInt(webElt.getText())))
                 .sorted(Comparator.comparing(d -> d.toDate('/')))
                 .collect(Collectors.toList());
 
-        for (BRDate d : allDays) {
+        for (EZDate d : allDays) {
             if (!new File(getNewFilename(account, d)).exists()) { // si le fichier pdf n'existe pas deja
                 downloadPdf(account, cptIndex, d);
             }
@@ -127,7 +134,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         get("https://www.boursedirect.fr/priv/avis-operes.php?tr=RO&nc="+cptIndex+"&month="+ month.getMonth()+"&year="+ month.getYear());
     }
 
-    private String selectAccount(BourseDirectBRAccountDeclaration account) {
+    private String selectAccount(BourseDirectEZAccountDeclaration account) {
         WebElement option = findByContainsText("option", account.getNumber());
         reporting.info("Account "+account.getNumber()+" found");
         String cptIndex = option.getAttribute("value");
@@ -195,9 +202,9 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     }
 
 
-    private void downloadPdf(BourseDirectBRAccountDeclaration account, String cptIndex, BRDate d) {
-        String month = BRDate.leadingZero(d.getMonth());
-        String day = BRDate.leadingZero(d.getDay());
+    private void downloadPdf(BourseDirectEZAccountDeclaration account, String cptIndex, EZDate d) {
+        String month = EZDate.leadingZero(d.getMonth());
+        String day = EZDate.leadingZero(d.getDay());
         String downloadUrl = "https://www.boursedirect.fr/priv/releveOpe.php?nc="+cptIndex+"&type=RO&year="+d.getYear()+"&month="+month+"&day="+day+"&trash=/avis.pdf&pdf=1";
 
         String newFile = getNewFilename(account, d);
@@ -207,22 +214,22 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     }
 
 
-    private String getNewFilename(BourseDirectBRAccountDeclaration account, BRDate d){
-        String month = BRDate.leadingZero(d.getMonth());
-        String day = BRDate.leadingZero(d.getDay());
-        return SettingsManager.getDownloadDir(mainSettings, EnumBRCourtier.BourseDirect)
+    private String getNewFilename(BourseDirectEZAccountDeclaration account, EZDate d){
+        String month = EZDate.leadingZero(d.getMonth());
+        String day = EZDate.leadingZero(d.getDay());
+        return SettingsManager.getDownloadDir(mainSettings, EnumEZCourtier.BourseDirect)
                 + File.separator + account.getName() // if this change, review the method  getAccountNameFromPdfFilePath
                 + File.separator + d.getYear()
                 + File.separator +
                 BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX; // if this change, review the method getDateFromPdfFilePath
     }
 
-    public static BRDate getDateFromPdfFilePath(String pdfFilePath) {
+    public static EZDate getDateFromPdfFilePath(String pdfFilePath) {
         try {
             String s = new File(pdfFilePath).getName().substring(BOURSE_DIRECT_PDF_PREFIX.length());
             String s2 = s.substring(0, s.length() - BOURSE_DIRECT_PDF_SUFFIX.length());
             String[] elem = s2.split("-");
-            BRDate date = new BRDate(Integer.parseInt(elem[0]), Integer.parseInt(elem[1]), Integer.parseInt(elem[2]));
+            EZDate date = new EZDate(Integer.parseInt(elem[0]), Integer.parseInt(elem[1]), Integer.parseInt(elem[2]));
             if (date.isValid()) {
                 return date;
             }
@@ -233,7 +240,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         return null;
     }
 
-    public BourseDirectBRAccountDeclaration getAccountFromPdfFilePath(String pdfFile){
+    public BourseDirectEZAccountDeclaration getAccountFromPdfFilePath(String pdfFile){
         String[] section = pdfFile.replace('\\', '/') // for windows
                                     .split("/");
         String account = section.length >=3 ? section[section.length-3] : null; // the pdfFile is: /path/AccountDeclarationName/Year/file.pdf => extract the AccountDeclarationName

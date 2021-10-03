@@ -17,8 +17,8 @@ export function ViewLog(props: ViewLogProps) {
         if (props.ezProcess !== undefined){
             const dynLogger = new DynamicLogger();
 
-            function add(s: string){
-                dynLogger.add(s);
+            function add(s: string, isError: boolean){
+                dynLogger.add(s, isError);
             }
             function popSection(){
                 dynLogger.popSection();

@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
-import com.pascal.ezload.service.model.BRDate;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.parsers.bourseDirect.BourseDirectPdfParser;
 import com.pascal.ezload.service.parsers.bourseDirect.Dataset;
 import com.pascal.ezload.service.sources.Reporting;
@@ -72,7 +72,7 @@ public class BourseDirectText2Model {
         if (!leDate.startsWith("Le ")) {
             throw new BRException("Invalid Format detected.");
         }
-        model.setDateAvisOperation(BRDate.parseFrenchDate(leDate.substring(3).trim(), '/'));
+        model.setDateAvisOperation(EZDate.parseFrenchDate(leDate.substring(3).trim(), '/'));
         String [] accountDetails = accountSection[1].split(" ");
         model.setAccountNumber(accountDetails[2]);
         model.setAccountType(accountDetails[3]);
@@ -93,7 +93,7 @@ public class BourseDirectText2Model {
             Dataset dataset = parser.Dataset();
             model.setOperations(dataset.getOperations());
             // the dates in the BourseDirect pdf are french dates: dd/mm/yyyy
-            model.setDates(new ArrayList<>(dataset.getDates().stream().map(d -> BRDate.parseFrenchDate(d, '/')).collect(Collectors.toList())));
+            model.setDates(new ArrayList<>(dataset.getDates().stream().map(d -> EZDate.parseFrenchDate(d, '/')).collect(Collectors.toList())));
             model.setAmounts(dataset.getAmounts());
         }
         catch(Exception e){

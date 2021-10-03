@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.model;
 
-public enum BROperationType {
+public enum EZOperationType {
 
     ACHAT_TITRES("Achat titres"),
     ACOMPTE_IMPOT_SUR_LE_REVENU("Acompte Impôt sur le Revenu"),
@@ -22,7 +22,7 @@ public enum BROperationType {
 
     private String ezOperationType;
 
-    BROperationType(String ezOperationType){
+    EZOperationType(String ezOperationType){
         this.ezOperationType = ezOperationType;
     }
 

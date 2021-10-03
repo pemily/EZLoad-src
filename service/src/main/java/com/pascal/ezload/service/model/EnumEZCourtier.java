@@ -1,11 +1,11 @@
 package com.pascal.ezload.service.model;
 
-public enum EnumBRCourtier {
+public enum EnumEZCourtier {
     BourseDirect("Bourse Direct", "BourseDirect");
 
     private String ezPortfolioName, dirName;
 
-    EnumBRCourtier(String ezPortfolioName, String dirName){
+    EnumEZCourtier(String ezPortfolioName, String dirName){
         this.ezPortfolioName = ezPortfolioName;
         this.dirName = dirName;
     }

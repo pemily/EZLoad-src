@@ -1,10 +1,11 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
-import com.pascal.ezload.service.model.BRAccountDeclaration;
+import com.pascal.ezload.service.model.EZAccountDeclaration;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
-public class BourseDirectBRAccountDeclaration extends Checkable implements BRAccountDeclaration {
+public class BourseDirectEZAccountDeclaration extends Checkable implements EZAccountDeclaration {
 
     public enum Field{name, number}
 
@@ -25,7 +26,7 @@ public class BourseDirectBRAccountDeclaration extends Checkable implements BRAcc
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name;
+        this.name = name == null ? null : name.trim();
     }
 
     public boolean isActive() {

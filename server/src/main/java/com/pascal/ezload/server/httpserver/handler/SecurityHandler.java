@@ -2,7 +2,7 @@ package com.pascal.ezload.server.httpserver.handler;
 
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EnumBRCourtier;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.security.AuthManager;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -17,7 +17,7 @@ public class SecurityHandler {
     @Path("/createLogin")
     @Consumes(MediaType.APPLICATION_JSON)
     public void createUserPassword(
-            @NotNull @QueryParam("courtier") EnumBRCourtier courtier,
+            @NotNull @QueryParam("courtier") EnumEZCourtier courtier,
             @NotNull AuthInfo authParam) throws Exception {
 
         AuthManager authManager = SettingsManager.getAuthManager();
@@ -38,7 +38,7 @@ public class SecurityHandler {
     @GET
     @Path("/info")
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumBRCourtier courtier) throws Exception {
+    public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumEZCourtier courtier) throws Exception {
         return SettingsManager.getAuthManager().getAuthWithDummyPassword(courtier);
     }
 }

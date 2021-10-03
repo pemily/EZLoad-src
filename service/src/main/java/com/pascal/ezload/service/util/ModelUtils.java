@@ -2,7 +2,7 @@ package com.pascal.ezload.service.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pascal.ezload.service.model.BRModel;
+import com.pascal.ezload.service.model.EZModel;
 
 public class ModelUtils {
 
@@ -31,7 +31,7 @@ public class ModelUtils {
         return Integer.parseInt(quantite);
     }
 
-    public static String toJson(BRModel model){
+    public static String toJson(EZModel model){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(model);
     }

@@ -13,6 +13,11 @@ public interface Reporting extends Closeable {
 
      void error(String error);
 
+     default void error(String msg, Throwable error){
+          error(msg);
+          error(error);
+     }
+
      void info(String info);
 
      void popSection();

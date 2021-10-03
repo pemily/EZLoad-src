@@ -41,14 +41,14 @@ a:active {color:#000000;}  /* Selected link   */
     border:1px solid #ccc;
     background: #eee
 }
-div.openedItem{
+.br-tree div.openedItem{
     background: #0056b3!important;
     color: #fff;
 }
-div.error{
+.br-tree div.error{
     background: #c55959 !important;
     color: #fff;
 }
-.toggler{
+.br-tree .toggler{
     transition: all 1s;
 }

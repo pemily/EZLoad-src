@@ -15,68 +15,68 @@ public class BourseDirectModelChecker {
     }
 
     public boolean isValid(BourseDirectModel model){
-        try(Reporting ignored = reporting.pushSection("Checking BourseDirect model...")){
+        try(Reporting ignored = reporting.pushSection("Vérification du Model extrait du PDF de BourseDirect...")){
             boolean isValid = true;
 
             long nbOfDroitDeGarde = nbOfDroitsDeGarde(model.getOperations());
 
             if (nbOfDroitDeGarde > 1) {
-                reporting.error("The number of 'Droit de Garde' sections detected is: " + nbOfDroitDeGarde);
+                reporting.error("Le nombre de sections detecté de 'Droit de Garde' est: " + nbOfDroitDeGarde+". Une seule est attendue!");
                 isValid = false;
             }
 
             if (nbOfDroitDeGarde == 1 && !(model.getOperations().get(model.getOperations().size() - 1) instanceof DroitsDeGarde)) {
                 // si ce n'est pas le dernier, il faudra en tenir compte pour les index des dates vs operations vs amounts
-                reporting.error("The 'Droit de Garde' section is not the latest");
+                reporting.error("La section 'Droit de Garde' n'est pas la dernière section");
             }
 
             if (model.getDates().size() != model.getOperations().size()) {
-                reporting.error("The number of dates found: " + model.getDates().size() + " do not match the number of operations found: " + model.getOperations().size());
+                reporting.error("Le nombre de dates trouvées: " + model.getDates().size() + " ne correspond pas au nombre d'opérations trouvées: " + model.getOperations().size());
                 isValid = false;
             }
 
             if (model.getAmounts().size() != model.getOperations().size() - nbOfDroitDeGarde) {
-                reporting.error("The number of amounts found: " + model.getAmounts().size() + " do not match the number of operations found: " + model.getOperations().size());
+                reporting.error("Le nombre de montant trouvés: " + model.getAmounts().size() + " ne correspond pas au au nombre d'opérations trouvées: " + model.getOperations().size());
                 isValid = false;
             }
 
             if (!model.getDeviseCredit().equals("€")) {
-                reporting.error("The credit devise is not € : " + model.getDeviseCredit());
+                reporting.error("La devise de la colonne Crédit n'est pas en € mais en: " + model.getDeviseCredit());
                 isValid = false;
             }
 
             if (!model.getDeviseDebit().equals("€")) {
-                reporting.error("The debit devise is not € : " + model.getDeviseDebit());
+                reporting.error("La devise de la colonne Débit n'est pas en € mais en: " + model.getDeviseDebit());
                 isValid = false;
             }
 
             if (StringUtils.isBlank(model.getAccountNumber())) {
-                reporting.error("The account number is empty");
+                reporting.error("Le numéro de compte est vide");
                 isValid = false;
             }
 
             if (StringUtils.isBlank(model.getAccountOwnerName())) {
-                reporting.error("The account owner is empty");
+                reporting.error("Le nom du compte est vide");
                 isValid = false;
             }
 
             if (StringUtils.isBlank(model.getAddress())) {
-                reporting.error("The owner address is empty");
+                reporting.error("L'adresse du compte est vide");
                 isValid = false;
             }
 
             if (StringUtils.isBlank(model.getAccountType())) {
-                reporting.error("The account type is empty");
+                reporting.error("Le type du compte est vide");
                 isValid = false;
             }
 
             if (model.getDateAvisOperation() == null) {
-                reporting.error("The date of the report is empty");
+                reporting.error("La date du relevée d'opérations est vide");
                 isValid = false;
             }
 
             if (isValid) {
-                reporting.info("=> No error detected");
+                reporting.info("=> Pas d'erreur détecté");
             }
 
             return isValid;

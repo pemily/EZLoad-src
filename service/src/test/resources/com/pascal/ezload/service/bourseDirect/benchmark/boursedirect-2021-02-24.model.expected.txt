@@ -12,17 +12,17 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "€",
+      "symbol": "ï¿½",
       "code": "EUR"
     }
   },
-  "BRAccountDeclaration": {
+  "EZAccountDeclaration": {
     "name": "Pascal CTO"
   },
   "operations": [
     {
       "devise": {
-        "symbol": "€",
+        "symbol": "ï¿½",
         "code": "EUR"
       },
       "date": {
@@ -40,11 +40,11 @@
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "€",
+          "symbol": "ï¿½",
           "code": "EUR"
         }
       },
-      "BRAccountDeclaration": {
+      "EZAccountDeclaration": {
         "name": "Pascal CTO"
       }
     }

@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
-import com.pascal.ezload.service.model.BRAccountDeclaration;
+import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.parsers.bourseDirect.*;
 import com.pascal.ezload.service.sources.Reporting;
@@ -22,59 +22,59 @@ public class BourseDirect2BRModel {
         this.reporting = reporting;
     }
     
-    public BRModel create(String sourceFile, BRAccountDeclaration BRAccountDeclaration, BourseDirectModel model) {
+    public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
-        BRModel brModel = new BRModel();
-        brModel.setReportDate(model.getDateAvisOperation());
-        brModel.setSource(EnumBRCourtier.BourseDirect);
-        brModel.setSourceFile(sourceFile);
+        EZModel EZModel = new EZModel();
+        EZModel.setReportDate(model.getDateAvisOperation());
+        EZModel.setSource(EnumEZCourtier.BourseDirect);
+        EZModel.setSourceFile(sourceFile);
 
-        BRAccount brAccount = new BRAccount();
-        brAccount.setAccountNumber(model.getAccountNumber());
-        brAccount.setAccountType(model.getAccountType());
-        brAccount.setOwnerAdress(model.getAddress());
+        EZAccount EZAccount = new EZAccount();
+        EZAccount.setAccountNumber(model.getAccountNumber());
+        EZAccount.setAccountType(model.getAccountType());
+        EZAccount.setOwnerAdress(model.getAddress());
         if (!model.getDeviseDebit().equals("€")) throw new BRException("The account is not an Euro account");
-        brAccount.setDevise(DeviseUtil.foundByCode("EUR"));
-        brAccount.setOwnerName(model.getAccountOwnerName());
-        brModel.setAccount(brAccount);
-        brModel.setAccountDeclaration(BRAccountDeclaration);
+        EZAccount.setDevise(DeviseUtil.foundByCode("EUR"));
+        EZAccount.setOwnerName(model.getAccountOwnerName());
+        EZModel.setAccount(EZAccount);
+        EZModel.setAccountDeclaration(EZAccountDeclaration);
 
-        List<BROperation> brOperations = new ArrayList<>();
-        brModel.setOperations(brOperations);
+        List<EZOperation> EZOperations = new ArrayList<>();
+        EZModel.setOperations(EZOperations);
 
         for (int i = 0; i < model.getOperations().size(); i++) {
             if (model.getOperations().get(i) instanceof DroitsDeGarde) {
                 // the last operation is an DroitsDeGarde and the amount is not in the amounts array, it is in the details text
-                brOperations.add(toBROperation(brModel, model.getOperations().get(i), model.getDates().get(i), null));
+                EZOperations.add(toBROperation(EZModel, model.getOperations().get(i), model.getDates().get(i), null));
             } else {
-                brOperations.add(toBROperation(brModel, model.getOperations().get(i), model.getDates().get(i), model.getAmounts().get(i)));
+                EZOperations.add(toBROperation(EZModel, model.getOperations().get(i), model.getDates().get(i), model.getAmounts().get(i)));
             }
         }
 
         reporting.info("Standard Model => ok");
-        return brModel;
+        return EZModel;
     }
 
-    private BROperation toBROperation(BRModel brModel, Operation operation, BRDate date, String amount) {
-        BROperation brOperation = null;
+    private EZOperation toBROperation(EZModel EZModel, Operation operation, EZDate date, String amount) {
+        EZOperation EZOperation = null;
         if (operation instanceof VirementEspece){
             VirementEspece op = (VirementEspece) operation;
             if (amount.contains("-")) {
-                BRRetraitFonds brOp = new BRRetraitFonds();
-                brOp.setDevise(brModel.getAccount().getDevise());
-                brOperation = brOp;
+                EZRetraitFonds brOp = new EZRetraitFonds();
+                brOp.setDevise(EZModel.getAccount().getDevise());
+                EZOperation = brOp;
             }
             else {
-                BRVersementFonds brOp = new BRVersementFonds();
-                brOp.setDevise(brModel.getAccount().getDevise());
-                brOperation = brOp;
+                EZVersementFonds brOp = new EZVersementFonds();
+                brOp.setDevise(EZModel.getAccount().getDevise());
+                EZOperation = brOp;
             }
-            brOperation.setDescription(op.getDetails());
+            EZOperation.setDescription(op.getDetails());
         }
         else if (operation instanceof AchatComptant){
             AchatComptant op = (AchatComptant) operation;
-            BRAchat brOp = new BRAchat();
-            brOperation = brOp;
+            EZAchat brOp = new EZAchat();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
@@ -85,8 +85,8 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof AchatEtranger){
             AchatEtranger op = (AchatEtranger) operation;
-            BRAchatEtranger brOp = new BRAchatEtranger();
-            brOperation = brOp;
+            EZAchatEtranger brOp = new EZAchatEtranger();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
@@ -99,8 +99,8 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof VenteEtranger){
             VenteEtranger op = (VenteEtranger) operation;
-            BRVenteEtranger brOp = new BRVenteEtranger();
-            brOperation = brOp;
+            EZVenteEtranger brOp = new EZVenteEtranger();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
@@ -113,15 +113,15 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof TaxeTransatFinancieres){
             TaxeTransatFinancieres op = (TaxeTransatFinancieres) operation;
-            BRTaxe brOp = new BRTaxe();
-            brOperation = brOp;
+            EZTaxe brOp = new EZTaxe();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setDescription(op.getDetails());
         }
         else if (operation instanceof Coupons){
             Coupons op = (Coupons) operation;
-            BRCoupons brOp = new BRCoupons();
-            brOperation = brOp;
+            EZCoupons brOp = new EZCoupons();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setPrixUnitaireBrut(ModelUtils.normalizeAmount(op.getPrixUnitBrut()));
@@ -133,8 +133,8 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof DroitsDeGarde){
             DroitsDeGarde op = (DroitsDeGarde) operation;
-            BRDroitDeGarde brOp = new BRDroitDeGarde();
-            brOperation = brOp;
+            EZDroitDeGarde brOp = new EZDroitDeGarde();
+            EZOperation = brOp;
             String[] details = op.getDetails().split(" ");
             // the amount is the last figure in the details
             amount = details[details.length-1];
@@ -146,16 +146,16 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof DividendeOptionnel){
             DividendeOptionnel op = (DividendeOptionnel) operation;
-            BRDividendeOptionel brOp = new BRDividendeOptionel();
-            brOperation = brOp;
+            EZDividendeOptionel brOp = new EZDividendeOptionel();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
         }
         else if (operation instanceof EspecesSurOST){
             EspecesSurOST op = (EspecesSurOST) operation;
-            BREspeceSurOST brOp = new BREspeceSurOST();
-            brOperation = brOp;
+            EZEspeceSurOST brOp = new EZEspeceSurOST();
+            EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setDescription(op.getDetails());
         }
@@ -163,18 +163,18 @@ public class BourseDirect2BRModel {
             reporting.error("Unknown Operation type: "+operation.getClass().getSimpleName());
         }
 
-        if (brOperation != null) {
-            brOperation.setAmount(ModelUtils.normalizeAmount(amount));
-            brOperation.setDate(date);
-            brOperation.setCourtier(EnumBRCourtier.BourseDirect);
-            if (brModel.getAccount().getAccountType().equals("Ordinaire")){
-                brOperation.setCompteType(EnumBRCompteType.COMPTE_TITRES_ORDINAIRE);
+        if (EZOperation != null) {
+            EZOperation.setAmount(ModelUtils.normalizeAmount(amount));
+            EZOperation.setDate(date);
+            EZOperation.setCourtier(EnumEZCourtier.BourseDirect);
+            if (EZModel.getAccount().getAccountType().equals("Ordinaire")){
+                EZOperation.setCompteType(EnumEZCompteType.COMPTE_TITRES_ORDINAIRE);
             }
-            brOperation.setAccount(brModel.getAccount());
-            brOperation.setAccountDeclaration(brModel.getAccountDeclaration());
+            EZOperation.setAccount(EZModel.getAccount());
+            EZOperation.setAccountDeclaration(EZModel.getAccountDeclaration());
 
         }
-        return brOperation;
+        return EZOperation;
     }
 
 }

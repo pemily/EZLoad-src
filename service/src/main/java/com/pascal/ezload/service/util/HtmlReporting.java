@@ -96,7 +96,7 @@ public class HtmlReporting implements Reporting {
 
     private void write(String text, boolean isError){
         try {
-            writer.write( "<script>add(\""+ escape(text)+"\","+isError+")</script>\n");
+            writer.write( "<script>add(\""+ escape(text)+"\", "+isError+")</script>\n");
             writer.flush();
         }
         catch(IOException e){

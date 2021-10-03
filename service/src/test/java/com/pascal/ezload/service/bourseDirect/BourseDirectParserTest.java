@@ -12,7 +12,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectBRAccountDeclaration;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.TextReporting;
 
 import org.junit.jupiter.api.Test;
@@ -155,9 +155,9 @@ public class BourseDirectParserTest {
 
     private void test(String file) throws IOException {
         TextReporting reporting = new TextReporting();
-        BourseDirectBRAccountDeclaration bracc = new BourseDirectBRAccountDeclaration();
+        BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-      //  BRModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
+      //  EZModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
        // String jsonBrModel = ModelUtils.toJson(brModel);
         //String report = reporting.getReport();
 

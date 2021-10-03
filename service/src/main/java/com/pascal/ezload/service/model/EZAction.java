@@ -1,10 +1,10 @@
 package com.pascal.ezload.service.model;
 
-public class BRAction {
+public class EZAction {
     private String name;
     private String ticker;
     private String isin;
-    private BRMarketPlace marketPlace;
+    private EZMarketPlace marketPlace;
 
     public String getName() {
         return name;
@@ -30,11 +30,11 @@ public class BRAction {
         this.isin = isin;
     }
 
-    public BRMarketPlace getMarketPlace() {
+    public EZMarketPlace getMarketPlace() {
         return marketPlace;
     }
 
-    public void setMarketPlace(BRMarketPlace marketPlace) {
+    public void setMarketPlace(EZMarketPlace marketPlace) {
         this.marketPlace = marketPlace;
     }
 }

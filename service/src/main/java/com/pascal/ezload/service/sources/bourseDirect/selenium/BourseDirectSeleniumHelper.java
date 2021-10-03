@@ -3,7 +3,7 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EnumBRCourtier;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.BaseSelenium;
@@ -42,7 +42,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
             WebElement login = findById("bd_auth_login_type_login");
             WebElement password = findById("bd_auth_login_type_password");
 
-            AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumBRCourtier.BourseDirect);
+            AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumEZCourtier.BourseDirect);
             if (StringUtils.isBlank(login.getText())) {
                 login.sendKeys(authInfo.getUsername());
                 password.sendKeys(authInfo.getPassword());

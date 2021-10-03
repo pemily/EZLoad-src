@@ -1,12 +1,8 @@
 package com.pascal.ezload.service.security;
 
 import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.model.EnumBRCourtier;
-import com.pascal.ezload.service.util.FileValue;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,13 +13,13 @@ public class AuthManagerTest {
         AuthInfo login = new AuthInfo();
         login.setUsername("pascal");
         login.setPassword("motdepasse");
-        authManager.saveAuthInfo(EnumBRCourtier.BourseDirect, login);
+        authManager.saveAuthInfo(EnumEZCourtier.BourseDirect, login);
 
-        login = authManager.getAuthInfo(EnumBRCourtier.BourseDirect);
+        login = authManager.getAuthInfo(EnumEZCourtier.BourseDirect);
         assertEquals("pascal", login.getUsername());
         assertEquals("motdepasse", login.getPassword());
 
-        login = authManager.getAuthWithDummyPassword(EnumBRCourtier.BourseDirect);
+        login = authManager.getAuthWithDummyPassword(EnumEZCourtier.BourseDirect);
         assertEquals("pascal", login.getUsername());
         assertEquals("@@@@@@@@@@", login.getPassword());
     }

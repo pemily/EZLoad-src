@@ -2,7 +2,6 @@ package com.pascal.ezload.service.security;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,10 +21,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.model.EnumBRCourtier;
+import com.pascal.ezload.service.model.EnumEZCourtier;
 
-import com.pascal.ezload.service.util.FileValue;
-import com.pascal.ezload.service.util.StringValue;
 import org.apache.commons.lang3.StringUtils;
 
 public class AuthManager {
@@ -38,7 +35,7 @@ public class AuthManager {
         this.authFilePath = authFilePath;
     }
 
-    public AuthInfo getAuthWithDummyPassword(EnumBRCourtier courtier) throws Exception {
+    public AuthInfo getAuthWithDummyPassword(EnumEZCourtier courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
@@ -51,7 +48,7 @@ public class AuthManager {
         return result;
     }
 
-    public AuthInfo getAuthInfo(EnumBRCourtier courtier) throws Exception {
+    public AuthInfo getAuthInfo(EnumEZCourtier courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
@@ -61,7 +58,7 @@ public class AuthManager {
         return result;
     }
 
-    public void saveAuthInfo(EnumBRCourtier courtier, AuthInfo authInfo) throws Exception {
+    public void saveAuthInfo(EnumEZCourtier courtier, AuthInfo authInfo) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo encrypted = new AuthInfo();
         encrypted.setPassword(encryptPassword(authInfo.getPassword(), passPhrase));
@@ -130,13 +127,13 @@ public class AuthManager {
     }
 
     private static class Data {
-        private Map<EnumBRCourtier, AuthInfo> info = new HashMap<>();
+        private Map<EnumEZCourtier, AuthInfo> info = new HashMap<>();
 
-        public Map<EnumBRCourtier, AuthInfo> getInfo() {
+        public Map<EnumEZCourtier, AuthInfo> getInfo() {
             return info;
         }
 
-        public void setInfo(Map<EnumBRCourtier, AuthInfo> info) {
+        public void setInfo(Map<EnumEZCourtier, AuthInfo> info) {
             this.info = info;
         }
     }

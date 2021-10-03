@@ -6,6 +6,8 @@ import com.pascal.ezload.service.util.HtmlReporting;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class HttpProcessRunner implements Closeable {
 
@@ -22,7 +24,7 @@ public class HttpProcessRunner implements Closeable {
 
     public void header(String escapedTitle) throws IOException {
         logFileWriter.write("<html><head><meta charset='UTF-8'>\n");
-        reporting.writeHeader(escapedTitle);
+        reporting.writeHeader(escapedTitle+"<BR>"+reporting.escape(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date())));
         logFileWriter.write("</head><body>\n"+FILE_HEADER+"\n");
     }
 

@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.exporter.ezPortfolio;
 
-import com.pascal.ezload.service.model.BRAccountDeclaration;
+import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.*;
@@ -18,7 +18,7 @@ public class MesOperations  {
     private int firstFreeRow = -1;
     private final Reporting reporting;
 
-    private static final String BIENTOT_RENTIER_OPERATION = "[AUTO]";
+    private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad]";
 
     private static final int DATE_COL = 0;
     private static final int COMPTE_TYPE_COL = 1;
@@ -47,7 +47,7 @@ public class MesOperations  {
         return newOperations;
     }
 
-    public boolean isOperationsExists(BROperation operation){
+    public boolean isOperationsExists(EZOperation operation){
         return existingOperations.getValues().stream().filter(
             row -> {
                 boolean opResult =
@@ -62,7 +62,7 @@ public class MesOperations  {
 
                 if (operation instanceof IOperationWithAction){
                     IOperationWithAction opWithAction = (IOperationWithAction) operation;
-                    BRAction action = opWithAction.getAction();
+                    EZAction action = opWithAction.getAction();
                     opResult &=
                             action.getMarketPlace().getCountry().getName().equals(row.valueStr(COUNTRY_COL))
                             && action.getName().equals(row.valueStr(ACTION_NAME_COL));
@@ -72,7 +72,7 @@ public class MesOperations  {
         ).count() > 1;
     }
 
-    public void newOperation(BRDate date, EnumBRCompteType compteType, EnumBRCourtier courtier, BRAccountDeclaration account, String periode, BROperationType operationType, String actionName, String country, String amount, String description) {
+    public void newOperation(EZDate date, EnumEZCompteType compteType, EnumEZCourtier courtier, EZAccountDeclaration account, String periode, EZOperationType operationType, String actionName, String country, String amount, String description) {
         newOperations.add(new Row(date.toEzPortoflioDate(), compteType.getEZPortfolioName(), courtier.getEzPortfolioName(), format(periode),
                         operationType.getEZPortfolioName(), format(actionName), format(country), format(amount), format(description), format(account.getName()), BIENTOT_RENTIER_OPERATION));
     }
@@ -82,15 +82,15 @@ public class MesOperations  {
     }
 
 
-    public boolean isAlreadyProcessed(EnumBRCourtier courtier, BRAccountDeclaration BRAccountDeclaration, BRDate pdfDate) {
-        return getLastOperationDate(courtier, BRAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(pdfDate)).orElse(false);
+    public boolean isAlreadyProcessed(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration, EZDate pdfDate) {
+        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(pdfDate)).orElse(false);
     }
 
-    public Optional<BRDate> getLastOperationDate(EnumBRCourtier courtier, BRAccountDeclaration BRAccountDeclaration) {
+    public Optional<EZDate> getLastOperationDate(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
                 .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
                         && courtier.getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
-                        && BRAccountDeclaration.getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL)))
+                        && EZAccountDeclaration.getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL)))
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);

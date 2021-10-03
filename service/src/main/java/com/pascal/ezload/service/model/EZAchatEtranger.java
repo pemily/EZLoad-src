@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.model;
 
-public class BRAchatEtranger extends BRAchat {
+public class EZAchatEtranger extends EZAchat {
 
     private String changeRate;
     private String coursUSD;
@@ -22,8 +22,8 @@ public class BRAchatEtranger extends BRAchat {
     }
 
     @Override
-    public BROperationType getOperationType() {
-        return BROperationType.ACHAT_TITRES;
+    public EZOperationType getOperationType() {
+        return EZOperationType.ACHAT_TITRES;
     }
 
 }

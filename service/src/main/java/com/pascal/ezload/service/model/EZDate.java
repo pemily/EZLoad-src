@@ -2,12 +2,12 @@ package com.pascal.ezload.service.model;
 
 import java.util.Objects;
 
-public class BRDate {
+public class EZDate {
     private int day;
     private int month;
     private int year;
 
-    public BRDate(int year, int month, int day){
+    public EZDate(int year, int month, int day){
         this.year = year;
         this.month = month;
         this.day = day;
@@ -33,11 +33,11 @@ public class BRDate {
         return year+""+separator+leadingZero(month)+separator+leadingZero(day);
     }
 
-    public static BRDate parseFrenchDate(String date, char separator) {
+    public static EZDate parseFrenchDate(String date, char separator) {
         if (date == null) return null;
         String elem[] = date.split(separator+"");
         // la valeur de la Date en String dans une Row est: dd/mm/yyyy (a cause du choix de ezPortfolio)
-        return new BRDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
+        return new EZDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
     }
 
     public boolean isValid(){
@@ -59,8 +59,8 @@ public class BRDate {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BRDate brDate = (BRDate) o;
-        return day == brDate.day && month == brDate.month && year == brDate.year;
+        EZDate EZDate = (EZDate) o;
+        return day == EZDate.day && month == EZDate.month && year == EZDate.year;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class BRDate {
         return Objects.hash(day, month, year);
     }
 
-    public boolean isBeforeOrEquals(BRDate d) {
+    public boolean isBeforeOrEquals(EZDate d) {
         return toDate('/').compareTo(d.toDate('/')) <= 0;
     }
 
@@ -78,7 +78,7 @@ public class BRDate {
 
     @Override
     public String toString() {
-        return "BRDate{" +
+        return "EZDate{" +
                 "day=" + day +
                 ", month=" + month +
                 ", year=" + year +
