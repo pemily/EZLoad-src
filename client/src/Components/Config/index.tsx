@@ -1,8 +1,9 @@
 import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
-import { Add, Trash } from 'grommet-icons';
-import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion } from '../../ez-api/tools';
+import { Add, Trash, Validate } from 'grommet-icons';
+import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { ConfigTextField } from '../Tools/ConfigTextField';
+import { Message } from '../Tools/Message';
 import { Help } from '../Tools/Help';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -23,7 +24,7 @@ Si vous ne les spécifiez pas, il faudra les saisir **à chaque execution**.
 
 _Les mots de passe sont encryptés à l'aide d'une clé qui est généré à l'installation de EZLoad_`;
 
-const genSecurityFile = (gdriverAccessPath: string|undefined|null) : String =>  `
+const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
 #### Etape 1 - Création du project EZLoad chez Google
 - Créer un projet <a href="https://console.cloud.google.com/projectcreate" target="install">**Ici**</a>
 - Nom du project: **EZLoad**
@@ -49,7 +50,8 @@ const genSecurityFile = (gdriverAccessPath: string|undefined|null) : String =>  
 - Cliquez sur "**Enregistrer et continuer**"
 
 #### Etape 4 - Utilisateurs tests
-- Ne rien faire
+- Cliquez sur "**ADD USERS**"
+- Entrez **Votre Adresse Email** et Enregistrer
 - Cliquez sur "**Enregistrer et continuer**"
 
 #### Etape 5 - Creation du fichier de d'authentification
@@ -57,17 +59,18 @@ const genSecurityFile = (gdriverAccessPath: string|undefined|null) : String =>  
 - Cliquez sur "**Créer des identifiants**"
 - Selectionnez "**ID client OAuth**"
 - Type d'application: "**Application de bureau**"
-- Nom: **EZLoad_ClientPC**
+- Nom: **EZLoad_Client**
 - Cliquez sur "**Créer**"
-- Cliquez sur "**OK**" pour fermer la fenêtre
-- Sur la ligne de EZLoad_ClientPC (à coté de la poubelle) il y a un boutton pour **télécharger** le fichier json
-`+(gdriverAccessPath != null && gdriverAccessPath !== undefined ?  `- Renommez et déplacez ce fichier ici: **`+gdriverAccessPath+`**` : `- Entrez le path complet dans le champ: "**Fichier de sécurité Google Drive**" de la config EZLoad`) +
+- Cliquez sur "**Télécharger JSON**" puis sur "**OK**" pour fermer la fenêtre
+- Si vous avez perdu le fichier, vous pouvez le télécharger plus tard, sur la ligne de EZLoad_Client (à coté de la poubelle) il y a un boutton pour **télécharger le client oauth**
+`+(gdriveAccessPath != null && gdriveAccessPath !== undefined ?  `- Renommez et déplacez ce fichier ici: **`+gdriveAccessPath+`**` : `- Entrez le path complet dans le champ: "**Fichier de sécurité Google Drive**" de la config EZLoad`) +
 `
 
 #### Etape 6 - Activation de l'accès
 - Aller <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=ezload" target="install">**Ici**</a>
 - Cliquer sur "**Activer**"
 
+#### Etape 7 - Validation de la connection
 `;
 
 
@@ -75,9 +78,6 @@ export function Config(props: ConfigProps) {
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    {props.readOnly && 
-                        (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                            Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}
                     <Heading level="5" >EZPortfolio</Heading>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
@@ -100,8 +100,20 @@ export function Config(props: ConfigProps) {
                                           ezPortfolio: { ...props.mainSettings.ezPortfolio, gdriveCredsFile: newValue }
                                    }, props.mainSettingsStateSetter)}/>
                            <Help title="Comment obtenir son fichier de sécurité?">
-                               <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
+                               <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">                                   
                                 <Markdown>{genSecurityFile(props.mainSettings?.ezPortfolio?.gdriveCredsFile)}</Markdown>
+                                {valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === "" &&
+                                    (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner l'url de EZPortfolio</span>"}</Markdown>)}
+                                {valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === "" &&
+                                    (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner le fichier de sécurité</span>"}</Markdown>)}
+                                <Button 
+                                    disabled={valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === ""
+                                        || valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === ""} 
+                                        onClick={() =>
+                                            jsonCall(ezApi.security.gDriveCheck())
+                                            .then(process =>{ console.log("process", process); props.followProcess(process);})
+                                            }
+                                            size="small" icon={<Validate size="small"/>} label="Valider la connection"/>
                                </Box>
                            </Help>
                        </Box>                        

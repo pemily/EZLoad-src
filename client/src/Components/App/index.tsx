@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Anchor } from "grommet";
+import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text } from "grommet";
 import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
@@ -59,7 +59,7 @@ export function App(){
 
 
     return (
-        <Box fill>
+        <Box>
             <Header direction="column" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
                 <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
             </Header>
@@ -67,13 +67,16 @@ export function App(){
             <Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Actions" icon={<Command size='small'/>}>
-                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                        <Box fill overflow="auto">
                             {(mainSettings === undefined || mainSettings == null) && (
                                 <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
                             )}            
                             {mainSettings &&
                             (<>
-                                <Box margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
+                                {processRunning && 
+                                    (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                                        Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
+                                <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
                                     <Heading level="4">Courtiers</Heading>
                                     <BourseDirect mainSettings={mainSettings}
                                                 followProcess={followProcess}
@@ -89,19 +92,27 @@ console.log("TODO")
                         </Box>
                     </Tab>
                     <Tab title="Operations" icon={<DocumentStore size='small'/>}>
-                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
-                           
+                        <Box fill overflow="auto">
+                            {mainSettings && processRunning && 
+                                (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                                    Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                                                                         
                         </Box>
                     </Tab>                       
-                    <Tab title="Execution" icon={<Clipboard size='small'/>}>
-                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                    <Tab title="Exécution" icon={<Clipboard size='small'/>}>
+                        <Box fill overflow="auto">
+                            {mainSettings && processRunning && 
+                                (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                                    Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             <ViewLog 
-                                    ezProcess={lastProcess}                                     
+                                    ezProcess={lastProcess}    
                                     processFinished={() => {reloadAllData()}}/>
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>
-                        <Box fill overflow="auto" border={{ color: 'dark-1', size: 'medium' }}>
+                        <Box fill overflow="auto">
+                            {mainSettings && processRunning && 
+                                (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                                    Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                            
                             {mainSettings && (
                                 <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
                                         followProcess={followProcess}
@@ -109,7 +120,7 @@ console.log("TODO")
                                         bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
                                         readOnly={processRunning}
                                         />
-                            )}
+                            )}                            
                         </Box>
                     </Tab>
                 </Tabs>

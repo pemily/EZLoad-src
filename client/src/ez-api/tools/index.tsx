@@ -8,7 +8,6 @@ export function valued(v: string|undefined|null) : string {
 
 
 export function jsonCall(promise: Promise<HttpResponse<any, any>>) {
-    console.log("jsonCall");
     return promise.then(httpResponse => {
       if (httpResponse.status === 204) return null; // no content for 204
       return httpResponse.json();

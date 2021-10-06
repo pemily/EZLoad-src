@@ -8,7 +8,7 @@ var { DynamicLogger } = require( './ezLoad/ezLoadHeaderReporting.js');
 
 export interface ViewLogProps {
     ezProcess: EzProcess|undefined;
-    processFinished: () => void;
+    processFinished: () => void; 
 }
 
 export function ViewLog(props: ViewLogProps) {    
@@ -47,7 +47,7 @@ export function ViewLog(props: ViewLogProps) {
     useEffect(showLog, []) // Le [] fait que le useEffect ne sera appelé qu'une fois apres le 1er rendu
 
     
-    return (<Box id="ProcessOutput" pad="medium" >
+    return (<Box id="ProcessOutput" pad="medium" >   
             <Text margin="small" size="xlarge" alignSelf="center">{valued(props.ezProcess?.title)}</Text>
             <Text>{valued(props.ezProcess?.logFile)}</Text>
             { (props.ezProcess === "") && (
