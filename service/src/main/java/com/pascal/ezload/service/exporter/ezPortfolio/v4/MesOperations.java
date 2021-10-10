@@ -1,5 +1,6 @@
-package com.pascal.ezload.service.exporter.ezPortfolio;
+package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -72,18 +73,15 @@ public class MesOperations  {
         ).count() > 1;
     }
 
-    public void newOperation(EZDate date, EnumEZCompteType compteType, EnumEZCourtier courtier, EZAccountDeclaration account, String periode, EZOperationType operationType, String actionName, String country, String amount, String description) {
-        newOperations.add(new Row(date.toEzPortoflioDate(), compteType.getEZPortfolioName(), courtier.getEzPortfolioName(), format(periode),
-                        operationType.getEZPortfolioName(), format(actionName), format(country), format(amount), format(description), format(account.getName()), BIENTOT_RENTIER_OPERATION));
+    public void newOperation(EzOperationEdition operationEdition) {
+        newOperations.add(new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getCourtier(),
+                        null, operationEdition.getOperationType(), operationEdition.getActionName(),
+                        operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
+                        operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION));
     }
 
-    public String format(String value){
-        return value == null ? "" : value.replace('\n', ' ');
-    }
-
-
-    public boolean isAlreadyProcessed(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration, EZDate pdfDate) {
-        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(pdfDate)).orElse(false);
+    public boolean isFileAlreadyLoaded(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
+        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(fileDate)).orElse(false);
     }
 
     public Optional<EZDate> getLastOperationDate(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration) {
@@ -95,7 +93,6 @@ public class MesOperations  {
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);
         return Optional.of(latestRow.valueDate(DATE_COL));
-
     }
 
 }

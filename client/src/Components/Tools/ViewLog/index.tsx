@@ -34,9 +34,7 @@ export function ViewLog(props: ViewLogProps) {
                     return false; // do not stop the streaming
                 }
                 return true; // stop the streaming
-            }, () => {
-                props.processFinished();
-            }); 
+            }, props.processFinished, (e) => {console.log(e); props.processFinished()}); 
 
             return function cleanup(){
                 dynLogger.stop();

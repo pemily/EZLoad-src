@@ -2,7 +2,8 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
+import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPortfolio;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.sources.Reporting;
@@ -42,11 +43,11 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
-    public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolio ezPortfolio) {
+    public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolioProxy ezPortfolioProxy) {
         try(Reporting ignored = reporting.pushSection("Downloading BourseDirect Reports...")) {
 
             try {
-                downloadUpdates(currentChromeVersion, newDriverPathSaver, ezPortfolio);
+                downloadUpdates(currentChromeVersion, newDriverPathSaver, ezPortfolioProxy);
             } catch (Exception e) {
                 if (e instanceof InvalidArgumentException)
                     reporting.error("Impossible de controller Chrome. Verifiez qu'il n'est pas déjà ouvert, si c'est la cas fermez toutes les fenetres et recommencez");
@@ -59,7 +60,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         }
     }
 
-    private void downloadUpdates(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolio ezPortfolio) throws Exception {
+    private void downloadUpdates(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolioProxy ezPortfolioProxy) throws Exception {
         login(currentChromeVersion, newDriverPathSaver);
 
         goToAvisOperes();
@@ -68,7 +69,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         for (BourseDirectEZAccountDeclaration account : bourseDirectSettings.getAccounts()) {
             try(Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
 
-                Optional<EZDate> fromDateOpt = ezPortfolio.getMesOperations().getLastOperationDate(EnumEZCourtier.BourseDirect, account);
+                Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZCourtier.BourseDirect, account);
                 if (fromDateOpt.isPresent()) {
                     reporting.info("Dernière date chargé dans EZPortfolio par EZLoad pour le compte " + courtier.getEzPortfolioName() + ":" + account.getName() + "=> " + fromDateOpt.get().toEzPortoflioDate());
                 } else {

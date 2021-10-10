@@ -1,10 +1,12 @@
 package com.pascal.ezload.service.exporter;
 
 import com.google.api.services.sheets.v4.Sheets;
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
-import com.pascal.ezload.service.exporter.ezPortfolio.MesOperations;
-import com.pascal.ezload.service.exporter.ezPortfolio.MonPortefeuille;
+import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPorfolioProxyV4;
+import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPortfolio;
+import com.pascal.ezload.service.exporter.ezPortfolio.v4.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -13,59 +15,42 @@ import com.pascal.ezload.service.util.StringUtils;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 
 public class EZPortfolioManager {
 
     private Reporting reporting;
     private GDriveSheets sheets;
+    private MainSettings mainSettings;
 
-    public EZPortfolioManager(Reporting reporting, EZPortfolioSettings settings) throws GeneralSecurityException, IOException {
+    public EZPortfolioManager(Reporting reporting, MainSettings settings) throws GeneralSecurityException, IOException {
+        this.mainSettings = settings;
         Sheets service;
         try {
-            service = GDriveConnection.getService(settings.getGdriveCredsFile());
+            service = GDriveConnection.getService(settings.getEzPortfolio().getGdriveCredsFile());
         }
         catch(Exception e){
             reporting.error("Impossible de se connecter à Google Drive. Vérifiez votre fichier de sécurité Google Drive");
             throw e;
         }
-        String url = settings.getEzPortfolioUrl();
+        String url = settings.getEzPortfolio().getEzPortfolioUrl();
         String next = url.substring(SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX.length());
         String ezPortfolioId = StringUtils.divide(next, '/')[0];
         sheets = new GDriveSheets(reporting, service, ezPortfolioId);
         this.reporting = reporting;
     }
 
-    public EZPortfolio load() throws Exception {
+    public EZPortfolioProxy load() throws Exception {
         try(Reporting rep = reporting.pushSection("Loading EZPortfolio...")){
             reporting.info("Getting data from Google Drive API...");
-            EZPortfolio ezPortfolio = new EZPortfolio();
 
-            List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:K", "MonPortefeuille!A4:L");
+            // ici detection de la version de EZPortfolio
+            if (EZPorfolioProxyV5.isCompatible(reporting, sheets)){
+                return new EZPorfolioProxyV5(reporting, sheets);
+            }
 
-            SheetValues allOperations = ezSheets.get(0);
-            MesOperations mesOperations = new MesOperations(reporting, allOperations);
-            ezPortfolio.setMesOperations(mesOperations);
-            reporting.info(allOperations.getValues().size()+" rows from MesOperations loaded.");
-
-            SheetValues portefeuille = ezSheets.get(1);
-            MonPortefeuille monPortefeuille = new MonPortefeuille(reporting, portefeuille);
-            ezPortfolio.setMonPortefeuille(monPortefeuille);
-            reporting.info(portefeuille.getValues().size()+" rows from MonPortefeuille loaded.");
-            return ezPortfolio;
+            // the default version
+            return new EZPorfolioProxyV4(reporting, sheets);
         }
     }
 
-    public void save(EZPortfolio ezPortfolio) throws Exception {
-        reporting.info("Saving EZPortfolio...");
-        MesOperations operations = ezPortfolio.getMesOperations();
-        int firstFreeRow = operations.getFirstFreeRow()+1; // +1 to add the header
-        // sheets.update("MesOperations!A"+firstFreeRow+":J", operations.getNewOperations());
-
-        sheets.batchUpdate(
-                new SheetValues("MesOperations!A"+firstFreeRow+":", operations.getNewOperations()),
-                ezPortfolio.getMonPortefeuille().getSheetValues());
-
-        reporting.info("Save done!");
-    }
 }

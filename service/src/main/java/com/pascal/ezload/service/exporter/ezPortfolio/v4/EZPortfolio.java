@@ -1,4 +1,4 @@
-package com.pascal.ezload.service.exporter.ezPortfolio;
+package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 
 public class EZPortfolio {
     private MesOperations mesOperations;

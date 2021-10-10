@@ -1,7 +1,9 @@
 package com.pascal.ezload.server.httpserver.exec;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
+import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.util.Tail;
 
 import java.io.*;
@@ -15,10 +17,11 @@ import java.util.concurrent.Executors;
 public class ProcessManager {
 
     private final EZHttpServer server;
-    private boolean processRunning = false;
+    private final EzServerState serverState;
 
-    public ProcessManager(EZHttpServer server){
+    public ProcessManager(EZHttpServer server, EzServerState serverState){
         this.server = server;
+        this.serverState = serverState;
     }
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -36,19 +39,15 @@ public class ProcessManager {
         return ezProcesses.size() > 0 ? ezProcesses.get(ezProcesses.size()-1) : null;
     }
 
-    public boolean isProcessRunning() {
-        return processRunning;
-    }
-
     public interface RunnableWithException {
         void run(HttpProcessRunner processRunner) throws Exception;
     }
 
     public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String title, String logFile, RunnableWithException runnable) throws IOException {
         EzProcess latestProcess = getLatestProcess();
-        if (latestProcess == null || !processRunning){
+        if (latestProcess == null || !serverState.isProcessRunning()){
             EzProcess p = new EzProcess(title, logFile);
-            processRunning = true;
+            serverState.setProcessRunning(true);
             ezProcesses.add(p);
             Writer fileWriter = new BufferedWriter(new FileWriter(logFile));
 
@@ -59,12 +58,13 @@ public class ProcessManager {
                         runnable.run(processLogger);
                     } catch (Exception e) {
                         processLogger.getReporting().error(e);
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 finally{
-                    processRunning = false;
+                    serverState.setProcessRunning(false);
                 }
             });
             return p;
@@ -82,7 +82,7 @@ public class ProcessManager {
         if ((!logFile.exists() && !logFile.isFile())){
             return;
         }
-        if (processRunning) {
+        if (serverState.isProcessRunning()) {
             Tail.tail(logFile, htmlPageWriter, HttpProcessRunner.FILE_HEADER, HttpProcessRunner.FILE_FOOTER);
         }
         else{
@@ -109,9 +109,9 @@ public class ProcessManager {
 
     public void kill() {
         EzProcess latestProcess = getLatestProcess();
-        if (latestProcess != null && processRunning){
+        if (latestProcess != null && serverState.isProcessRunning()){
             executor.shutdownNow();
-            processRunning = false;
+            serverState.setProcessRunning(false);
         }
     }
 }

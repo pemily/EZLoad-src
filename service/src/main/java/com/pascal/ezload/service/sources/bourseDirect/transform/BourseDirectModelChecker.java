@@ -28,6 +28,7 @@ public class BourseDirectModelChecker {
             if (nbOfDroitDeGarde == 1 && !(model.getOperations().get(model.getOperations().size() - 1) instanceof DroitsDeGarde)) {
                 // si ce n'est pas le dernier, il faudra en tenir compte pour les index des dates vs operations vs amounts
                 reporting.error("La section 'Droit de Garde' n'est pas la dernière section");
+                isValid = false;
             }
 
             if (model.getDates().size() != model.getOperations().size()) {
@@ -40,12 +41,12 @@ public class BourseDirectModelChecker {
                 isValid = false;
             }
 
-            if (!model.getDeviseCredit().equals("€")) {
+            if (!"€".equals(model.getDeviseCredit())) {
                 reporting.error("La devise de la colonne Crédit n'est pas en € mais en: " + model.getDeviseCredit());
                 isValid = false;
             }
 
-            if (!model.getDeviseDebit().equals("€")) {
+            if (!"€".equals(model.getDeviseDebit())) {
                 reporting.error("La devise de la colonne Débit n'est pas en € mais en: " + model.getDeviseDebit());
                 isValid = false;
             }

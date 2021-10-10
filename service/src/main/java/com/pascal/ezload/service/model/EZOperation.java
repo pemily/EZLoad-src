@@ -1,9 +1,11 @@
 package com.pascal.ezload.service.model;
 
 
+import java.util.Map;
+
 public abstract class EZOperation {
 
-
+    protected boolean error;
     private EZDate date;
     private String amount;
     private String description;
@@ -11,6 +13,8 @@ public abstract class EZOperation {
     private EnumEZCourtier courtier;
     private EZAccount account;
     private EZAccountDeclaration EZAccountDeclaration;
+
+    public abstract EZOperationType getOperationType();
 
     public EZDate getDate() {
         return date;
@@ -35,8 +39,6 @@ public abstract class EZOperation {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public abstract EZOperationType getOperationType();
 
     public EnumEZCompteType getCompteType() {
         return compteType;
@@ -82,4 +84,23 @@ public abstract class EZOperation {
                 ", courtier='" + courtier + '\'' +
                 '}';
     }
+
+    public boolean hasError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
+    public void fill(Map<String, String> data) {
+        data.put("operation.type", getOperationType().getEZPortfolioName());
+        data.put("operation.date", date.toEzPortoflioDate());
+        data.put("operation.montant", amount);
+        data.put("operation.description", description);
+        data.put("operation.compteType", compteType.getEZPortfolioName());
+        fillData(data); // force the subtype to implements the fillData method
+    }
+
+    protected abstract void fillData(Map<String, String> data);
 }

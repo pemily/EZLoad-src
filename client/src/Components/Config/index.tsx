@@ -111,8 +111,7 @@ export function Config(props: ConfigProps) {
                                         || valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === ""} 
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
-                                            .then(process =>{ console.log("process", process); props.followProcess(process);})
-                                            }
+                                            .then(props.followProcess) }
                                             size="small" icon={<Validate size="small"/>} label="Valider la connection"/>
                                </Box>
                            </Help>
@@ -260,7 +259,7 @@ export function Config(props: ConfigProps) {
                                 <Button
                                     disabled={props.readOnly} onClick={() =>
                                         jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect", chromeVersion: getChromeVersion()}))
-                                        .then(process => props.followProcess(process))
+                                        .then(props.followProcess)
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>

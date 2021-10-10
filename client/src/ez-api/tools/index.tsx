@@ -17,7 +17,7 @@ export function jsonCall(promise: Promise<HttpResponse<any, any>>) {
 
  
 // onText return true if it wants to stop the streaming
-export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void){    
+export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void, onError: (e: any) => void){    
     promise
     .then(response => response.body)
     .then(body => {
@@ -43,7 +43,7 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
             }
           });
     })
-    .catch(e => console.log("Stream error: ", e));      
+    .catch(e => onError(e));      
 }
 
 

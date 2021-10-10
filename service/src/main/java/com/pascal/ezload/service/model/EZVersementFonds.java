@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.model;
 
+import java.util.Map;
+
 public class EZVersementFonds extends EZOperation {
     private EZDevise devise;
 
@@ -14,5 +16,11 @@ public class EZVersementFonds extends EZOperation {
 
     public void setDevise(EZDevise devise) {
         this.devise = devise;
+    }
+
+    @Override
+    protected void fillData(Map<String, String> data) {
+        data.put("operation.codeDevise", devise.getCode());
+        data.put("operation.symbolDevise", devise.getSymbol());
     }
 }

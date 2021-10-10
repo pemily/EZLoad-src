@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.model;
 
+import java.util.Map;
+
 public class EZMarketPlace {
 
     private String stockExchange;
@@ -46,5 +48,17 @@ public class EZMarketPlace {
 
     public String getGoogleFinanceCode() {
         return googleFinanceCode;
+    }
+
+    public void fill(Map<String, String> data) {
+        data.put("marché.echange", stockExchange);
+        data.put("marché.ville", city);
+        data.put("marché.mic", mic);
+        data.put("marché.acronym", acronym);
+        data.put("marché.codePays", country.getCode());
+        data.put("marché.pays", country.getName());
+        data.put("marché.googleFinanceCode", googleFinanceCode);
+        data.put("marché.codeDevise", currency.getCode());
+        data.put("marché.symbolDevise", currency.getSymbol());
     }
 }

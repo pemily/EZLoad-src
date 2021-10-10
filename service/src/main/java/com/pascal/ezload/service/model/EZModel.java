@@ -1,10 +1,12 @@
 package com.pascal.ezload.service.model;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class EZModel {
 
-    private EnumEZCourtier source;
+    private EnumEZCourtier courtier;
 
     private String sourceFile;
 
@@ -12,16 +14,31 @@ public class EZModel {
 
     private EZAccount account;
 
-    private EZAccountDeclaration EZAccountDeclaration;
+    private EZAccountDeclaration ezAccountDeclaration;
 
-    private List<EZOperation> operations;
+    private List<EZOperation> operations = new LinkedList<>();
 
-    public EnumEZCourtier getSource() {
-        return source;
+    private boolean error;
+
+    public EZModel(EnumEZCourtier courtier, String sourceFile){
+        this.courtier = courtier;
+        this.sourceFile = sourceFile;
     }
 
-    public void setSource(EnumEZCourtier source) {
-        this.source = source;
+    public boolean hasError(){
+        return error;
+    }
+
+    public void setError(boolean error){
+        this.error = error;
+    }
+
+    public EnumEZCourtier getCourtier() {
+        return courtier;
+    }
+
+    public void setCourtier(EnumEZCourtier courtier) {
+        this.courtier = courtier;
     }
 
     public String getSourceFile() {
@@ -57,10 +74,24 @@ public class EZModel {
     }
 
     public EZAccountDeclaration getAccountDeclaration() {
-        return EZAccountDeclaration;
+        return ezAccountDeclaration;
     }
 
-    public void setAccountDeclaration(EZAccountDeclaration EZAccountDeclaration) {
-        this.EZAccountDeclaration = EZAccountDeclaration;
+    public void setAccountDeclaration(EZAccountDeclaration ezAccountDeclaration) {
+        this.ezAccountDeclaration = ezAccountDeclaration;
+    }
+
+    public void fill(Map<String, String> data) {
+        data.put("rapport.courtier", courtier.getEzPortfolioName());
+        data.put("rapport.fichier", sourceFile);
+        data.put("rapport.date", reportDate.toEzPortoflioDate());
+        data.put("rapport.numeroCompte", account.getAccountNumber());
+        data.put("rapport.typeCompte", account.getAccountType());
+        data.put("rapport.nomCompte", ezAccountDeclaration.getName());
+        data.put("rapport.symbolDevise", account.getDevise().getSymbol());
+        data.put("rapport.codeDevise", account.getDevise().getCode());
+        data.put("rapport.proprietaire", account.getOwnerName());
+        data.put("rapport.addresse", account.getOwnerAdress());
     }
 }
+

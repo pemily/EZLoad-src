@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text } from "grommet";
-import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert } from 'grommet-icons';
+import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Message } from '../Tools/Message';
@@ -24,7 +24,9 @@ export function App(){
             setLastProcess(process);
             setProcessRunning(true);
         }
-        else setProcessLaunchFail(true);
+        else {
+            setProcessLaunchFail(true);
+        }
         setActiveIndex(EXECUTION_TAB_INDEX); //switch to the execution tab
     }
 
@@ -82,10 +84,18 @@ export function App(){
                                                 followProcess={followProcess}
                                                 bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
                                                 readOnly={processRunning}/>                                
-                                </Box>                        
+                                </Box>                   
+
+                                <Button alignSelf="start" margin="medium"
+                                    disabled={processRunning} onClick={() => 
+                                        jsonCall(ezApi.engine.analyze())
+                                        .then(followProcess)
+                                    }
+                                    size="small" icon={<Services size='small'/>} label="Analyser les nouvelles opérations"/>                                                
                                 <Anchor label="Vérifier les opérations et Corriger" margin="medium" onClick={() => setActiveIndex(OPERATIONS_TAB_INDEX)}  icon={<UserExpert size="medium" />}/>
                                 <Button alignSelf="start" margin="medium" disabled={processRunning} onClick={() =>
-console.log("TODO")
+                                        jsonCall(ezApi.engine.upload())
+                                        .then(followProcess)
                                     }
                                     size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>       
                             </>)}

@@ -1,9 +1,11 @@
 package com.pascal.ezload.service.model;
 
+import java.util.Map;
+
 public class EZCoupons extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
-    private int number;
+    private int quantite;
     private String prixUnitaireBrut;
     private String commission;
     private String prelevement;
@@ -11,12 +13,12 @@ public class EZCoupons extends EZOperation implements IOperationWithAction {
     private String creditImpot;
     private String contributionSocial;
 
-    public int getNumber() {
-        return number;
+    public int getQuantite() {
+        return quantite;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setQuantite(int number) {
+        this.quantite = number;
     }
 
     public String getPrixUnitaireBrut() {
@@ -79,5 +81,21 @@ public class EZCoupons extends EZOperation implements IOperationWithAction {
 
     public void setAction(EZAction action){
         this.action = action;
+    }
+
+    public boolean hasError() {
+        return super.error || action.isError();
+    }
+
+    @Override
+    protected void fillData(Map<String, String> data) {
+        data.put("operation.quantite", quantite+"");
+        data.put("operation.prixUnitBrut", prixUnitaireBrut);
+        data.put("operation.commission", commission);
+        data.put("operation.prelevement", prelevement);
+        data.put("operation.montantBrut", amountBrut);
+        data.put("operation.creditImpot", creditImpot);
+        data.put("operation.contributionSocial", contributionSocial);
+        action.fill(data);
     }
 }

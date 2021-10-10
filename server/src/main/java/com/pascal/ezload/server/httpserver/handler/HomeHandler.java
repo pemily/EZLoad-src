@@ -1,6 +1,7 @@
 package com.pascal.ezload.server.httpserver.handler;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
+import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.WebData;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
@@ -32,6 +33,9 @@ public class HomeHandler {
     @Inject
     private ProcessManager processManager;
 
+    @Inject
+    private EzServerState ezServerState;
+
     @GET
     @Path("/ping")
     public String ping(){
@@ -45,7 +49,9 @@ public class HomeHandler {
     public WebData getMainData() throws Exception {
         return new WebData(SettingsManager.getInstance().loadProps().validate(),
                             processManager.getLatestProcess(),
-                            processManager.isProcessRunning());
+                            ezServerState.isProcessRunning(),
+                            ezServerState.getOperations()
+        );
     }
 
     @POST
@@ -109,42 +115,4 @@ public class HomeHandler {
         writer.close();
     }
 
-
-    @GET
-    @Path("/test1")
-    @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess test1() throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        return processManager.createNewRunningProcess(mainSettings, "Test1", ProcessManager.getLog(mainSettings, "test1", "-searchAccount.log"),
-                (processLogger) -> {
-                    for (int i = 0; i < 20; i++) {
-                        processLogger.getReporting().info("Bonjour " + i + "\n");
-                        System.out.println("Bonjour " + i);
-                        sleep();
-                    }
-                });
-    }
-
-    @GET
-    @Path("/test2")
-    @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess test2() throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        return processManager.createNewRunningProcess(mainSettings, "Test2", ProcessManager.getLog(mainSettings, "test2", "-searchAccount.log"),
-                (processLogger) -> {
-                    for (int i = 0; i < 60; i++) {
-                        processLogger.getReporting().info("Bonjour " + i + "\n");
-                        System.out.println("Bonjour " + i);
-                        sleep();
-                    }
-                });
-    }
-
-    private void sleep(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package com.pascal.ezload.server;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
+import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.SettingsManager;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
@@ -17,8 +18,10 @@ public class Main {
         int port = server.start(new AbstractBinder() {
             @Override
             protected void configure() {
+                EzServerState serverState = new EzServerState();
                 bind(server).to(EZHttpServer.class);
-                bind(new ProcessManager(server)).to(ProcessManager.class);
+                bind(new ProcessManager(server, serverState)).to(ProcessManager.class);
+                bind(serverState).to(EzServerState.class);
             }
         });
         String homePage = "http://localhost:"+port+"/EZLoad/api/home";

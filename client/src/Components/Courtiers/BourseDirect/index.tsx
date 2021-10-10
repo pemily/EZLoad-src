@@ -17,10 +17,10 @@ export function BourseDirect(props: BourseDirectProps){
             
           <Button alignSelf="start" margin="medium"
                 disabled={props.readOnly} onClick={() => 
-                    jsonCall(ezApi.engine.downloadAndAnalyze({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
+                    jsonCall(ezApi.engine.download({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
                     .then(process => props.followProcess(process))
                 }
-                size="small" icon={<Download size='small'/>} label="Lancer la récupérations des opérations et l'analyse"/>            
+                size="small" icon={<Download size='small'/>} label="Télécharger les nouvelles opérations"/>                             
         </Box>
     );
 }

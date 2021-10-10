@@ -1,17 +1,19 @@
 package com.pascal.ezload.service.model;
 
+import java.util.Map;
+
 public class EZDividendeOptionel extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
-    private int number;
+    private int quantite;
     private String cours;
 
-    public int getNumber() {
-        return number;
+    public int getQuantite() {
+        return quantite;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setQuantite(int quantite) {
+        this.quantite = quantite;
     }
 
     public String getCours() {
@@ -34,5 +36,16 @@ public class EZDividendeOptionel extends EZOperation implements IOperationWithAc
 
     public void setAction(EZAction action){
         this.action = action;
+    }
+
+    public boolean hasError() {
+        return super.error || action.isError();
+    }
+
+    @Override
+    protected void fillData(Map<String, String> data) {
+        action.fill(data);
+        data.put("operation.quantite", quantite+"");
+        data.put("operation.cours", cours);
     }
 }

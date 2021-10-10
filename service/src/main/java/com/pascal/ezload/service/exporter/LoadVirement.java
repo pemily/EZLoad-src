@@ -1,10 +1,9 @@
 package com.pascal.ezload.service.exporter;
 
-import com.pascal.ezload.service.exporter.ezPortfolio.EZPortfolio;
-import com.pascal.ezload.service.exporter.ezPortfolio.MesOperations;
-import com.pascal.ezload.service.exporter.ezPortfolio.MonPortefeuille;
-import com.pascal.ezload.service.model.EZRetraitFonds;
-import com.pascal.ezload.service.model.EZVersementFonds;
+import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
+import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
+import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
+import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
@@ -16,28 +15,18 @@ public class LoadVirement {
         this.reporting = reporting;
     }
 
-    public void load(EZPortfolio ezPortfolio, EZVersementFonds op){
-        MesOperations mesOperations = ezPortfolio.getMesOperations();
-        if (!mesOperations.isOperationsExists(op)){
-            reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
-            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
-                    op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
-
-            MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();
-            portefeuille.updateLiquidite(str2Float(op.getAmount()));
-        }
+    public EzEdition load(EZModel fromEzModel, EZVersementFonds op){
+        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
+                op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
+        EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition(EzPortefeuilleEdition.LIQUIDITE_ACTION, str2Float(op.getAmount()));
+        return new EzEdition(fromEzModel, op, ezOperationEdition, ezPortefeuilleEdition);
     }
 
-    public void load(EZPortfolio ezPortfolio, EZRetraitFonds op){
-        MesOperations mesOperations = ezPortfolio.getMesOperations();
-        if (!mesOperations.isOperationsExists(op)){
-            reporting.info("New operation "+op.getDate()+" "+op.getOperationType()+" "+op.getAmount()+op.getDevise().getSymbol());
-            mesOperations.newOperation(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
-                    op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
-
-            MonPortefeuille portefeuille = ezPortfolio.getMonPortefeuille();
-            portefeuille.updateLiquidite(str2Float(op.getAmount()));
-        }
+    public EzEdition load(EZModel fromEzModel, EZRetraitFonds op){
+        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
+                op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
+        EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition(EzPortefeuilleEdition.LIQUIDITE_ACTION, str2Float(op.getAmount()));
+        return new EzEdition(fromEzModel, op, ezOperationEdition, ezPortefeuilleEdition);
     }
 
 }

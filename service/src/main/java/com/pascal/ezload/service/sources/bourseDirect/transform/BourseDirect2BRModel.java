@@ -24,10 +24,8 @@ public class BourseDirect2BRModel {
     
     public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
-        EZModel EZModel = new EZModel();
+        EZModel EZModel = new EZModel(EnumEZCourtier.BourseDirect, sourceFile);
         EZModel.setReportDate(model.getDateAvisOperation());
-        EZModel.setSource(EnumEZCourtier.BourseDirect);
-        EZModel.setSourceFile(sourceFile);
 
         EZAccount EZAccount = new EZAccount();
         EZAccount.setAccountNumber(model.getAccountNumber());
@@ -76,7 +74,7 @@ public class BourseDirect2BRModel {
             EZAchat brOp = new EZAchat();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
             brOp.setTva(ModelUtils.normalizeAmount(op.getTva()));
@@ -88,7 +86,7 @@ public class BourseDirect2BRModel {
             EZAchatEtranger brOp = new EZAchatEtranger();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
@@ -102,7 +100,7 @@ public class BourseDirect2BRModel {
             EZVenteEtranger brOp = new EZVenteEtranger();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
@@ -123,7 +121,7 @@ public class BourseDirect2BRModel {
             EZCoupons brOp = new EZCoupons();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setPrixUnitaireBrut(ModelUtils.normalizeAmount(op.getPrixUnitBrut()));
             brOp.setCommission(ModelUtils.normalizeAmount(op.getCommission()));
             brOp.setPrelevement(ModelUtils.normalizeAmount(op.getPrelevement()));
@@ -149,7 +147,7 @@ public class BourseDirect2BRModel {
             EZDividendeOptionel brOp = new EZDividendeOptionel();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setNumber(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
         }
         else if (operation instanceof EspecesSurOST){

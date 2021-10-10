@@ -65,10 +65,9 @@ public class SecurityHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try{
-                        Sheets service = GDriveConnection.getService(SettingsManager.getInstance().loadProps().getEzPortfolio().getGdriveCredsFile());
-                        if (service != null)
-                            reporting.info("La connection est validé, vous pouvez utiliser EZLoad");
-                        else reporting.error("Le document EZPortfolio n'a pas pu être récupéré. Vérifiez votre URL EZPortfolio ou votre fichier de sécurité");
+                        GDriveConnection.getService(SettingsManager.getInstance().loadProps().getEzPortfolio().getGdriveCredsFile());
+                        // si pas d'exception
+                        reporting.info("La connection est validé, vous pouvez utiliser EZLoad");
                     }
                     catch(Exception e){
                         reporting.error("Il y a une erreur soit avec votre fichier de sécurité, soit avec votre url EZPortfolio");

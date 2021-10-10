@@ -157,7 +157,7 @@ public class BourseDirectParserTest {
         TextReporting reporting = new TextReporting();
         BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-      //  EZModel brModel = new BourseDirectProcessor(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
+      //  EZModel brModel = new BourseDirectAnalyser(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
        // String jsonBrModel = ModelUtils.toJson(brModel);
         //String report = reporting.getReport();
 
