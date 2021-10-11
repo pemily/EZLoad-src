@@ -5,21 +5,12 @@ import java.util.Map;
 public class EZCoupons extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
-    private int quantite;
     private String prixUnitaireBrut;
     private String commission;
     private String prelevement;
     private String amountBrut;
     private String creditImpot;
     private String contributionSocial;
-
-    public int getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(int number) {
-        this.quantite = number;
-    }
 
     public String getPrixUnitaireBrut() {
         return prixUnitaireBrut;
@@ -83,13 +74,12 @@ public class EZCoupons extends EZOperation implements IOperationWithAction {
         this.action = action;
     }
 
-    public boolean hasError() {
+    public boolean getError() {
         return super.error || action.isError();
     }
 
     @Override
     protected void fillData(Map<String, String> data) {
-        data.put("operation.quantite", quantite+"");
         data.put("operation.prixUnitBrut", prixUnitaireBrut);
         data.put("operation.commission", commission);
         data.put("operation.prelevement", prelevement);

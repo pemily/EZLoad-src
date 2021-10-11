@@ -20,7 +20,7 @@ export function BourseDirect(props: BourseDirectProps){
                     jsonCall(ezApi.engine.download({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
                     .then(process => props.followProcess(process))
                 }
-                size="small" icon={<Download size='small'/>} label="Télécharger les nouvelles opérations"/>                             
+                size="small" icon={<Download size='small'/>} label="Télécharger les nouveaux Relevés"/>                             
         </Box>
     );
 }

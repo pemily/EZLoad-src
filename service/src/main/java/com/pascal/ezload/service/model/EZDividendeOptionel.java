@@ -5,16 +5,7 @@ import java.util.Map;
 public class EZDividendeOptionel extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
-    private int quantite;
     private String cours;
-
-    public int getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(int quantite) {
-        this.quantite = quantite;
-    }
 
     public String getCours() {
         return cours;
@@ -38,14 +29,13 @@ public class EZDividendeOptionel extends EZOperation implements IOperationWithAc
         this.action = action;
     }
 
-    public boolean hasError() {
+    public boolean getError() {
         return super.error || action.isError();
     }
 
     @Override
     protected void fillData(Map<String, String> data) {
         action.fill(data);
-        data.put("operation.quantite", quantite+"");
         data.put("operation.cours", cours);
     }
 }

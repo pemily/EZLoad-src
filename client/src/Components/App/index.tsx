@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text } from "grommet";
+import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner } from "grommet";
 import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
+import { Reports } from '../Reports';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
 import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
-    const OPERATIONS_TAB_INDEX = 1;
+    
     const EXECUTION_TAB_INDEX = 2;
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
+    const [reports, setReports] = useState<EzReport[]>([]);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
     const [processRunning, setProcessRunning] = useState<boolean>(false);
  
@@ -38,6 +40,7 @@ export function App(){
              setMainSettings(r.mainSettings);                          
              setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);
              setProcessRunning(r.processRunning);
+             setReports(r.reports);
           })
         .catch((error) => {
             console.log("Error while loading Data.", error);
@@ -59,6 +62,14 @@ export function App(){
         reloadAllData();
     }, []);
 
+    const runningTaskOrLog = (isRunning: boolean|undefined) => {
+        return isRunning ? (<Spinner
+          border={[
+            { side: 'all', color: 'transparent', size: 'small' },
+            { side: 'horizontal', color: 'focus', size: 'small' },
+          ]}
+        />) : (<Clipboard size='small'/>);
+    }
 
     return (
         <Box>
@@ -68,7 +79,7 @@ export function App(){
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             <Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
-                    <Tab title="Actions" icon={<Command size='small'/>}>
+                    <Tab title="Relevés" icon={<Command size='small'/>}>
                         <Box fill overflow="auto">
                             {(mainSettings === undefined || mainSettings == null) && (
                                 <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
@@ -86,29 +97,31 @@ export function App(){
                                                 readOnly={processRunning}/>                                
                                 </Box>                   
 
-                                <Button alignSelf="start" margin="medium"
-                                    disabled={processRunning} onClick={() => 
-                                        jsonCall(ezApi.engine.analyze())
-                                        .then(followProcess)
-                                    }
-                                    size="small" icon={<Services size='small'/>} label="Analyser les nouvelles opérations"/>                                                
-                                <Anchor label="Vérifier les opérations et Corriger" margin="medium" onClick={() => setActiveIndex(OPERATIONS_TAB_INDEX)}  icon={<UserExpert size="medium" />}/>
-                                <Button alignSelf="start" margin="medium" disabled={processRunning} onClick={() =>
-                                        jsonCall(ezApi.engine.upload())
-                                        .then(followProcess)
-                                    }
-                                    size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>       
                             </>)}
                         </Box>
                     </Tab>
-                    <Tab title="Operations" icon={<DocumentStore size='small'/>}>
+                    <Tab title="EZ-Operations" icon={<DocumentStore size='small'/>}>
                         <Box fill overflow="auto">
                             {mainSettings && processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                                                                         
+                                    Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}              
+                                <Box margin="none" direction="row">
+                                    <Button alignSelf="start" margin="medium"
+                                        disabled={processRunning} onClick={() => 
+                                            jsonCall(ezApi.engine.analyze())
+                                            .then(followProcess)
+                                        }
+                                        size="small" icon={<Services size='small'/>} label="Charger les nouvelles opérations"/>                                                
+                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
+                                                    jsonCall(ezApi.engine.upload())
+                                                    .then(followProcess)
+                                                }
+                                                size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
+                                </Box>
+                                <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}/>                                                                                                                  
                         </Box>
                     </Tab>                       
-                    <Tab title="Exécution" icon={<Clipboard size='small'/>}>
+                    <Tab title="Rapport" icon={runningTaskOrLog(mainSettings && processRunning)}>
                         <Box fill overflow="auto">
                             {mainSettings && processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">

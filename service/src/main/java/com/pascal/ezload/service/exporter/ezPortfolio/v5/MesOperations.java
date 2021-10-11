@@ -1,4 +1,4 @@
-package com.pascal.ezload.service.exporter.ezPortfolio.v4;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -24,7 +24,7 @@ public class MesOperations  {
     private static final int DATE_COL = 0;
     private static final int COMPTE_TYPE_COL = 1;
     private static final int COURTIER_DISPLAY_NAME_COL = 2;
-    private static final int PERIODE_COL = 3;
+    private static final int QUANTITE_COL = 3;
     private static final int OPERATION_TYPE_COL = 4;
     private static final int ACTION_NAME_COL = 5;
     private static final int COUNTRY_COL = 6;
@@ -55,6 +55,7 @@ public class MesOperations  {
                         BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
                         && operation.getDate().equals(row.valueDate(DATE_COL))
                         && operation.getAmount().equals(row.valueStr(AMOUNT_COL))
+                        && operation.getQuantity().equals(row.valueStr(QUANTITE_COL))
                         && operation.getCourtier().getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
                         && operation.getCompteType().getEZPortfolioName().equals(row.valueStr(COMPTE_TYPE_COL))
                         && operation.getAccountDeclaration().getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL))

@@ -1,6 +1,7 @@
 package com.pascal.ezload.server.httpserver.handler;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
@@ -11,7 +12,7 @@ import com.pascal.ezload.service.exporter.EZModelChecker;
 import com.pascal.ezload.service.exporter.EzEditionExporter;
 import com.pascal.ezload.service.exporter.EZPortfolioManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
+import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.sources.Reporting;
@@ -85,8 +86,8 @@ public class EngineHandler {
                         new EZModelChecker(reporting).validateModels(allEZModels);
                     }
 
-                    List<EzEdition> allEzEditions = new EzEditionExporter(reporting).exportModels(allEZModels, ezPortfolioProxy);
-                    serverState.setOperations(allEzEditions);
+                    List<EzReport> allEzReports = new EzEditionExporter(reporting).exportModels(allEZModels, ezPortfolioProxy);
+                    serverState.setEzReports(allEzReports);
                 });
 
     }
@@ -107,7 +108,7 @@ public class EngineHandler {
             try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
                 EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
                 EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
-                serverState.setOperations(ezPortfolioProxy.save(serverState.getOperations()));
+                serverState.setEzReports(ezPortfolioProxy.save(serverState.getEzReports()));
             }
         });
     }

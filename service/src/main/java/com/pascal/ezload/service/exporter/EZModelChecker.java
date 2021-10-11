@@ -9,8 +9,6 @@ import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EZModelChecker {
     private final Reporting reporting;
@@ -38,7 +36,7 @@ public class EZModelChecker {
 
             if (model.getOperations().size() == 0){
                 model.setError(true);
-                reporting.error("Aucune operation trouvée!");
+                reporting.error("Aucune operation trouvée! Si il n'y en a pas dans ce fichier, il faudra le supprimer manuellement");
             }
             else {
                 for (EZOperation op : model.getOperations()) {
@@ -81,7 +79,7 @@ public class EZModelChecker {
                 operation.setError(true);
         }
 
-        return operation.hasError();
+        return operation.getError();
     }
 
     // return true if error found

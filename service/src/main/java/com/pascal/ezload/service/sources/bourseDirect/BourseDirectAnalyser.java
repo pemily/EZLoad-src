@@ -64,16 +64,21 @@ public class BourseDirectAnalyser {
                 boolean isValid = new BourseDirectModelChecker(reporting).isValid(model);
 
                 if (isValid) {
-                    return new BourseDirect2BRModel(reporting).create(pdfFilePath, EZAccountDeclaration, model);
+                    return new BourseDirect2BRModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model);
                 }
             }
             catch(Exception e){
                 reporting.error("Erreur pendant l'analyze", e);
             }
-            EZModel ezModel = new EZModel(EnumEZCourtier.BourseDirect, pdfFilePath);
+            EZModel ezModel = new EZModel(EnumEZCourtier.BourseDirect, getSourceRef(mainSettings, pdfFilePath));
             ezModel.setError(true);
             return ezModel;
         }
     }
 
+    public static String getSourceRef(MainSettings mainSettings, String pdfFilePath) {
+        String file = pdfFilePath.substring(mainSettings.getEZLoad().getDownloadDir().length()).replace('\\', '/');
+        if (file.startsWith("/")) file = file.substring(1);
+        return file;
+    }
 }

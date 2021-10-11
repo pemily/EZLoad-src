@@ -8,6 +8,7 @@ import com.pascal.ezload.service.util.Sleep;
 import com.pascal.ezload.service.util.SupplierWithException;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,9 +60,10 @@ public class GDriveSheets {
                     .batchGet(spreadsheetId)
                     .setRanges(ranges)
                     .execute();
-            return resp.getValueRanges().stream().map(vr ->
-                new SheetValues(vr.getRange(),
-                                vr.getValues().stream().map(Row::new).collect(Collectors.toList()))
+            return resp.getValueRanges().stream().map(vr -> {
+                List<Row> rows = vr.getValues() == null ? new LinkedList<>() : vr.getValues().stream().map(Row::new).collect(Collectors.toList());
+                return new SheetValues(vr.getRange(), rows);
+            }
             ).collect(Collectors.toList());
         });
     }

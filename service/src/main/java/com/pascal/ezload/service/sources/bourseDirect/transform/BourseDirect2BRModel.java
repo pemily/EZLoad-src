@@ -1,9 +1,11 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.parsers.bourseDirect.*;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.ezload.service.util.BRException;
 import com.pascal.ezload.service.util.DeviseUtil;
@@ -16,15 +18,17 @@ import java.util.List;
 
 public class BourseDirect2BRModel {
 
-    public Reporting reporting;
+    private Reporting reporting;
+    private MainSettings mainSettings;
 
-    public BourseDirect2BRModel(Reporting reporting){
+    public BourseDirect2BRModel(MainSettings mainSettings, Reporting reporting){
         this.reporting = reporting;
+        this.mainSettings = mainSettings;
     }
     
     public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
-        EZModel EZModel = new EZModel(EnumEZCourtier.BourseDirect, sourceFile);
+        EZModel EZModel = new EZModel(EnumEZCourtier.BourseDirect, BourseDirectAnalyser.getSourceRef(mainSettings, sourceFile));
         EZModel.setReportDate(model.getDateAvisOperation());
 
         EZAccount EZAccount = new EZAccount();
@@ -74,7 +78,7 @@ public class BourseDirect2BRModel {
             EZAchat brOp = new EZAchat();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantity(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
             brOp.setTva(ModelUtils.normalizeAmount(op.getTva()));
@@ -86,7 +90,7 @@ public class BourseDirect2BRModel {
             EZAchatEtranger brOp = new EZAchatEtranger();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantity(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
@@ -100,7 +104,7 @@ public class BourseDirect2BRModel {
             EZVenteEtranger brOp = new EZVenteEtranger();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantity(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setChangeRate(ModelUtils.normalizeAmount(op.getTxUSDvsEUR()));
             brOp.setDescription(op.getHeureExecution()+" "+op.getLieu());
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
@@ -121,7 +125,7 @@ public class BourseDirect2BRModel {
             EZCoupons brOp = new EZCoupons();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantity(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setPrixUnitaireBrut(ModelUtils.normalizeAmount(op.getPrixUnitBrut()));
             brOp.setCommission(ModelUtils.normalizeAmount(op.getCommission()));
             brOp.setPrelevement(ModelUtils.normalizeAmount(op.getPrelevement()));
@@ -147,7 +151,7 @@ public class BourseDirect2BRModel {
             EZDividendeOptionel brOp = new EZDividendeOptionel();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
-            brOp.setQuantite(ModelUtils.normalizeNumber(op.getQuantite()));
+            brOp.setQuantity(ModelUtils.normalizeNumber(op.getQuantite()));
             brOp.setCours(ModelUtils.normalizeAmount(op.getCours()));
         }
         else if (operation instanceof EspecesSurOST){

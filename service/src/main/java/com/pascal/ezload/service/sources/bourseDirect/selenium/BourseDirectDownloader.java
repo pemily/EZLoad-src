@@ -3,7 +3,6 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPortfolio;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.sources.Reporting;

@@ -25,7 +25,7 @@ public class EZModel {
         this.sourceFile = sourceFile;
     }
 
-    public boolean hasError(){
+    public boolean getError(){
         return error;
     }
 
@@ -83,15 +83,15 @@ public class EZModel {
 
     public void fill(Map<String, String> data) {
         data.put("rapport.courtier", courtier.getEzPortfolioName());
-        data.put("rapport.fichier", sourceFile);
-        data.put("rapport.date", reportDate.toEzPortoflioDate());
-        data.put("rapport.numeroCompte", account.getAccountNumber());
-        data.put("rapport.typeCompte", account.getAccountType());
-        data.put("rapport.nomCompte", ezAccountDeclaration.getName());
-        data.put("rapport.symbolDevise", account.getDevise().getSymbol());
-        data.put("rapport.codeDevise", account.getDevise().getCode());
-        data.put("rapport.proprietaire", account.getOwnerName());
-        data.put("rapport.addresse", account.getOwnerAdress());
+        data.put("rapport.source", sourceFile);
+        data.put("rapport.date", reportDate == null ? null : reportDate.toEzPortoflioDate());
+        data.put("rapport.numeroCompte", account == null ?  null : account.getAccountNumber());
+        data.put("rapport.typeCompte", account == null ?  null : account.getAccountType());
+        data.put("rapport.nomCompte", ezAccountDeclaration == null ? null : ezAccountDeclaration.getName());
+        data.put("rapport.symbolDevise", account == null ?  null : account.getDevise().getSymbol());
+        data.put("rapport.codeDevise", account == null ?  null : account.getDevise().getCode());
+        data.put("rapport.proprietaire", account == null ?  null : account.getOwnerName());
+        data.put("rapport.addresse", account == null ?  null : account.getOwnerAdress());
     }
 }
 

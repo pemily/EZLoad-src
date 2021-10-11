@@ -3,13 +3,9 @@ package com.pascal.ezload.service.exporter;
 import com.google.api.services.sheets.v4.Sheets;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPorfolioProxyV4;
-import com.pascal.ezload.service.exporter.ezPortfolio.v4.EZPortfolio;
-import com.pascal.ezload.service.exporter.ezPortfolio.v4.MesOperations;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
-import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.StringUtils;
 
@@ -49,7 +45,7 @@ public class EZPortfolioManager {
             }
 
             // the default version
-            return new EZPorfolioProxyV4(reporting, sheets);
+            throw new IllegalStateException("Vous devez utiliser EZPortfolio V5");
         }
     }
 

@@ -5,13 +5,13 @@ public class EzPortefeuilleEdition {
     public static final String LIQUIDITE_ACTION = "LIQUIDITE";
 
     private String valeur;
-    private float quantitée; // can be negative
+    private float quantite; // can be negative
 
     public EzPortefeuilleEdition(){}
 
-    public EzPortefeuilleEdition(String valeur, float quantitée) {
+    public EzPortefeuilleEdition(String valeur, float quantite) {
         this.valeur = valeur;
-        this.quantitée = quantitée;
+        this.quantite = quantite;
     }
 
     public String getValeur() {
@@ -22,11 +22,11 @@ public class EzPortefeuilleEdition {
         this.valeur = valeur;
     }
 
-    public float getQuantitée() {
-        return quantitée;
+    public float getQuantite() {
+        return quantite;
     }
 
-    public void setQuantitée(float quantitée) {
-        this.quantitée = quantitée;
+    public void setQuantite(float quantite) {
+        this.quantite = quantite;
     }
 }

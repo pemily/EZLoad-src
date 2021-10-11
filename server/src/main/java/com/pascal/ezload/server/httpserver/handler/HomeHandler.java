@@ -50,8 +50,7 @@ public class HomeHandler {
         return new WebData(SettingsManager.getInstance().loadProps().validate(),
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
-                            ezServerState.getOperations()
-        );
+                            ezServerState.getEzReports());
     }
 
     @POST

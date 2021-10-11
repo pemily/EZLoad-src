@@ -5,19 +5,10 @@ import java.util.Map;
 public class EZVente extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
-    private int quantite;
     private String cours;
     private String amountBrut;
     private String fraisCourtage;
     private String tva;
-
-    public int getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(int quantite) {
-        this.quantite = quantite;
-    }
 
     public String getCours() {
         return cours;
@@ -65,14 +56,13 @@ public class EZVente extends EZOperation implements IOperationWithAction {
         this.action = action;
     }
 
-    public boolean hasError() {
+    public boolean getError() {
         return super.error || action.isError();
     }
 
     @Override
     protected void fillData(Map<String, String> data) {
         action.fill(data);
-        data.put("operation.quantite", quantite+"");
         data.put("operation.cours", cours);
         data.put("operation.montantBrut", amountBrut);
         data.put("operation.fraisCourtage", fraisCourtage);

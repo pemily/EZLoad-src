@@ -3,22 +3,24 @@ package com.pascal.ezload.server.httpserver;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
+import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.model.EZOperation;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class WebData {
 
     private MainSettings mainSettings;
     private EzProcess latestEzProcess;
-    private List<EzEdition> operations;
+    private List<EzReport> reports;
     private boolean processRunning;
 
-    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning, List<EzEdition> operations){
+    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning, List<EzReport> reports){
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
         this.processRunning = processRunning;
-        this.operations = operations;
+        this.reports = reports;
     }
 
     public MainSettings getMainSettings() {
@@ -45,11 +47,11 @@ public class WebData {
         this.processRunning = processRunning;
     }
 
-    public List<EzEdition> getOperations() {
-        return operations;
+    public List<EzReport> getReports() {
+        return reports;
     }
 
-    public void setOperations(List<EzEdition> operations) {
-        this.operations = operations;
+    public void setReports(List<EzReport> reports) {
+        this.reports = reports;
     }
 }

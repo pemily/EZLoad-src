@@ -20,7 +20,7 @@ public class EZEspeceSurOST extends EZOperation implements IOperationWithAction 
         this.action = action;
     }
 
-    public boolean hasError() {
+    public boolean getError() {
         return super.error || action.isError();
     }
 

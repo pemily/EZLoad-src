@@ -1,13 +1,13 @@
 package com.pascal.ezload.server.httpserver;
 
-import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
+import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class EzServerState {
     private boolean processRunning = false;
-    private List<EzEdition> operations = new LinkedList<>();
+    private List<EzReport> ezReports = new LinkedList<>();
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -17,11 +17,11 @@ public class EzServerState {
         this.processRunning = processRunning;
     }
 
-    public List<EzEdition> getOperations() {
-        return operations;
+    public List<EzReport> getEzReports() {
+        return ezReports;
     }
 
-    public void setOperations(List<EzEdition> operations) {
-        this.operations = operations;
+    public void setEzReports(List<EzReport> ezReports) {
+        this.ezReports = ezReports;
     }
 }

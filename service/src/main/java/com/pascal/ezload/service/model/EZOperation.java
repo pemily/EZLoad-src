@@ -8,6 +8,7 @@ public abstract class EZOperation {
     protected boolean error;
     private EZDate date;
     private String amount;
+    private Integer quantity;
     private String description;
     private EnumEZCompteType compteType;
     private EnumEZCourtier courtier;
@@ -77,6 +78,7 @@ public abstract class EZOperation {
         return "EZOperation{" +
                 "date='" + date + '\'' +
                 ", amount='" + amount + '\'' +
+                ", quantity='" + quantity + '\'' +
                 ", description='" + description + '\'' +
                 ", compteType=" + compteType +
                 ", account Name=" + account.getOwnerName() +
@@ -85,7 +87,7 @@ public abstract class EZOperation {
                 '}';
     }
 
-    public boolean hasError() {
+    public boolean getError() {
         return error;
     }
 
@@ -99,8 +101,17 @@ public abstract class EZOperation {
         data.put("operation.montant", amount);
         data.put("operation.description", description);
         data.put("operation.compteType", compteType.getEZPortfolioName());
+        data.put("operation.quantity", quantity == null ? null : quantity+"");
         fillData(data); // force the subtype to implements the fillData method
     }
 
     protected abstract void fillData(Map<String, String> data);
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

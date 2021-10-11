@@ -1,6 +1,5 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EZOperation;
 
 import java.util.HashMap;
@@ -15,14 +14,13 @@ public class EzEdition {
 
     private Map<String, String> data = new HashMap<>();
 
+    public EzEdition(){}
 
-    public EzEdition(EZModel fromEzModel, EZOperation fromEzOperation, EzOperationEdition ezOperationEdition, EzPortefeuilleEdition ezPortefeuilleEdition) {
-        fromEzModel.fill(data);
+    public EzEdition(EZOperation fromEzOperation, EzOperationEdition ezOperationEdition, EzPortefeuilleEdition ezPortefeuilleEdition) {
         fromEzOperation.fill(data);
         this.ezOperationEdition = ezOperationEdition;
         this.ezPortefeuilleEdition = ezPortefeuilleEdition;
-        this.error = fromEzOperation.hasError() ? "Une erreur à été détectée dans l'opération" :
-                        (fromEzModel.hasError() ? "Une erreur à été détectée dans le rapport" : null);
+        this.error = fromEzOperation.getError() ? "Une erreur à été détectée dans l'opération" : null;
     }
 
 
