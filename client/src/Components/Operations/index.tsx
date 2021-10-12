@@ -12,8 +12,8 @@ export interface OperationsProps {
 
 export function Operations(props: OperationsProps){
     return (
-        <Box margin="small" >
-            <List data={props.operations} 
+        <Box margin="small">            
+            <List data={props.operations} margin="none" pad="xsmall"
              background={['light-2', 'light-4']}             
              action={(item, index) => (
                 <Menu

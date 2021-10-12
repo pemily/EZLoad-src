@@ -18,19 +18,19 @@ public class EZModel {
 
     private List<EZOperation> operations = new LinkedList<>();
 
-    private boolean error;
+    private List<String> errors = new LinkedList<>();
 
     public EZModel(EnumEZCourtier courtier, String sourceFile){
         this.courtier = courtier;
         this.sourceFile = sourceFile;
     }
 
-    public boolean getError(){
-        return error;
+    public List<String> getErrors(){
+        return errors;
     }
 
-    public void setError(boolean error){
-        this.error = error;
+    public void setErrors(List<String> errors){
+        this.errors = errors;
     }
 
     public EnumEZCourtier getCourtier() {

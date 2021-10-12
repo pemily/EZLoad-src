@@ -24,7 +24,7 @@ public class ExplorerHandler {
         FileInputStream fileInputStream = new FileInputStream(file);
         Response.ResponseBuilder responseBuilder = Response.ok(fileInputStream);
         responseBuilder.type("application/pdf");
-        responseBuilder.header("Content-Disposition", sourceFile);
+        responseBuilder.header("Content-Disposition","filename=\"" + sourceFile + "\"");
         return responseBuilder.build();
     }
 

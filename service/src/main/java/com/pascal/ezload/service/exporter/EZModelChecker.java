@@ -26,79 +26,76 @@ public class EZModelChecker {
     private void validateModel(EZModel model){
         try(Reporting rep = reporting.pushSection((reporting, lnkCreator) -> reporting.escape("Checking: ") + lnkCreator.createSourceLink(reporting, model.getSourceFile()))){
             if (model.getReportDate() == null){
-                model.setError(true);
-                reporting.info("La date du rapport n'a pas été trouvé");
+                addError(model, "La date du rapport n'a pas été trouvé");
             }
             else if (!model.getReportDate().isValid()) {
-                model.setError(true);
-                reporting.info("La date du rapport est invalide: "+model.getReportDate());
+                addError(model, "La date du rapport est invalide: "+model.getReportDate());
             }
 
             if (model.getOperations().size() == 0){
-                model.setError(true);
-                reporting.error("Aucune operation trouvée! Si il n'y en a pas dans ce fichier, il faudra le supprimer manuellement");
+                addError(model, "Aucune operation trouvée! Si il n'y en a pas dans ce fichier, il faudra le supprimer manuellement");
             }
             else {
-                for (EZOperation op : model.getOperations()) {
-                    if (validateModel(op))
-                        model.setError(true);
-                }
+                model.getOperations().forEach(this::validateModel);
             }
         }
     }
 
+    private void addError(EZModel model, String error){
+        reporting.error(error);
+        model.getErrors().add(error);
+    }
+
+    private void addError(EZOperation operation, String error){
+        reporting.error(error);
+        operation.getErrors().add(error);
+    }
+
+    private void addError(IOperationWithAction operation, String error){
+        reporting.error(error);
+        operation.getErrors().add(error);
+    }
+
     // return true if error found
-    private boolean validateModel(EZOperation operation){
+    private void validateModel(EZOperation operation){
         if (operation.getDate() == null){
-            operation.setError(true);
-            reporting.info("La date de l'opération n'a pas été trouvé.");
+            addError(operation, "La date de l'opération n'a pas été trouvé.");
         }
         else if (!operation.getDate().isValid()) {
-            operation.setError(true);
-            reporting.info("La date de l'opération est invalide. "+operation);
+            addError(operation, "La date de l'opération est invalide. "+operation);
         }
 
         if (operation.getCompteType() == null) {
-            operation.setError(true);
-            reporting.info("Le type de compte d'une opération n'a pas été trouvé! "+operation);
+            addError(operation, "Le type de compte d'une opération n'a pas été trouvé! "+operation);
         }
 
         if (operation.getCourtier() == null) {
-            operation.setError(true);
-            reporting.info("Le courtier pour une opération n'a pas été trouvé! "+operation);
+            addError(operation, "Le courtier pour une opération n'a pas été trouvé! "+operation);
         }
 
         if (StringUtils.isBlank(operation.getAmount())) {
-            operation.setError(true);
-            reporting.info("Le montant d'une opération n'a pas été trouvé! "+operation);
+            addError(operation, "Le montant d'une opération n'a pas été trouvé! "+operation);
         }
 
         if (operation instanceof IOperationWithAction){
             IOperationWithAction opWithTitre = (IOperationWithAction) operation;
-            if (validateAction(opWithTitre))
-                operation.setError(true);
+            validateAction(opWithTitre);
         }
-
-        return operation.getError();
     }
 
     // return true if error found
-    private boolean validateAction(IOperationWithAction operation) {
+    private void validateAction(IOperationWithAction operation) {
         EZAction action = operation.getAction();
         if (StringUtils.isBlank(action.getName())) {
-            action.setError(true);
-            reporting.error("L'action pour une opération n'a pas été trouvé! "+operation);
+            addError(operation, "L'action pour une opération n'a pas été trouvé! "+operation);
         }
 
         if (StringUtils.isBlank(action.getTicker())) {
-            action.setError(true);
-            reporting.error("L'action ticker pour une opération n'a pas été trouvé! "+operation);
+            addError(operation,"L'action ticker pour une opération n'a pas été trouvé! "+operation);
         }
 
         if (action.getMarketPlace() == null) {
-            action.setError(true);
-            reporting.error("La Place de Marché pour une opération n'a pas été trouvé! "+operation);
+            addError(operation,"La Place de Marché pour une opération n'a pas été trouvé! "+operation);
         }
-        return action.isError();
     }
 }

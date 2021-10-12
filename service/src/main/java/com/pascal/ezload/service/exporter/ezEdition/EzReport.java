@@ -10,7 +10,7 @@ import java.util.Map;
 public class EzReport {
 
     private List<EzEdition> ezEditions = new LinkedList<>();
-    private String error;
+    private List<String> errors;
     private String sourceFile;
     private Map<String, String> data = new HashMap<>();
 
@@ -18,7 +18,7 @@ public class EzReport {
     }
 
     public EzReport(EZModel fromEzModel){
-        error = fromEzModel.getError() ? "Une erreur a été détectée dans le rapport" : null;
+        errors = fromEzModel.getErrors();
         sourceFile = fromEzModel.getSourceFile();
         fromEzModel.fill(data);
     }
@@ -29,16 +29,17 @@ public class EzReport {
 
     public void setEzEditions(List<EzEdition> ezEditions) {
         this.ezEditions = ezEditions;
-        if (error == null)
-            error = ezEditions.stream().anyMatch(ez -> ez.getError() != null) ? "Une errreur a été détectée dans une opération" : null;
+        if (ezEditions.stream().anyMatch(ez -> ez.getErrors().size() > 0)){
+            errors.add("Une errreur a été détectée dans une opération");
+        }
     }
 
-    public String getError() {
-        return error;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setError(List<String> errors) {
+        this.errors = errors;
     }
 
     public String getSourceFile() {

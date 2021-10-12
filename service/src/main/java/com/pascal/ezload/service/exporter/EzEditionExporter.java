@@ -49,7 +49,7 @@ public class EzEditionExporter {
                 case RETRAIT_FONDS:
                     return new LoadVirement(reporting).load((EZRetraitFonds) fromEzOperation);
                 default:
-                    fromEzOperation.setError(true);//not implemented
+                    fromEzOperation.getErrors().add("Ce type d'opération n'a pas encore été implementé: "+fromEzOperation.getOperationType());
                     return new EzEdition(fromEzOperation, null, null);
             }
         }

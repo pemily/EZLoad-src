@@ -163,19 +163,18 @@ public class BourseDirect2BRModel {
         }
         else {
             reporting.error("Unknown Operation type: "+operation.getClass().getSimpleName());
+            throw new BRException("Unknown Operation type: "+operation.getClass().getSimpleName());
         }
 
-        if (EZOperation != null) {
-            EZOperation.setAmount(ModelUtils.normalizeAmount(amount));
-            EZOperation.setDate(date);
-            EZOperation.setCourtier(EnumEZCourtier.BourseDirect);
-            if (EZModel.getAccount().getAccountType().equals("Ordinaire")){
-                EZOperation.setCompteType(EnumEZCompteType.COMPTE_TITRES_ORDINAIRE);
-            }
-            EZOperation.setAccount(EZModel.getAccount());
-            EZOperation.setAccountDeclaration(EZModel.getAccountDeclaration());
-
+        EZOperation.setAmount(ModelUtils.normalizeAmount(amount));
+        EZOperation.setDate(date);
+        EZOperation.setCourtier(EnumEZCourtier.BourseDirect);
+        if (EZModel.getAccount().getAccountType().equals("Ordinaire")){
+            EZOperation.setCompteType(EnumEZCompteType.COMPTE_TITRES_ORDINAIRE);
         }
+        EZOperation.setAccount(EZModel.getAccount());
+        EZOperation.setEzAccountDeclaration(EZModel.getAccountDeclaration());
+
         return EZOperation;
     }
 

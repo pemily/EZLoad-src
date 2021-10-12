@@ -58,7 +58,7 @@ public class MesOperations  {
                         && operation.getQuantity().equals(row.valueStr(QUANTITE_COL))
                         && operation.getCourtier().getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
                         && operation.getCompteType().getEZPortfolioName().equals(row.valueStr(COMPTE_TYPE_COL))
-                        && operation.getAccountDeclaration().getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL))
+                        && operation.getEzAccountDeclaration().getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL))
                         && operation.getDescription().equals(row.valueStr(INFORMATION_COL))
                         && operation.getOperationType().getEZPortfolioName().equals(row.valueStr(OPERATION_TYPE_COL));
 

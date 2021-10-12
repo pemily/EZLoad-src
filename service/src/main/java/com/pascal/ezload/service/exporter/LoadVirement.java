@@ -16,14 +16,14 @@ public class LoadVirement {
     }
 
     public EzEdition load(EZVersementFonds op){
-        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
+        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getEzAccountDeclaration(), null,
                 op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
         EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition(EzPortefeuilleEdition.LIQUIDITE_ACTION, str2Float(op.getAmount()));
         return new EzEdition(op, ezOperationEdition, ezPortefeuilleEdition);
     }
 
     public EzEdition load(EZRetraitFonds op){
-        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getAccountDeclaration(), null,
+        EzOperationEdition ezOperationEdition = new EzOperationEdition(op.getDate(), op.getCompteType(), op.getCourtier(), op.getEzAccountDeclaration(), null,
                 op.getOperationType(), null, null, op.getAmount()+op.getDevise().getSymbol(), op.getDescription());
         EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition(EzPortefeuilleEdition.LIQUIDITE_ACTION, str2Float(op.getAmount()));
         return new EzEdition(op, ezOperationEdition, ezPortefeuilleEdition);

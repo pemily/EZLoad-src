@@ -9,7 +9,7 @@ import com.pascal.ezload.service.model.EZDate;
 
 public class Row {
 
-    private List<Object> values;
+    private final List<Object> values;
 
     public Row(List<Object> values){
         this.values = values;
@@ -18,7 +18,6 @@ public class Row {
     public Row(String... values){
         this.values = Arrays.asList(values);
     }
-
 
     public EZDate valueDate(int colIndex) {
         String date = valueStr(colIndex);
@@ -35,7 +34,8 @@ public class Row {
     }
 
     public float valueFloat(int colIndex) {
-        return colIndex >= values.size() ? null : str2Float((String)values.get(colIndex));
+        if(colIndex >= values.size()) throw new IllegalStateException(values.size()+" < "+colIndex);
+        return str2Float((String)values.get(colIndex));
     }
 
     public void setValue(int colIndex, String s) {

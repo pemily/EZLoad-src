@@ -3,7 +3,6 @@ package com.pascal.ezload.service.model;
 import java.util.Map;
 
 public class EZAction {
-    private boolean error;
     private String name;
     private String ticker;
     private String isin;
@@ -39,14 +38,6 @@ public class EZAction {
 
     public void setMarketPlace(EZMarketPlace marketPlace) {
         this.marketPlace = marketPlace;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
     }
 
     public void fill(Map<String, String> data) {

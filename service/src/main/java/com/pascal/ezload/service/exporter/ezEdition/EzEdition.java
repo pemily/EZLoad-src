@@ -3,6 +3,7 @@ package com.pascal.ezload.service.exporter.ezEdition;
 import com.pascal.ezload.service.model.EZOperation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // une operation qui impact la feuille MesOperations & Portefeuille
@@ -10,7 +11,7 @@ public class EzEdition {
 
     private EzOperationEdition ezOperationEdition;
     private EzPortefeuilleEdition ezPortefeuilleEdition;
-    private String error;
+    private List<String> errors;
 
     private Map<String, String> data = new HashMap<>();
 
@@ -20,7 +21,7 @@ public class EzEdition {
         fromEzOperation.fill(data);
         this.ezOperationEdition = ezOperationEdition;
         this.ezPortefeuilleEdition = ezPortefeuilleEdition;
-        this.error = fromEzOperation.getError() ? "Une erreur à été détectée dans l'opération" : null;
+        this.errors = fromEzOperation.getErrors();
     }
 
 
@@ -40,12 +41,12 @@ public class EzEdition {
         this.ezPortefeuilleEdition = ezPortefeuilleEdition;
     }
 
-    public String getError() {
-        return error;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setError(List<String> errors) {
+        this.errors = errors;
     }
 
     public Map<String, String> getData() {

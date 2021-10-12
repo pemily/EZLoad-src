@@ -13,15 +13,15 @@ import java.util.Map;
 
 // https://rapidapi.com/category/Finance
 public class FinanceTools {
-    private GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
+    private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    private static FinanceTools instance = new FinanceTools();
+    private static final FinanceTools instance = new FinanceTools();
 
     public static FinanceTools getInstance(){
         return instance;
     }
 
-    private Map<String, EZAction> actionCode2BRAction = new HashMap<>();
+    private final Map<String, EZAction> actionCode2BRAction = new HashMap<>();
 
 
     public EZAction get(Reporting reporting, String actionCode){

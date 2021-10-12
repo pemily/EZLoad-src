@@ -74,10 +74,6 @@ public class EZCoupons extends EZOperation implements IOperationWithAction {
         this.action = action;
     }
 
-    public boolean getError() {
-        return super.error || action.isError();
-    }
-
     @Override
     protected void fillData(Map<String, String> data) {
         data.put("operation.prixUnitBrut", prixUnitaireBrut);

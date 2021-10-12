@@ -55,9 +55,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         boolean errorFound = false;
         AtomicInteger nbOperationSaved = new AtomicInteger();
         for (EzReport ezReportToAdd : operationsToAdd){
-            if (ezReportToAdd.getError() != null) errorFound = true;
+            if (ezReportToAdd.getErrors().size() > 0) errorFound = true;
             if (errorFound){
-                // if one of the operations is in error the report will be also in error (set the setter of the EzEdition in EzReport)
+                // if one of the operations is in error the report will be also in error (see the setter of the EzEdition in EzReport)
                 notSaved.add(ezReportToAdd);
             }
             else {
@@ -101,10 +101,12 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio")){
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
-            SheetValues s = sheets.getCells("MesOperations!D1:D1"); // récupère le nom de la colonne D ligne 1 de MesOperations
+            SheetValues s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
+            reporting.info("Valeur trouvé: "+ s.getValues().get(0).valueStr(0));
             return s.getValues().get(0).valueStr(0).equals("Quantité");
         }
         catch(Exception e){
+            reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un probleme", e);
             return false;
         }
     }

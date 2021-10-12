@@ -16,7 +16,7 @@ import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectPdfE
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BourseDirectAnalyser {
@@ -56,22 +56,24 @@ public class BourseDirectAnalyser {
     public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) {
         try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
 
+            List<String> errors = new LinkedList<>();
             try {
                 String pdfText = new BourseDirectPdfExtractor(reporting).getText(pdfFilePath);
 
                 BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
 
-                boolean isValid = new BourseDirectModelChecker(reporting).isValid(model);
+                errors = new BourseDirectModelChecker(reporting, model).getErrors();
 
-                if (isValid) {
+                if (errors.size() == 0) {
                     return new BourseDirect2BRModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model);
                 }
             }
             catch(Exception e){
                 reporting.error("Erreur pendant l'analyze", e);
+                errors.add("Erreur pendant l'analyze: "+e.getMessage());
             }
             EZModel ezModel = new EZModel(EnumEZCourtier.BourseDirect, getSourceRef(mainSettings, pdfFilePath));
-            ezModel.setError(true);
+            ezModel.setErrors(errors);
             return ezModel;
         }
     }

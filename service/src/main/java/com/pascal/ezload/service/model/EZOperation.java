@@ -1,11 +1,13 @@
 package com.pascal.ezload.service.model;
 
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class EZOperation {
 
-    protected boolean error;
+    protected List<String> errors = new LinkedList<>();
     private EZDate date;
     private String amount;
     private Integer quantity;
@@ -13,7 +15,7 @@ public abstract class EZOperation {
     private EnumEZCompteType compteType;
     private EnumEZCourtier courtier;
     private EZAccount account;
-    private EZAccountDeclaration EZAccountDeclaration;
+    private EZAccountDeclaration ezAccountDeclaration;
 
     public abstract EZOperationType getOperationType();
 
@@ -65,12 +67,20 @@ public abstract class EZOperation {
         this.account = account;
     }
 
-    public EZAccountDeclaration getAccountDeclaration() {
-        return EZAccountDeclaration;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setAccountDeclaration(EZAccountDeclaration EZAccountDeclaration) {
-        this.EZAccountDeclaration = EZAccountDeclaration;
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
+
+    public EZAccountDeclaration getEzAccountDeclaration() {
+        return ezAccountDeclaration;
+    }
+
+    public void setEzAccountDeclaration(EZAccountDeclaration ezAccountDeclaration) {
+        this.ezAccountDeclaration = ezAccountDeclaration;
     }
 
     @Override
@@ -87,13 +97,6 @@ public abstract class EZOperation {
                 '}';
     }
 
-    public boolean getError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
-    }
 
     public void fill(Map<String, String> data) {
         data.put("operation.type", getOperationType().getEZPortfolioName());

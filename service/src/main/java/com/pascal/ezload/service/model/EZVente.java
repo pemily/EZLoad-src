@@ -56,10 +56,6 @@ public class EZVente extends EZOperation implements IOperationWithAction {
         this.action = action;
     }
 
-    public boolean getError() {
-        return super.error || action.isError();
-    }
-
     @Override
     protected void fillData(Map<String, String> data) {
         action.fill(data);
