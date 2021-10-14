@@ -86,7 +86,7 @@ public class EngineHandler {
                         new EZModelChecker(reporting).validateModels(allEZModels);
                     }
 
-                    List<EzReport> allEzReports = new EzEditionExporter(reporting).exportModels(allEZModels, ezPortfolioProxy);
+                    List<EzReport> allEzReports = new EzEditionExporter(mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy);
                     serverState.setEzReports(allEzReports);
                 });
 

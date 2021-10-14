@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.model;
 
-import java.util.Map;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
 public class EZDroitDeGarde extends EZOperation {
     @Override
@@ -9,7 +9,7 @@ public class EZDroitDeGarde extends EZOperation {
     }
 
     @Override
-    protected void fillData(Map<String, String> data) {
+    protected void fillData(EzData data) {
         // no additional data
     }
 

@@ -18,6 +18,7 @@ import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDire
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BourseDirectAnalyser {
 
@@ -34,9 +35,8 @@ public class BourseDirectAnalyser {
         }
         try(Reporting ignored = reporting.pushSection("Analyse des fichiers téléchargés...")) {
             return new FileProcessor(SettingsManager.getDownloadDir(mainSettings, EnumEZCourtier.BourseDirect),
-                    BourseDirectDownloader.dirFilter(mainSettings),
-                    BourseDirectDownloader.fileFilter())
-                    .forEachFiles(pdfFilePath -> {
+                                        BourseDirectDownloader.dirFilter(mainSettings), BourseDirectDownloader.fileFilter())
+                    .mapFile(pdfFilePath -> {
                         EZAccountDeclaration account = bourseDirectDownloader.getAccountFromPdfFilePath(pdfFilePath);
                         EZDate pdfDate = BourseDirectDownloader.getDateFromPdfFilePath(pdfFilePath);
 
@@ -49,7 +49,8 @@ public class BourseDirectAnalyser {
                             return start(reporting, account, pdfFilePath);
                         }
                         return null;
-                    });
+                    })
+                    .collect(Collectors.toList());
         }
     }
 

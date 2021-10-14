@@ -1,8 +1,8 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.model.*;
-
 public class EzOperationEdition {
+
+    private String ruleDefinitionApplied;
 
     private String date;
     private String compteType;
@@ -14,26 +14,6 @@ public class EzOperationEdition {
     private String country;
     private String amount;
     private String description;
-
-    public EzOperationEdition(){}
-
-    public EzOperationEdition(EZDate date, EnumEZCompteType compteType, EnumEZCourtier courtier, EZAccountDeclaration account,
-                             String quantity, EZOperationType operationType, String actionName, String country, String amount, String description) {
-        this.date = date.toEzPortoflioDate();
-        this.compteType = compteType.getEZPortfolioName();
-        this.courtier = courtier.getEzPortfolioName();
-        this.account = format(account.getName());
-        this.quantity = quantity;
-        this.operationType = operationType.getEZPortfolioName();
-        this.actionName = format(actionName);
-        this.country = format(country);
-        this.amount  = format(amount);
-        this.description = format(description);
-    }
-
-    private static String format(String value){
-        return value == null ? "" : value.replace('\n', ' ').trim();
-    }
 
     public String getDate() {
         return date;
@@ -113,5 +93,13 @@ public class EzOperationEdition {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getRuleDefinitionApplied() {
+        return ruleDefinitionApplied;
+    }
+
+    public void setRuleDefinitionApplied(String ruleDefinitionApplied) {
+        this.ruleDefinitionApplied = ruleDefinitionApplied;
     }
 }

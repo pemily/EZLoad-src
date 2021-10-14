@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.model;
 
-import java.util.Map;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
 public class EZTaxe extends EZOperation implements IOperationWithAction {
     private EZAction action;
@@ -21,7 +21,7 @@ public class EZTaxe extends EZOperation implements IOperationWithAction {
     }
 
     @Override
-    protected void fillData(Map<String, String> data) {
+    protected void fillData(EzData data) {
         action.fill(data);
     }
 

@@ -97,9 +97,11 @@ public class MainSettings {
     }
 
     public static class EZLoad extends Checkable {
-        enum Field {downloadDir, logsDir, passPhrase, courtierCredFile}
+
+        enum Field {downloadDir, logsDir, passPhrase, courtierCredFile, rulesDir}
 
         private String downloadDir;
+        private String rulesDir;
         private String logsDir;
         private String passPhrase;
         private String courtierCredsFile;
@@ -136,12 +138,21 @@ public class MainSettings {
             this.downloadDir = downloadDir == null ? null : downloadDir.trim();
         }
 
+        public String getRulesDir() {
+            return rulesDir;
+        }
+
+        public void setRulesDir(String rulesDir) {
+            this.rulesDir = rulesDir;
+        }
+
         @Override
         public void validate() {
             new FileValue(true).validate(this, Field.courtierCredFile.name(), courtierCredsFile);
             new DirValue(true).validate(this, Field.downloadDir.name(), downloadDir);
             new DirValue(true).validate(this, Field.logsDir.name(), logsDir);
             new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
+            new DirValue(true).validate(this, Field.rulesDir.name(), rulesDir);
         }
 
     }

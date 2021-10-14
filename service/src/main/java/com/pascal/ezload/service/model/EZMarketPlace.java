@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+
 import java.util.Map;
 
 public class EZMarketPlace {
@@ -50,7 +52,7 @@ public class EZMarketPlace {
         return googleFinanceCode;
     }
 
-    public void fill(Map<String, String> data) {
+    public void fill(EzData data) {
         data.put("marché.echange", stockExchange);
         data.put("marché.ville", city);
         data.put("marché.mic", mic);

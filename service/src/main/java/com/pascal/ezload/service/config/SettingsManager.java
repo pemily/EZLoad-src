@@ -95,6 +95,7 @@ public class SettingsManager {
         String ezHome = new File(configFilePath).getParentFile().getAbsolutePath();
         ezLoad.setLogsDir(ezHome+File.separator+"logs");
         ezLoad.setDownloadDir(ezHome+File.separator+"courtiers");
+        ezLoad.setRulesDir(ezHome+File.separator+"rules");
         ezLoad.setPassPhrase(genString(42));
         ezLoad.setCourtierCredsFile(ezHome+File.separator+"ezCreds.json");
 

@@ -1,6 +1,8 @@
 package com.pascal.ezload.service.model;
 
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +100,7 @@ public abstract class EZOperation {
     }
 
 
-    public void fill(Map<String, String> data) {
+    public void fill(EzData data) {
         data.put("operation.type", getOperationType().getEZPortfolioName());
         data.put("operation.date", date.toEzPortoflioDate());
         data.put("operation.montant", amount);
@@ -108,7 +110,7 @@ public abstract class EZOperation {
         fillData(data); // force the subtype to implements the fillData method
     }
 
-    protected abstract void fillData(Map<String, String> data);
+    protected abstract void fillData(EzData data);
 
     public Integer getQuantity() {
         return quantity;

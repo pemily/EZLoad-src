@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+
 import java.util.Map;
 
 public class EZAction {
@@ -40,7 +42,7 @@ public class EZAction {
         this.marketPlace = marketPlace;
     }
 
-    public void fill(Map<String, String> data) {
+    public void fill(EzData data) {
         data.put("action.name", name);
         data.put("action.ticker", ticker);
         data.put("action.isin", isin);

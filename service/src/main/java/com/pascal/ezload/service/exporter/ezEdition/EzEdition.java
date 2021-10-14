@@ -13,7 +13,7 @@ public class EzEdition {
     private EzPortefeuilleEdition ezPortefeuilleEdition;
     private List<String> errors;
 
-    private Map<String, String> data = new HashMap<>();
+    private EzData data = new EzData();
 
     public EzEdition(){}
 
@@ -49,11 +49,11 @@ public class EzEdition {
         this.errors = errors;
     }
 
-    public Map<String, String> getData() {
+    public EzData getData() {
         return data;
     }
 
-    public void setData(Map<String, String> data) {
+    public void setData(EzData data) {
         this.data = data;
     }
 }

@@ -20,7 +20,7 @@ public class Row {
     }
 
     public EZDate valueDate(int colIndex) {
-        String date = valueStr(colIndex);
+        String date = getValueStr(colIndex);
         if (date == null) return null;
         return EZDate.parseFrenchDate(date, '/');
     }
@@ -29,11 +29,11 @@ public class Row {
         return values;
     }
 
-    public String valueStr(int colIndex){
+    public String getValueStr(int colIndex){
         return colIndex >= values.size() ? null : (String) values.get(colIndex);
     }
 
-    public float valueFloat(int colIndex) {
+    public float getValueFloat(int colIndex) {
         if(colIndex >= values.size()) throw new IllegalStateException(values.size()+" < "+colIndex);
         return str2Float((String)values.get(colIndex));
     }

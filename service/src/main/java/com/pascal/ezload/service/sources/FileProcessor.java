@@ -23,7 +23,7 @@ public class FileProcessor {
         this.fileFiter = fileFiter;
     }
 
-    public <FileResult> List<FileResult> forEachFiles(Function<String, FileResult> processFile) throws IOException {
+    public <FileResult> Stream<FileResult> mapFile(Function<String, FileResult> processFile) throws IOException {
         try(Stream<Path> stream = Files.walk(Paths.get(rootDirectory), 5)){
             return stream
                     .filter(Files::isRegularFile)
@@ -31,8 +31,7 @@ public class FileProcessor {
                     .filter(f -> fileFiter.test(f.toFile()))
                     .sorted() // sort the files per date (use the name for that, it contains the date yyy/mm/dd)
                     .map(p -> processFile.apply(p.toFile().getAbsolutePath()))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                    .filter(Objects::nonNull);
         }
     }
 }

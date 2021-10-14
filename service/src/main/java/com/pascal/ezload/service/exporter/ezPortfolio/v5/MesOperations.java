@@ -48,37 +48,32 @@ public class MesOperations  {
         return newOperations;
     }
 
-    public boolean isOperationsExists(EZOperation operation){
+    public boolean isOperationsExists(Row operation){
         return existingOperations.getValues().stream().filter(
-            row -> {
-                boolean opResult =
-                        BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
-                        && operation.getDate().equals(row.valueDate(DATE_COL))
-                        && operation.getAmount().equals(row.valueStr(AMOUNT_COL))
-                        && operation.getQuantity().equals(row.valueStr(QUANTITE_COL))
-                        && operation.getCourtier().getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
-                        && operation.getCompteType().getEZPortfolioName().equals(row.valueStr(COMPTE_TYPE_COL))
-                        && operation.getEzAccountDeclaration().getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL))
-                        && operation.getDescription().equals(row.valueStr(INFORMATION_COL))
-                        && operation.getOperationType().getEZPortfolioName().equals(row.valueStr(OPERATION_TYPE_COL));
-
-                if (operation instanceof IOperationWithAction){
-                    IOperationWithAction opWithAction = (IOperationWithAction) operation;
-                    EZAction action = opWithAction.getAction();
-                    opResult &=
-                            action.getMarketPlace().getCountry().getName().equals(row.valueStr(COUNTRY_COL))
-                            && action.getName().equals(row.valueStr(ACTION_NAME_COL));
-                }
-                return opResult;
-            }
+            row ->
+                BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
+                && operation.valueDate(DATE_COL).equals(row.valueDate(DATE_COL))
+                && operation.getValueStr(AMOUNT_COL).equals(row.getValueStr(AMOUNT_COL))
+                && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
+                && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
+                && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
+                && operation.getValueStr(ACCOUNT_DECLARED_NAME_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NAME_COL))
+                && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
+                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
+                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
+                && operation.getValueStr(ACTION_NAME_COL).equals(row.getValueStr(ACTION_NAME_COL))
         ).count() > 1;
     }
 
-    public void newOperation(EzOperationEdition operationEdition) {
-        newOperations.add(new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getCourtier(),
+    public static Row newOperationRow(EzOperationEdition operationEdition) {
+        return new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getCourtier(),
                         null, operationEdition.getOperationType(), operationEdition.getActionName(),
                         operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
-                        operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION));
+                        operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION);
+    }
+
+    public void newOperation(EzOperationEdition operationEdition){
+        newOperations.add(newOperationRow(operationEdition));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
@@ -87,9 +82,9 @@ public class MesOperations  {
 
     public Optional<EZDate> getLastOperationDate(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
-                .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.valueStr(AUTOMATIC_UPD_COL))
-                        && courtier.getEzPortfolioName().equals(row.valueStr(COURTIER_DISPLAY_NAME_COL))
-                        && EZAccountDeclaration.getName().equals(row.valueStr(ACCOUNT_DECLARED_NAME_COL)))
+                .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
+                        && courtier.getEzPortfolioName().equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
+                        && EZAccountDeclaration.getName().equals(row.getValueStr(ACCOUNT_DECLARED_NAME_COL)))
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);

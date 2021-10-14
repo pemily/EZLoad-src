@@ -3,31 +3,31 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.BRException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-
-import static com.pascal.ezload.service.util.ModelUtils.float2Str;
 
 public class MonPortefeuille {
 
     private final Reporting reporting;
     private final SheetValues portefeuille;
+    private final List<Row> newValeurs = new ArrayList<>();
 
     private static final String LIQUIDITE = "LIQUIDITE";
 
-    private static final int VALEUR_COL = 0;
-    private static final int COMPTE_TYPE_COL = 1;
-    private static final int COURTIER_COL = 2;
-    private static final int TICKER_COL = 3;
-    private static final int COUNTRY_COL = 4;
-    private static final int SECTEUR_COL = 5;
-    private static final int INDUSTRIE_COL = 6;
-    private static final int ELIGIBILITE_ABATTEMENT_COL = 7;
-    private static final int TYPE_COL = 8;
-    private static final int PRIX_DE_REVIENT_UNITAIRE_COL = 9;
-    private static final int QUANTITE_COL = 10;
-    private static final int DIVIDENDE_ANNUEL_COL = 11;
+    public static final int VALEUR_COL = 0;
+    public static final int COMPTE_TYPE_COL = 1;
+    public static final int COURTIER_COL = 2;
+    public static final int TICKER_COL = 3;
+    public static final int COUNTRY_COL = 4;
+    public static final int SECTEUR_COL = 5;
+    public static final int INDUSTRIE_COL = 6;
+    public static final int ELIGIBILITE_ABATTEMENT_COL = 7;
+    public static final int TYPE_COL = 8;
+    public static final int PRIX_DE_REVIENT_UNITAIRE_COL = 9;
+    public static final int QUANTITE_COL = 10;
+    public static final int DIVIDENDE_ANNUEL_COL = 11;
 
     public MonPortefeuille(Reporting reporting, SheetValues portefeuille) {
         this.reporting = reporting;
@@ -38,13 +38,16 @@ public class MonPortefeuille {
         return portefeuille;
     }
 
-    public void updateLiquidite(float amount) {
-        Optional<Row> liquiditeOpt = this.portefeuille.getValues().stream().filter(r -> r.valueStr(VALEUR_COL).equals(LIQUIDITE)).findFirst();
-        Row liquidite = liquiditeOpt.orElseThrow(() -> new BRException(LIQUIDITE + " row not found in MonPortefeuille"));
-        float liquide = liquidite.valueFloat(QUANTITE_COL);
-        float result = liquide+amount;
-        reporting.info("Update MonPortefeuille->"+LIQUIDITE+" "+float2Str(liquide)+(amount < 0 ? float2Str(amount) : "+"+float2Str(amount))+"="+float2Str(result));
-        liquidite.setValue(QUANTITE_COL, float2Str(result));
+    public List<Row> getNewValeurs() { return newValeurs; }
+
+    public Optional<Row> searchRow(String valeur){
+        return this.portefeuille.getValues().stream().filter(r -> r.getValueStr(VALEUR_COL).equals(valeur)).findFirst();
     }
 
+    public Row getNewRow(String valeur) {
+        Row row = new Row();
+        row.setValue(VALEUR_COL, valeur);
+        this.newValeurs.add(row);
+        return row;
+    }
 }

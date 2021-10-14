@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZOperation;
@@ -19,5 +20,5 @@ public interface EZPortfolioProxy {
 
     boolean isFileAlreadyLoaded(EnumEZCourtier courtier, EZAccountDeclaration account, EZDate pdfDate);
 
-    boolean isOperationsExists(EZOperation operation);
+    boolean isOperationsExists(Row operation);
 }

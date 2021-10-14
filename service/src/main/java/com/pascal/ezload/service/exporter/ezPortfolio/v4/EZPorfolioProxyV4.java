@@ -3,6 +3,7 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
+import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZOperation;
@@ -40,7 +41,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public boolean isOperationsExists(EZOperation operation) {
+    public boolean isOperationsExists(Row operation) {
         throw new NotImplementedException();
     }
 }

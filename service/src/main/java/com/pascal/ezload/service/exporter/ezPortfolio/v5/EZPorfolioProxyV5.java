@@ -1,9 +1,9 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
+import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
@@ -92,7 +92,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public boolean isOperationsExists(EZOperation operation) {
+    public boolean isOperationsExists(Row operation) {
         return ezPortfolio.getMesOperations().isOperationsExists(operation);
     }
 
@@ -102,8 +102,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
             SheetValues s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
-            reporting.info("Valeur trouvé: "+ s.getValues().get(0).valueStr(0));
-            return s.getValues().get(0).valueStr(0).equals("Quantité");
+            reporting.info("Valeur trouvé: "+ s.getValues().get(0).getValueStr(0));
+            return s.getValues().get(0).getValueStr(0).equals("Quantité");
         }
         catch(Exception e){
             reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un probleme", e);
