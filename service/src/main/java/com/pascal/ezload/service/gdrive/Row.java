@@ -2,6 +2,7 @@ package com.pascal.ezload.service.gdrive;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +18,12 @@ public class Row {
 
     public Row(String... values){
         this.values = Arrays.asList(values);
+    }
+
+    public Row(int nbOfCol){
+        this.values = new ArrayList<>(nbOfCol);
+        for (int i = 0; i < nbOfCol; nbOfCol++)
+            this.values.set(i, "");
     }
 
     public EZDate valueDate(int colIndex) {

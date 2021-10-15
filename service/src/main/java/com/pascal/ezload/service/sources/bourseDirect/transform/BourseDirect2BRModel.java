@@ -28,33 +28,33 @@ public class BourseDirect2BRModel {
     
     public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) {
         reporting.info("Creating Standard Model...");
-        EZModel EZModel = new EZModel(EnumEZCourtier.BourseDirect, BourseDirectAnalyser.getSourceRef(mainSettings, sourceFile));
-        EZModel.setReportDate(model.getDateAvisOperation());
+        EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, model.getBrokerFileVersion(), BourseDirectAnalyser.getSourceRef(mainSettings, sourceFile));
+        ezModel.setReportDate(model.getDateAvisOperation());
 
         EZAccount EZAccount = new EZAccount();
         EZAccount.setAccountNumber(model.getAccountNumber());
         EZAccount.setAccountType(model.getAccountType());
         EZAccount.setOwnerAdress(model.getAddress());
-        if (!model.getDeviseDebit().equals("€")) throw new BRException("The account is not an Euro account");
+        if (!model.getDeviseDebit().equals("€")) throw new BRException("Le compte n'est pas un compte en Euro");
         EZAccount.setDevise(DeviseUtil.foundByCode("EUR"));
         EZAccount.setOwnerName(model.getAccountOwnerName());
-        EZModel.setAccount(EZAccount);
-        EZModel.setAccountDeclaration(EZAccountDeclaration);
+        ezModel.setAccount(EZAccount);
+        ezModel.setAccountDeclaration(EZAccountDeclaration);
 
         List<EZOperation> EZOperations = new ArrayList<>();
-        EZModel.setOperations(EZOperations);
+        ezModel.setOperations(EZOperations);
 
         for (int i = 0; i < model.getOperations().size(); i++) {
             if (model.getOperations().get(i) instanceof DroitsDeGarde) {
                 // the last operation is an DroitsDeGarde and the amount is not in the amounts array, it is in the details text
-                EZOperations.add(toBROperation(EZModel, model.getOperations().get(i), model.getDates().get(i), null));
+                EZOperations.add(toBROperation(ezModel, model.getOperations().get(i), model.getDates().get(i), null));
             } else {
-                EZOperations.add(toBROperation(EZModel, model.getOperations().get(i), model.getDates().get(i), model.getAmounts().get(i)));
+                EZOperations.add(toBROperation(ezModel, model.getOperations().get(i), model.getDates().get(i), model.getAmounts().get(i)));
             }
         }
 
         reporting.info("Standard Model => ok");
-        return EZModel;
+        return ezModel;
     }
 
     private EZOperation toBROperation(EZModel EZModel, Operation operation, EZDate date, String amount) {
@@ -168,9 +168,9 @@ public class BourseDirect2BRModel {
 
         EZOperation.setAmount(ModelUtils.normalizeAmount(amount));
         EZOperation.setDate(date);
-        EZOperation.setCourtier(EnumEZCourtier.BourseDirect);
+        EZOperation.setBroker(EnumEZBroker.BourseDirect);
         if (EZModel.getAccount().getAccountType().equals("Ordinaire")){
-            EZOperation.setCompteType(EnumEZCompteType.COMPTE_TITRES_ORDINAIRE);
+            EZOperation.setAccountType(EnumEZAccountType.COMPTE_TITRES_ORDINAIRE);
         }
         EZOperation.setAccount(EZModel.getAccount());
         EZOperation.setEzAccountDeclaration(EZModel.getAccountDeclaration());

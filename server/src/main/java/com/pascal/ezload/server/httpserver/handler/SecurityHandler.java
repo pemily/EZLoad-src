@@ -1,13 +1,12 @@
 package com.pascal.ezload.server.httpserver.handler;
 
-import com.google.api.services.sheets.v4.Sheets;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.Reporting;
 import jakarta.inject.Inject;
@@ -15,8 +14,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
 
 
 @Path("security")
@@ -28,7 +25,7 @@ public class SecurityHandler {
     @Path("/createLogin")
     @Consumes(MediaType.APPLICATION_JSON)
     public void createUserPassword(
-            @NotNull @QueryParam("courtier") EnumEZCourtier courtier,
+            @NotNull @QueryParam("courtier") EnumEZBroker courtier,
             @NotNull AuthInfo authParam) throws Exception {
 
         AuthManager authManager = SettingsManager.getAuthManager();
@@ -49,7 +46,7 @@ public class SecurityHandler {
     @GET
     @Path("/info")
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumEZCourtier courtier) throws Exception {
+    public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
         return SettingsManager.getAuthManager().getAuthWithDummyPassword(courtier);
     }
 
@@ -65,7 +62,7 @@ public class SecurityHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try{
-                        GDriveConnection.getService(SettingsManager.getInstance().loadProps().getEzPortfolio().getGdriveCredsFile());
+                        GDriveConnection.getService(reporting, SettingsManager.getInstance().loadProps().getEzPortfolio().getGdriveCredsFile());
                         // si pas d'exception
                         reporting.info("La connection est validé, vous pouvez utiliser EZLoad");
                     }

@@ -111,7 +111,8 @@ export function Config(props: ConfigProps) {
                                         || valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === ""} 
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
-                                            .then(props.followProcess) }
+                                            .then(props.followProcess)
+                                            .catch(e => console.log(e)) }
                                             size="small" icon={<Validate size="small"/>} label="Valider la connection"/>
                                </Box>
                            </Help>
@@ -120,12 +121,12 @@ export function Config(props: ConfigProps) {
 
                     <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">
-                        <ConfigTextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezload?.downloadDir}
-                            isRequired={true} errorMsg={props.mainSettings.ezload?.field2ErrorMsg?.downloadDir}
+                        <ConfigTextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezLoad?.downloadDir}
+                            isRequired={true} errorMsg={props.mainSettings.ezLoad?.field2ErrorMsg?.downloadDir}
                             readOnly={props.readOnly}
                             onChange={newValue  => saveSettings(
                                 { ...props.mainSettings,
-                                      ezload: { ...props.mainSettings.ezload, downloadDir: newValue }
+                                      ezLoad: { ...props.mainSettings.ezLoad, downloadDir: newValue }
                                }, props.mainSettingsStateSetter)}/>
                     </Box>
                     <Box>
@@ -260,6 +261,7 @@ export function Config(props: ConfigProps) {
                                     disabled={props.readOnly} onClick={() =>
                                         jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect", chromeVersion: getChromeVersion()}))
                                         .then(props.followProcess)
+                                        .catch(e => console.log(e))
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>

@@ -1,17 +1,19 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
+import com.pascal.ezload.service.exporter.rules.RuleDefinition;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZOperation;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 // une operation qui impact la feuille MesOperations & Portefeuille
 public class EzEdition {
 
+    private RuleDefinitionSummary ruleDefinitionSummary;
     private EzOperationEdition ezOperationEdition;
     private EzPortefeuilleEdition ezPortefeuilleEdition;
-    private List<String> errors;
+    private List<String> errors = new LinkedList<>();
 
     private EzData data = new EzData();
 
@@ -45,7 +47,7 @@ public class EzEdition {
         return errors;
     }
 
-    public void setError(List<String> errors) {
+    public void setErrors(List<String> errors) {
         this.errors = errors;
     }
 
@@ -55,5 +57,13 @@ public class EzEdition {
 
     public void setData(EzData data) {
         this.data = data;
+    }
+
+    public RuleDefinitionSummary getRuleDefinitionSummary() {
+        return ruleDefinitionSummary;
+    }
+
+    public void setRuleDefinitionSummary(RuleDefinitionSummary ruleDefinitionSummary) {
+        this.ruleDefinitionSummary = ruleDefinitionSummary;
     }
 }

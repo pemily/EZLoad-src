@@ -6,7 +6,8 @@ import java.util.Map;
 
 public class EZModel {
 
-    private EnumEZCourtier courtier;
+    private EnumEZBroker broker;
+    private int brokerFileVersion;
 
     private String sourceFile;
 
@@ -20,9 +21,10 @@ public class EZModel {
 
     private List<String> errors = new LinkedList<>();
 
-    public EZModel(EnumEZCourtier courtier, String sourceFile){
-        this.courtier = courtier;
+    public EZModel(EnumEZBroker broker, int brokerFileVersion, String sourceFile){
+        this.broker = broker;
         this.sourceFile = sourceFile;
+        this.brokerFileVersion = brokerFileVersion;
     }
 
     public List<String> getErrors(){
@@ -33,12 +35,12 @@ public class EZModel {
         this.errors = errors;
     }
 
-    public EnumEZCourtier getCourtier() {
-        return courtier;
+    public EnumEZBroker getBroker() {
+        return broker;
     }
 
-    public void setCourtier(EnumEZCourtier courtier) {
-        this.courtier = courtier;
+    public void setBroker(EnumEZBroker broker) {
+        this.broker = broker;
     }
 
     public String getSourceFile() {
@@ -82,7 +84,7 @@ public class EZModel {
     }
 
     public void fill(Map<String, String> data) {
-        data.put("rapport.courtier", courtier.getEzPortfolioName());
+        data.put("rapport.courtier", broker.getEzPortfolioName());
         data.put("rapport.source", sourceFile);
         data.put("rapport.date", reportDate == null ? null : reportDate.toEzPortoflioDate());
         data.put("rapport.numeroCompte", account == null ?  null : account.getAccountNumber());

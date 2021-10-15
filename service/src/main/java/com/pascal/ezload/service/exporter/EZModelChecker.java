@@ -65,11 +65,11 @@ public class EZModelChecker {
             addError(operation, "La date de l'opération est invalide. "+operation);
         }
 
-        if (operation.getCompteType() == null) {
+        if (operation.getAccountType() == null) {
             addError(operation, "Le type de compte d'une opération n'a pas été trouvé! "+operation);
         }
 
-        if (operation.getCourtier() == null) {
+        if (operation.getBroker() == null) {
             addError(operation, "Le courtier pour une opération n'a pas été trouvé! "+operation);
         }
 

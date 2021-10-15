@@ -14,12 +14,10 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.FileValue;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -33,13 +31,13 @@ public class GDriveConnection {
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 
-    public static Sheets getService(String gDriveCredentialsFile) throws IOException, GeneralSecurityException {
+    public static Sheets getService(Reporting reporting, String gDriveCredentialsFile) throws IOException, GeneralSecurityException {
 
         // 2: Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         // 3: Read client_secret.json file & create Credential object.
-        Credential credential = getCredentials(gDriveCredentialsFile, HTTP_TRANSPORT);
+        Credential credential = getCredentials(reporting, gDriveCredentialsFile, HTTP_TRANSPORT);
 
         // 5: Create Google Sheet Service.
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, setTimeout(credential, 10*1000))
@@ -50,7 +48,7 @@ public class GDriveConnection {
     }
 
 
-    private static Credential getCredentials(String gDriveCredentialsFile, final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    private static Credential getCredentials(Reporting reporting, String gDriveCredentialsFile, final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         java.io.File clientSecretFilePath = new java.io.File(gDriveCredentialsFile);
 
         // Load client secrets.
@@ -59,13 +57,17 @@ public class GDriveConnection {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
+        // ici le fichier StoredCredential va etre créé dans le repertoire clientSecretFilePath.getParentFile()
+        // il va correspondre a un token temporaire de connection (valable 7 jours pour les comptes google dev de tests)
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(clientSecretFilePath.getParentFile()))
                 .setAccessType("offline").build();
 
+        reporting.info("Si cela fait longtemps que vous ne vous êtes pas connecté avec EZLoad");
+        reporting.info("Google va vous re-demander de choisir le compte de connection et de valider l'application EZLoad");
+        reporting.info("Vous devrez selectionner votre compte Google et cliquer sur 'Continuer'");
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
-
 
 
     private static HttpRequestInitializer setTimeout(final HttpRequestInitializer initializer, final int timeout) {
@@ -74,5 +76,9 @@ public class GDriveConnection {
             request.setConnectTimeout(timeout);
             request.setReadTimeout(timeout);
         };
+    }
+
+    public static void deleteOldToken(String gDriveCredentialsFile) {
+        new File(new File(gDriveCredentialsFile).getParent()+"/StoredCredential").delete();
     }
 }

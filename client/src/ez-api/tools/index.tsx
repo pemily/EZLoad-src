@@ -1,4 +1,4 @@
-import { Api, MainSettings, AuthInfo, HttpResponse } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary } from '../gen-api/EZLoadApi';
 
 export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"}); // TODO update => remove the 8080 before the production, the port is dynamically computed
 
@@ -7,18 +7,17 @@ export function valued(v: string|undefined|null) : string {
 }
 
 
-export function jsonCall(promise: Promise<HttpResponse<any, any>>) {
+export function jsonCall(promise: Promise<HttpResponse<any, any>>):  Promise<any> {
     return promise.then(httpResponse => {
       if (httpResponse.status === 204) return null; // no content for 204
       return httpResponse.json();
-    } )
-    .catch(e => {console.log("Promise error: ", e); throw e});
+    } )    
 }
 
  
 // onText return true if it wants to stop the streaming
-export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void, onError: (e: any) => void){    
-    promise
+export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void): Promise<any>{    
+    return promise
     .then(response => response.body)
     .then(body => {
         const reader = body?.getReader();
@@ -42,8 +41,7 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
               push();
             }
           });
-    })
-    .catch(e => onError(e));      
+    });
 }
 
 
@@ -71,5 +69,10 @@ export function getChromeVersion() : string {
   return pieces2[1]+"."+ pieces2[2]+"."+ pieces2[3]+ "."+ pieces2[4];  
 }
 
+
+export function ruleTitle(rule: RuleDefinitionSummary|undefined): string{
+  if (rule === undefined) return "";
+  return rule.broker+" v"+rule.brokerFileVersion+" "+rule.name;
+}
 
 

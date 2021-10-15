@@ -1,10 +1,12 @@
 package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MonPortefeuille;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.gdrive.Row;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RulesEngine {
+    public static final String NO_RULE_FOUND = "NO_RULE_FOUND";
 
     private Reporting reporting;
     private MainSettings mainSettings;
@@ -27,43 +30,66 @@ public class RulesEngine {
         this.allRules = allRules;
     }
 
-    public EzEdition transform(MonPortefeuille monPortefeuille, EZOperation operation){
+    public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation){
         EzData ezData = new EzData();
         operation.fill(ezData);
 
         EzEdition ezEdition = new EzEdition();
         ezEdition.setData(ezData);
 
-        List<RuleDefinition> compatibleRules = allRules.stream().filter(ruleDef -> isCompatible(ruleDef, ezData)).collect(Collectors.toList());
+        List<RuleDefinition> compatibleRules = allRules.stream().filter(ruleDef -> isCompatible(ezPortfolioProxy, ruleDef, ezData)).collect(Collectors.toList());
         if (compatibleRules.size() == 0){
-            ezEdition.getErrors().add("Il n'y a pas de règle de transformation pour cette opération");
+            ezEdition.getErrors().add(NO_RULE_FOUND);
         }
         else if (compatibleRules.size() > 1){
             ezEdition.getErrors().add("Il y a plusieurs règles de transformation pour cette opération: "+compatibleRules);
         }
         else {
             RuleDefinition ruleDef = compatibleRules.get(0);
-            reporting.info("Utilisation de la règle "+ruleDef.getCourtier().getEzPortfolioName()+": "+ruleDef.getName());
-            ezEdition.setEzOperationEdition(applyForOperation(ruleDef, ezData));
-            ezEdition.setEzPortefeuilleEdition(applyForPortefeuille(ruleDef, monPortefeuille, ezData));
+            reporting.info("Utilisation de la règle "+ruleDef.getBroker().getEzPortfolioName()+": "+ruleDef.getName());
+            ezEdition.setRuleDefinitionSummary(ruleDef);
+            if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezEdition.getEzOperationEdition()))) {
+                try {
+                    EzOperationEdition ezOperationEdition = applyForOperation(ruleDef, ezData);
+                    ezEdition.setEzOperationEdition(ezOperationEdition);
+                    ezEdition.getEzOperationEdition().fill(ezData);
+                    ezEdition.setEzPortefeuilleEdition(applyForPortefeuille(ruleDef, ezPortfolioProxy, ezData));
+
+                    reporting.info("New operation " + ezOperationEdition.getDate() + " " + ezOperationEdition.getOperationType() + " " + ezOperationEdition.getAmount());
+                }
+                catch(Exception e){
+                    reporting.error(e);
+                    ezEdition.setEzOperationEdition(null);
+                    ezEdition.setEzPortefeuilleEdition(null);
+                    ezEdition.getErrors().add("Il y a eu une erreur de transformation pour cette opération");
+                }
+            }
         }
         return ezEdition;
     }
 
 
-    private boolean isCompatible(RuleDefinition ruleDefinition, EzData data) {
-        return data.get("courtier").equals(ruleDefinition.getCourtier().getEzPortfolioName()) &&
+    private boolean isCompatible(EZPortfolioProxy portfolioProxy, RuleDefinition ruleDefinition, EzData data) {
+        return ruleDefinition.isEnabled() &&
+                data.get("courtier").equals(ruleDefinition.getBroker().getEzPortfolioName()) &&
+                data.getInt("brokerFileVersion") == ruleDefinition.getBrokerFileVersion() &&
+                isRuleDefinitionCompatibleWithEzPortfolio(ruleDefinition, portfolioProxy) &&
                 ExpressionEvaluator.getSingleton().evaluateAsBoolean(reporting, mainSettings, ruleDefinition.getCondition(), data);
+    }
+
+    private boolean isRuleDefinitionCompatibleWithEzPortfolio(RuleDefinition ruleDefinition, EZPortfolioProxy ezPortfolioProxy){
+        // ici plus tard il peut y avoir de la logique specifique.
+        // exemple, les versions 5 & 6 & 7 de EzPortfolio sont compatibles avec les regles écrites avec EzLoad v1 & v2
+        return ezPortfolioProxy.getEzPortfolioVersion() == 5 && ruleDefinition.getEzLoadVersion() == 1;
     }
 
     private EzOperationEdition applyForOperation(RuleDefinition ruleDefinition, EzData data) {
         EzOperationEdition ezOperationEdition = new EzOperationEdition();
 
-        ezOperationEdition.setRuleDefinitionApplied(ruleDefinition.getName());
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationTypeExpr(), data));
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationDateExpr(), data));
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationCompteTypeExpr(), data));
-        ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationCourtierExpr(), data));
+        ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationBrokerExpr(), data));
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationAccountExpr(), data));
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationQuantityExpr(), data));
         ezOperationEdition.setOperationType(eval(ruleDefinition.getOperationActionNameExpr(), data));
@@ -74,10 +100,10 @@ public class RulesEngine {
         return ezOperationEdition;
     }
 
-    private EzPortefeuilleEdition applyForPortefeuille(RuleDefinition ruleDefinition, MonPortefeuille portefeuille, EzData data) {
+    private EzPortefeuilleEdition applyForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
         String valeur = data.get("valeur");
-        Optional<Row> rowOpt = portefeuille.searchRow(valeur);
-        Row row = rowOpt.orElse(portefeuille.getNewRow(valeur));
+        Optional<Row> rowOpt = portfolioProxy.searchPortefeuilleRow(valeur);
+        Row row = rowOpt.orElse(portfolioProxy.getNewPortefeuilleRow(valeur));
         return applyForPortefeuille(ruleDefinition, row, data);
     }
 
@@ -109,17 +135,17 @@ public class RulesEngine {
 
     private EzData newPortefeuilleEzData(Row portefeuilleRow, EzData data){
         EzData newData = new EzData(data);
-        newData.put("compte", portefeuilleRow.getValueStr(MonPortefeuille.COMPTE_TYPE_COL));
-        newData.put("courtier", portefeuilleRow.getValueStr(MonPortefeuille.COURTIER_COL));
-        newData.put("tickerGoogle", portefeuilleRow.getValueStr(MonPortefeuille.TICKER_COL));
-        newData.put("pays", portefeuilleRow.getValueStr(MonPortefeuille.COUNTRY_COL));
-        newData.put("secteur", portefeuilleRow.getValueStr(MonPortefeuille.SECTEUR_COL));
-        newData.put("industrie", portefeuilleRow.getValueStr(MonPortefeuille.INDUSTRIE_COL));
-        newData.put("eligibilite40", portefeuilleRow.getValueStr(MonPortefeuille.ELIGIBILITE_ABATTEMENT_COL));
-        newData.put("type", portefeuilleRow.getValueStr(MonPortefeuille.TYPE_COL));
-        newData.put("prixDeRevientUnit", portefeuilleRow.getValueStr(MonPortefeuille.PRIX_DE_REVIENT_UNITAIRE_COL));
-        newData.put("quantite", portefeuilleRow.getValueStr(MonPortefeuille.QUANTITE_COL));
-        newData.put("dividendeAnnuel", portefeuilleRow.getValueStr(MonPortefeuille.DIVIDENDE_ANNUEL_COL));
+        newData.put("ezPortfolio.portefeuille.compte", portefeuilleRow.getValueStr(MonPortefeuille.COMPTE_TYPE_COL));
+        newData.put("ezPortfolio.portefeuille.courtier", portefeuilleRow.getValueStr(MonPortefeuille.COURTIER_COL));
+        newData.put("ezPortfolio.portefeuille.tickerGoogle", portefeuilleRow.getValueStr(MonPortefeuille.TICKER_COL));
+        newData.put("ezPortfolio.portefeuille.pays", portefeuilleRow.getValueStr(MonPortefeuille.COUNTRY_COL));
+        newData.put("ezPortfolio.portefeuille.secteur", portefeuilleRow.getValueStr(MonPortefeuille.SECTEUR_COL));
+        newData.put("ezPortfolio.portefeuille.industrie", portefeuilleRow.getValueStr(MonPortefeuille.INDUSTRIE_COL));
+        newData.put("ezPortfolio.portefeuille.eligibilite40", portefeuilleRow.getValueStr(MonPortefeuille.ELIGIBILITE_ABATTEMENT_COL));
+        newData.put("ezPortfolio.portefeuille.type", portefeuilleRow.getValueStr(MonPortefeuille.TYPE_COL));
+        newData.put("ezPortfolio.portefeuille.prixDeRevientUnit", portefeuilleRow.getValueStr(MonPortefeuille.PRIX_DE_REVIENT_UNITAIRE_COL));
+        newData.put("ezPortfolio.portefeuille.quantite", portefeuilleRow.getValueStr(MonPortefeuille.QUANTITE_COL));
+        newData.put("ezPortfolio.portefeuille.dividendeAnnuel", portefeuilleRow.getValueStr(MonPortefeuille.DIVIDENDE_ANNUEL_COL));
         return newData;
     }
 

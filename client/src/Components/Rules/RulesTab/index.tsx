@@ -1,0 +1,32 @@
+import { useState, useEffect } from "react";
+import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, List, Menu, Select } from "grommet";
+import { Download, Trash, More, Upload } from 'grommet-icons';
+import { ezApi, jsonCall, getChromeVersion, ruleTitle } from '../../../ez-api/tools';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, RuleDefinitionSummary, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
+import { Rule } from '../../Rules/Rule';
+
+export interface RulesTabProps {
+    readOnly : boolean;
+    operation: EzEdition|undefined;
+    ruleDefinitionSelected: RuleDefinitionSummary|undefined;
+    rules: RuleDefinitionSummary[];
+    reload: () => void;
+}      
+
+export function RulesTab(props: RulesTabProps){
+    const [ruleDefinitionSelected, setRuleDefinitionSelected] = useState<RuleDefinitionSummary|undefined>(props.ruleDefinitionSelected);
+    const [ruleDefinitionLoaded, setRuleDefinitionLoaded] = useState<RuleDefinition|undefined>(undefined);
+
+    return (
+        <Box margin="small">            
+             <Select placeholder="Selectionnez une règle"
+                value={ruleTitle(ruleDefinitionSelected)}
+                options={props.rules.map(r => ruleTitle(r))}
+                onChange={({ val }) => setRuleDefinitionSelected(val)} />
+
+            { ruleDefinitionLoaded && (
+                <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={ruleDefinitionLoaded}/>
+            )}
+        </Box>
+    );
+}

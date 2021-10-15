@@ -1,7 +1,6 @@
 package com.pascal.ezload.server.httpserver.handler;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
@@ -13,8 +12,9 @@ import com.pascal.ezload.service.exporter.EzEditionExporter;
 import com.pascal.ezload.service.exporter.EZPortfolioManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.model.EZModel;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 
@@ -40,8 +40,8 @@ public class EngineHandler {
     @Path("/downloadAndAnalyse")
     @Produces(MediaType.APPLICATION_JSON)
     public EzProcess download(@NotNull @QueryParam("chromeVersion") String chromeVersion,
-                      @NotNull @QueryParam("courtier") EnumEZCourtier courtier) throws Exception {
-        if (courtier != EnumEZCourtier.BourseDirect) {
+                      @NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
+        if (courtier != EnumEZBroker.BourseDirect) {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
         else {
@@ -67,7 +67,7 @@ public class EngineHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public EzProcess analyze() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        EnumEZCourtier courtier = EnumEZCourtier.BourseDirect;
+        EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Analyse des nouvelles opérations de " + courtier.getEzPortfolioName(),
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.log"),
@@ -99,7 +99,7 @@ public class EngineHandler {
     // upload valid operations into GoogleDriver EZPortfolio
     public EzProcess upload() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        EnumEZCourtier courtier = EnumEZCourtier.BourseDirect;
+        EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Mise à jour d'EZPortfolio avec les opérations validé",
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.log"),

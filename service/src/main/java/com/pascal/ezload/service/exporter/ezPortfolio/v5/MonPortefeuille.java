@@ -29,6 +29,8 @@ public class MonPortefeuille {
     public static final int QUANTITE_COL = 10;
     public static final int DIVIDENDE_ANNUEL_COL = 11;
 
+    private static final int NB_OF_COLUMNS = 12;
+
     public MonPortefeuille(Reporting reporting, SheetValues portefeuille) {
         this.reporting = reporting;
         this.portefeuille = portefeuille;
@@ -45,7 +47,7 @@ public class MonPortefeuille {
     }
 
     public Row getNewRow(String valeur) {
-        Row row = new Row();
+        Row row = new Row(NB_OF_COLUMNS);
         row.setValue(VALEUR_COL, valeur);
         this.newValeurs.add(row);
         return row;

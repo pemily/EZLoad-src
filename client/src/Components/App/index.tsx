@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner } from "grommet";
+import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner, Select } from "grommet";
 import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Reports } from '../Reports';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
+import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary } from '../../ez-api/gen-api/EZLoadApi';
+import { produceWithPatches } from "immer";
 
 export function App(){
     
     const EXECUTION_TAB_INDEX = 2;
+    const RULES_TAB_INDEX = 4;
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
@@ -19,7 +22,10 @@ export function App(){
     const [reports, setReports] = useState<EzReport[]>([]);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
     const [processRunning, setProcessRunning] = useState<boolean>(false);
- 
+    const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
+    const [editOperation, setEditOperation] = useState<EzEdition|undefined>(undefined);
+    const [ruleDefinition, setRuleDefinition] = useState<RuleDefinitionSummary|undefined>(undefined);
+
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
             setProcessLaunchFail(false);
@@ -35,13 +41,14 @@ export function App(){
     function reloadAllData(){
         console.log("Loading Data...");
         jsonCall(ezApi.home.getMainData())
-           .then(r =>  {            
+        .then(r =>  {            
              console.log("Data loaded: ", r);
              setMainSettings(r.mainSettings);                          
              setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);
              setProcessRunning(r.processRunning);
              setReports(r.reports);
-          })
+             setRules(r.rules);
+        })
         .catch((error) => {
             console.log("Error while loading Data.", error);
         });
@@ -110,15 +117,19 @@ export function App(){
                                         disabled={processRunning} onClick={() => 
                                             jsonCall(ezApi.engine.analyze())
                                             .then(followProcess)
+                                            .catch(e => console.log(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Charger les nouvelles opérations"/>                                                
                                     <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
                                                     jsonCall(ezApi.engine.upload())
                                                     .then(followProcess)
+                                                    .catch(e => console.log(e))
                                                 }
                                                 size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                 </Box>
-                                <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}/>                                                                                                                  
+                                <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
+                                        createRule={op =>{ setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(undefined); }}
+                                        viewRule={op => { setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(op.ruleDefinitionSummary); } }/>
                         </Box>
                     </Tab>                       
                     <Tab title="Rapport" icon={runningTaskOrLog(mainSettings && processRunning)}>
@@ -128,7 +139,7 @@ export function App(){
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             <ViewLog 
                                     ezProcess={lastProcess}    
-                                    processFinished={() => {reloadAllData()}}/>
+                                    processFinished={() => reloadAllData()}/>
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>
@@ -146,6 +157,11 @@ export function App(){
                             )}                            
                         </Box>
                     </Tab>
+                    <Tab title="Règles" icon={<Services size='small'/>}>
+                        <Box fill overflow="auto">
+                            <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={ruleDefinition} rules={rules} reload={reloadAllData}/>
+                        </Box>
+                    </Tab>                    
                 </Tabs>
             </Box>
         </Box>

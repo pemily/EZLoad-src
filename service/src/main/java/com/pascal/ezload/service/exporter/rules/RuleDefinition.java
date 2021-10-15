@@ -1,19 +1,23 @@
 package com.pascal.ezload.service.exporter.rules;
 
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.util.StringValue;
 
-public class RuleDefinition {
+public class RuleDefinition extends RuleDefinitionSummary {
+    public enum Field{name, description, condition, operationTypeExpr, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
+        operationAccountExpr, operationQuantityExpr, operationActionNameExpr, operationCountryExpr, operationAmountExpr,
+        operationDescriptionExpr, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
+        portefeuilleTickerGoogleFinanceExpr, portefeuillePaysExpr, portefeuilleSecteurExpr, portefeuilleIndustrieExpr,
+        portefeuilleEligibiliteAbbattement40Expr, portefeuilleTypeExpr, portefeuillePrixDeRevientExpr,
+        portefeuilleQuantiteExpr, portefeuilleDividendeAnnuelExpr}
 
-    private String name;
-    private String description;
-    private EnumEZCourtier courtier;
-
+    private int ezLoadVersion; // the version of EzLoad when this RuleDefinition was created/edited
     private String condition;
 
     private String operationTypeExpr;
     private String operationDateExpr;
     private String operationCompteTypeExpr;
-    private String operationCourtierExpr;
+    private String operationBrokerExpr;
     private String operationAccountExpr;
     private String operationQuantityExpr;
     private String operationActionNameExpr;
@@ -66,12 +70,12 @@ public class RuleDefinition {
         this.operationCompteTypeExpr = operationCompteTypeExpr;
     }
 
-    public String getOperationCourtierExpr() {
-        return operationCourtierExpr;
+    public String getOperationBrokerExpr() {
+        return operationBrokerExpr;
     }
 
-    public void setOperationCourtierExpr(String operationCourtierExpr) {
-        this.operationCourtierExpr = operationCourtierExpr;
+    public void setOperationBrokerExpr(String operationBrokerExpr) {
+        this.operationBrokerExpr = operationBrokerExpr;
     }
 
     public String getOperationAccountExpr() {
@@ -218,27 +222,41 @@ public class RuleDefinition {
         this.portefeuilleDividendeAnnuelExpr = portefeuilleDividendeAnnuelExpr;
     }
 
-    public String getName() {
-        return name;
+    public int getEzLoadVersion() {
+        return ezLoadVersion;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEzLoadVersion(int ezLoadVersion) {
+        this.ezLoadVersion = ezLoadVersion;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    public void validate(){
+        new StringValue(true).validate(this, Field.name.name(), getName());
+        new StringValue(false).validate(this, Field.description.name(), getDescription());
+        new StringValue(true).validate(this, Field.condition.name(), condition);
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+        new StringValue(true).validate(this, Field.operationTypeExpr.name(), operationTypeExpr);
+        new StringValue(true).validate(this, Field.operationDateExpr.name(), operationDateExpr);
+        new StringValue(true).validate(this, Field.operationCompteTypeExpr.name(), operationCompteTypeExpr);
+        new StringValue(true).validate(this, Field.operationBrokerExpr.name(), operationBrokerExpr);
+        new StringValue(true).validate(this, Field.operationAccountExpr.name(), operationAccountExpr);
+        new StringValue(true).validate(this, Field.operationQuantityExpr.name(), operationQuantityExpr);
+        new StringValue(true).validate(this, Field.operationActionNameExpr.name(), operationActionNameExpr);
+        new StringValue(true).validate(this, Field.operationCountryExpr.name(), operationCountryExpr);
+        new StringValue(true).validate(this, Field.operationAmountExpr.name(), operationAmountExpr);
+        new StringValue(true).validate(this, Field.operationDescriptionExpr.name(), operationDescriptionExpr);
 
-    public EnumEZCourtier getCourtier() {
-        return courtier;
-    }
-
-    public void setCourtier(EnumEZCourtier courtier) {
-        this.courtier = courtier;
+        new StringValue(true).validate(this, Field.portefeuilleValeurExpr.name(), portefeuilleValeurExpr);
+        new StringValue(true).validate(this, Field.portefeuilleCompteExpr.name(), portefeuilleCompteExpr);
+        new StringValue(true).validate(this, Field.portefeuilleCourtierExpr.name(), portefeuilleCourtierExpr);
+        new StringValue(true).validate(this, Field.portefeuilleTickerGoogleFinanceExpr.name(), portefeuilleTickerGoogleFinanceExpr);
+        new StringValue(true).validate(this, Field.portefeuillePaysExpr.name(), portefeuillePaysExpr);
+        new StringValue(true).validate(this, Field.portefeuilleSecteurExpr.name(), portefeuilleSecteurExpr);
+        new StringValue(true).validate(this, Field.portefeuilleIndustrieExpr.name(), portefeuilleIndustrieExpr);
+        new StringValue(true).validate(this, Field.portefeuilleEligibiliteAbbattement40Expr.name(), portefeuilleEligibiliteAbbattement40Expr);
+        new StringValue(true).validate(this, Field.portefeuilleTypeExpr.name(), portefeuilleTypeExpr);
+        new StringValue(true).validate(this, Field.portefeuillePrixDeRevientExpr.name(), portefeuillePrixDeRevientExpr);
+        new StringValue(true).validate(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr);
+        new StringValue(true).validate(this, Field.portefeuilleDividendeAnnuelExpr.name(), portefeuilleDividendeAnnuelExpr);
     }
 }

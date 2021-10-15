@@ -3,7 +3,6 @@ package com.pascal.ezload.server.httpserver.exec;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.util.Tail;
 
 import java.io.*;
@@ -101,7 +100,7 @@ public class ProcessManager {
     }
 
     public static String getLog(MainSettings mainSettings, String prefix, String suffix){
-        File logsDir = new File(mainSettings.getEZLoad().getLogsDir());
+        File logsDir = new File(mainSettings.getEzLoad().getLogsDir());
         Date now = new Date();
         String reportFileName =  prefix + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + suffix;
         return logsDir + File.separator + reportFileName;

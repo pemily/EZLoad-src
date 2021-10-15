@@ -20,7 +20,7 @@ public class ExplorerHandler {
     @Produces("application/pdf")
     public Response SourceFile(@NotNull @QueryParam("source") String sourceFile) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        File file = new File(mainSettings.getEZLoad().getDownloadDir()+File.separator+sourceFile);
+        File file = new File(mainSettings.getEzLoad().getDownloadDir()+File.separator+sourceFile);
         FileInputStream fileInputStream = new FileInputStream(file);
         Response.ResponseBuilder responseBuilder = Response.ok(fileInputStream);
         responseBuilder.type("application/pdf");

@@ -5,7 +5,6 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class EZOperation {
 
@@ -14,8 +13,8 @@ public abstract class EZOperation {
     private String amount;
     private Integer quantity;
     private String description;
-    private EnumEZCompteType compteType;
-    private EnumEZCourtier courtier;
+    private EnumEZAccountType accountType;
+    private EnumEZBroker broker;
     private EZAccount account;
     private EZAccountDeclaration ezAccountDeclaration;
 
@@ -45,20 +44,20 @@ public abstract class EZOperation {
         this.description = description;
     }
 
-    public EnumEZCompteType getCompteType() {
-        return compteType;
+    public EnumEZAccountType getAccountType() {
+        return accountType;
     }
 
-    public void setCompteType(EnumEZCompteType compteType) {
-        this.compteType = compteType;
+    public void setAccountType(EnumEZAccountType accountType) {
+        this.accountType = accountType;
     }
 
-    public EnumEZCourtier getCourtier() {
-        return courtier;
+    public EnumEZBroker getBroker() {
+        return broker;
     }
 
-    public void setCourtier(EnumEZCourtier courtier) {
-        this.courtier = courtier;
+    public void setBroker(EnumEZBroker broker) {
+        this.broker = broker;
     }
 
     public EZAccount getAccount() {
@@ -92,10 +91,10 @@ public abstract class EZOperation {
                 ", amount='" + amount + '\'' +
                 ", quantity='" + quantity + '\'' +
                 ", description='" + description + '\'' +
-                ", compteType=" + compteType +
+                ", compteType=" + accountType +
                 ", account Name=" + account.getOwnerName() +
                 ", account Number=" + account.getAccountNumber() +
-                ", courtier='" + courtier + '\'' +
+                ", courtier='" + broker + '\'' +
                 '}';
     }
 
@@ -105,7 +104,7 @@ public abstract class EZOperation {
         data.put("operation.date", date.toEzPortoflioDate());
         data.put("operation.montant", amount);
         data.put("operation.description", description);
-        data.put("operation.compteType", compteType.getEZPortfolioName());
+        data.put("operation.compteType", accountType.getEZPortfolioName());
         data.put("operation.quantity", quantity == null ? null : quantity+"");
         fillData(data); // force the subtype to implements the fillData method
     }

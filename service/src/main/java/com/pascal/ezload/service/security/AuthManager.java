@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,7 +35,7 @@ public class AuthManager {
         this.authFilePath = authFilePath;
     }
 
-    public AuthInfo getAuthWithDummyPassword(EnumEZCourtier courtier) throws Exception {
+    public AuthInfo getAuthWithDummyPassword(EnumEZBroker courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
@@ -48,7 +48,7 @@ public class AuthManager {
         return result;
     }
 
-    public AuthInfo getAuthInfo(EnumEZCourtier courtier) throws Exception {
+    public AuthInfo getAuthInfo(EnumEZBroker courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
@@ -58,7 +58,7 @@ public class AuthManager {
         return result;
     }
 
-    public void saveAuthInfo(EnumEZCourtier courtier, AuthInfo authInfo) throws Exception {
+    public void saveAuthInfo(EnumEZBroker courtier, AuthInfo authInfo) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo encrypted = new AuthInfo();
         encrypted.setPassword(encryptPassword(authInfo.getPassword(), passPhrase));
@@ -127,13 +127,13 @@ public class AuthManager {
     }
 
     private static class Data {
-        private Map<EnumEZCourtier, AuthInfo> info = new HashMap<>();
+        private Map<EnumEZBroker, AuthInfo> info = new HashMap<>();
 
-        public Map<EnumEZCourtier, AuthInfo> getInfo() {
+        public Map<EnumEZBroker, AuthInfo> getInfo() {
             return info;
         }
 
-        public void setInfo(Map<EnumEZCourtier, AuthInfo> info) {
+        public void setInfo(Map<EnumEZBroker, AuthInfo> info) {
             this.info = info;
         }
     }

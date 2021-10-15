@@ -7,7 +7,9 @@ import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
+import com.pascal.ezload.service.exporter.rules.RulesManager;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
@@ -21,6 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("home")
 public class HomeHandler {
@@ -47,10 +50,16 @@ public class HomeHandler {
     @Path("/main")
     @Produces(MediaType.APPLICATION_JSON)
     public WebData getMainData() throws Exception {
-        return new WebData(SettingsManager.getInstance().loadProps().validate(),
+        MainSettings mainSettings = SettingsManager.getInstance().loadProps().validate();
+        return new WebData(mainSettings,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
-                            ezServerState.getEzReports());
+                            ezServerState.getEzReports(),
+                            new RulesManager(mainSettings).getAllRules()
+                                    .stream()
+                                    .map(e -> (RuleDefinitionSummary)e)
+                                    .collect(Collectors.toList())
+                );
     }
 
     @POST
@@ -65,9 +74,9 @@ public class HomeHandler {
     @GET
     @Path("/searchAccounts")
     @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumEZCourtier courtier,
+    public EzProcess searchAccounts(@NotNull @QueryParam("courtier") EnumEZBroker courtier,
                                     @NotNull @QueryParam("chromeVersion") String chromeVersion) throws Exception {
-        if (courtier != EnumEZCourtier.BourseDirect) {
+        if (courtier != EnumEZBroker.BourseDirect) {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
         else {

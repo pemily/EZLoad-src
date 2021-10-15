@@ -10,9 +10,12 @@ import java.awt.*;
 import java.net.URI;
 
 
-public class Main {
+public class EZLoad {
+
+    public static int VERSION = 1;
 
     public static void main(String args[]) throws Exception {
+        System.out.println("Configuration file: "+ SettingsManager.getConfigFilePath());
 
         EZHttpServer server = new EZHttpServer();
         int port = server.start(new AbstractBinder() {
@@ -25,7 +28,6 @@ public class Main {
             }
         });
         String homePage = "http://localhost:"+port+"/EZLoad/api/home";
-        System.out.println("Configuration file: "+ SettingsManager.getConfigFilePath());
         System.out.println("HomePage: "+homePage);
         System.out.println("ApiPage: http://localhost:"+port+"/EZLoad/api/home/settings");
         Desktop.getDesktop().browse(new URI(homePage));

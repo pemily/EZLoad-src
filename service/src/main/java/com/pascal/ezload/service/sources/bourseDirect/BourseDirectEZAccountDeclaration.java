@@ -1,7 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
 import com.pascal.ezload.service.model.EZAccountDeclaration;
-import com.pascal.ezload.service.model.EnumEZCourtier;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 

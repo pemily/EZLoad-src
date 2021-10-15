@@ -2,11 +2,9 @@ package com.pascal.ezload.service.exporter.ezEdition;
 
 public class EzOperationEdition {
 
-    private String ruleDefinitionApplied;
-
     private String date;
     private String compteType;
-    private String courtier;
+    private String broker;
     private String account;
     private String quantity;
     private String operationType;
@@ -31,12 +29,12 @@ public class EzOperationEdition {
         this.compteType = compteType;
     }
 
-    public String getCourtier() {
-        return courtier;
+    public String getBroker() {
+        return broker;
     }
 
-    public void setCourtier(String courtier) {
-        this.courtier = courtier;
+    public void setBroker(String broker) {
+        this.broker = broker;
     }
 
     public String getAccount() {
@@ -95,11 +93,16 @@ public class EzOperationEdition {
         this.description = description;
     }
 
-    public String getRuleDefinitionApplied() {
-        return ruleDefinitionApplied;
-    }
-
-    public void setRuleDefinitionApplied(String ruleDefinitionApplied) {
-        this.ruleDefinitionApplied = ruleDefinitionApplied;
+    public void fill(EzData ezData) {
+        ezData.put("ezPortfolio.operation.date", date);
+        ezData.put("ezPortfolio.operation.compteType", compteType);
+        ezData.put("ezPortfolio.operation.courtier", broker);
+        ezData.put("ezPortfolio.operation.account", account);
+        ezData.put("ezPortfolio.operation.quantity", quantity);
+        ezData.put("ezPortfolio.operation.operationType", operationType);
+        ezData.put("ezPortfolio.operation.actionName", actionName);
+        ezData.put("ezPortfolio.operation.country", country);
+        ezData.put("ezPortfolio.operation.amount", amount);
+        ezData.put("ezPortfolio.operation.description", description);
     }
 }

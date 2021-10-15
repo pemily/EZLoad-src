@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 public class BourseDirectText2Model {
 
+    private static final int VERSION = 1;
 
     public static final String TEXT_INTRO = "Nous vous prions de trouver ci-dessous votre relevé d'opérations. Sans observation de votre part au\n" +
             "sujet du présent relevé, nous le considérerons comme ayant obtenu votre accord. Veuillez agréer nos\n" +
@@ -44,7 +45,7 @@ public class BourseDirectText2Model {
     private BourseDirectModel analyzePdfText(String pdfText) throws BRException {
         try {
             pdfText = StringUtils.clean(pdfText);
-            BourseDirectModel model = new BourseDirectModel();
+            BourseDirectModel model = new BourseDirectModel(VERSION);
             analyzePdfText(pdfText, model);
             return model;
         }

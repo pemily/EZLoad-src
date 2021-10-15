@@ -7,8 +7,7 @@ import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZOperation;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.LinkedList;
@@ -28,8 +27,13 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
+    public int getEzPortfolioVersion() {
+        return 5;
+    }
+
+    @Override
     public void load() throws Exception {
-        ezPortfolio = new EZPortfolio();
+        ezPortfolio = new EZPortfolio("v5");
 
         List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:K", "MonPortefeuille!A4:L");
 
@@ -82,12 +86,12 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<EZDate> getLastOperationDate(EnumEZCourtier courtier, EZAccountDeclaration account) {
+    public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account) {
         return ezPortfolio.getMesOperations().getLastOperationDate(courtier, account);
     }
 
     @Override
-    public boolean isFileAlreadyLoaded(EnumEZCourtier courtier, EZAccountDeclaration account, EZDate pdfDate) {
+    public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration account, EZDate pdfDate) {
         return ezPortfolio.getMesOperations().isFileAlreadyLoaded(courtier, account, pdfDate);
     }
 
@@ -96,17 +100,40 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         return ezPortfolio.getMesOperations().isOperationsExists(operation);
     }
 
+    @Override
+    public Optional<Row> searchPortefeuilleRow(String valeur) {
+        return ezPortfolio.getMonPortefeuille().searchRow(valeur);
+    }
+
+    @Override
+    public Row getNewPortefeuilleRow(String valeur) {
+        return ezPortfolio.getMonPortefeuille().getNewRow(valeur);
+    }
+
 
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) {
-        try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio")){
+        try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio avec EZLoad")){
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
-            SheetValues s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
-            reporting.info("Valeur trouvé: "+ s.getValues().get(0).getValueStr(0));
+            SheetValues s;
+            try {
+                s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
+            }
+            catch(Exception e){
+                // TODO catcher l'exception sur le token expired
+                String errorMsg = "Il y a un problème pour se connecter à EzPortfolio ou alors vous devez recréer votre fichier de sécurité. "+sheets.getEzPortfolioUrl();
+                reporting.error(errorMsg);
+                throw new IllegalStateException(errorMsg, e);
+            }
+
+            reporting.info("Valeur trouvée: "+ s.getValues().get(0).getValueStr(0));
             return s.getValues().get(0).getValueStr(0).equals("Quantité");
         }
         catch(Exception e){
-            reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un probleme", e);
+            if (e instanceof IllegalStateException){
+                throw e;
+            }
+            reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème", e);
             return false;
         }
     }

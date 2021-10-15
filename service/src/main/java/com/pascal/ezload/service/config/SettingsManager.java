@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 
@@ -23,9 +23,9 @@ public class SettingsManager {
 
     public MainSettings loadProps() throws Exception {
         MainSettings settings = readConfigFile();
-        String passphrase = settings.getEZLoad().getPassPhrase();
+        String passphrase = settings.getEzLoad().getPassPhrase();
         if (passphrase == null){
-            settings.getEZLoad().setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase());
+            settings.getEzLoad().setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase());
             saveConfigFile(settings);
         }
         return settings;
@@ -46,11 +46,11 @@ public class SettingsManager {
 
     public static AuthManager getAuthManager() throws Exception {
         MainSettings mainSettings = getInstance().loadProps();
-        return new AuthManager(mainSettings.getEZLoad().getPassPhrase(), mainSettings.getEZLoad().getCourtierCredsFile());
+        return new AuthManager(mainSettings.getEzLoad().getPassPhrase(), mainSettings.getEzLoad().getCourtierCredsFile());
     }
 
-    public static String getDownloadDir(MainSettings mainSettings, EnumEZCourtier brCourtier){
-        return mainSettings.getEZLoad().getDownloadDir()+ File.separator+brCourtier.getDirName();
+    public static String getDownloadDir(MainSettings mainSettings, EnumEZBroker brCourtier){
+        return mainSettings.getEzLoad().getDownloadDir()+ File.separator+brCourtier.getDirName();
     }
 
     public static String getConfigFilePath(){
@@ -100,11 +100,12 @@ public class SettingsManager {
         ezLoad.setCourtierCredsFile(ezHome+File.separator+"ezCreds.json");
 
         new File(ezLoad.getDownloadDir()).mkdirs();
+        new File(ezLoad.getRulesDir()).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
         FileOutputStream output = new FileOutputStream(ezLoad.getCourtierCredsFile());
         output.write("{}".getBytes(StandardCharsets.UTF_8));
         output.close();
-        mainSettings.setEZLoad(ezLoad);
+        mainSettings.setEzLoad(ezLoad);
 
         MainSettings.ChromeSettings chromeSettings = new MainSettings.ChromeSettings();
         chromeSettings.setUserDataDir(ezHome+File.separator+"chrome"+File.separator+"data");
@@ -122,7 +123,7 @@ public class SettingsManager {
         output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile());
         output.write("{}".getBytes(StandardCharsets.UTF_8));
         output.close();
-        mainSettings.setEZLoad(ezLoad);
+        mainSettings.setEzLoad(ezLoad);
 
         BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
         bourseDirectSettings.setAccounts(new LinkedList<>());

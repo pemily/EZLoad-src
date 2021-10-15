@@ -2,8 +2,6 @@ package com.pascal.ezload.service.exporter.ezEdition;
 
 public class EzPortefeuilleEdition {
 
-    private String ruleDefinitionApplied;
-
     private String valeur;
     private String Compte;
     private String courtier;
@@ -113,11 +111,4 @@ public class EzPortefeuilleEdition {
         this.dividendeAnnuel = dividendeAnnuel;
     }
 
-    public String getRuleDefinitionApplied() {
-        return ruleDefinitionApplied;
-    }
-
-    public void setRuleDefinitionApplied(String ruleDefinitionApplied) {
-        this.ruleDefinitionApplied = ruleDefinitionApplied;
-    }
 }

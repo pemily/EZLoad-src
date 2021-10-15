@@ -3,7 +3,7 @@ package com.pascal.ezload.server.httpserver;
 import com.pascal.ezload.server.httpserver.handler.HttpMethodOverrideEnabler;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.FileLinkCreator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -69,13 +69,13 @@ public class EZHttpServer {
 
     public FileLinkCreator fileLinkCreator(MainSettings mainSettings){
         return (reporting, sourceFile) -> {
-            if (sourceFile.startsWith(SettingsManager.getDownloadDir(mainSettings, EnumEZCourtier.BourseDirect))){
-                String file = sourceFile.substring(SettingsManager.getDownloadDir(mainSettings, EnumEZCourtier.BourseDirect).length());
+            if (sourceFile.startsWith(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect))){
+                String file = sourceFile.substring(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect).length());
                 file = file.replace('\\', '/'); // pour windows
                 return "<a target='"+PDF_BOURSE_DIRECT_TARGET+"' href='"+PDF_BOURSE_DIRECT_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
             }
-            else if (sourceFile.startsWith(mainSettings.getEZLoad().getLogsDir())){
-                String file = sourceFile.substring(mainSettings.getEZLoad().getLogsDir().length());
+            else if (sourceFile.startsWith(mainSettings.getEzLoad().getLogsDir())){
+                String file = sourceFile.substring(mainSettings.getEzLoad().getLogsDir().length());
                 file = file.replace('\\', '/'); // pour windows
                 return "<a target='"+LOGS_TARGET+"' href='"+LOGS_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
             }

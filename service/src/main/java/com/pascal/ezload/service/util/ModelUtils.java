@@ -43,6 +43,12 @@ public class ModelUtils {
                 .replace(" ",""));
     }
 
+    public static int str2Int(String v) {
+        if (v == null) return 0;
+        return Integer.parseInt(v.replace(' ', ' ') // google drive add some NNBSP as a thousand separator
+                .replace(" ",""));
+    }
+
 
     public static String float2Str(float v) {
         return normalizeAmount(v+"");

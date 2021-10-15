@@ -4,7 +4,7 @@ import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EnumEZCourtier;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.*;
@@ -64,11 +64,11 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
         goToAvisOperes();
 
-        EnumEZCourtier courtier = EnumEZCourtier.BourseDirect;
+        EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         for (BourseDirectEZAccountDeclaration account : bourseDirectSettings.getAccounts()) {
             try(Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
 
-                Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZCourtier.BourseDirect, account);
+                Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZBroker.BourseDirect, account);
                 if (fromDateOpt.isPresent()) {
                     reporting.info("Dernière date chargé dans EZPortfolio par EZLoad pour le compte " + courtier.getEzPortfolioName() + ":" + account.getName() + "=> " + fromDateOpt.get().toEzPortoflioDate());
                 } else {
@@ -217,7 +217,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     private String getNewFilename(BourseDirectEZAccountDeclaration account, EZDate d){
         String month = EZDate.leadingZero(d.getMonth());
         String day = EZDate.leadingZero(d.getDay());
-        return SettingsManager.getDownloadDir(mainSettings, EnumEZCourtier.BourseDirect)
+        return SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect)
                 + File.separator + account.getName() // if this change, review the method  getAccountNameFromPdfFilePath
                 + File.separator + d.getYear()
                 + File.separator +

@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
+import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.model.EZModel;
 
 import java.util.HashMap;
@@ -30,7 +31,10 @@ public class EzReport {
     public void setEzEditions(List<EzEdition> ezEditions) {
         this.ezEditions = ezEditions;
         if (ezEditions.stream().anyMatch(ez -> ez.getErrors().size() > 0)){
-            errors.add("Une errreur a été détectée dans une opération");
+            if (ezEditions.stream().allMatch(ez -> ez.getErrors().stream().allMatch(e-> e.equals(RulesEngine.NO_RULE_FOUND)))){
+                errors.add(RulesEngine.NO_RULE_FOUND);
+            }
+            else errors.add("Une errreur a été détectée dans une opération");
         }
     }
 

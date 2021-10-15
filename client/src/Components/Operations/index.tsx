@@ -8,21 +8,23 @@ export interface OperationsProps {
     operations: EzEdition[];
     processRunning: boolean;
     followProcess: (process: EzProcess|undefined) => void;
+    createRule: (from: EzEdition) => void;
+    viewRule: (from: EzEdition) => void;
 }      
 
 export function Operations(props: OperationsProps){
+        
+    function operationAction(operation: EzEdition){
+        if (operation.errors!.findIndex(e => e === 'NO_RULE_FOUND') === 0) return (<Anchor onClick={e => props.createRule(operation)}>Créer une règle</Anchor>)
+        return (<Anchor onClick={e => props.viewRule(operation)}>Règle {operation.ruleDefinitionSummary}</Anchor>)
+    }
+
     return (
         <Box margin="small">            
             <List data={props.operations} margin="none" pad="xsmall"
              background={['light-2', 'light-4']}             
-             action={(item, index) => (
-                <Menu
-                  key={index}
-                  icon={<More />}
-                  hoverIndicator
-                  items={[{ label: 'Edit' }]}
-                />)}>
-                {(op: EzEdition) => (<Operation operation={op}/>)}                    
+             action={(item, index) => operationAction(item)}>
+                {(op: EzEdition, index: number) =>(<Operation index={index} operation={op}/>)} 
             </List>            
         </Box>
     );

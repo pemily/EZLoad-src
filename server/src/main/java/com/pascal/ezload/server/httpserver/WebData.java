@@ -4,6 +4,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZOperation;
 
 import java.util.LinkedList;
@@ -14,13 +15,15 @@ public class WebData {
     private MainSettings mainSettings;
     private EzProcess latestEzProcess;
     private List<EzReport> reports;
+    private List<RuleDefinitionSummary> rules;
     private boolean processRunning;
 
-    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning, List<EzReport> reports){
+    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning, List<EzReport> reports, List<RuleDefinitionSummary> allRules){
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
         this.processRunning = processRunning;
         this.reports = reports;
+        this.rules = allRules;
     }
 
     public MainSettings getMainSettings() {
@@ -53,5 +56,13 @@ public class WebData {
 
     public void setReports(List<EzReport> reports) {
         this.reports = reports;
+    }
+
+    public List<RuleDefinitionSummary> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<RuleDefinitionSummary> rules) {
+        this.rules = rules;
     }
 }

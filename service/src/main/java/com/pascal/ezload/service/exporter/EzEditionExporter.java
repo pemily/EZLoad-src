@@ -31,7 +31,7 @@ public class EzEditionExporter {
     public EzEditionExporter(MainSettings mainSettings, Reporting reporting) throws IOException {
         this.reporting = reporting;
         this.mainSettings = mainSettings;
-        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(reporting, mainSettings).getAllRules());
+        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(mainSettings).getAllRules());
     }
 
     /**
@@ -39,25 +39,23 @@ public class EzEditionExporter {
      */
     public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy) {
         try(Reporting rep = reporting.pushSection("Rapport EZPortfolio")){
-            return allEZModels.stream().map(ezModel -> loadOperations(ezPortfolioProxy, ezModel, ezModel.getOperations()))
+            return allEZModels.stream()
+                    .map(ezModel -> loadOperations(ezPortfolioProxy, ezModel, ezModel.getOperations()))
                     .collect(Collectors.toList());
         }
     }
 
     private EzReport loadOperations(EZPortfolioProxy ezPortfolioProxy, EZModel fromEzModel, List<EZOperation> operations) {
         EzReport ezReport = new EzReport(fromEzModel);
-        List<EzEdition> editions = operations.stream().map(operation -> loadOperation(ezPortfolioProxy, operation)).filter(Objects::nonNull).collect(Collectors.toList());
+        List<EzEdition> editions = operations.stream()
+                .map(operation -> loadOperation(ezPortfolioProxy, operation))
+                .collect(Collectors.toList());
         ezReport.setEzEditions(editions);
         return ezReport;
     }
 
     private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation) {
-        EzEdition ezEdition = rulesEngine.transform(ezPortfolioProxy, fromEzOperation);
-        if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezEdition.getEzOperationEdition()))) {
-            reporting.info("New operation " + fromEzOperation.getDate() + " " + fromEzOperation.getOperationType() + " " + fromEzOperation.getAmount());
-            return ezEdition;
-        }
-        return null;
+        return rulesEngine.transform(ezPortfolioProxy, fromEzOperation);
     }
 
 }

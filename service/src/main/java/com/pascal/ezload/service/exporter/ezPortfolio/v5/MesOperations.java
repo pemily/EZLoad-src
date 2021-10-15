@@ -66,7 +66,7 @@ public class MesOperations  {
     }
 
     public static Row newOperationRow(EzOperationEdition operationEdition) {
-        return new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getCourtier(),
+        return new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getBroker(),
                         null, operationEdition.getOperationType(), operationEdition.getActionName(),
                         operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
                         operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION);
@@ -76,11 +76,11 @@ public class MesOperations  {
         newOperations.add(newOperationRow(operationEdition));
     }
 
-    public boolean isFileAlreadyLoaded(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
+    public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
         return getLastOperationDate(courtier, EZAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(fileDate)).orElse(false);
     }
 
-    public Optional<EZDate> getLastOperationDate(EnumEZCourtier courtier, EZAccountDeclaration EZAccountDeclaration) {
+    public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
                 .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
                         && courtier.getEzPortfolioName().equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))

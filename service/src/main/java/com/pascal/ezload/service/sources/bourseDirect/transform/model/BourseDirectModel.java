@@ -7,6 +7,7 @@ import com.pascal.ezload.service.parsers.bourseDirect.Operation;
 import java.util.ArrayList;
 
 public class BourseDirectModel {
+    private int version;
     private String accountNumber;
     private String accountType;
     private String accountOwnerName;
@@ -17,6 +18,14 @@ public class BourseDirectModel {
     private ArrayList<Operation> operations;
     private ArrayList<EZDate> dates;
     private ArrayList<String> amounts;
+
+    public BourseDirectModel(int version){
+        this.version = version;
+    }
+
+    public int getBrokerFileVersion(){
+        return version;
+    }
 
     public String getAccountNumber() {
         return accountNumber;

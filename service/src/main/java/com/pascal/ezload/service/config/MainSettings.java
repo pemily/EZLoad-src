@@ -35,11 +35,11 @@ public class MainSettings {
         this.ezPortfolio = ezPortfolio;
     }
 
-    public EZLoad getEZLoad() {
+    public EZLoad getEzLoad() {
         return bientotRentier;
     }
 
-    public void setEZLoad(EZLoad bientotRentier) {
+    public void setEzLoad(EZLoad bientotRentier) {
         this.bientotRentier = bientotRentier;
     }
 
