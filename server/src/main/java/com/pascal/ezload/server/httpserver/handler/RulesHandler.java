@@ -9,8 +9,10 @@ import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,8 +42,8 @@ public class RulesHandler {
     @GET
     @Path("{ruleName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public RuleDefinition getRule(@NotNull EnumEZBroker broker,
-                                  @NotNull int brokerFileVersion,
+    public RuleDefinition getRule(@NotNull @PathParam("broker") EnumEZBroker broker,
+                                  @NotNull @PathParam("brokerFileVersion") int brokerFileVersion,
                                   @NotNull @PathParam("ruleName") String ruleName) throws Exception {
         return new RulesManager(SettingsManager.getInstance().loadProps())
                 .getAllRules()
@@ -60,6 +62,6 @@ public class RulesHandler {
                          @NotNull RuleDefinition ruleDefinition) throws Exception {
         ruleDefinition.setEzLoadVersion(EZLoad.VERSION);
         new RulesManager(SettingsManager.getInstance().loadProps())
-                .saveRule(oldName, ruleDefinition);
+                .saveRule(oldName == null || StringUtils.isBlank(oldName) ? null : oldName, ruleDefinition);
     }
 }

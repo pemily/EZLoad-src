@@ -17,18 +17,28 @@ export interface RuleProps {
 
 export function Rule(props: RuleProps){
     const [ruleDefinition, setRuleDefinition] = useState<RuleDefinition>(props.ruleDefinition);
-
-    function saveRuleDefinition(ruleDef: RuleDefinition){
-        jsonCall(ezApi.rule.saveRule(props.ruleDefinition.name, ruleDefinition))
+     
+    function saveRuleDefinition(){
+        jsonCall(ezApi.rule.saveRule(ruleDefinition.name === undefined ? "" : ruleDefinition.name, ruleDefinition))
         .then(r => props.reload())
         .catch(e => console.log("Save Password Error: ", e));
+    }
+
+    function saveRule(rd: RuleDefinition){
+        setRuleDefinition(rd);
+        saveRuleDefinition();
     }
     
     return (
         <ConfigTextField id="ruleName" label="Nom de la règle" value={ruleDefinition.name}
             isRequired={true} errorMsg={ruleDefinition.field2ErrorMsg?.name}
             readOnly={props.readOnly}
-            onChange={newValue  => saveRuleDefinition(ruleDefinition)}/>
+            onChange={newValue  => {                
+                saveRule({
+                    ...ruleDefinition,
+                    name: newValue
+                });
+            }}/>
     );
 }
 

@@ -17,15 +17,39 @@ export function RulesTab(props: RulesTabProps){
     const [ruleDefinitionSelected, setRuleDefinitionSelected] = useState<RuleDefinitionSummary|undefined>(props.ruleDefinitionSelected);
     const [ruleDefinitionLoaded, setRuleDefinitionLoaded] = useState<RuleDefinition|undefined>(undefined);
 
+    function selectRule(ruleDefSum: RuleDefinitionSummary){
+        jsonCall(ezApi.rule.getRule(ruleDefSum.broker!, ruleDefSum.brokerFileVersion!, ruleDefSum.name!))
+            .then(ruleDef => {
+                if (ruleDef === undefined){
+                    setRuleDefinitionSelected(undefined);
+                    setRuleDefinitionLoaded(undefined);
+                }
+                else{
+                    setRuleDefinitionSelected(ruleDefSum);
+                    setRuleDefinitionLoaded(ruleDef);
+                }
+            })
+            .catch(e => console.log(e));
+    }
+
     return (
         <Box margin="small">            
              <Select placeholder="Selectionnez une règle"
+                disabled={props.readOnly}
                 value={ruleTitle(ruleDefinitionSelected)}
                 options={props.rules.map(r => ruleTitle(r))}
-                onChange={({ val }) => setRuleDefinitionSelected(val)} />
+                onChange={({ val }) => selectRule(val)} />
 
             { ruleDefinitionLoaded && (
                 <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={ruleDefinitionLoaded}/>
+            )}
+            { ruleDefinitionLoaded === undefined && ( // ici la ruleDefinition n'existe pas, on va en creer une nouvelle a partir des info dans operation
+                <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={{
+                    name: 'Nouvelle Regle',
+                    broker: "BourseDirect",
+                    brokerFileVersion: parseInt(props.operation!.data!.data!.brokerFileVersion!),
+                    enabled: true
+                }}/>
             )}
         </Box>
     );

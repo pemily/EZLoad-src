@@ -9,7 +9,7 @@ export function valued(v: string|undefined|null) : string {
 
 export function jsonCall(promise: Promise<HttpResponse<any, any>>):  Promise<any> {
     return promise.then(httpResponse => {
-      if (httpResponse.status === 204) return null; // no content for 204
+      if (httpResponse.status === 204) return undefined; // no content for 204
       return httpResponse.json();
     } )    
 }
@@ -74,5 +74,3 @@ export function ruleTitle(rule: RuleDefinitionSummary|undefined): string{
   if (rule === undefined) return "";
   return rule.broker+" v"+rule.brokerFileVersion+" "+rule.name;
 }
-
-

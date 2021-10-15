@@ -1,7 +1,7 @@
 import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, List, Menu } from "grommet";
 import { Download, Trash, More, Upload } from 'grommet-icons';
 import { Operation } from '../Operation';
-import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
+import { ezApi, jsonCall, getChromeVersion, ruleTitle } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, EzEdition } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface OperationsProps {
@@ -16,7 +16,7 @@ export function Operations(props: OperationsProps){
         
     function operationAction(operation: EzEdition){
         if (operation.errors!.findIndex(e => e === 'NO_RULE_FOUND') === 0) return (<Anchor onClick={e => props.createRule(operation)}>Créer une règle</Anchor>)
-        return (<Anchor onClick={e => props.viewRule(operation)}>Règle {operation.ruleDefinitionSummary}</Anchor>)
+        return (<Anchor onClick={e => props.viewRule(operation)}>Règle {ruleTitle(operation.ruleDefinitionSummary)}</Anchor>)
     }
 
     return (
