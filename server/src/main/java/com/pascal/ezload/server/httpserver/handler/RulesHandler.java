@@ -40,7 +40,7 @@ public class RulesHandler {
     }
 
     @GET
-    @Path("{ruleName}")
+    @Path("{broker}/{brokerFileVersion}/{ruleName}")
     @Produces(MediaType.APPLICATION_JSON)
     public RuleDefinition getRule(@NotNull @PathParam("broker") EnumEZBroker broker,
                                   @NotNull @PathParam("brokerFileVersion") int brokerFileVersion,
@@ -58,7 +58,7 @@ public class RulesHandler {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveRule(@PathParam("oldName") String oldName,
+    public void saveRule(@QueryParam("oldName") String oldName,
                          @NotNull RuleDefinition ruleDefinition) throws Exception {
         ruleDefinition.setEzLoadVersion(EZLoad.VERSION);
         new RulesManager(SettingsManager.getInstance().loadProps())

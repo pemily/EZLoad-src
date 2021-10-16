@@ -72,5 +72,5 @@ export function getChromeVersion() : string {
 
 export function ruleTitle(rule: RuleDefinitionSummary|undefined): string{
   if (rule === undefined) return "";
-  return rule.broker+" v"+rule.brokerFileVersion+" "+rule.name;
+  return rule.broker+" v"+rule.brokerFileVersion+" - "+rule.name;
 }

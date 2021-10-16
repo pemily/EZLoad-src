@@ -4,7 +4,6 @@ import { Download, Trash, More, Upload } from 'grommet-icons';
 import { ConfigTextField } from '../../Tools/ConfigTextField';
 import { ezApi, jsonCall, getChromeVersion, ruleTitle } from '../../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, EzEdition, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
-import { resolveModuleName } from "typescript";
 
 
 export interface RuleProps {
@@ -17,16 +16,23 @@ export interface RuleProps {
 
 export function Rule(props: RuleProps){
     const [ruleDefinition, setRuleDefinition] = useState<RuleDefinition>(props.ruleDefinition);
-     
-    function saveRuleDefinition(){
-        jsonCall(ezApi.rule.saveRule(ruleDefinition.name === undefined ? "" : ruleDefinition.name, ruleDefinition))
-        .then(r => props.reload())
+    const [previousName, setPreviousName] = useState<string|undefined>(props.ruleDefinition.name);
+
+    useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
+        setRuleDefinition(props.ruleDefinition); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
+        setPreviousName(props.ruleDefinition.name);
+    }, [props.ruleDefinition]);
+      
+
+    function saveRuleDefinition(newRuleDef: RuleDefinition){
+        jsonCall(ezApi.rule.saveRule({oldName: previousName}, newRuleDef))
+        .then(r => { setPreviousName(newRuleDef.name); props.reload(); })
         .catch(e => console.log("Save Password Error: ", e));
     }
 
-    function saveRule(rd: RuleDefinition){
-        setRuleDefinition(rd);
-        saveRuleDefinition();
+    function saveRule(rd: RuleDefinition){        
+        setRuleDefinition(rd);        
+        saveRuleDefinition(rd);
     }
     
     return (

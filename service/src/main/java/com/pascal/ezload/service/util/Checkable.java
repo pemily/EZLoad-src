@@ -30,4 +30,8 @@ public abstract class Checkable {
     public void clearErrors(){
         setField2ErrorMsg(null);
     }
+
+    public boolean hasError(){
+        return field2ErrorMsg != null && !field2ErrorMsg.isEmpty();
+    }
 }

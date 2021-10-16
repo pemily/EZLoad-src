@@ -19,7 +19,7 @@ export interface ConfigTextFieldProps {
 export function ConfigTextField(props: ConfigTextFieldProps) {
     const [value, setValue] = useState<string>(valued(props.value));
 
-    useEffect(() => {
+    useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
       setValue(valued(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
     }, [props.value]);
     

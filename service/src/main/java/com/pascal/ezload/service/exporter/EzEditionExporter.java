@@ -5,6 +5,7 @@ import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.gdrive.Row;
@@ -38,6 +39,8 @@ public class EzEditionExporter {
      * exports the allEZModels into the EZPortfolio
      */
     public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy) {
+        rulesEngine.validateRules();
+
         try(Reporting rep = reporting.pushSection("Rapport EZPortfolio")){
             return allEZModels.stream()
                     .map(ezModel -> loadOperations(ezPortfolioProxy, ezModel, ezModel.getOperations()))

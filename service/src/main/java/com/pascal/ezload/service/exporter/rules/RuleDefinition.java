@@ -231,6 +231,8 @@ public class RuleDefinition extends RuleDefinitionSummary {
     }
 
     public void validate(){
+        // TODO ici vérifiez que chaque expression n'utilise pas une variable qui n'existe pas et que l'expression est correcte
+        // faire une dummy operation est l'executer sur chaque expression?
         new StringValue(true).validate(this, Field.name.name(), getName());
         new StringValue(false).validate(this, Field.description.name(), getDescription());
         new StringValue(true).validate(this, Field.condition.name(), condition);

@@ -37,7 +37,9 @@ public class RulesEngine {
         EzEdition ezEdition = new EzEdition();
         ezEdition.setData(ezData);
 
-        List<RuleDefinition> compatibleRules = allRules.stream().filter(ruleDef -> isCompatible(ezPortfolioProxy, ruleDef, ezData)).collect(Collectors.toList());
+        List<RuleDefinition> compatibleRules = allRules.stream()
+                .filter(ruleDef -> isCompatible(ezPortfolioProxy, ruleDef, ezData))
+                .collect(Collectors.toList());
         if (compatibleRules.size() == 0){
             ezEdition.getErrors().add(NO_RULE_FOUND);
         }
@@ -71,6 +73,7 @@ public class RulesEngine {
 
     private boolean isCompatible(EZPortfolioProxy portfolioProxy, RuleDefinition ruleDefinition, EzData data) {
         return ruleDefinition.isEnabled() &&
+                !ruleDefinition.hasError() &&
                 data.get("courtier").equals(ruleDefinition.getBroker().getEzPortfolioName()) &&
                 data.getInt("brokerFileVersion") == ruleDefinition.getBrokerFileVersion() &&
                 isRuleDefinitionCompatibleWithEzPortfolio(ruleDefinition, portfolioProxy) &&
@@ -149,4 +152,7 @@ public class RulesEngine {
         return newData;
     }
 
+    public void validateRules() {
+        allRules.forEach(RuleDefinition::validate);
+    }
 }

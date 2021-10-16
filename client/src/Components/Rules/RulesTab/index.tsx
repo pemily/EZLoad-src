@@ -17,14 +17,16 @@ export function RulesTab(props: RulesTabProps){
     const [ruleDefinitionSelected, setRuleDefinitionSelected] = useState<RuleDefinitionSummary|undefined>(props.ruleDefinitionSelected);
     const [ruleDefinitionLoaded, setRuleDefinitionLoaded] = useState<RuleDefinition|undefined>(undefined);
 
-    function selectRule(ruleDefSum: RuleDefinitionSummary){
-        jsonCall(ezApi.rule.getRule(ruleDefSum.broker!, ruleDefSum.brokerFileVersion!, ruleDefSum.name!))
+    function selectRule(ruleDefSum: RuleDefinitionSummary){        
+        jsonCall(ezApi.rule.getRule( { broker: ruleDefSum.broker!, brokerFileVersion: ruleDefSum.brokerFileVersion!, ruleName: ruleDefSum.name!}))
             .then(ruleDef => {
                 if (ruleDef === undefined){
                     setRuleDefinitionSelected(undefined);
                     setRuleDefinitionLoaded(undefined);
                 }
                 else{
+                    console.log(ruleDefSum);
+
                     setRuleDefinitionSelected(ruleDefSum);
                     setRuleDefinitionLoaded(ruleDef);
                 }
@@ -36,16 +38,18 @@ export function RulesTab(props: RulesTabProps){
         <Box margin="small">            
              <Select placeholder="Selectionnez une règle"
                 disabled={props.readOnly}
-                value={ruleTitle(ruleDefinitionSelected)}
-                options={props.rules.map(r => ruleTitle(r))}
-                onChange={({ val }) => selectRule(val)} />
+                labelKey="title"
+                valueKey="rule"
+                value={ruleDefinitionSelected}
+                options={props.rules.map(r => { console.log(r); return { title: ruleTitle(r), rule: r }})}
+                onChange={ val => selectRule(val.option.rule) } />
 
             { ruleDefinitionLoaded && (
                 <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={ruleDefinitionLoaded}/>
             )}
-            { ruleDefinitionLoaded === undefined && ( // ici la ruleDefinition n'existe pas, on va en creer une nouvelle a partir des info dans operation
+            { !ruleDefinitionLoaded && props?.operation && ( // ici la ruleDefinition n'existe pas, on va en creer une nouvelle a partir des info dans operation
                 <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={{
-                    name: 'Nouvelle Regle',
+                    name: undefined,
                     broker: "BourseDirect",
                     brokerFileVersion: parseInt(props.operation!.data!.data!.brokerFileVersion!),
                     enabled: true

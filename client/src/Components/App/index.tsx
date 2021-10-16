@@ -84,32 +84,29 @@ export function App(){
                 <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
-            <Box fill>
+            {(mainSettings === undefined || mainSettings == null) && (
+                                <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
+                            )}      
+            { mainSettings && 
+            (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
-                        <Box fill overflow="auto">
-                            {(mainSettings === undefined || mainSettings == null) && (
-                                <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
-                            )}            
-                            {mainSettings &&
-                            (<>
-                                {processRunning && 
-                                    (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                        Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
-                                <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
-                                    <Heading level="4">Courtiers</Heading>
-                                    <BourseDirect mainSettings={mainSettings}
-                                                followProcess={followProcess}
-                                                bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
-                                                readOnly={processRunning}/>                                
-                                </Box>                   
-
-                            </>)}
+                        <Box fill overflow="auto">      
+                            {processRunning && 
+                                (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                                    Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
+                            <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
+                                <Heading level="4">Courtiers</Heading>
+                                <BourseDirect mainSettings={mainSettings}
+                                            followProcess={followProcess}
+                                            bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
+                                            readOnly={processRunning}/>                                
+                            </Box>                   
                         </Box>
                     </Tab>
                     <Tab title="EZ-Operations" icon={<DocumentStore size='small'/>}>
                         <Box fill overflow="auto">
-                            {mainSettings && processRunning && 
+                            {processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}              
                                 <Box margin="none" direction="row">
@@ -134,7 +131,7 @@ export function App(){
                     </Tab>                       
                     <Tab title="Rapport" icon={runningTaskOrLog(mainSettings && processRunning)}>
                         <Box fill overflow="auto">
-                            {mainSettings && processRunning && 
+                            {processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             <ViewLog 
@@ -144,17 +141,15 @@ export function App(){
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>
                         <Box fill overflow="auto">
-                            {mainSettings && processRunning && 
+                            { processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                            
-                            {mainSettings && (
+                                    Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                                                        
                                 <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
-                                        followProcess={followProcess}
-                                        bourseDirectAuthInfo={bourseDirectAuthInfo}
-                                        bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
-                                        readOnly={processRunning}
-                                        />
-                            )}                            
+                                    followProcess={followProcess}
+                                    bourseDirectAuthInfo={bourseDirectAuthInfo}
+                                    bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
+                                    readOnly={processRunning}
+                                    />
                         </Box>
                     </Tab>
                     <Tab title="Règles" icon={<Services size='small'/>}>
@@ -163,7 +158,7 @@ export function App(){
                         </Box>
                     </Tab>                    
                 </Tabs>
-            </Box>
+            </Box> )}
         </Box>
     );
 }
