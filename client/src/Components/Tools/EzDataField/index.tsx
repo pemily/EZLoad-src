@@ -36,8 +36,6 @@ export function EzDataField(props: EzDataProps) {
               .sort((key1, key2) => key1.localeCompare(key2))
               .map(key => { return { name: key, value: props.value!.data![key] }});
 
-              console.log("data: ", data);
-
   return (          
       <>      
         <Button hoverIndicator="background" onClick={() => setExpandData(!expandData)}

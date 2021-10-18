@@ -25,8 +25,6 @@ export function RulesTab(props: RulesTabProps){
                     setRuleDefinitionLoaded(undefined);
                 }
                 else{
-                    console.log(ruleDefSum);
-
                     setRuleDefinitionSelected(ruleDefSum);
                     setRuleDefinitionLoaded(ruleDef);
                 }
@@ -41,7 +39,7 @@ export function RulesTab(props: RulesTabProps){
                 labelKey="title"
                 valueKey="rule"
                 value={ruleDefinitionSelected}
-                options={props.rules.map(r => { console.log(r); return { title: ruleTitle(r), rule: r }})}
+                options={props.rules.map(r => { return { title: ruleTitle(r), rule: r }})}
                 onChange={ val => selectRule(val.option.rule) } />
 
             { ruleDefinitionLoaded && (
