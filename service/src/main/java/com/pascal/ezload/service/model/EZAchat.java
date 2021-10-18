@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
 
 public class EZAchat extends EZOperation implements IOperationWithAction {
 
@@ -60,10 +61,10 @@ public class EZAchat extends EZOperation implements IOperationWithAction {
     @Override
     protected void fillData(EzData data) {
         action.fill(data);
-        data.put("operation.cours", cours);
-        data.put("operation.montantBrut", amountBrut);
-        data.put("operation.fraisCourtage", fraisCourtage);
-        data.put("operation.tva", tva);
+        data.put(operation_cours, cours);
+        data.put(operation_montantBrut, amountBrut);
+        data.put(operation_fraisCourtage, fraisCourtage);
+        data.put(operation_tva, tva);
     }
 
 }

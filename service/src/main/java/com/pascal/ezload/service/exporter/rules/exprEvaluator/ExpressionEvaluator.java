@@ -59,12 +59,10 @@ public class ExpressionEvaluator {
         Object resultObj = evaluateAsObj(reporting, mainSettings, lineToEval, allVariables);
 
         if (resultObj != null && !(resultObj instanceof Boolean)) {
-            reporting.error("La condition: "+lineToEval+" ne retourne pas un boolean, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
-            resultObj = Boolean.FALSE;
+            throw new IllegalStateException("La condition: "+lineToEval+" ne retourne pas un boolean, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
         }
         if (resultObj == null){
-            reporting.error("La condition: "+lineToEval+" retourne null!!");
-            resultObj = Boolean.FALSE;
+            throw new IllegalStateException("La condition: "+lineToEval+" retourne null!!");
         }
         boolean result = (Boolean) resultObj;
 
@@ -76,16 +74,12 @@ public class ExpressionEvaluator {
         Object resultObj = evaluateAsObj(reporting, mainSettings, lineToEval, allVariables);
 
         if (resultObj != null && !(resultObj instanceof String)) {
-            reporting.error("La condition: "+lineToEval+" ne retourne pas un boolea, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
-            resultObj = Boolean.FALSE;
+            throw new IllegalStateException("La condition: "+lineToEval+" ne retourne pas une String, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
         }
         if (resultObj == null){
-            reporting.error("La condition: "+lineToEval+" retourne null!!");
-            resultObj = Boolean.FALSE;
+            throw new IllegalStateException("La condition: "+lineToEval+" retourne null!!");
         }
-        String result = (String) resultObj;
-
-        return result;
+        return (String) resultObj;
     }
 
     static class ExpressionException extends RuntimeException {

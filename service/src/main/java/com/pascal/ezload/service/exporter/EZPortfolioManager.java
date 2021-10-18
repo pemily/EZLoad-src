@@ -45,8 +45,8 @@ public class EZPortfolioManager {
             reporting.info("Le token de connection est expiré, renouvellement du token.");
             GDriveConnection.deleteOldToken(mainSettings.getEzPortfolio().getGdriveCredsFile());
             connect(reporting, mainSettings);
-            if (retry > 0) {
-               return load(retry--);
+            if (retry-- > 0) {
+               return load(retry);
             }
             reporting.error("Impossible de récupérer les données de EZPortfolio");
             throw new Exception("Impossible de récupérer les données de EZPortfolio", e);

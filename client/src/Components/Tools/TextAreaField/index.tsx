@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { Box, FormField, TextInput } from "grommet";
+import { Box, FormField, TextArea } from "grommet";
 import { valued } from '../../../ez-api/tools';
 
 
-export interface ConfigTextFieldProps {
+export interface ConfigTextAreaFieldProps {
   onChange: (newValue: string) => void;
   value: string|undefined|null;
   id: string;
@@ -16,7 +16,7 @@ export interface ConfigTextFieldProps {
 }
 
 
-export function ConfigTextField(props: ConfigTextFieldProps) {
+export function TextAreadField(props: ConfigTextAreaFieldProps) {
     const [value, setValue] = useState<string>(valued(props.value));
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
@@ -28,15 +28,14 @@ export function ConfigTextField(props: ConfigTextFieldProps) {
                          setValue(newValue);
                        }, []);
 
-                       return (          
+    return (          
               <Box direction="column" pad="none" margin="xsmall" fill>
                 <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
                       required={props.isRequired} margin="none" error={props.errorMsg}>
-                <TextInput id={props.id}                           
+                <TextArea id={props.id}                           
                            name={props.id}
                            value={ value === null ? undefined : value}
-                           placeholder={props.isRequired ? "Champ Obligatoire" : ""}
-                           type={props.isPassword ? "password" : "text"}
+                           placeholder={props.isRequired ? "Champ Obligatoire" : ""}                           
                            onChange={onChangeLocal}
                            onBlur={evt => props.onChange(evt.target.value)}
                            disabled={props.readOnly}/>

@@ -1,6 +1,5 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZOperation;
 

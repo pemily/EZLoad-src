@@ -7,10 +7,13 @@ import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.exporter.EZPortfolioManager;
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
 import jakarta.inject.Inject;
@@ -51,10 +54,12 @@ public class HomeHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public WebData getMainData() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps().validate();
+
         return new WebData(mainSettings,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
+                            ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(mainSettings).getAllRules()
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)

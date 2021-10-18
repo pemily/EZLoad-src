@@ -1,10 +1,12 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
-public class BourseDirectEZAccountDeclaration extends Checkable implements EZAccountDeclaration {
+public class BourseDirectEZAccountDeclaration extends Checkable implements EZAccountDeclaration, AccountData {
 
     public enum Field{name, number}
 
@@ -30,6 +32,12 @@ public class BourseDirectEZAccountDeclaration extends Checkable implements EZAcc
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void fill(EzData data) {
+        data.put(account_name, name);
+        data.put(account_number, number);
     }
 
     public void setActive(boolean active) {

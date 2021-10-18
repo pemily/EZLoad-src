@@ -5,7 +5,6 @@ import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ public class MesOperations  {
     private final SheetValues existingOperations;
     private final List<Row> newOperations = new ArrayList<>();
     private int firstFreeRow = -1;
-    private final Reporting reporting;
 
     private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad]";
 
@@ -34,8 +32,7 @@ public class MesOperations  {
     private static final int AUTOMATIC_UPD_COL = 10;
 
 
-    public MesOperations(Reporting reporting, SheetValues mesOperations){
-        this.reporting = reporting;
+    public MesOperations(SheetValues mesOperations){
         this.existingOperations = mesOperations;
         firstFreeRow = mesOperations.getValues().size()+1;
     }
@@ -66,8 +63,8 @@ public class MesOperations  {
     }
 
     public static Row newOperationRow(EzOperationEdition operationEdition) {
-        return new Row(operationEdition.getDate(), operationEdition.getCompteType(), operationEdition.getBroker(),
-                        null, operationEdition.getOperationType(), operationEdition.getActionName(),
+        return new Row(operationEdition.getDate(), operationEdition.getAccountType(), operationEdition.getBroker(),
+                        null, operationEdition.getOperationType(), operationEdition.getShareName(),
                         operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
                         operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION);
     }

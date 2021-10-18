@@ -2,12 +2,9 @@ package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
-import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
-import com.pascal.ezload.service.model.EZOperation;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class WebData {
@@ -16,13 +13,17 @@ public class WebData {
     private EzProcess latestEzProcess;
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
+    private List<String> filesNotYetLoaded;
     private boolean processRunning;
 
-    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning, List<EzReport> reports, List<RuleDefinitionSummary> allRules){
+    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
+                   List<EzReport> reports, List<String> filesNotYetLoaded,
+                   List<RuleDefinitionSummary> allRules){
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
         this.processRunning = processRunning;
         this.reports = reports;
+        this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
     }
 
@@ -64,5 +65,13 @@ public class WebData {
 
     public void setRules(List<RuleDefinitionSummary> rules) {
         this.rules = rules;
+    }
+
+    public List<String> getFilesNotYetLoaded() {
+        return filesNotYetLoaded;
+    }
+
+    public void setFilesNotYetLoaded(List<String> filesNotYetLoaded) {
+        this.filesNotYetLoaded = filesNotYetLoaded;
     }
 }

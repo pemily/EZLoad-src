@@ -1,10 +1,14 @@
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-public class EZModel {
+public class EZModel implements BourseDirectV1Data, ReportData {
 
     private EnumEZBroker broker;
     private int brokerFileVersion;
@@ -83,17 +87,14 @@ public class EZModel {
         this.ezAccountDeclaration = ezAccountDeclaration;
     }
 
-    public void fill(Map<String, String> data) {
-        data.put("rapport.courtier", broker.getEzPortfolioName());
-        data.put("rapport.source", sourceFile);
-        data.put("rapport.date", reportDate == null ? null : reportDate.toEzPortoflioDate());
-        data.put("rapport.numeroCompte", account == null ?  null : account.getAccountNumber());
-        data.put("rapport.typeCompte", account == null ?  null : account.getAccountType());
-        data.put("rapport.nomCompte", ezAccountDeclaration == null ? null : ezAccountDeclaration.getName());
-        data.put("rapport.symbolDevise", account == null ?  null : account.getDevise().getSymbol());
-        data.put("rapport.codeDevise", account == null ?  null : account.getDevise().getCode());
-        data.put("rapport.proprietaire", account == null ?  null : account.getOwnerName());
-        data.put("rapport.addresse", account == null ?  null : account.getOwnerAdress());
+    public void fill(EzData data) {
+        broker.fill(data);
+        account.fill(data);
+        ezAccountDeclaration.fill(data);
+
+        data.put(BrokerData.broker_version, brokerFileVersion+"");
+        data.put(report_source, sourceFile);
+        data.put(report_date, reportDate == null ? null : reportDate.toEzPortoflioDate());
     }
 }
 

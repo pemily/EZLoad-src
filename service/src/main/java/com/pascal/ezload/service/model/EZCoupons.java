@@ -1,8 +1,9 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
 
-public class EZCoupons extends EZOperation implements IOperationWithAction {
+public class EZCoupons extends EZOperation implements IOperationWithAction, BourseDirectV1Data {
 
     private EZAction action;
     private String prixUnitaireBrut;
@@ -76,12 +77,12 @@ public class EZCoupons extends EZOperation implements IOperationWithAction {
 
     @Override
     protected void fillData(EzData data) {
-        data.put("operation.prixUnitBrut", prixUnitaireBrut);
-        data.put("operation.commission", commission);
-        data.put("operation.prelevement", prelevement);
-        data.put("operation.montantBrut", amountBrut);
-        data.put("operation.creditImpot", creditImpot);
-        data.put("operation.contributionSocial", contributionSocial);
+        data.put(operation_prixUnitBrut, prixUnitaireBrut);
+        data.put(operation_commission, commission);
+        data.put(operation_prelevement, prelevement);
+        data.put(operation_montantBrut, amountBrut);
+        data.put(operation_creditImpot, creditImpot);
+        data.put(operation_contributionSocial, contributionSocial);
         action.fill(data);
     }
 }

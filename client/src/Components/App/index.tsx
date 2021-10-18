@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner, Select } from "grommet";
+import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner, Select, List } from "grommet";
 import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Reports } from '../Reports';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
+import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary } from '../../ez-api/gen-api/EZLoadApi';
@@ -20,6 +21,7 @@ export function App(){
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
+    const [filesNotLoaded, setFilesNotLoaded] = useState<string[]|undefined>(undefined);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
     const [processRunning, setProcessRunning] = useState<boolean>(false);
     const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
@@ -43,11 +45,12 @@ export function App(){
         jsonCall(ezApi.home.getMainData())
         .then(r =>  {            
              console.log("Data loaded: ", r);
-             setMainSettings(r.mainSettings);                          
-             setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);
+             setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);             
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
+             setFilesNotLoaded(r.filesNotYetLoaded);             
+             setMainSettings(r.mainSettings);                          
         })
         .catch((error) => {
             console.log("Error while loading Data.", error);
@@ -84,9 +87,17 @@ export function App(){
                 <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
-            {(mainSettings === undefined || mainSettings == null) && (
-                                <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
-                            )}      
+            {(mainSettings === undefined || mainSettings == null) && ( 
+                <Box direction="row" alignSelf="center" margin="large" background="grey" fill justify="center">
+                    <Spinner margin="small"
+                        border={[
+                        { side: 'all', color: 'transparent', size: 'small' },
+                        { side: 'horizontal', color: 'focus', size: 'small' },
+                        ]}
+                    />
+                    <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
+                </Box>
+            )}      
             { mainSettings && 
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
@@ -96,12 +107,20 @@ export function App(){
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
                             <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
-                                <Heading level="4">Courtiers</Heading>
                                 <BourseDirect mainSettings={mainSettings}
                                             followProcess={followProcess}
                                             bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
                                             readOnly={processRunning}/>                                
-                            </Box>                   
+                            </Box>         
+                            { filesNotLoaded && filesNotLoaded.length > 0 && (
+                            <Box fill>
+                                <Heading level="5" fill>Fichiers téléchargés mais pas encore chargé dans EZPortfolio</Heading>
+                                <Box margin="small">            
+                                    <List data={filesNotLoaded} margin="none" pad="xsmall" background={['light-2', 'light-4']}>
+                                        {(file: string, index: number) =>(<Box direction="row"><SourceFileLink key={index} sourceFile={file}/></Box>)} 
+                                    </List>            
+                                </Box>                                
+                            </Box> ) }
                         </Box>
                     </Tab>
                     <Tab title="EZ-Operations" icon={<DocumentStore size='small'/>}>
@@ -116,8 +135,8 @@ export function App(){
                                             .then(followProcess)
                                             .catch(e => console.log(e) )
                                         }
-                                        size="small" icon={<Services size='small'/>} label="Charger les nouvelles opérations"/>                                                
-                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
+                                        size="small" icon={<Services size='small'/>} label="Générer les nouvelles opérations"/>                                                
+                                        <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
                                                     jsonCall(ezApi.engine.upload())
                                                     .then(followProcess)
                                                     .catch(e => console.log(e))
@@ -125,6 +144,7 @@ export function App(){
                                                 size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                 </Box>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
+                                        showRules={mainSettings.ezLoad!.admin!.showRules!}
                                         createRule={op =>{ setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(undefined); }}
                                         viewRule={op => { setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(op.ruleDefinitionSummary); } }/>
                         </Box>
@@ -152,11 +172,12 @@ export function App(){
                                     />
                         </Box>
                     </Tab>
-                    <Tab title="Règles" icon={<Services size='small'/>}>
-                        <Box fill overflow="auto">
-                            <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={ruleDefinition} rules={rules} reload={reloadAllData}/>
-                        </Box>
-                    </Tab>                    
+                    { mainSettings.ezLoad?.admin?.showRules && (
+                        <Tab title="Règles" icon={<Services size='small'/>}>
+                            <Box fill overflow="auto">
+                                <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={ruleDefinition} rules={rules} reload={reloadAllData}/>
+                            </Box>
+                        </Tab> )}
                 </Tabs>
             </Box> )}
         </Box>

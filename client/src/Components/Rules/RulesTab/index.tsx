@@ -18,7 +18,7 @@ export function RulesTab(props: RulesTabProps){
     const [ruleDefinitionLoaded, setRuleDefinitionLoaded] = useState<RuleDefinition|undefined>(undefined);
 
     function selectRule(ruleDefSum: RuleDefinitionSummary){        
-        jsonCall(ezApi.rule.getRule( { broker: ruleDefSum.broker!, brokerFileVersion: ruleDefSum.brokerFileVersion!, ruleName: ruleDefSum.name!}))
+        jsonCall(ezApi.rule.getRule(ruleDefSum.broker!, ruleDefSum.brokerFileVersion!, ruleDefSum.name!))
             .then(ruleDef => {
                 if (ruleDef === undefined){
                     setRuleDefinitionSelected(undefined);

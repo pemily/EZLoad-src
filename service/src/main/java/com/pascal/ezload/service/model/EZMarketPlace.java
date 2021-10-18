@@ -1,10 +1,9 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.MarketPlaceData;
 
-import java.util.Map;
-
-public class EZMarketPlace {
+public class EZMarketPlace implements MarketPlaceData {
 
     private String stockExchange;
     private String city;
@@ -53,14 +52,14 @@ public class EZMarketPlace {
     }
 
     public void fill(EzData data) {
-        data.put("marché.echange", stockExchange);
-        data.put("marché.ville", city);
-        data.put("marché.mic", mic);
-        data.put("marché.acronym", acronym);
-        data.put("marché.codePays", country.getCode());
-        data.put("marché.pays", country.getName());
-        data.put("marché.googleFinanceCode", googleFinanceCode);
-        data.put("marché.codeDevise", currency.getCode());
-        data.put("marché.symbolDevise", currency.getSymbol());
+        data.put(market_exchange, stockExchange);
+        data.put(market_city, city);
+        data.put(market_mic, mic);
+        data.put(market_acronym, acronym);
+        data.put(market_countryCode, country.getCode());
+        data.put(market_country, country.getName());
+        data.put(market_googleTicker, googleFinanceCode);
+        data.put(market_currencyCode, currency.getCode());
+        data.put(market_currencySymbol, currency.getSymbol());
     }
 }

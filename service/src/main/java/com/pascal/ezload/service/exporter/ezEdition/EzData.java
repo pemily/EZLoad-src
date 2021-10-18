@@ -5,6 +5,7 @@ import com.pascal.ezload.service.model.EZDate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 import static com.pascal.ezload.service.util.ModelUtils.str2Int;
@@ -38,7 +39,9 @@ public class EzData {
 
     @JsonIgnore
     public void put(String key, String value){
-        if (containsKey(key)) throw new RuntimeException("Il y a déjà une variable dans la liste avec le même nom. Sa valeur: "+this.data.get(key));
+        if (containsKey(key) && !Objects.equals(value, data.get(key)))
+            throw new RuntimeException("There is already a variable with this key: "+key+" current Value:"
+                    +this.data.get(key)+" new Value: "+value);
         this.data.put(key, value);
     }
 

@@ -1,19 +1,21 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-public class EzPortefeuilleEdition {
+import com.pascal.ezload.service.exporter.ezEdition.data.common.EzLoadPortfolioPortefeuilleData;
+
+public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData {
 
     private String valeur;
-    private String Compte;
-    private String courtier;
+    private String account_type;
+    private String broker;
     private String tickerGoogleFinance;
-    private String pays;
-    private String secteur;
-    private String industrie;
-    private String eligibiliteAbbattement40;
+    private String country;
+    private String sector;
+    private String industry;
+    private String eligibilityDeduction40;
     private String type;
-    private String prixDeRevient;
-    private String quantite;
-    private String dividendeAnnuel;
+    private String costPrice;
+    private String quantity;
+    private String annualDividend;
 
     public String getValeur() {
         return valeur;
@@ -23,20 +25,20 @@ public class EzPortefeuilleEdition {
         this.valeur = valeur;
     }
 
-    public String getCompte() {
-        return Compte;
+    public String getAccount_type() {
+        return account_type;
     }
 
-    public void setCompte(String compte) {
-        Compte = compte;
+    public void setAccount_type(String account_type) {
+        this.account_type = account_type;
     }
 
-    public String getCourtier() {
-        return courtier;
+    public String getBroker() {
+        return broker;
     }
 
-    public void setCourtier(String courtier) {
-        this.courtier = courtier;
+    public void setBroker(String broker) {
+        this.broker = broker;
     }
 
     public String getTickerGoogleFinance() {
@@ -47,36 +49,36 @@ public class EzPortefeuilleEdition {
         this.tickerGoogleFinance = tickerGoogleFinance;
     }
 
-    public String getPays() {
-        return pays;
+    public String getCountry() {
+        return country;
     }
 
-    public void setPays(String pays) {
-        this.pays = pays;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
-    public String getSecteur() {
-        return secteur;
+    public String getSector() {
+        return sector;
     }
 
-    public void setSecteur(String secteur) {
-        this.secteur = secteur;
+    public void setSector(String sector) {
+        this.sector = sector;
     }
 
-    public String getIndustrie() {
-        return industrie;
+    public String getIndustry() {
+        return industry;
     }
 
-    public void setIndustrie(String industrie) {
-        this.industrie = industrie;
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
-    public String getEligibiliteAbbattement40() {
-        return eligibiliteAbbattement40;
+    public String getEligibilityDeduction40() {
+        return eligibilityDeduction40;
     }
 
-    public void setEligibiliteAbbattement40(String eligibiliteAbbattement40) {
-        this.eligibiliteAbbattement40 = eligibiliteAbbattement40;
+    public void setEligibilityDeduction40(String eligibilityDeduction40) {
+        this.eligibilityDeduction40 = eligibilityDeduction40;
     }
 
     public String getType() {
@@ -87,28 +89,42 @@ public class EzPortefeuilleEdition {
         this.type = type;
     }
 
-    public String getPrixDeRevient() {
-        return prixDeRevient;
+    public String getCostPrice() {
+        return costPrice;
     }
 
-    public void setPrixDeRevient(String prixDeRevient) {
-        this.prixDeRevient = prixDeRevient;
+    public void setCostPrice(String costPrice) {
+        this.costPrice = costPrice;
     }
 
-    public String getQuantite() {
-        return quantite;
+    public String getQuantity() {
+        return quantity;
     }
 
-    public void setQuantite(String quantite) {
-        this.quantite = quantite;
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
     }
 
-    public String getDividendeAnnuel() {
-        return dividendeAnnuel;
+    public String getAnnualDividend() {
+        return annualDividend;
     }
 
-    public void setDividendeAnnuel(String dividendeAnnuel) {
-        this.dividendeAnnuel = dividendeAnnuel;
+    public void setAnnualDividend(String annualDividend) {
+        this.annualDividend = annualDividend;
     }
 
+
+    public void fill(EzData data) {
+        data.put(ezLoad_portefeuille_account_type, account_type);
+        data.put(ezLoad_portefeuille_broker, broker);
+        data.put(ezLoad_portefeuille_tickerGoogle, tickerGoogleFinance);
+        data.put(ezLoad_portefeuille_country, country);
+        data.put(ezLoad_portefeuille_sector, sector);
+        data.put(ezLoad_portefeuille_industry, industry);
+        data.put(ezLoad_portefeuille_eligibilityDeduction40, eligibilityDeduction40);
+        data.put(ezLoad_portefeuille_type, type);
+        data.put(ezLoad_portefeuille_costPriceUnit, costPrice);
+        data.put(ezLoad_portefeuille_quantity, quantity);
+        data.put(ezLoad_portefeuille_annualDividend, annualDividend);
+    }
 }

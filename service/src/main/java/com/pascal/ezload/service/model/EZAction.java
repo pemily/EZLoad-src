@@ -1,10 +1,9 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
 
-import java.util.Map;
-
-public class EZAction {
+public class EZAction implements ActionData {
     private String name;
     private String ticker;
     private String isin;
@@ -43,9 +42,9 @@ public class EZAction {
     }
 
     public void fill(EzData data) {
-        data.put("action.name", name);
-        data.put("action.ticker", ticker);
-        data.put("action.isin", isin);
+        data.put(share_name, name);
+        data.put(share_ticker, ticker);
+        data.put(share_isin, isin);
         marketPlace.fill(data);
     }
 }

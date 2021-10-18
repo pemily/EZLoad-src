@@ -1,8 +1,9 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
 
-public class EZVersementFonds extends EZOperation {
+public class EZVersementFonds extends EZOperation implements BourseDirectV1Data {
     private EZDevise devise;
 
     @Override
@@ -20,7 +21,7 @@ public class EZVersementFonds extends EZOperation {
 
     @Override
     protected void fillData(EzData data) {
-        data.put("operation.codeDevise", devise.getCode());
-        data.put("operation.symbolDevise", devise.getSymbol());
+        data.put(operation_codeDevise, devise.getCode());
+        data.put(operation_symbolDevise, devise.getSymbol());
     }
 }

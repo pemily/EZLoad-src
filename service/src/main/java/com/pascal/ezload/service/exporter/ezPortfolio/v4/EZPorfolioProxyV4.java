@@ -1,6 +1,8 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
@@ -50,12 +52,12 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<Row> searchPortefeuilleRow(String valeur) {
+    public void applyOnPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition) {
         throw new NotImplementedException();
     }
 
     @Override
-    public Row getNewPortefeuilleRow(String valeur) {
+    public void fillFromMonPortefeuille(EzData data, String valeur) {
         throw new NotImplementedException();
     }
 }

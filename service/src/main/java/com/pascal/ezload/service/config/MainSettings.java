@@ -9,7 +9,7 @@ public class MainSettings {
     private BourseDirectSettings bourseDirect;
     private ChromeSettings chrome;
     private EZPortfolioSettings ezPortfolio;
-    private EZLoad bientotRentier;
+    private EZLoad ezLoad;
 
     public BourseDirectSettings getBourseDirect() {
         return bourseDirect;
@@ -36,18 +36,18 @@ public class MainSettings {
     }
 
     public EZLoad getEzLoad() {
-        return bientotRentier;
+        return ezLoad;
     }
 
     public void setEzLoad(EZLoad bientotRentier) {
-        this.bientotRentier = bientotRentier;
+        this.ezLoad = bientotRentier;
     }
 
     public MainSettings validate(){
         bourseDirect.validate();
         chrome.validate();
         ezPortfolio.validate();
-        bientotRentier.validate();
+        ezLoad.validate();
         return this;
     }
 
@@ -55,7 +55,7 @@ public class MainSettings {
         bourseDirect.clearErrors();
         chrome.clearErrors();
         ezPortfolio.clearErrors();
-        bientotRentier.clearErrors();
+        ezLoad.clearErrors();
     }
 
     public static class ChromeSettings extends Checkable {
@@ -105,6 +105,7 @@ public class MainSettings {
         private String logsDir;
         private String passPhrase;
         private String courtierCredsFile;
+        public Admin admin;
 
         public String getLogsDir() {
             return logsDir;
@@ -146,6 +147,14 @@ public class MainSettings {
             this.rulesDir = rulesDir;
         }
 
+        public Admin getAdmin(){
+            return admin;
+        }
+
+        public void setAdmin(Admin admin){
+            this.admin = admin;
+        }
+
         @Override
         public void validate() {
             new FileValue(true).validate(this, Field.courtierCredFile.name(), courtierCredsFile);
@@ -154,7 +163,18 @@ public class MainSettings {
             new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
             new DirValue(true).validate(this, Field.rulesDir.name(), rulesDir);
         }
+    }
 
+    public static class Admin {
+        private boolean showRules;
+
+        public boolean isShowRules() {
+            return showRules;
+        }
+
+        public void setShowRules(boolean showRules) {
+            this.showRules = showRules;
+        }
     }
 
 }

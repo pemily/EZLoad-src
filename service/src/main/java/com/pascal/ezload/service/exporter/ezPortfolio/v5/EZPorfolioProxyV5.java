@@ -1,6 +1,8 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
@@ -38,12 +40,12 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A2:K", "MonPortefeuille!A4:L");
 
         SheetValues allOperations = ezSheets.get(0);
-        MesOperations mesOperations = new MesOperations(reporting, allOperations);
+        MesOperations mesOperations = new MesOperations(allOperations);
         ezPortfolio.setMesOperations(mesOperations);
         reporting.info(allOperations.getValues().size() + " rows from MesOperations loaded.");
 
         SheetValues portefeuille = ezSheets.get(1);
-        MonPortefeuille monPortefeuille = new MonPortefeuille(reporting, portefeuille);
+        MonPortefeuille monPortefeuille = new MonPortefeuille(portefeuille);
         ezPortfolio.setMonPortefeuille(monPortefeuille);
         reporting.info(portefeuille.getValues().size() + " rows from MonPortefeuille loaded.");
     }
@@ -67,8 +69,18 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             else {
                 ezReportToAdd.getEzEditions()
                         .forEach(ezEdition -> {
-                            operations.newOperation(ezEdition.getEzOperationEdition());
-                            nbOperationSaved.incrementAndGet();
+                            if (ezEdition.getEzOperationEdition() != null) {
+                                operations.newOperation(ezEdition.getEzOperationEdition());
+                                nbOperationSaved.incrementAndGet();
+                                if (ezEdition.getEzPortefeuilleEdition() != null){
+                                    ezPortfolio.getMonPortefeuille().apply(ezEdition.getEzPortefeuilleEdition());
+                                }
+                            }
+                            else if (ezEdition.getEzPortefeuilleEdition() != null){
+                                throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
+                                        +ezEdition.getRuleDefinitionSummary().getBroker()+"_v"+ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
+                                        +ezEdition.getRuleDefinitionSummary().getName());
+                            }
                         });
             }
         }
@@ -101,13 +113,13 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<Row> searchPortefeuilleRow(String valeur) {
-        return ezPortfolio.getMonPortefeuille().searchRow(valeur);
+    public void applyOnPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition) {
+        ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition);
     }
 
     @Override
-    public Row getNewPortefeuilleRow(String valeur) {
-        return ezPortfolio.getMonPortefeuille().getNewRow(valeur);
+    public void fillFromMonPortefeuille(EzData data, String valeur) {
+        ezPortfolio.getMonPortefeuille().fill(data, valeur);
     }
 
 

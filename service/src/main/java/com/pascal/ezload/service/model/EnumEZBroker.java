@@ -1,6 +1,9 @@
 package com.pascal.ezload.service.model;
 
-public enum EnumEZBroker {
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
+
+public enum EnumEZBroker implements BrokerData {
     BourseDirect("Bourse Direct", "BourseDirect");
 
     private String ezPortfolioName, dirName;
@@ -17,4 +20,10 @@ public enum EnumEZBroker {
     public String getDirName() {
         return dirName;
     }
+
+    public void fill(EzData data) {
+        data.put(broker_name, getEzPortfolioName());
+        data.put(broker_dir, getDirName());
+    }
+
 }

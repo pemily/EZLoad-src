@@ -13,7 +13,6 @@ public class EzReport {
     private List<EzEdition> ezEditions = new LinkedList<>();
     private List<String> errors;
     private String sourceFile;
-    private Map<String, String> data = new HashMap<>();
 
     public EzReport(){
     }
@@ -21,7 +20,6 @@ public class EzReport {
     public EzReport(EZModel fromEzModel){
         errors = fromEzModel.getErrors();
         sourceFile = fromEzModel.getSourceFile();
-        fromEzModel.fill(data);
     }
 
     public List<EzEdition> getEzEditions() {
@@ -54,11 +52,5 @@ public class EzReport {
         this.sourceFile = sourceFile;
     }
 
-    public Map<String, String> getData() {
-        return data;
-    }
 
-    public void setData(Map<String, String> data) {
-        this.data = data;
-    }
 }

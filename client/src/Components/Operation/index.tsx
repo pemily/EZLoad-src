@@ -7,7 +7,7 @@ import { MainSettings, AuthInfo, EzProcess, EzEdition } from '../../ez-api/gen-a
 
 export interface OperationProps {
     operation: EzEdition;
-    index: number;
+    id: number;
 }      
 
 function getBorder(errors: string[]) : BorderType {
@@ -17,17 +17,17 @@ function getBorder(errors: string[]) : BorderType {
     return {color: "status-warning", side: "start", size: "large"};    
 }
 
-function getOperationError(error: string){
-    if (error === 'NO_RULE_FOUND') return (<Text margin="none">Pas de règle trouvé pour cette opération</Text>);
-    return (<Text margin="none">{error}</Text>);
+function getOperationError(index: number, error: string){
+    if (error === 'NO_RULE_FOUND') return (<Text key={index} margin="none">Pas de règle trouvé pour cette opération</Text>);
+    return (<Text key={index} margin="none">{error}</Text>);
 }
 
 export function Operation(props: OperationProps){
     return (
-        <Box key={props.index} border={getBorder(props.operation.errors!)}>            
+        <Box key={props.id} border={getBorder(props.operation.errors!)}>            
             { props.operation.errors!.length > 0 && (
                 <List data={props.operation.errors} margin="xsmall" pad="none" border={false} >
-                     {(error: string) => getOperationError(error)}      
+                     {(error: string, index: number) => getOperationError(index, error)}      
                 </List>
             )}
             { props.operation.errors!.length === 0 && (
@@ -46,11 +46,11 @@ export function Operation(props: OperationProps){
                 <TableBody>
                     <TableRow>
                         <TableCell><Text>{props.operation.ezOperationEdition?.date}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition?.compteType}</Text></TableCell>
+                        <TableCell><Text>{props.operation.ezOperationEdition?.account}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.broker}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.quantity}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.operationType}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition?.actionName}</Text></TableCell>
+                        <TableCell><Text>{props.operation.ezOperationEdition?.shareName}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.country}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.amount}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.description}</Text></TableCell>

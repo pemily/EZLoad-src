@@ -7,7 +7,9 @@ import java.util.List;
 
 public class EzServerState {
     private boolean processRunning = false;
+
     private List<EzReport> ezReports = new LinkedList<>();
+    private List<String> filesNotYetLoaded = new LinkedList<>();
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -23,5 +25,13 @@ public class EzServerState {
 
     public void setEzReports(List<EzReport> ezReports) {
         this.ezReports = ezReports;
+    }
+
+    public List<String> getFilesNotYetLoaded() {
+        return filesNotYetLoaded;
+    }
+
+    public void setFilesNotYetLoaded(List<String> filesNotYetLoaded) {
+        this.filesNotYetLoaded = filesNotYetLoaded;
     }
 }

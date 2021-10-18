@@ -1,6 +1,7 @@
 import { Box, List, Accordion, AccordionPanel, Text, Anchor } from "grommet";
 import { BorderType } from "grommet/utils";
 import { Upload, View } from 'grommet-icons';
+import { SourceFileLink } from '../Tools/SourceFileLink';
 import { Operations } from '../Operations';
 import { ezApi, jsonCall } from '../../ez-api/tools';
 import { EzProcess, EzEdition, EzReport } from '../../ez-api/gen-api/EZLoadApi';
@@ -9,6 +10,7 @@ export interface Reports {
     reports: EzReport[];
     processRunning: boolean;
     followProcess: (process: EzProcess|undefined) => void;
+    showRules: boolean;
     createRule: (from: EzEdition) => void;
     viewRule: (from: EzEdition) => void;
 }      
@@ -53,9 +55,9 @@ function getListBorder(errors: string[]) : ListBorderType{
     return {color: "status-warning", side: "left", size: "large"};    
 }
 
-function getReportError(error: string){
+function getReportError(index: number, error: string){
     if (error === 'NO_RULE_FOUND') return (<></>);
-    return (<Text margin={{ horizontal: 'medium'}}>{error}</Text>);      
+    return (<Text key={index} margin={{ horizontal: 'medium'}}>{error}</Text>);      
 }
 
 export function Reports(props: Reports){
@@ -64,24 +66,19 @@ export function Reports(props: Reports){
             <Accordion animate={true} multiple>            
              { props.reports.map((report, index) => {                 
                      return (
-                        <AccordionPanel key={index} label={(<Box direction="row"
-                                            border={getAccordionBorder(report.errors!)} >
-                                                    <Text margin="xxsmall">{report.sourceFile}</Text>
-                                                    <Anchor style={{padding: 2, boxShadow: "none"}} target="source" 
-                                                            href={ezApi.baseUrl+"/explorer/file?source="+encodeURIComponent(report.sourceFile ? report.sourceFile : "")} 
-                                                            icon={<View size="small"/>} onClick={(e) => {                                                                     
-                                                                e.stopPropagation();
-                                                                } }/>
+                        <AccordionPanel key={index} label={(<Box direction="row" border={getAccordionBorder(report.errors!)} >
+                                                    <SourceFileLink sourceFile={report.sourceFile!}/>
                                                 </Box>)}>
                             {report.errors!.length > 0 && (                                    
                                 <List data={report.errors} margin="none" pad="none" 
                                     border={getListBorder(report.errors!)}>
-                                    {(error: string) => getReportError(error)}
+                                    {(error: string, index: number) => getReportError(index, error)}
                                 </List>
                             )}
-                            {report?.ezEditions && (<Operations
+                            {report?.ezEditions && (<Operations id={index}
                                 processRunning={props.processRunning}
                                 followProcess={props.followProcess}
+                                showRules={props.showRules}
                                 createRule={props.createRule}
                                 viewRule={props.viewRule}
                                 operations={report.ezEditions}/>)}

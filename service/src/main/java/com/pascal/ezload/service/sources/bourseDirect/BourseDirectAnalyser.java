@@ -30,7 +30,19 @@ public class BourseDirectAnalyser {
         this.mainSettings = mainSettings;
     }
 
+    private interface IProcess<R> {
+        R execute(EZAccountDeclaration account, String pdfFilePath);
+    }
+
+    public List<String> getFilesNotYetLoaded(Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
+        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(mainSettings, pdfFilePath)));
+    }
+
     public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
+        return startProcess(reporting, ezPortfolioProxy, (account, pdfFilePath) -> start(reporting, account, pdfFilePath));
+    }
+
+    private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
         try(Reporting rep = reporting.pushSection("Chargement EZPortfolio")) {
             ezPortfolioProxy.load();
@@ -49,7 +61,7 @@ public class BourseDirectAnalyser {
                                 && account.isActive()) {
                             // if the pdf file is valid, and is not yet processed
                             // start its analysis
-                            return start(reporting, account, pdfFilePath);
+                            return process.execute(account, pdfFilePath);
                         }
                         return null;
                     });

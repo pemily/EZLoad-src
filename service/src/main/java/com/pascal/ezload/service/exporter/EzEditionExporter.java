@@ -1,23 +1,18 @@
 package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
-import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
-import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
-import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.model.EZVersementFonds;
 import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.sources.Reporting;
-import org.apache.commons.codec.language.bm.Rule;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -51,14 +46,22 @@ public class EzEditionExporter {
     private EzReport loadOperations(EZPortfolioProxy ezPortfolioProxy, EZModel fromEzModel, List<EZOperation> operations) {
         EzReport ezReport = new EzReport(fromEzModel);
         List<EzEdition> editions = operations.stream()
-                .map(operation -> loadOperation(ezPortfolioProxy, operation))
+                .map(operation -> {
+                    EzData ezData = new EzData();
+                    fromEzModel.fill(ezData);
+                    return loadOperation(ezPortfolioProxy, operation, ezData);
+                })
                 .collect(Collectors.toList());
         ezReport.setEzEditions(editions);
         return ezReport;
     }
 
-    private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation) {
-        return rulesEngine.transform(ezPortfolioProxy, fromEzOperation);
+    private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation, EzData ezData) {
+        EzEdition ezEdition = rulesEngine.transform(ezPortfolioProxy, fromEzOperation, ezData);
+        // ici je modifie le ezPortoflio.MonPortefeuille pour appliquer les calculs
+        if (ezEdition.getEzPortefeuilleEdition() != null)
+            ezPortfolioProxy.applyOnPortefeuille(ezEdition.getEzPortefeuilleEdition());
+        return ezEdition;
     }
 
 }

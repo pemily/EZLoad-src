@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.exporter;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -23,7 +25,7 @@ public interface EZPortfolioProxy {
 
     boolean isOperationsExists(Row operation);
 
-    Optional<Row> searchPortefeuilleRow(String valeur);
+    void applyOnPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition);
 
-    Row getNewPortefeuilleRow(String valeur);
+    void fillFromMonPortefeuille(EzData data, String valeur);
 }

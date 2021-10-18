@@ -93,6 +93,9 @@ public class SettingsManager {
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         String ezHome = new File(configFilePath).getParentFile().getAbsolutePath();
+        MainSettings.Admin admin = new MainSettings.Admin();
+        admin.setShowRules(false);
+        ezLoad.setAdmin(admin);
         ezLoad.setLogsDir(ezHome+File.separator+"logs");
         ezLoad.setDownloadDir(ezHome+File.separator+"courtiers");
         ezLoad.setRulesDir(ezHome+File.separator+"rules");
