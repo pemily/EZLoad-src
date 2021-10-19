@@ -47,7 +47,7 @@ export function RulesTab(props: RulesTabProps){
             )}
             { !ruleDefinitionLoaded && props?.operation && ( // ici la ruleDefinition n'existe pas, on va en creer une nouvelle a partir des info dans operation
                 <Rule readOnly={props.readOnly} reload={props.reload} operation={props.operation} ruleDefinition={{
-                    name: undefined,
+                    name: props.operation.data?.data?.['operation.type']+' '+Date.now(),
                     broker: "BourseDirect",
                     brokerFileVersion: parseInt(props.operation!.data!.data!.brokerFileVersion!),
                     enabled: true

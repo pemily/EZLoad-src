@@ -88,7 +88,7 @@ export function App(){
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 
-                <Box direction="row" alignSelf="center" margin="large" background="grey" fill justify="center">
+                <Box direction="row" alignSelf="center" margin="large" background="dark-1" fill justify="center">
                     <Spinner margin="small"
                         border={[
                         { side: 'all', color: 'transparent', size: 'small' },
