@@ -14,6 +14,15 @@ export function jsonCall(promise: Promise<HttpResponse<any, any>>):  Promise<any
     } )    
 }
 
+// For method that returns string
+export function textCall(promise: Promise<HttpResponse<any, any>>):  Promise<string|undefined> {
+  return promise.then(httpResponse => {
+    if (httpResponse.status === 204) return undefined; // no content for 204
+    return httpResponse.text();
+  } )    
+}
+
+
  
 // onText return true if it wants to stop the streaming
 export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void): Promise<any>{    

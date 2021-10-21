@@ -1,9 +1,7 @@
-import { Box, List, Accordion, AccordionPanel, Text, Anchor } from "grommet";
+import { Box, List, Accordion, AccordionPanel, Text } from "grommet";
 import { BorderType } from "grommet/utils";
-import { Upload, View } from 'grommet-icons';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { Operations } from '../Operations';
-import { ezApi, jsonCall } from '../../ez-api/tools';
 import { EzProcess, EzEdition, EzReport } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface Reports {

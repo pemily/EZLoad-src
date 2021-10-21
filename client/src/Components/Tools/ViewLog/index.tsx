@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Box, Text } from "grommet";
 import { stream, ezApi, valued } from '../../../ez-api/tools';
 import { EzProcess } from '../../../ez-api/gen-api/EZLoadApi';

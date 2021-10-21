@@ -1,9 +1,6 @@
-import { Box, Heading, Anchor, Form, Button, Text, List, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
+import { Box, Text, List, Table, TableHeader, TableRow, TableCell, TableBody } from "grommet";
 import { BorderType } from "grommet/utils";
-import { Download, Trash } from 'grommet-icons';
-
-import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition } from '../../ez-api/gen-api/EZLoadApi';
+import {  EzEdition } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface OperationProps {
     operation: EzEdition;

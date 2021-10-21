@@ -1,5 +1,5 @@
-import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
-import { Download, Trash } from 'grommet-icons';
+import { Box, Anchor, Button } from "grommet";
+import { Download } from 'grommet-icons';
 import { MainSettings, AuthInfo, EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 

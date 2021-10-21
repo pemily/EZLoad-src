@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect, ReactElement } from "react";
+import { useState } from "react";
 import { Box, Heading, Text, Button, Layer, DataTable, ColumnConfig } from "grommet";
-import { FormDown, FormNext, Grow, CircleInformation, Tty } from 'grommet-icons';
-import { valued } from '../../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzData } from '../../../ez-api/gen-api/EZLoadApi';
+import { CircleInformation, Tty } from 'grommet-icons';
+import { EzData } from '../../../ez-api/gen-api/EZLoadApi';
 
 
 interface EzSingleData {
@@ -11,13 +10,13 @@ interface EzSingleData {
 }
 
 export interface EzDataProps {
-  value: EzData;
+  value: EzData | undefined;
   iconInfo: boolean;
   onSelect?: (d: EzSingleData) => void
 } 
 
 export function EzDataField(props: EzDataProps) {
-  const [expandData, setExpandData] = useState(false);
+  const [open, setOpen] = useState(false);
  
 
   const columns: ColumnConfig<EzSingleData>[] = [
@@ -32,26 +31,27 @@ export function EzDataField(props: EzDataProps) {
   ];
   
 
-  const data = Object.keys(props.value!.data!)
+  const data = props.value && Object.keys(props.value.data!)
               .sort((key1, key2) => key1.localeCompare(key2))
               .map(key => { return { name: key, value: props.value!.data![key] }});
 
   return (          
       <>      
-        <Button hoverIndicator="background" onClick={() => setExpandData(!expandData)}
+        <Button hoverIndicator="background" onClick={() => setOpen(!open)}
            icon={props.iconInfo ? <CircleInformation color="brand"/> : <Tty color="brand"/>}/>
-        { expandData && 
-        <Layer onEsc={() => setExpandData(false)} onClickOutside={() => setExpandData(false)} margin="large" >
+        { open && 
+        <Layer onEsc={() => setOpen(false)} onClickOutside={() => setOpen(false)} margin="large" >
           <Heading margin="small" level="4" color="brand">Données extraites</Heading>
           <Box overflow="auto">
-            <DataTable
+            { !props.value && (<Text alignSelf="center">Aucune données</Text>)}
+            { props.value && (<DataTable
               columns={columns}
               data={data}
               onClickRow={(event) => {                
                 props.onSelect && props.onSelect(event.datum);
-              }}/>                     
+              }}/> )}
             </Box>   
-            <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setExpandData(false)} />            
+            <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            
         </Layer> }
       </>
   );

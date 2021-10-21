@@ -1,4 +1,4 @@
-import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
+import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
 import { Add, Trash, Validate } from 'grommet-icons';
 import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
@@ -106,7 +106,8 @@ export function Config(props: ConfigProps) {
                                 {valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === "" &&
                                     (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner le fichier de sécurité</span>"}</Markdown>)}
                                 <Button 
-                                    disabled={valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === ""
+                                    disabled={ props.readOnly 
+                                        || valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === ""
                                         || valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === ""} 
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
@@ -196,7 +197,7 @@ export function Config(props: ConfigProps) {
                                     </TableCell>
                                     <TableCell scope="row" pad="xsmall" margin="none">
                                     <CheckBox key={"activeBD"+index} reverse checked={account.active}
-                                        readOnly={props.readOnly}
+                                        disabled={props.readOnly}
                                         onChange={evt => 
                                          saveSettings(
                                             { ...props.mainSettings,

@@ -40,22 +40,22 @@ public class RulesManager {
         }
     }
 
-    public synchronized void saveRule(String oldName, RuleDefinition ruleDef) throws IOException {
-        if (StringUtils.isBlank(ruleDef.getName())) return;
+    public synchronized String saveRule(String oldName, RuleDefinition ruleDef) throws IOException {
+        if (StringUtils.isBlank(ruleDef.getName())) return "Le nom de la règle est vide!";
 
         String oldFilePath = oldName != null ? getFilePath(oldName, ruleDef) : null;
-        String newFilePath = getFilePath(ruleDef.getName(), ruleDef);
+        String newFilePath = getFilePath(ruleDef.getName().trim(), ruleDef);
         boolean isRenaming = oldFilePath != null && !oldFilePath.equals(newFilePath);
 
         if (oldName == null){
             // it is a new file
             if (new File(newFilePath).exists()){
-                throw new FileAlreadyExistsException(newFilePath);
+                return "La règle existe déjà";
             }
         }
         else{
             if (isRenaming && new File(newFilePath).exists()){
-                throw new FileAlreadyExistsException(newFilePath);
+                return "La règle existe déjà";
             }
         }
 
@@ -69,6 +69,8 @@ public class RulesManager {
             // it is a rename, remove the old file
             boolean ignored = new File(oldFilePath).delete();
         }
+
+        return null;
     }
 
     private String encodeFile(String filename) {

@@ -1,9 +1,8 @@
-import { Box, Heading, Anchor, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, List, Menu } from "grommet";
-import { Download, Trash, More, Upload } from 'grommet-icons';
+import { Box, Anchor, List } from "grommet";
 import { Operation } from '../Operation';
 import { EzDataField } from '../Tools/EzDataField';
-import { ezApi, jsonCall, getChromeVersion, ruleTitle } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition } from '../../ez-api/gen-api/EZLoadApi';
+import { ruleTitle } from '../../ez-api/tools';
+import { EzProcess, EzEdition } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface OperationsProps {
     id: number;

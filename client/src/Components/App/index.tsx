@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Anchor, Text, Spinner, Select, List } from "grommet";
-import { Upload, Configure, Clipboard, DocumentStore, Command, UserExpert, Services } from 'grommet-icons';
+import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List } from "grommet";
+import { Upload, Configure, Clipboard, DocumentStore, Command, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Reports } from '../Reports';
@@ -8,9 +8,8 @@ import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
-import { ezApi, jsonCall, getChromeVersion } from '../../ez-api/tools';
+import { ezApi, jsonCall } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary } from '../../ez-api/gen-api/EZLoadApi';
-import { produceWithPatches } from "immer";
 
 export function App(){
     

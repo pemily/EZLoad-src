@@ -56,12 +56,12 @@ public class RulesHandler {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveRule(@QueryParam("oldName") String oldName,
+    @Produces(MediaType.TEXT_PLAIN)
+    public String saveRule(@QueryParam("oldName") String oldName,
                          @NotNull RuleDefinition ruleDefinition) throws Exception {
         ruleDefinition.setEzLoadVersion(EZLoad.VERSION);
-        new RulesManager(SettingsManager.getInstance().loadProps())
+        return new RulesManager(SettingsManager.getInstance().loadProps())
                 .saveRule(oldName == null || StringUtils.isBlank(oldName) ? null : oldName, ruleDefinition);
     }
 }
