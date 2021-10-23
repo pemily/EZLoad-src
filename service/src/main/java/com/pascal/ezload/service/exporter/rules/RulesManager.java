@@ -50,12 +50,12 @@ public class RulesManager {
         if (oldName == null){
             // it is a new file
             if (new File(newFilePath).exists()){
-                return "La règle existe déjà";
+                return "Le nom de cette règle existe déjà";
             }
         }
         else{
             if (isRenaming && new File(newFilePath).exists()){
-                return "La règle existe déjà";
+                return "La nom de cette règle existe déjà";
             }
         }
 

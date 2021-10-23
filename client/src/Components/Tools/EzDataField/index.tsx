@@ -4,7 +4,7 @@ import { CircleInformation, Tty } from 'grommet-icons';
 import { EzData } from '../../../ez-api/gen-api/EZLoadApi';
 
 
-interface EzSingleData {
+export interface EzSingleData {
   name: string,
   value: string
 }

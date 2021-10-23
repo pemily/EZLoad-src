@@ -1,6 +1,12 @@
-import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
 
 export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"}); // TODO update => remove the 8080 before the production, the port is dynamically computed
+
+export interface SelectedRule {
+  ruleDefinition: RuleDefinition;
+  oldName: string|undefined;
+}
+
 
 export function valued(v: string|undefined|null) : string {
   return v ? v : "";
@@ -82,4 +88,10 @@ export function getChromeVersion() : string {
 export function ruleTitle(rule: RuleDefinitionSummary|undefined): string{
   if (rule === undefined) return "";
   return rule.broker+" v"+rule.brokerFileVersion+" - "+rule.name;
+}
+
+export function strToBroker(str: string | undefined) : 'BourseDirect'|undefined{
+  if (str === undefined) return undefined;
+  if (str === 'BourseDirect') return 'BourseDirect';
+  return undefined;
 }

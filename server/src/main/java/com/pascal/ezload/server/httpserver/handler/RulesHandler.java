@@ -52,16 +52,28 @@ public class RulesHandler {
                                     && ruleDef.getBrokerFileVersion() == brokerFileVersion
                                     && ruleDef.getBroker() == broker)
                 .findFirst()
+                .map(r -> {r.validate(); return r; })
                 .orElse(null);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String saveRule(@QueryParam("oldName") String oldName,
+    @Produces(MediaType.APPLICATION_JSON)
+    public RuleDefinition saveRule(@QueryParam("oldName") String oldName,
                          @NotNull RuleDefinition ruleDefinition) throws Exception {
         ruleDefinition.setEzLoadVersion(EZLoad.VERSION);
-        return new RulesManager(SettingsManager.getInstance().loadProps())
+        String errorForName = new RulesManager(SettingsManager.getInstance().loadProps())
                 .saveRule(oldName == null || StringUtils.isBlank(oldName) ? null : oldName, ruleDefinition);
+
+        RuleDefinition result;
+        if (errorForName == null) {
+            result = getRule(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion(), ruleDefinition.getName());
+        }
+        else{
+            ruleDefinition.validate();
+            ruleDefinition.getField2ErrorMsg().put(RuleDefinition.Field.name.name(), errorForName);
+            return ruleDefinition;
+        }
+        return result;
     }
 }

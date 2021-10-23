@@ -8,8 +8,8 @@ import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
-import { ezApi, jsonCall } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary } from '../../ez-api/gen-api/EZLoadApi';
+import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
     
@@ -25,7 +25,7 @@ export function App(){
     const [processRunning, setProcessRunning] = useState<boolean>(false);
     const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
     const [editOperation, setEditOperation] = useState<EzEdition|undefined>(undefined);
-    const [ruleDefinition, setRuleDefinition] = useState<RuleDefinitionSummary|undefined>(undefined);
+    const [selectedRule, setSelectedRule] = useState<SelectedRule|undefined>(undefined);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -64,6 +64,26 @@ export function App(){
         .catch((error) => {
             console.log("Error while loading BourseDirect Username", error);
         });
+    }
+
+    function saveRuleDefinition(oldName: string|undefined, newRuleDef: RuleDefinition) : Promise<RuleDefinition>{
+        return jsonCall(ezApi.rule.saveRule({oldName: oldName}, newRuleDef))
+        .then(rule => { 
+            setSelectedRule({oldName: rule.name, ruleDefinition: rule});
+            return rule;
+        })
+        .catch(e => console.log("Save Password Error: ", e));
+    }
+
+    function changeRuleSelection(newRule: RuleDefinitionSummary) : void {
+        jsonCall(ezApi.rule.getRule(newRule.broker!, newRule.brokerFileVersion!, newRule.name!))
+        .then(ruleDef => {
+            if (ruleDef === undefined)
+                setSelectedRule(undefined);                
+            else
+                setSelectedRule({oldName: ruleDef.name, ruleDefinition: ruleDef});                            
+        })
+        .catch(e => console.log(e));
     }
 
     useEffect(() => {
@@ -144,8 +164,35 @@ export function App(){
                                 </Box>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
-                                        createRule={op =>{ setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(undefined); }}
-                                        viewRule={op => { setActiveIndex(RULES_TAB_INDEX); setEditOperation(op); setRuleDefinition(op.ruleDefinitionSummary); } }/>
+                                        createRule={op =>{ 
+                                            if (op.data?.data?.['courtier.version'] === undefined){
+                                                console.error("Il manque des données dans l'opération");
+                                                return;
+                                            }         
+                                            const newRule = {
+                                                name: op.data?.data?.['operation.type'],
+                                                broker: strToBroker(op.data?.data?.['courtier.dossier']),
+                                                brokerFileVersion: parseInt(op.data?.data?.['courtier.version']),
+                                                enabled: true
+                                            };
+                                            saveRuleDefinition(undefined, newRule)
+                                            .then(r => {
+                                                setActiveIndex(RULES_TAB_INDEX); 
+                                                setEditOperation(op);                                                 
+                                                rules.push(newRule); 
+                                            })}}
+                                        viewRule={op => {
+                                            const broker = strToBroker(op.data?.data?.['courtier.dossier']);
+                                            if (broker === undefined || op.data?.data?.['courtier.version'] === undefined){
+                                                console.error("Il manque des données dans l'opération");
+                                                return;
+                                            }
+                                            setActiveIndex(RULES_TAB_INDEX);
+                                            setEditOperation(op); 
+                                            jsonCall(ezApi.rule.getRule(broker,
+                                                    parseInt(op.data?.data?.['courtier.version']), op.data!.data!['rapport.source']))
+                                            .then(r => setSelectedRule({oldName: r.name, ruleDefinition: r})) }}
+                                            />
                         </Box>
                     </Tab>                       
                     <Tab title="Rapport" icon={runningTaskOrLog(mainSettings && processRunning)}>
@@ -174,7 +221,10 @@ export function App(){
                     { mainSettings.ezLoad?.admin?.showRules && (
                         <Tab title="Règles" icon={<Services size='small'/>}>
                             <Box fill overflow="auto">
-                                <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={ruleDefinition} rules={rules} reload={reloadAllData}/>
+                                <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={selectedRule}
+                                            rules={rules} 
+                                            changeSelection={changeRuleSelection}
+                                            saveRule={saveRuleDefinition}/>
                             </Box>
                         </Tab> )}
                 </Tabs>

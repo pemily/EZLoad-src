@@ -16,7 +16,7 @@ export interface ConfigTextAreaFieldProps {
 }
 
 
-export function TextAreadField(props: ConfigTextAreaFieldProps) {
+export function TextAreaField(props: ConfigTextAreaFieldProps) {
     const [value, setValue] = useState<string>(valued(props.value));
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property

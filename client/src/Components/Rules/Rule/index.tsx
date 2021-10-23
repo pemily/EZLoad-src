@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Heading, Text, Table, TableHeader, TableRow, TableCell, TableBody, CheckBox } from "grommet";
-import { TextAreadField } from '../../Tools/TextAreaField';
+import { TextAreaField } from '../../Tools/TextAreaField';
+import { TextField } from '../../Tools/TextField';
 import { CheckBoxField } from '../../Tools/CheckBoxField';
-import { EzDataField } from '../../Tools/EzDataField';
+import { EzDataField, EzSingleData } from '../../Tools/EzDataField';
 import { EzEdition, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
 
 
@@ -10,9 +11,8 @@ export interface RuleProps {
     readOnly: boolean;
     operation: EzEdition|undefined;
     ruleDefinition: RuleDefinition;
-    saveRule: (newRule: RuleDefinition) => void;
+    saveRule: (oldName: string|undefined, newRule: RuleDefinition) => void;
 }      
-
 
 export function Rule(props: RuleProps){
     const [readOnly, setReadOnly] = useState<boolean>(props.readOnly);
@@ -23,87 +23,132 @@ export function Rule(props: RuleProps){
     }, [props.readOnly, props.ruleDefinition.name, props.ruleDefinition.enabled]);
 
 
+    function saveRule(newRule: RuleDefinition){
+        props.saveRule(props.ruleDefinition.name, newRule);
+    }
+    
+    function append(expr: string|undefined, data: EzSingleData) : string {
+        if (expr === undefined || expr === null) return data.name;
+        return expr + ' ' + data.name;
+    }
+
     return (
         <>
-        <Box direction="row" align="center" margin="medium">
+        <Box direction="row" align="center" margin="small">
             <CheckBoxField label="Active" 
                         value={props.ruleDefinition.enabled!}
                         readOnly={props.readOnly} // readonly que si il y a un process en cours
                         onChange={newValue  => {                
-                            props.saveRule({
+                            saveRule({
                                 ...props.ruleDefinition,
                                 enabled: newValue
                             });
                         }}/>
-            <TextAreadField id="condition" label="Condition" value={props.ruleDefinition.condition}
+            <TextField id="name" label="name" value={props.ruleDefinition.name}
+                isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.name}
+                readOnly={readOnly}
+                onChange={newValue => {
+                    saveRule({ ...props.ruleDefinition, name: newValue})
+                }}/>
+        </Box>
+        <Box direction="row" align="Center" margin="small">
+            <TextAreaField id="condition" label="Condition" value={props.ruleDefinition.condition}
                 isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.condition}
                 readOnly={readOnly}
                 onChange={newValue => {
-                    props.saveRule({ ...props.ruleDefinition, condition: newValue})
+                    saveRule({ ...props.ruleDefinition, condition: newValue})
                 }}/>
-            <EzDataField value={props.operation?.data} iconInfo={false}/>
+            <EzDataField value={props.operation?.data} iconInfo={false}
+                 onSelect={ d => saveRule({...props.ruleDefinition, condition: append(props.ruleDefinition.condition,d)})}/>
         </Box>
 
         <Box margin="small"  border="all" background="light-1" align="center">
             <Heading level="3">Mes Opérations</Heading>
             <Table >
                 <TableHeader>
-                    <TableCell><Box direction="row" align="center"><Text>Date</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Compte</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Courtier</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Quantité</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Opération</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Valeur</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Pays</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Montant</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Information</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Date</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationDateExpr: append(props.ruleDefinition.operationDateExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Compte</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationAccountExpr: append(props.ruleDefinition.operationAccountExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Courtier</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationBrokerExpr: append(props.ruleDefinition.operationBrokerExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Quantité</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationQuantityExpr: append(props.ruleDefinition.operationQuantityExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Opération</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationTypeExpr: append(props.ruleDefinition.operationTypeExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Valeur</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationActionNameExpr: append(props.ruleDefinition.operationActionNameExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Pays</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationCountryExpr: append(props.ruleDefinition.operationCountryExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Montant</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationAmountExpr: append(props.ruleDefinition.operationAmountExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Information</Text>                            
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, operationDescriptionExpr: append(props.ruleDefinition.operationDescriptionExpr,d)})}/></Box>
+                    </TableCell>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
                         <TableCell>
-                            <TextAreadField id="operationDateExpr"
+                            <TextAreaField id="operationDateExpr"
                             value={props.ruleDefinition.operationDateExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationDateExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationDateExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationDateExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationAccountExpr"
+                            <TextAreaField id="operationAccountExpr"
                             value={props.ruleDefinition.operationAccountExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationAccountExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationAccountExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationAccountExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationBrokerExpr"
+                            <TextAreaField id="operationBrokerExpr"
                             value={props.ruleDefinition.operationBrokerExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationBrokerExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationBrokerExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationBrokerExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationQuantityExpr"
+                            <TextAreaField id="operationQuantityExpr"
                             value={props.ruleDefinition.operationQuantityExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationQuantityExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationQuantityExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationQuantityExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationTypeExpr"
+                            <TextAreaField id="operationTypeExpr"
                             value={props.ruleDefinition.operationTypeExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationTypeExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationTypeExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationTypeExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationActionNameExpr"
+                            <TextAreaField id="operationActionNameExpr"
                             value={props.ruleDefinition.operationActionNameExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationActionNameExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationActionNameExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationActionNameExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationCountryExpr"
+                            <TextAreaField id="operationCountryExpr"
                             value={props.ruleDefinition.operationCountryExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationCountryExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationCountryExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationCountryExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationAmountExpr"
+                            <TextAreaField id="operationAmountExpr"
                             value={props.ruleDefinition.operationAmountExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationAmountExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationAmountExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationAmountExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="operationDescriptionExpr"
+                            <TextAreaField id="operationDescriptionExpr"
                             value={props.ruleDefinition.operationDescriptionExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.operationDescriptionExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, operationDescriptionExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, operationDescriptionExpr: newValue})}/>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -123,34 +168,34 @@ export function Rule(props: RuleProps){
                 <TableBody>
                     <TableRow>
                         <TableCell>
-                            <TextAreadField id="portefeuilleValeurExpr"
+                            <TextAreaField id="portefeuilleValeurExpr"
                             value={props.ruleDefinition.portefeuilleValeurExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleValeurExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleValeurExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleValeurExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleCompteExpr"
+                            <TextAreaField id="portefeuilleCompteExpr"
                             value={props.ruleDefinition.portefeuilleCompteExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleCompteExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleCompteExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleCompteExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleCourtierExpr"
+                            <TextAreaField id="portefeuilleCourtierExpr"
                             value={props.ruleDefinition.portefeuilleCourtierExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleCourtierExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleCourtierExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleCourtierExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleTickerGoogleFinanceExpr"
+                            <TextAreaField id="portefeuilleTickerGoogleFinanceExpr"
                             value={props.ruleDefinition.portefeuilleTickerGoogleFinanceExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleTickerGoogleFinanceExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleTickerGoogleFinanceExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleTickerGoogleFinanceExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuillePaysExpr"
+                            <TextAreaField id="portefeuillePaysExpr"
                             value={props.ruleDefinition.portefeuillePaysExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuillePaysExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuillePaysExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuillePaysExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleSecteurExpr"
+                            <TextAreaField id="portefeuilleSecteurExpr"
                             value={props.ruleDefinition.portefeuilleSecteurExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleSecteurExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleSecteurExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleSecteurExpr: newValue})}/>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -168,34 +213,34 @@ export function Rule(props: RuleProps){
                 <TableBody>
                     <TableRow>
                         <TableCell>
-                            <TextAreadField id="portefeuilleIndustrieExpr"
+                            <TextAreaField id="portefeuilleIndustrieExpr"
                             value={props.ruleDefinition.portefeuilleIndustrieExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleIndustrieExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleIndustrieExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleIndustrieExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleEligibiliteAbbattement40Expr"
+                            <TextAreaField id="portefeuilleEligibiliteAbbattement40Expr"
                             value={props.ruleDefinition.portefeuilleEligibiliteAbbattement40Expr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleEligibiliteAbbattement40Expr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleEligibiliteAbbattement40Expr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleEligibiliteAbbattement40Expr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleTypeExpr"
+                            <TextAreaField id="portefeuilleTypeExpr"
                             value={props.ruleDefinition.portefeuilleTypeExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleTypeExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleTypeExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleTypeExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuillePrixDeRevientExpr"
+                            <TextAreaField id="portefeuillePrixDeRevientExpr"
                             value={props.ruleDefinition.portefeuillePrixDeRevientExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuillePrixDeRevientExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuillePrixDeRevientExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuillePrixDeRevientExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleQuantiteExpr"
+                            <TextAreaField id="portefeuilleQuantiteExpr"
                             value={props.ruleDefinition.portefeuilleQuantiteExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleQuantiteExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleQuantiteExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleQuantiteExpr: newValue})}/>
                         </TableCell>
                         <TableCell>
-                            <TextAreadField id="portefeuilleDividendeAnnuelExpr"
+                            <TextAreaField id="portefeuilleDividendeAnnuelExpr"
                             value={props.ruleDefinition.portefeuilleDividendeAnnuelExpr} isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr}
-                            readOnly={readOnly} onChange={newValue => props.saveRule({ ...props.ruleDefinition, portefeuilleDividendeAnnuelExpr: newValue})}/>
+                            readOnly={readOnly} onChange={newValue => saveRule({ ...props.ruleDefinition, portefeuilleDividendeAnnuelExpr: newValue})}/>
                         </TableCell>                                                
 
                     </TableRow>
