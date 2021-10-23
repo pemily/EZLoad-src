@@ -158,12 +158,30 @@ export function Rule(props: RuleProps){
             <Heading level="3">Mon Portefeuille</Heading>
             <Table>
                 <TableHeader>
-                    <TableCell><Box direction="row" align="center"><Text>Valeur</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Compte</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Courtier</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Ticker Google</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>                    
-                    <TableCell><Box direction="row" align="center"><Text>Pays</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                    <TableCell><Box direction="row" align="center"><Text>Secteur</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Valeur</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false} 
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleValeurExpr: append(props.ruleDefinition.portefeuilleValeurExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Compte</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleCompteExpr: append(props.ruleDefinition.portefeuilleCompteExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Courtier</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleCourtierExpr: append(props.ruleDefinition.portefeuilleCourtierExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Ticker Google</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleTickerGoogleFinanceExpr: append(props.ruleDefinition.portefeuilleTickerGoogleFinanceExpr,d)})}/></Box>
+                    </TableCell>                    
+                    <TableCell><Box direction="row" align="center"><Text>Pays</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuillePaysExpr: append(props.ruleDefinition.portefeuillePaysExpr,d)})}/></Box>
+                    </TableCell>
+                    <TableCell><Box direction="row" align="center"><Text>Secteur</Text>
+                        <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleSecteurExpr: append(props.ruleDefinition.portefeuilleSecteurExpr,d)})}/></Box>
+                    </TableCell>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
@@ -203,12 +221,30 @@ export function Rule(props: RuleProps){
             <Table>
                 <TableHeader>
 
-                        <TableCell><Box direction="row" align="center"><Text>Industrie</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                        <TableCell><Box direction="row" align="center"><Text>Eligibilité Abattement 40%</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                        <TableCell><Box direction="row" align="center"><Text>Type</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                        <TableCell><Box direction="row" align="center"><Text>Prix de Revient Unitaire</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                        <TableCell><Box direction="row" align="center"><Text>Quantité</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
-                        <TableCell><Box direction="row" align="center"><Text>Dividende annuel</Text><EzDataField value={props.operation?.data} iconInfo={false}/></Box></TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Industrie</Text>
+                           <EzDataField value={props.operation?.data} iconInfo={false}
+                                onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleIndustrieExpr: append(props.ruleDefinition.portefeuilleIndustrieExpr,d)})}/></Box>
+                        </TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Eligibilité Abattement 40%</Text>
+                          <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleEligibiliteAbbattement40Expr: append(props.ruleDefinition.portefeuilleEligibiliteAbbattement40Expr,d)})}/></Box>
+                        </TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Type</Text>
+                          <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleTypeExpr: append(props.ruleDefinition.portefeuilleTypeExpr,d)})}/></Box>
+                        </TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Prix de Revient Unitaire</Text>
+                          <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuillePrixDeRevientExpr: append(props.ruleDefinition.portefeuillePrixDeRevientExpr,d)})}/></Box>
+                        </TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Quantité</Text>
+                          <EzDataField value={props.operation?.data} iconInfo={false}
+                          onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleQuantiteExpr: append(props.ruleDefinition.portefeuilleQuantiteExpr,d)})}/></Box>
+                        </TableCell>
+                        <TableCell><Box direction="row" align="center"><Text>Dividende annuel</Text>
+                          <EzDataField value={props.operation?.data} iconInfo={false}
+                            onSelect={ d => saveRule({...props.ruleDefinition, portefeuilleDividendeAnnuelExpr: append(props.ruleDefinition.portefeuilleDividendeAnnuelExpr,d)})}/></Box>
+                        </TableCell>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
