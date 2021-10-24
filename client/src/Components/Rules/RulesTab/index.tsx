@@ -8,6 +8,7 @@ export interface RulesTabProps {
     operation: EzEdition|undefined;
     ruleDefinitionSelected: SelectedRule|undefined;
     rules: RuleDefinitionSummary[];
+    deleteSelectedRule: () => void;
     saveRule: (newRule: RuleDefinition) => void;
     changeSelection: (newSelection: RuleDefinitionSummary) => void;
 }      
@@ -33,7 +34,9 @@ export function RulesTab(props: RulesTabProps){
         </Box>            
 
         { props.ruleDefinitionSelected && (
-            <Rule readOnly={props.readOnly} saveRule={props.saveRule} operation={props.operation} ruleDefinition={props.ruleDefinitionSelected?.ruleDefinition}/>
+            <Rule readOnly={props.readOnly} saveRule={props.saveRule} 
+                deleteRule={props.deleteSelectedRule}
+                operation={props.operation} ruleDefinition={props.ruleDefinitionSelected?.ruleDefinition}/>
         )}
         </>
     );

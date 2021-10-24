@@ -76,4 +76,12 @@ public class RulesHandler {
         }
         return result;
     }
+
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteRule(@NotNull RuleDefinition ruleDefinition) throws Exception {
+        new RulesManager(SettingsManager.getInstance().loadProps())
+                .delete(ruleDefinition);
+    }
 }

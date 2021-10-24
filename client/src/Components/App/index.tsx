@@ -113,6 +113,17 @@ export function App(){
         .catch(e => console.log(e));
     }
 
+    function deleteSelectedRule(){
+        if (selectedRule !== undefined){
+            jsonCall(ezApi.rule.deleteRule(selectedRule.ruleDefinition))
+            .then(v => {
+                reloadAllData();
+                setSelectedRule(undefined);    
+            })
+            .catch(e => console.error(e));
+        }
+    }
+
     useEffect(() => {
         // will be executed on the load
         reloadAllData();
@@ -254,6 +265,7 @@ export function App(){
                                 <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={selectedRule}
                                             rules={rules} 
                                             changeSelection={changeRuleSelection}
+                                            deleteSelectedRule={deleteSelectedRule}
                                             saveRule={r => saveRuleDefinition({
                                                 oldName: selectedRule?.oldName,
                                                 ruleDefinition: r

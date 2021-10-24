@@ -82,4 +82,11 @@ public class RulesManager {
                 +File.separator+encodeFile(name)+RULE_FILE_EXTENSION;
     }
 
+    public void delete(RuleDefinition ruleDefinition) {
+        String filePath = getFilePath(ruleDefinition.getName(), ruleDefinition);
+        File f = new File(filePath);
+        if (f.exists()){
+            f.delete();
+        }
+    }
 }
