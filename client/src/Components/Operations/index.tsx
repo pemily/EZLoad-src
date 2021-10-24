@@ -18,20 +18,20 @@ export function Operations(props: OperationsProps){
         
     function showActions(index: number, operation: EzEdition){
         return props.showRules && 
-            (<Box direction="row" align="center">
-                <EzDataField value={operation!.data!} iconInfo={true}/>
-                {createRule(index, operation)}
+            (<Box direction="row" align="center" key={"operationAction"+index}>
+                <EzDataField key={"OperationData"+index} value={operation!.data!} iconInfo={true}/>
+                {createOrViewRule(index, operation)}
                 </Box>);
     }
 
-    function createRule(index: number, operation: EzEdition){
+    function createOrViewRule(index: number, operation: EzEdition){                
         if (operation.errors!.findIndex((e: string) => e === 'NO_RULE_FOUND') === 0) 
-            return (<Anchor key={index} onClick={e => props.createRule(operation)}>Créer une règle</Anchor>)
-        return (<Anchor key={index} onClick={e => props.viewRule(operation)}>Règle {ruleTitle(operation.ruleDefinitionSummary)}</Anchor>)
+            return (<Anchor key={"CreateRule"+index} onClick={e => props.createRule(operation)}>Créer une règle</Anchor>)
+        return (<Anchor key={"ViewRule"+index} onClick={e => props.viewRule(operation)}>Règle {ruleTitle(operation.ruleDefinitionSummary)}</Anchor>)
     }
 
     return (
-        <Box margin="small" key={props.id}>            
+        <Box margin="small" key={"Operations"+props.id}>            
             <List data={props.operations} margin="none" pad="xsmall"
              background={['light-2', 'light-4']}             
              action={(item, index) => showActions(index, item) }>

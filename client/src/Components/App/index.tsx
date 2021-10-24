@@ -66,10 +66,36 @@ export function App(){
         });
     }
 
-    function saveRuleDefinition(oldName: string|undefined, newRuleDef: RuleDefinition) : Promise<RuleDefinition>{
-        return jsonCall(ezApi.rule.saveRule({oldName: oldName}, newRuleDef))
-        .then(rule => { 
-            setSelectedRule({oldName: rule.name, ruleDefinition: rule});
+    function saveRuleDefinition(newRuleDef: SelectedRule) : Promise<RuleDefinition>{
+        return jsonCall(ezApi.rule.saveRule({oldName: newRuleDef.oldName}, newRuleDef.ruleDefinition))
+        .then(rule => {       
+            if (rule.field2ErrorMsg?.['name'] === undefined || rule.field2ErrorMsg?.['name'] === null){
+                // sauvegarde ok
+                // si il n'y a pas d'erreur sur le nom, alors je mets a jours le old Name car la sauvegarde a réussis, 
+                setSelectedRule({oldName: rule.name, ruleDefinition: rule});
+                // updates the rules list
+                if (newRuleDef.oldName === undefined){
+                    // new rule
+                    rules.push({
+                        name: rule.name,
+                        broker: rule.broker,
+                        brokerFileVersion: rule.brokerFileVersion,
+                        enabled: rule.enabled
+                    });
+                }
+                else { // rename
+                    setRules(rules.map(r => {
+                        if (r.name === newRuleDef.oldName){
+                            return {...r, name: rule.name};
+                        }
+                        else return r;
+                    }));
+                } 
+            }
+            else{                
+                // sauvegarde ko, je garde l'ancien nom
+                setSelectedRule({oldName: newRuleDef.oldName, ruleDefinition: rule});
+            }
             return rule;
         })
         .catch(e => console.log("Save Password Error: ", e));
@@ -78,6 +104,7 @@ export function App(){
     function changeRuleSelection(newRule: RuleDefinitionSummary) : void {
         jsonCall(ezApi.rule.getRule(newRule.broker!, newRule.brokerFileVersion!, newRule.name!))
         .then(ruleDef => {
+            console.log("new selection:", ruleDef);
             if (ruleDef === undefined)
                 setSelectedRule(undefined);                
             else
@@ -169,17 +196,19 @@ export function App(){
                                                 console.error("Il manque des données dans l'opération");
                                                 return;
                                             }         
-                                            const newRule = {
-                                                name: op.data?.data?.['operation.type'],
-                                                broker: strToBroker(op.data?.data?.['courtier.dossier']),
-                                                brokerFileVersion: parseInt(op.data?.data?.['courtier.version']),
-                                                enabled: true
-                                            };
-                                            saveRuleDefinition(undefined, newRule)
+                                            const newSelectedRule : SelectedRule = 
+                                                {
+                                                    oldName: undefined,
+                                                    ruleDefinition: {
+                                                        name: op.data?.data?.['operation.type'],
+                                                        broker: strToBroker(op.data?.data?.['courtier.dossier']),
+                                                        brokerFileVersion: parseInt(op.data?.data?.['courtier.version']),
+                                                        enabled: true
+                                                }};
+                                            saveRuleDefinition(newSelectedRule)
                                             .then(r => {
                                                 setActiveIndex(RULES_TAB_INDEX); 
-                                                setEditOperation(op);                                                 
-                                                rules.push(newRule); 
+                                                setEditOperation(op);                              
                                             })}}
                                         viewRule={op => {
                                             const broker = strToBroker(op.data?.data?.['courtier.dossier']);
@@ -189,8 +218,9 @@ export function App(){
                                             }
                                             setActiveIndex(RULES_TAB_INDEX);
                                             setEditOperation(op); 
+                                            const ruleName = op.data!.data!['rapport.source'];                                            
                                             jsonCall(ezApi.rule.getRule(broker,
-                                                    parseInt(op.data?.data?.['courtier.version']), op.data!.data!['rapport.source']))
+                                                    parseInt(op.data?.data?.['courtier.version']), ruleName))
                                             .then(r => setSelectedRule({oldName: r.name, ruleDefinition: r})) }}
                                             />
                         </Box>
@@ -224,7 +254,10 @@ export function App(){
                                 <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={selectedRule}
                                             rules={rules} 
                                             changeSelection={changeRuleSelection}
-                                            saveRule={saveRuleDefinition}/>
+                                            saveRule={r => saveRuleDefinition({
+                                                oldName: selectedRule?.oldName,
+                                                ruleDefinition: r
+                                            })}/>
                             </Box>
                         </Tab> )}
                 </Tabs>

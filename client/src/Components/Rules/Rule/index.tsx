@@ -10,8 +10,8 @@ import { EzEdition, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
 export interface RuleProps {
     readOnly: boolean;
     operation: EzEdition|undefined;
-    ruleDefinition: RuleDefinition;
-    saveRule: (oldName: string|undefined, newRule: RuleDefinition) => void;
+    ruleDefinition: RuleDefinition; 
+    saveRule: (newRule: RuleDefinition) => void;
 }      
 
 export function Rule(props: RuleProps){
@@ -24,7 +24,7 @@ export function Rule(props: RuleProps){
 
 
     function saveRule(newRule: RuleDefinition){
-        props.saveRule(props.ruleDefinition.name, newRule);
+        props.saveRule(newRule);
     }
     
     function append(expr: string|undefined, data: EzSingleData) : string {
