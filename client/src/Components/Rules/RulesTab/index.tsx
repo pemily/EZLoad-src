@@ -8,7 +8,7 @@ export interface RulesTabProps {
     operation: EzEdition|undefined;
     ruleDefinitionSelected: SelectedRule|undefined;
     rules: RuleDefinitionSummary[];
-    saveRule: (oldName: string|undefined, newRule: RuleDefinition) => void;
+    saveRule: (newRule: RuleDefinition) => void;
     changeSelection: (newSelection: RuleDefinitionSummary) => void;
 }      
 
