@@ -3,15 +3,15 @@ package com.pascal.ezload.service.exporter.ezEdition.data.common;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
 public interface MarketPlaceData {
-    String market_exchange = "marché.place";
-    String market_city = "marché.ville";
-    String market_mic = "marché.mic";
-    String market_acronym = "marché.acronyme";
-    String market_countryCode = "marché.codePays";
-    String market_country = "marché.pays";
-    String market_googleTicker = "marché.tickerGoogle";
-    String market_currencyCode = "marché.devise.code";
-    String market_currencySymbol = "marché.devise.symbole";
+    String market_exchange = "marche.place";
+    String market_city = "marche.ville";
+    String market_mic = "marche.mic";
+    String market_acronym = "marche.acronyme";
+    String market_countryCode = "marche.codePays";
+    String market_country = "marche.pays";
+    String market_googleTicker = "marche.tickerGoogle";
+    String market_currencyCode = "marche.devise.code";
+    String market_currencySymbol = "marche.devise.symbole";
 
     void fill(EzData data);
 }

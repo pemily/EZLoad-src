@@ -1,11 +1,10 @@
 package com.pascal.ezload.service.exporter.rules;
 
-import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.StringValue;
 
 public class RuleDefinition extends RuleDefinitionSummary {
-    public enum Field{name, description, condition, operationTypeExpr, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
-        operationAccountExpr, operationQuantityExpr, operationActionNameExpr, operationCountryExpr, operationAmountExpr,
+    public enum Field{name, description, condition, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
+        operationQuantityExpr, operationTypeExpr, operationActionNameExpr, operationCountryExpr, operationAmountExpr,
         operationDescriptionExpr, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
         portefeuilleTickerGoogleFinanceExpr, portefeuillePaysExpr, portefeuilleSecteurExpr, portefeuilleIndustrieExpr,
         portefeuilleEligibiliteAbbattement40Expr, portefeuilleTypeExpr, portefeuillePrixDeRevientExpr,
@@ -14,12 +13,11 @@ public class RuleDefinition extends RuleDefinitionSummary {
     private int ezLoadVersion; // the version of EzLoad when this RuleDefinition was created/edited
     private String condition;
 
-    private String operationTypeExpr;
     private String operationDateExpr;
     private String operationCompteTypeExpr;
     private String operationBrokerExpr;
-    private String operationAccountExpr;
     private String operationQuantityExpr;
+    private String operationTypeExpr;
     private String operationActionNameExpr;
     private String operationCountryExpr;
     private String operationAmountExpr;
@@ -46,14 +44,6 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.condition = condition;
     }
 
-    public String getOperationTypeExpr() {
-        return operationTypeExpr;
-    }
-
-    public void setOperationTypeExpr(String operationTypeExpr) {
-        this.operationTypeExpr = operationTypeExpr;
-    }
-
     public String getOperationDateExpr() {
         return operationDateExpr;
     }
@@ -78,14 +68,6 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.operationBrokerExpr = operationBrokerExpr;
     }
 
-    public String getOperationAccountExpr() {
-        return operationAccountExpr;
-    }
-
-    public void setOperationAccountExpr(String operationAccountExpr) {
-        this.operationAccountExpr = operationAccountExpr;
-    }
-
     public String getOperationQuantityExpr() {
         return operationQuantityExpr;
     }
@@ -108,6 +90,14 @@ public class RuleDefinition extends RuleDefinitionSummary {
 
     public void setOperationCountryExpr(String operationCountryExpr) {
         this.operationCountryExpr = operationCountryExpr;
+    }
+
+    public String getOperationTypeExpr() {
+        return operationTypeExpr;
+    }
+
+    public void setOperationTypeExpr(String operationTypeExpr) {
+        this.operationTypeExpr = operationTypeExpr;
     }
 
     public String getOperationAmountExpr() {
@@ -237,12 +227,11 @@ public class RuleDefinition extends RuleDefinitionSummary {
         new StringValue(false).validate(this, Field.description.name(), getDescription());
         new StringValue(true).validate(this, Field.condition.name(), condition);
 
-        new StringValue(true).validate(this, Field.operationTypeExpr.name(), operationTypeExpr);
         new StringValue(true).validate(this, Field.operationDateExpr.name(), operationDateExpr);
         new StringValue(true).validate(this, Field.operationCompteTypeExpr.name(), operationCompteTypeExpr);
         new StringValue(true).validate(this, Field.operationBrokerExpr.name(), operationBrokerExpr);
-        new StringValue(true).validate(this, Field.operationAccountExpr.name(), operationAccountExpr);
         new StringValue(true).validate(this, Field.operationQuantityExpr.name(), operationQuantityExpr);
+        new StringValue(true).validate(this, Field.operationTypeExpr.name(), operationTypeExpr);
         new StringValue(true).validate(this, Field.operationActionNameExpr.name(), operationActionNameExpr);
         new StringValue(true).validate(this, Field.operationCountryExpr.name(), operationCountryExpr);
         new StringValue(true).validate(this, Field.operationAmountExpr.name(), operationAmountExpr);

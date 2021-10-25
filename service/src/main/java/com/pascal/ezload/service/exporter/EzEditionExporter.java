@@ -12,6 +12,7 @@ import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,13 +46,16 @@ public class EzEditionExporter {
 
     private EzReport loadOperations(EZPortfolioProxy ezPortfolioProxy, EZModel fromEzModel, List<EZOperation> operations) {
         EzReport ezReport = new EzReport(fromEzModel);
-        List<EzEdition> editions = operations.stream()
-                .map(operation -> {
-                    EzData ezData = new EzData();
-                    fromEzModel.fill(ezData);
-                    return loadOperation(ezPortfolioProxy, operation, ezData);
-                })
-                .collect(Collectors.toList());
+        List<EzEdition> editions = new LinkedList<>();
+        for (EZOperation op : operations){
+            EzData ezData = new EzData();
+            fromEzModel.fill(ezData);
+            EzEdition edit = loadOperation(ezPortfolioProxy, op, ezData);
+            editions.add(edit);
+            if (edit.getErrors().size() > 0) {
+                break;
+            }
+        }
         ezReport.setEzEditions(editions);
         return ezReport;
     }

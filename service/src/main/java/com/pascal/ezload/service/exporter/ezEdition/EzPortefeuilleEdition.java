@@ -2,7 +2,9 @@ package com.pascal.ezload.service.exporter.ezEdition;
 
 import com.pascal.ezload.service.exporter.ezEdition.data.common.EzLoadPortfolioPortefeuilleData;
 
-public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData {
+public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, WithErrors {
+
+    private String errors;
 
     private String valeur;
     private String account_type;
@@ -126,5 +128,15 @@ public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData {
         data.put(ezLoad_portefeuille_costPriceUnit, costPrice);
         data.put(ezLoad_portefeuille_quantity, quantity);
         data.put(ezLoad_portefeuille_annualDividend, annualDividend);
+    }
+
+    @Override
+    public String getErrors() {
+        return errors;
+    }
+
+    @Override
+    public void setErrors(String errors) {
+        this.errors = errors;
     }
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Trash } from 'grommet-icons';
-import { Box, Heading, Text, Button } from "grommet";
+import { Trash, HelpOption } from 'grommet-icons';
+import { Box, Heading, Text, Button, Anchor } from "grommet";
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
 import { CheckBoxField } from '../../Tools/CheckBoxField';
@@ -55,42 +55,44 @@ export function Rule(props: RuleProps){
 
     return (
         <>
-        <Box direction="row" align="center" margin="small">
-            <CheckBoxField label="Active"
-                        value={props.ruleDefinition.enabled!}
-                        readOnly={props.readOnly} // readonly que si il y a un process en cours
-                        onChange={newValue  => {                
-                            saveRule({
-                                ...props.ruleDefinition,
-                                enabled: newValue
-                            });
-                        }}/>
-            <TextField id="name" label="name" value={props.ruleDefinition.name}
-                isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.name}
-                readOnly={readOnly}
-                onChange={newValue => {
-                    saveRule({ ...props.ruleDefinition, name: newValue})
-                }}/>
+        <Box> 
+            <Anchor margin={{right: "medium"}} alignSelf="end" label="Syntaxe" target="jexl" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html" icon={<HelpOption size="medium"/>}/>                    
+            <Box direction="row" align="center" margin="small">
+                <CheckBoxField label="Active"
+                            value={props.ruleDefinition.enabled!}
+                            readOnly={props.readOnly} // readonly que si il y a un process en cours
+                            onChange={newValue  => {                
+                                saveRule({
+                                    ...props.ruleDefinition,
+                                    enabled: newValue
+                                });
+                            }}/>
+                <TextField id="name" label="name" value={props.ruleDefinition.name}
+                    isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.name}
+                    readOnly={readOnly}
+                    onChange={newValue => {
+                        saveRule({ ...props.ruleDefinition, name: newValue})
+                    }}/>
 
-            <Button key={"delBD"} size="small" alignSelf="end"
-                disabled={props.readOnly}
-                icon={<Trash color='status-critical' size='medium'/>} onClick={() =>{
-                confirmAlert({
-                    title: 'Etes vous sûr de vouloir supprimer cette règle?',
-                    message: 'Elles ne pourra plus être utilisée pour créer des opérations.',
-                    buttons: [
-                        {
-                            label: 'Oui',
-                            onClick: () => props.deleteRule()
-                        },
-                        {
-                        label: 'Non',
-                            onClick: () => {}
-                        }
-                    ]
-                    });
-            }}/>     
-
+                <Button key={"delBD"} size="small" alignSelf="end"
+                    disabled={props.readOnly}
+                    icon={<Trash color='status-critical' size='medium'/>} onClick={() =>{
+                    confirmAlert({
+                        title: 'Etes vous sûr de vouloir supprimer cette règle?',
+                        message: 'Elles ne pourra plus être utilisée pour créer des opérations.',
+                        buttons: [
+                            {
+                                label: 'Oui',
+                                onClick: () => props.deleteRule()
+                            },
+                            {
+                            label: 'Non',
+                                onClick: () => {}
+                            }
+                        ]
+                        });
+                }}/>     
+            </Box>
         </Box>
         <Box direction="row" align="Center" margin="small">
             <TextAreaField id="condition" label="Condition" value={props.ruleDefinition.condition}
@@ -110,8 +112,8 @@ export function Rule(props: RuleProps){
                 return saveRule({...props.ruleDefinition, operationDateExpr: newVal});
             })}
 
-            {cellData("Compte", props.ruleDefinition.operationAccountExpr, props.ruleDefinition.field2ErrorMsg?.operationAccountExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationAccountExpr: newVal});
+            {cellData("Compte", props.ruleDefinition.operationCompteTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
+                return saveRule({...props.ruleDefinition, operationCompteTypeExpr: newVal});
             })}
                     
             {cellData("Courtier", props.ruleDefinition.operationBrokerExpr, props.ruleDefinition.field2ErrorMsg?.operationBrokerExpr, (newVal) => {

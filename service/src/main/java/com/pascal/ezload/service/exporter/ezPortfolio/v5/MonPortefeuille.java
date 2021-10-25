@@ -8,6 +8,7 @@ import com.pascal.ezload.service.gdrive.SheetValues;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MonPortefeuille implements MonPortefeuilleData {
@@ -41,7 +42,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     }
 
     public Optional<Row> searchRow(String valeur){
-        return this.portefeuille.getValues().stream().filter(r -> r.getValueStr(VALEUR_COL).equals(valeur)).findFirst();
+        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
     }
 
     public Row addNewRow(String share) {

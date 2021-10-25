@@ -4,11 +4,11 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
 public interface OperationData {
 
-    String operation_date="opération.date";
-    String operation_amount ="opération.montant";
-    String operation_description="opération.description";
-    String operation_accountType ="opération.typeCompte";
-    String operation_quantity="opération.quantité";
+    String operation_date="operation.date";
+    String operation_amount ="operation.montant";
+    String operation_description="operation.description";
+    String operation_accountType ="operation.typeCompte";
+    String operation_quantity="operation.quantite";
 
     void fill(EzData data);
 }

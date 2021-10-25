@@ -23,8 +23,10 @@ public abstract class Checkable {
     }
 
     public void setErrorMsg(String fieldName, String errorMsg){
-        if (this.getField2ErrorMsg() == null) setField2ErrorMsg(new HashMap<>());
-        this.getField2ErrorMsg().put(fieldName, errorMsg);
+        if (errorMsg != null) {
+            if (this.getField2ErrorMsg() == null) setField2ErrorMsg(new HashMap<>());
+            this.getField2ErrorMsg().put(fieldName, errorMsg);
+        }
     }
 
     public void clearErrors(){

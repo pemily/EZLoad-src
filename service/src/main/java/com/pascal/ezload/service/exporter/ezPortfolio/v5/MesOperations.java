@@ -64,9 +64,9 @@ public class MesOperations  {
 
     public static Row newOperationRow(EzOperationEdition operationEdition) {
         return new Row(operationEdition.getDate(), operationEdition.getAccountType(), operationEdition.getBroker(),
-                        null, operationEdition.getOperationType(), operationEdition.getShareName(),
+                        operationEdition.getQuantity(), operationEdition.getOperationType(), operationEdition.getShareName(),
                         operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
-                        operationEdition.getAccount(), BIENTOT_RENTIER_OPERATION);
+                        BIENTOT_RENTIER_OPERATION);
     }
 
     public void newOperation(EzOperationEdition operationEdition){

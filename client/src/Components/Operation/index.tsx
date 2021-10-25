@@ -30,20 +30,22 @@ export function Operation(props: OperationProps){
             { props.operation.errors!.length === 0 && (
                 <Table caption="Nouvelle Ligne dans MesOperations">
                 <TableHeader>
-                    <TableCell><Text>Date</Text></TableCell>
-                    <TableCell><Text>Compte</Text></TableCell>
-                    <TableCell><Text>Courtier</Text></TableCell>
-                    <TableCell><Text>Quantité</Text></TableCell>
-                    <TableCell><Text>Opération</Text></TableCell>
-                    <TableCell><Text>Valeur</Text></TableCell>
-                    <TableCell><Text>Pays</Text></TableCell>
-                    <TableCell><Text>Montant</Text></TableCell>
-                    <TableCell><Text>Information</Text></TableCell>
+                    <TableRow>
+                        <TableCell><Text>Date</Text></TableCell>
+                        <TableCell><Text>Compte</Text></TableCell>
+                        <TableCell><Text>Courtier</Text></TableCell>
+                        <TableCell><Text>Quantité</Text></TableCell>
+                        <TableCell><Text>Opération</Text></TableCell>
+                        <TableCell><Text>Valeur</Text></TableCell>
+                        <TableCell><Text>Pays</Text></TableCell>
+                        <TableCell><Text>Montant</Text></TableCell>
+                        <TableCell><Text>Information</Text></TableCell>
+                    </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
                         <TableCell><Text>{props.operation.ezOperationEdition?.date}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition?.account}</Text></TableCell>
+                        <TableCell><Text>{props.operation.ezOperationEdition?.accountType}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.broker}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.quantity}</Text></TableCell>
                         <TableCell><Text>{props.operation.ezOperationEdition?.operationType}</Text></TableCell>

@@ -192,7 +192,7 @@ export function App(){
                                             .then(followProcess)
                                             .catch(e => console.log(e) )
                                         }
-                                        size="small" icon={<Services size='small'/>} label="Générer les nouvelles opérations"/>                                                
+                                        size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
                                         <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
                                                     jsonCall(ezApi.engine.upload())
                                                     .then(followProcess)
@@ -222,16 +222,16 @@ export function App(){
                                                 setEditOperation(op);                              
                                             })}}
                                         viewRule={op => {
-                                            const broker = strToBroker(op.data?.data?.['courtier.dossier']);
-                                            if (broker === undefined || op.data?.data?.['courtier.version'] === undefined){
+                                            const broker = op.ruleDefinitionSummary?.broker;
+                                            const version =  op.ruleDefinitionSummary?.brokerFileVersion;
+                                            const name = op.ruleDefinitionSummary?.name;
+                                            if (broker === undefined || version === undefined || name === undefined){
                                                 console.error("Il manque des données dans l'opération");
                                                 return;
                                             }
                                             setActiveIndex(RULES_TAB_INDEX);
                                             setEditOperation(op); 
-                                            const ruleName = op.data!.data!['rapport.source'];                                            
-                                            jsonCall(ezApi.rule.getRule(broker,
-                                                    parseInt(op.data?.data?.['courtier.version']), ruleName))
+                                            jsonCall(ezApi.rule.getRule(broker, version, name))
                                             .then(r => setSelectedRule({oldName: r.name, ruleDefinition: r})) }}
                                             />
                         </Box>

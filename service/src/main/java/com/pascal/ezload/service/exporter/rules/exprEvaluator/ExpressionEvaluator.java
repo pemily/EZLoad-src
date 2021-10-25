@@ -38,18 +38,18 @@ public class ExpressionEvaluator {
         }
         catch(org.apache.commons.jexl3.JexlException.Tokenization e1){
             // oups, it was not an expression
-            throw new ExpressionException("Evaluate: "+lineToEval+ " tokenization problem: "+ e1.getMessage(), e1);
+            throw new ExpressionException("Evaluate: "+lineToEval+ " => tokenization problem: "+ e1.getMessage(), e1);
         }
         catch(org.apache.commons.jexl3.JexlException.Parsing e2){
             // oups, it was not an expression => use directly the lineToEval
-            throw new ExpressionException("Evaluate: "+lineToEval+ " parsing problem: "+ e2.getMessage(), e2);
+            throw new ExpressionException("Evaluate: "+lineToEval+ " => parsing problem: "+ e2.getMessage(), e2);
         }
         catch(org.apache.commons.jexl3.JexlException.Variable e3){
             // the line contains a variable that does not exists (or it is not a variable)
-            throw new ExpressionException("Evaluate: "+lineToEval+ " not a variable: "+ e3.getMessage(), e3);
+            throw new ExpressionException("Evaluate: "+lineToEval+ " => not a variable: "+ e3.getMessage(), e3);
         }
         catch(Exception e){
-            throw new ExpressionException("Evaluate: "+lineToEval+ " problem: "+ e.getMessage(), e);
+            throw new ExpressionException("Evaluate: "+lineToEval+ " => problem: "+ e.getMessage(), e);
         }
         reporting.info("L'evaluation de: "+lineToEval+ " donne: "+ result);
         return result;

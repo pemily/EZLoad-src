@@ -1,0 +1,30 @@
+---
+field2ErrorMsg: null
+broker: "BourseDirect"
+brokerFileVersion: 1
+name: "Versement fonds"
+enabled: true
+description: null
+ezLoadVersion: 1
+condition: "operation.type == \"Versement fonds\""
+operationDateExpr: "rapport.date"
+operationCompteTypeExpr: "operation.typeCompte"
+operationBrokerExpr: "courtier.nom"
+operationQuantityExpr: "operation.montant"
+operationTypeExpr: "operation.type"
+operationActionNameExpr: "\"LIQUIDITE\""
+operationCountryExpr: "\"\""
+operationAmountExpr: "operation.montant"
+operationDescriptionExpr: "operation.type + \" sur \" + compte.nom"
+portefeuilleValeurExpr: "\"LIQUIDITE\""
+portefeuilleCompteExpr: " operation.typeCompte"
+portefeuilleCourtierExpr: "courtier.nom"
+portefeuilleTickerGoogleFinanceExpr: "\"\""
+portefeuillePaysExpr: "\"\""
+portefeuilleSecteurExpr: "\"\""
+portefeuilleIndustrieExpr: "\"\""
+portefeuilleEligibiliteAbbattement40Expr: "\"\""
+portefeuilleTypeExpr: "\"\""
+portefeuillePrixDeRevientExpr: "\"\""
+portefeuilleQuantiteExpr: " operation.montant"
+portefeuilleDividendeAnnuelExpr: "\"\""

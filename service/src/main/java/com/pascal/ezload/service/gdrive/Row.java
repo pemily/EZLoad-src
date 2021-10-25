@@ -22,8 +22,8 @@ public class Row {
 
     public Row(int nbOfCol){
         this.values = new ArrayList<>(nbOfCol);
-        for (int i = 0; i < nbOfCol; nbOfCol++)
-            this.values.set(i, "");
+        for (int i = 0; i < nbOfCol; i++)
+            this.values.add(i, "");
     }
 
     public EZDate valueDate(int colIndex) {

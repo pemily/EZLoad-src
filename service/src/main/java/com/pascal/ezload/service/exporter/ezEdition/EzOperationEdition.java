@@ -2,12 +2,13 @@ package com.pascal.ezload.service.exporter.ezEdition;
 
 import com.pascal.ezload.service.exporter.ezEdition.data.common.EzLoadOperationEditionData;
 
-public class EzOperationEdition implements EzLoadOperationEditionData {
+public class EzOperationEdition implements EzLoadOperationEditionData, WithErrors {
+
+    private String errors;
 
     private String date;
     private String accountType;
     private String broker;
-    private String account;
     private String quantity;
     private String operationType;
     private String shareName;
@@ -37,14 +38,6 @@ public class EzOperationEdition implements EzLoadOperationEditionData {
 
     public void setBroker(String broker) {
         this.broker = broker;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public String getQuantity() {
@@ -99,12 +92,19 @@ public class EzOperationEdition implements EzLoadOperationEditionData {
         ezData.put(ezLoad_operation_date, date);
         ezData.put(ezLoad_operation_accountType, accountType);
         ezData.put(ezLoad_operation_broker, broker);
-        ezData.put(ezLoad_operation_account, account);
         ezData.put(ezLoad_operation_quantity, quantity);
         ezData.put(ezLoad_operation_operationType, operationType);
         ezData.put(ezLoad_operation_shareName, shareName);
         ezData.put(ezLoad_operation_country, country);
         ezData.put(ezLoad_operation_amount, amount);
         ezData.put(ezLoad_operation_description, description);
+    }
+
+    public String getErrors() {
+        return errors;
+    }
+
+    public void setErrors(String error) {
+        this.errors = error;
     }
 }
