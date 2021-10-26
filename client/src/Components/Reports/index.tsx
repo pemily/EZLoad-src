@@ -4,7 +4,7 @@ import { SourceFileLink } from '../Tools/SourceFileLink';
 import { Operations } from '../Operations';
 import { EzProcess, EzEdition, EzReport } from '../../ez-api/gen-api/EZLoadApi';
 
-export interface Reports {
+export interface ReportsProps {
     reports: EzReport[];
     processRunning: boolean;
     followProcess: (process: EzProcess|undefined) => void;
@@ -58,7 +58,7 @@ function getReportError(index: number, error: string){
     return (<Text key={index} margin={{ horizontal: 'medium'}}>{error}</Text>);      
 }
 
-export function Reports(props: Reports){
+export function Reports(props: ReportsProps){
     return (
         <Box margin="small" >
             <Accordion animate={true} multiple>            

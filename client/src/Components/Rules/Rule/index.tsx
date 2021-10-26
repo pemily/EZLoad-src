@@ -13,7 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 export interface RuleProps {
     readOnly: boolean;
     operation: EzEdition|undefined;
-    ruleDefinition: RuleDefinition; 
+    ruleDefinition: RuleDefinition;
     saveRule: (newRule: RuleDefinition) => void;
     deleteRule: () => void;
 }      
@@ -22,8 +22,7 @@ export function Rule(props: RuleProps){
     const [readOnly, setReadOnly] = useState<boolean>(props.readOnly);
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
-        setReadOnly(props.readOnly || props.ruleDefinition.enabled === undefined || !props.ruleDefinition.enabled || !props.ruleDefinition.name);
-        //console.log("Enabled: ", readOnly, ruleDefinition.enabled );
+        setReadOnly(props.readOnly || props.ruleDefinition.enabled === undefined || !props.ruleDefinition.enabled || !props.ruleDefinition.name);        
     }, [props.readOnly, props.ruleDefinition.name, props.ruleDefinition.enabled]);
 
 

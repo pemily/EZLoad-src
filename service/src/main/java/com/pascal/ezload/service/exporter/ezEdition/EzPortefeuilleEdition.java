@@ -7,7 +7,7 @@ public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, W
     private String errors;
 
     private String valeur;
-    private String account_type;
+    private String accountType;
     private String broker;
     private String tickerGoogleFinance;
     private String country;
@@ -27,12 +27,12 @@ public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, W
         this.valeur = valeur;
     }
 
-    public String getAccount_type() {
-        return account_type;
+    public String getAccountType() {
+        return accountType;
     }
 
-    public void setAccount_type(String account_type) {
-        this.account_type = account_type;
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public String getBroker() {
@@ -117,7 +117,7 @@ public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, W
 
 
     public void fill(EzData data) {
-        data.put(ezLoad_portefeuille_account_type, account_type);
+        data.put(ezLoad_portefeuille_account_type, accountType);
         data.put(ezLoad_portefeuille_broker, broker);
         data.put(ezLoad_portefeuille_tickerGoogle, tickerGoogleFinance);
         data.put(ezLoad_portefeuille_country, country);

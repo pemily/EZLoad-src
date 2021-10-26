@@ -30,29 +30,34 @@ export function EzDataField(props: EzDataProps) {
     }
   ];
   
-
-  const data = props.value && Object.keys(props.value.data!)
+  const data = props.value && props.value?.data && Object.keys(props.value.data)
               .sort((key1, key2) => key1.localeCompare(key2))
               .map(key => { return { name: key, value: props.value!.data![key] }});
 
-  return (          
-      <>      
-        <Button hoverIndicator="background" onClick={() => setOpen(!open)}
-           icon={props.iconInfo ? <CircleInformation color="brand"/> : <Tty color="brand"/>}/>
-        { open && 
-        <Layer onEsc={() => setOpen(false)} onClickOutside={() => setOpen(false)} margin="large" >
-          <Heading margin="small" level="4" color="brand">Données extraites</Heading>
-          <Box overflow="auto">
-            { !props.value && (<Text alignSelf="center">Aucune données</Text>)}
-            { props.value && (<DataTable
-              columns={columns}
-              data={data}
-              onClickRow={(event) => {                
-                props.onSelect && props.onSelect(event.datum);
-              }}/> )}
-            </Box>   
-            <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            
-        </Layer> }
+  return  (          
+      <>  
+      {props.value && props.value?.data && (    
+        <>
+          <Button hoverIndicator="background" onClick={() => setOpen(!open)}
+             icon={props.iconInfo ? <CircleInformation color="brand"/> : <Tty color="brand"/>}/>
+          { open && 
+            <Layer onEsc={() => setOpen(false)} onClickOutside={() => setOpen(false)} margin="large" >
+              <Heading margin="small" level="4" color="brand">Données extraites</Heading>
+              <Box overflow="auto">
+                { !props.value && (<Text alignSelf="center">Aucune données</Text>)}
+                { props.value && (<DataTable
+                  columns={columns}
+                  data={data}
+                  onClickRow={(event) => {                
+                    props.onSelect && props.onSelect(event.datum);
+                    setOpen(false);
+                  }}/> )}
+                </Box>   
+                <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            
+            </Layer> 
+          }
+        </>)
+      }
       </>
   );
 }

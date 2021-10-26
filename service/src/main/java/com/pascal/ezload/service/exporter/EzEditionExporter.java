@@ -61,11 +61,7 @@ public class EzEditionExporter {
     }
 
     private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation, EzData ezData) {
-        EzEdition ezEdition = rulesEngine.transform(ezPortfolioProxy, fromEzOperation, ezData);
-        // ici je modifie le ezPortoflio.MonPortefeuille pour appliquer les calculs
-        if (ezEdition.getEzPortefeuilleEdition() != null)
-            ezPortfolioProxy.applyOnPortefeuille(ezEdition.getEzPortefeuilleEdition());
-        return ezEdition;
+        return rulesEngine.transform(ezPortfolioProxy, fromEzOperation, ezData);
     }
 
 }

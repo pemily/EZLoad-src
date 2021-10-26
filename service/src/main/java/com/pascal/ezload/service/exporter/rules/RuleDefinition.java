@@ -1,8 +1,10 @@
 package com.pascal.ezload.service.exporter.rules;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.util.StringValue;
 
 public class RuleDefinition extends RuleDefinitionSummary {
+
     public enum Field{name, description, condition, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
         operationQuantityExpr, operationTypeExpr, operationActionNameExpr, operationCountryExpr, operationAmountExpr,
         operationDescriptionExpr, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,

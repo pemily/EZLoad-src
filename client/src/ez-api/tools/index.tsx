@@ -60,18 +60,17 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
 }
 
 
-export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){    
-  console.log("Saving settings", settings);
+export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){      
   jsonCall(ezApi.home.saveSettings(settings))
     .then(r => updModel(r))
-    .catch(e => console.log("Save Settings Error: ", e));
+    .catch(e => console.error("Save Settings Error: ", e));
 }
 
 export function savePassword(courtier: 'BourseDirect', username: string|undefined, password: string|undefined, updModel: (authInfo: AuthInfo) => void){
     const newAuth = {username, password};
     jsonCall(ezApi.security.createUserPassword({courtier}, newAuth))
     .then(r => updModel(newAuth))
-    .catch(e => console.log("Save Password Error: ", e));
+    .catch(e => console.error("Save Password Error: ", e));
 }
 
 
