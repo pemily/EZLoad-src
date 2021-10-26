@@ -1,3 +1,5 @@
+/* eslint-disable no-eval */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Fragment, useEffect } from 'react';
 import { Box, Text } from "grommet";
 import { stream, ezApi, valued } from '../../../ez-api/tools';
@@ -35,7 +37,7 @@ export function ViewLog(props: ViewLogProps) {
                 }
                 return true; // stop the streaming
             }, props.processFinished)
-            .catch((e) => {console.log(e); props.processFinished()}); 
+            .catch((e) => {console.error(e); props.processFinished()}); 
 
             return function cleanup(){
                 dynLogger.stop();
@@ -43,6 +45,7 @@ export function ViewLog(props: ViewLogProps) {
         }
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(showLog, []) // Le [] fait que le useEffect ne sera appelé qu'une fois apres le 1er rendu
 
     

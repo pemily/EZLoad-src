@@ -112,7 +112,7 @@ export function Config(props: ConfigProps) {
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
                                             .then(props.followProcess)
-                                            .catch(e => console.log(e)) }
+                                            .catch(e => console.error(e)) }
                                             size="small" icon={<Validate size="small"/>} label="Valider la connection"/>
                                </Box>
                            </Help>
@@ -261,7 +261,7 @@ export function Config(props: ConfigProps) {
                                     disabled={props.readOnly} onClick={() =>
                                         jsonCall(ezApi.home.searchAccounts({courtier: "BourseDirect", chromeVersion: getChromeVersion()}))
                                         .then(props.followProcess)
-                                        .catch(e => console.log(e))
+                                        .catch(e => console.error(e))
                                     }
                                     size="small" icon={<Add size='small'/>} label="Rechercher"/>
                             </Box>

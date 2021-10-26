@@ -16,8 +16,6 @@ public class MonPortefeuille implements MonPortefeuilleData {
     private final SheetValues portefeuille;
     private final List<Row> newValeurs = new ArrayList<>();
 
-    private static final String LIQUIDITE = "LIQUIDITE";
-
     public static final int VALEUR_COL = 0;
     public static final int ACCOUNT_TYPE_COL = 1;
     public static final int BROKER_COL = 2;
@@ -42,7 +40,9 @@ public class MonPortefeuille implements MonPortefeuilleData {
     }
 
     public Optional<Row> searchRow(String valeur){
-        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
+        Optional<Row> existingRow = this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
+        if (existingRow.isPresent()) return existingRow;
+        return newValeurs.stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
     }
 
     public Row addNewRow(String share) {
@@ -60,7 +60,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public void apply(EzPortefeuilleEdition ezPortefeuilleEdition) {
         Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getValeur());
         Row row = rowOpt.orElse(addNewRow(ezPortefeuilleEdition.getValeur()));
-        row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccount_type());
+        row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccountType());
         row.setValue(BROKER_COL, ezPortefeuilleEdition.getBroker());
         row.setValue(TICKER_COL, ezPortefeuilleEdition.getTickerGoogleFinance());
         row.setValue(COUNTRY_COL, ezPortefeuilleEdition.getCountry());

@@ -39,11 +39,9 @@ export function App(){
         setActiveIndex(EXECUTION_TAB_INDEX); //switch to the execution tab
     }
 
-    function reloadAllData(){
-        console.log("Loading Data...");
+    function reloadAllData(){        
         jsonCall(ezApi.home.getMainData())
-        .then(r =>  {            
-             console.log("Data loaded: ", r);
+        .then(r =>  {                         
              setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);             
              setProcessRunning(r.processRunning);
              setReports(r.reports);
@@ -52,17 +50,15 @@ export function App(){
              setMainSettings(r.mainSettings);                          
         })
         .catch((error) => {
-            console.log("Error while loading Data.", error);
+            console.error("Error while loading Data.", error);
         });
 
-        console.log("Loading BourseDirect Username...");
         jsonCall(ezApi.security.getAuthWithDummyPassword({courtier: "BourseDirect"}))
-        .then(resp => {
-            console.log("BourseDirect authInfo loaded: ", resp);
+        .then(resp => {            
             setBourseDirectAuthInfo(resp);
         })
         .catch((error) => {
-            console.log("Error while loading BourseDirect Username", error);
+            console.error("Error while loading BourseDirect Username", error);
         });
     }
 
@@ -98,19 +94,18 @@ export function App(){
             }
             return rule;
         })
-        .catch(e => console.log("Save Password Error: ", e));
+        .catch(e => console.error("Save Password Error: ", e));
     }
 
     function changeRuleSelection(newRule: RuleDefinitionSummary) : void {
         jsonCall(ezApi.rule.getRule(newRule.broker!, newRule.brokerFileVersion!, newRule.name!))
-        .then(ruleDef => {
-            console.log("new selection:", ruleDef);
+        .then(ruleDef => {            
             if (ruleDef === undefined)
                 setSelectedRule(undefined);                
             else
                 setSelectedRule({oldName: ruleDef.name, ruleDefinition: ruleDef});                            
         })
-        .catch(e => console.log(e));
+        .catch(e => console.error(e));
     }
 
     function deleteSelectedRule(){
@@ -190,13 +185,13 @@ export function App(){
                                         disabled={processRunning} onClick={() => 
                                             jsonCall(ezApi.engine.analyze())
                                             .then(followProcess)
-                                            .catch(e => console.log(e) )
+                                            .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
                                         <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
                                                     jsonCall(ezApi.engine.upload())
                                                     .then(followProcess)
-                                                    .catch(e => console.log(e))
+                                                    .catch(e => console.error(e))
                                                 }
                                                 size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                 </Box>

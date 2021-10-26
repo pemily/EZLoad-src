@@ -1,4 +1,4 @@
-import { Box, Anchor, List, Text } from "grommet";
+import { Box, Anchor, List } from "grommet";
 import { Operation } from '../Operation';
 import { EzDataField } from '../Tools/EzDataField';
 import { ruleTitle } from '../../ez-api/tools';

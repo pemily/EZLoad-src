@@ -19,7 +19,7 @@ export function BourseDirect(props: BourseDirectProps){
                 disabled={props.readOnly} onClick={() => 
                     jsonCall(ezApi.engine.download({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
                     .then(process => props.followProcess(process))
-                    .catch(e => console.log(e))
+                    .catch(e => console.error(e))
                 }
                 size="small" icon={<Download size='small'/>} label="Télécharger les nouveaux Relevés"/>                             
         </Box>

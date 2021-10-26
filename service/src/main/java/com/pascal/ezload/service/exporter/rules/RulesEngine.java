@@ -5,15 +5,12 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MonPortefeuille;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
-import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData.broker_version;
@@ -132,14 +129,16 @@ public class RulesEngine {
         else {
             if (ezPortefeuilleEdition.hasErrors()) return ezPortefeuilleEdition;
             portfolioProxy.fillFromMonPortefeuille(data, valeur);
-            return applyRuleForPortefeuille(ezPortefeuilleEdition, ruleDefinition, data);
+            applyRuleForPortefeuille(ezPortefeuilleEdition, ruleDefinition, data);
+            portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
+            return ezPortefeuilleEdition;
         }
     }
 
     private EzPortefeuilleEdition applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , RuleDefinition ruleDefinition, EzData data) {
 
         ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleValeurExpr(), data));
-        ezPortefeuilleEdition.setAccount_type(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleCompteExpr(), data));
+        ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleCompteExpr(), data));
         ezPortefeuilleEdition.setBroker(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleCourtierExpr(), data));
         ezPortefeuilleEdition.setTickerGoogleFinance(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleTickerGoogleFinanceExpr(), data));
         ezPortefeuilleEdition.setCountry(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuillePaysExpr(), data));
@@ -152,7 +151,8 @@ public class RulesEngine {
         ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleDividendeAnnuelExpr(), data));
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)
-        ezPortefeuilleEdition.fill(data);
+        // I comment the following line, because it add confusion in the variable we can use in the rule
+        // ezPortefeuilleEdition.fill(data);
 
         return ezPortefeuilleEdition;
     }
