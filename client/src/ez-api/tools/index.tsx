@@ -1,6 +1,7 @@
 import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
 
-export const ezApi = new Api({baseUrl:"http://localhost:8080/EZLoad/api"}); // TODO update => remove the 8080 before the production, the port is dynamically computed
+console.log("TODO change the url");
+export const ezApi = new Api({baseUrl:"http://localhost:3000/EZLoad/api"}); // TODO update => remove the 3000 before the production, the port is dynamically computed
 
 export interface SelectedRule {
   ruleDefinition: RuleDefinition;

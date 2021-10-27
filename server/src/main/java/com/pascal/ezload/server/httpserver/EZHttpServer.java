@@ -1,6 +1,5 @@
 package com.pascal.ezload.server.httpserver;
 
-import com.pascal.ezload.server.httpserver.handler.HttpMethodOverrideEnabler;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -48,7 +47,6 @@ public class EZHttpServer {
 
         ResourceConfig config = new ResourceConfig();
         config.register(configBinder);
-        config.register(HttpMethodOverrideEnabler.class);
         config.packages(EZHttpServer.class.getPackage().getName());
 
         ServletHolder serHol = new ServletHolder(new ServletContainer(config));
