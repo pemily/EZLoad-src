@@ -52,9 +52,6 @@ public class EzEditionExporter {
             fromEzModel.fill(ezData);
             EzEdition edit = loadOperation(ezPortfolioProxy, op, ezData);
             editions.add(edit);
-            if (edit.getErrors().size() > 0) {
-                break;
-            }
         }
         ezReport.setEzEditions(editions);
         return ezReport;

@@ -39,10 +39,11 @@ public class EzData {
 
     @JsonIgnore
     public void put(String key, String value){
-        if (containsKey(key) && !Objects.equals(value, data.get(key)))
+        String val = value == null ? "" : value;
+        if (containsKey(key) && !Objects.equals(val, data.get(key)))
             throw new RuntimeException("There is already a variable with this key: "+key+" current Value:"
-                    +this.data.get(key)+" new Value: "+value);
-        this.data.put(key, value);
+                    +this.data.get(key)+" new Value: "+val);
+        this.data.put(key, val);
     }
 
     @JsonIgnore

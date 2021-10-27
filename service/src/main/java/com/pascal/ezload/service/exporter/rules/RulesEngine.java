@@ -39,9 +39,14 @@ public class RulesEngine {
                 .collect(Collectors.toList());
         if (compatibleRules.size() == 0){
             ezEdition.getErrors().add(NO_RULE_FOUND);
+            new EzOperationEdition().fill(ezData); // même si erreur, je rajoute des data, pour pouvoir voir dans la UI ce que l'on a récupéré
+            ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
         }
         else if (compatibleRules.size() > 1){
             ezEdition.getErrors().add("Il y a plusieurs règles de transformation pour cette opération: "+compatibleRules);
+            new EzOperationEdition().fill(ezData); // même si erreur, je rajoute des data, pour pouvoir voir dans la UI ce que l'on a récupéré
+            ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
+
         }
         else {
             RuleDefinition ruleDef = compatibleRules.get(0);
@@ -51,10 +56,14 @@ public class RulesEngine {
                 EzOperationEdition ezOperationEdition = applyRuleForOperation(ruleDef, ezData);
                 if (ezOperationEdition.hasErrors()){
                     ezEdition.getErrors().addAll(ezOperationEdition.errorsAsList());
+                    ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+                    ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
                 }
                 else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezOperationEdition))) {
                     if (StringUtils.isBlank(ezOperationEdition.getDate())) {
                         reporting.info("Cette opération est ignorée");
+                        ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+                        ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
                     } else {
                         ezEdition.setEzOperationEdition(ezOperationEdition);
                         ezEdition.getEzOperationEdition().fill(ezData);
@@ -122,13 +131,14 @@ public class RulesEngine {
         EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
         String valeur = eval(ezPortefeuilleEdition, ruleDefinition.getPortefeuilleValeurExpr(), data);
+        portfolioProxy.fillFromMonPortefeuille(data, valeur);
+
         if (StringUtils.isBlank(valeur)) {
             reporting.info("Pas d'impact sur l'onglet MonPortefeuille pour cette opération");
             return null;
         }
         else {
             if (ezPortefeuilleEdition.hasErrors()) return ezPortefeuilleEdition;
-            portfolioProxy.fillFromMonPortefeuille(data, valeur);
             applyRuleForPortefeuille(ezPortefeuilleEdition, ruleDefinition, data);
             portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
             return ezPortefeuilleEdition;

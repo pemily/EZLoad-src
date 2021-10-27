@@ -93,6 +93,12 @@ export function Rule(props: RuleProps){
                 }}/>     
             </Box>
         </Box>
+        <TextAreaField id="description" label="Description" value={props.ruleDefinition.description}
+                isRequired={false} errorMsg={props.ruleDefinition.field2ErrorMsg?.description}
+                readOnly={readOnly}
+                onChange={newValue => {
+                    saveRule({ ...props.ruleDefinition, description: newValue})
+                }}/>        
         <Box direction="row" align="Center" margin="small">
             <TextAreaField id="condition" label="Condition" value={props.ruleDefinition.condition}
                 isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.condition}

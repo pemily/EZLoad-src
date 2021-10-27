@@ -3,6 +3,7 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -22,14 +23,14 @@ public class ExpressionEvaluator {
 
     public static ExpressionEvaluator getSingleton(){ return singleton; }
 
-    public static ExpressionEvaluator newInstance(){
+    private static ExpressionEvaluator newInstance(){
         return new ExpressionEvaluator();
     }
 
     private ExpressionEvaluator(){ }
 
     public Object evaluateAsObj(Reporting reporting, MainSettings mainSettings, String lineToEval, EzData allVariables) {
-        Object result = null;
+        Object result;
         try {
             // try to create an expression with the line to eval
             JexlExpression expression = jexl.createExpression(lineToEval);
@@ -73,13 +74,15 @@ public class ExpressionEvaluator {
     public String evaluateAsString(Reporting reporting, MainSettings mainSettings, String lineToEval, EzData allVariables) {
         Object resultObj = evaluateAsObj(reporting, mainSettings, lineToEval, allVariables);
 
-        if (resultObj != null && !(resultObj instanceof String)) {
-            throw new IllegalStateException("La condition: "+lineToEval+" ne retourne pas une String, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
-        }
         if (resultObj == null){
-            throw new IllegalStateException("La condition: "+lineToEval+" retourne null!!");
+            throw new IllegalStateException("L'expression: "+lineToEval+" retourne null!!");
         }
-        return (String) resultObj;
+        if (resultObj instanceof Float || resultObj instanceof Double){
+            // simplify if possible, in case the result of the expression is a float: 5000.00
+            // convert it into an int if possible to obtain a string: 5000
+            return ModelUtils.normalizeAmount(resultObj + "");
+        }
+        return resultObj+"";
     }
 
     static class ExpressionException extends RuntimeException {

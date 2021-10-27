@@ -3,6 +3,7 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.jexl3.JexlContext;
 
 
@@ -26,7 +27,23 @@ public class VariableResolver  implements JexlContext {
             return new SystemFunction();
         }
         // search if the variable is a in the allVariables map
-        return allVariables.get(name);
+        String v = allVariables.get(name);
+        if (v != null){
+            try {
+                int i = ModelUtils.str2Int(v);
+                return i;
+            }
+            catch(NumberFormatException e){
+                try {
+                    float f = ModelUtils.str2Float(v);
+                    return f;
+                }
+                catch(NumberFormatException e2){
+                    return v;
+                }
+            }
+        }
+        return v;
     }
 
     @Override

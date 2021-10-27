@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class FinanceToolsTest {
 
-    // @Test
+    @Test
     public void testSearchBourseDirect() throws IOException {
         EZAction action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "US92936U1097");
         assertNotNull(action);

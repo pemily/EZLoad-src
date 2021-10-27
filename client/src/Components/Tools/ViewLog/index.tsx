@@ -32,7 +32,10 @@ export function ViewLog(props: ViewLogProps) {
             stream(ezApi.home.viewLogProcess(), (update) => { 
                 if (!dynLogger.isStopped()){
                     const newCommand = update.replaceAll('<script>', '').replaceAll('</script>', ';');
-                    eval(newCommand);           
+                    try{
+                        eval(newCommand);           
+                    }
+                    catch(e2) {console.error("Error while evaluating: ", newCommand); return true;};
                     return false; // do not stop the streaming
                 }
                 return true; // stop the streaming
