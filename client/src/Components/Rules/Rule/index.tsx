@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Trash, HelpOption } from 'grommet-icons';
-import { Box, Heading, Text, Button, Anchor } from "grommet";
+import { Trash, HelpOption, Add, Duplicate } from 'grommet-icons';
+import { Box, Heading, Text, Button, Anchor, List } from "grommet";
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
 import { CheckBoxField } from '../../Tools/CheckBoxField';
 import { EzDataField, EzSingleData } from '../../Tools/EzDataField';
-import { EzEdition, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
+import { EzEdition, RuleDefinition, PortefeuilleRule } from '../../../ez-api/gen-api/EZLoadApi';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
@@ -15,6 +15,7 @@ export interface RuleProps {
     operation: EzEdition|undefined;
     ruleDefinition: RuleDefinition;
     saveRule: (newRule: RuleDefinition) => void;
+    duplicateRule: (newRule: RuleDefinition) => void;
     deleteRule: () => void;
 }      
 
@@ -31,7 +32,7 @@ export function Rule(props: RuleProps){
     }
     
     function append(expr: string|undefined, data: EzSingleData) : string {
-        if (expr === undefined || expr === null) return data.name;
+        if (expr === undefined || expr === null || expr === '' || expr === '""') return data.name;
         return expr + ' ' + data.name;
     }
 
@@ -51,7 +52,7 @@ export function Rule(props: RuleProps){
             </Box>
         );
     }
-
+    
     return (
         <>
         <Box> 
@@ -72,6 +73,15 @@ export function Rule(props: RuleProps){
                     onChange={newValue => {
                         saveRule({ ...props.ruleDefinition, name: newValue})
                     }}/>
+                
+                <Button key={"duplicate"} size="small" alignSelf="end"
+                    disabled={props.readOnly}
+                    icon={<Duplicate size='medium'/>} onClick={() =>{
+                        props.duplicateRule({
+                            ...props.ruleDefinition,
+                            name: props.ruleDefinition.name + " (Copie)"
+                        })
+                }}/>     
 
                 <Button key={"delBD"} size="small" alignSelf="end"
                     disabled={props.readOnly}
@@ -93,12 +103,14 @@ export function Rule(props: RuleProps){
                 }}/>     
             </Box>
         </Box>
-        <TextAreaField id="description" label="Description" value={props.ruleDefinition.description}
-                isRequired={false} errorMsg={props.ruleDefinition.field2ErrorMsg?.description}
-                readOnly={readOnly}
-                onChange={newValue => {
-                    saveRule({ ...props.ruleDefinition, description: newValue})
-                }}/>        
+        <Box align="Center" margin="small">
+            <TextAreaField id="description" label="Description" value={props.ruleDefinition.description}
+                    isRequired={false} errorMsg={props.ruleDefinition.field2ErrorMsg?.description}
+                    readOnly={readOnly}
+                    onChange={newValue => {
+                        saveRule({ ...props.ruleDefinition, description: newValue})
+                    }}/>        
+        </Box>
         <Box direction="row" align="Center" margin="small">
             <TextAreaField id="condition" label="Condition" value={props.ruleDefinition.condition}
                 isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.condition}
@@ -111,87 +123,143 @@ export function Rule(props: RuleProps){
         </Box>
 
         <Box margin="small"  border="all" background="light-1" align="center">
-            <Heading level="3">Mes Opérations</Heading>
-            <Box direction="row-responsive">
-            {cellData("Date", props.ruleDefinition.operationDateExpr, props.ruleDefinition.field2ErrorMsg?.operationDateExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationDateExpr: newVal});
-            })}
+            <Box direction="row">
+                <Heading level="3">Mes Opérations</Heading>
+                <Box margin="none" pad="none" alignSelf="center">
+                { (props.ruleDefinition.operationRule === undefined || props.ruleDefinition.operationRule === null)                     
+                    && (<Button icon={<Add size="small"/>} label="Nouveau" size="small"
+                    onClick={() =>  saveRule({...props.ruleDefinition, operationRule: {}})}/>) }
+                </Box>
+            </Box>
+            { props.ruleDefinition.operationRule
+                && (<Button alignSelf="end" margin="none" icon={<Trash size="medium" color="status-critical"/>} onClick={() =>
+                    confirmAlert({
+                        title: 'Etes vous sûr de vouloir supprimer cette règle pour l\'opération?',                        
+                        buttons: [
+                            {
+                                label: 'Oui',
+                                onClick: () => saveRule({...props.ruleDefinition, operationRule: undefined})
+                            },
+                            {
+                            label: 'Non',
+                                onClick: () => {}
+                            }
+                        ]
+                        })}/>) }
 
-            {cellData("Compte", props.ruleDefinition.operationCompteTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationCompteTypeExpr: newVal});
-            })}
-                    
-            {cellData("Courtier", props.ruleDefinition.operationBrokerExpr, props.ruleDefinition.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationBrokerExpr: newVal});
-            })}
+            { props.ruleDefinition.operationRule
+                && (
+                <Box direction="row-responsive">
+                {cellData("Date", props.ruleDefinition.operationRule.operationDateExpr, props.ruleDefinition.field2ErrorMsg?.operationDateExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule, operationDateExpr: newVal}});
+                })}
 
-            {cellData("Quantité", props.ruleDefinition.operationQuantityExpr, props.ruleDefinition.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationQuantityExpr: newVal});
-            })}
+                {cellData("Compte", props.ruleDefinition.operationRule.operationCompteTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationCompteTypeExpr: newVal}});
+                })}
+                        
+                {cellData("Courtier", props.ruleDefinition.operationRule.operationBrokerExpr, props.ruleDefinition.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationBrokerExpr: newVal}});
+                })}
 
-            {cellData("Opération", props.ruleDefinition.operationTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationTypeExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationTypeExpr: newVal});
-            })}            
-            
-            {cellData("Valeur", props.ruleDefinition.operationActionNameExpr, props.ruleDefinition.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationActionNameExpr: newVal});
-            })}
-            
-            {cellData("Pays", props.ruleDefinition.operationCountryExpr, props.ruleDefinition.field2ErrorMsg?.operationCountryExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationCountryExpr: newVal});
-            })}
+                {cellData("Quantité", props.ruleDefinition.operationRule.operationQuantityExpr, props.ruleDefinition.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationQuantityExpr: newVal}});
+                })}
 
-            {cellData("Montant", props.ruleDefinition.operationAmountExpr, props.ruleDefinition.field2ErrorMsg?.operationAmountExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationAmountExpr: newVal});
-            })}    
+                {cellData("Opération", props.ruleDefinition.operationRule.operationTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationTypeExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationTypeExpr: newVal}});
+                })}            
+                
+                {cellData("Valeur", props.ruleDefinition.operationRule.operationActionNameExpr, props.ruleDefinition.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationActionNameExpr: newVal}});
+                })}
+                
+                {cellData("Pays", props.ruleDefinition.operationRule.operationCountryExpr, props.ruleDefinition.field2ErrorMsg?.operationCountryExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationCountryExpr: newVal}});
+                })}
 
-            {cellData("Information", props.ruleDefinition.operationDescriptionExpr, props.ruleDefinition.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
-                return saveRule({...props.ruleDefinition, operationDescriptionExpr: newVal});
-            })} 
-            </Box>          
+                {cellData("Montant", props.ruleDefinition.operationRule.operationAmountExpr, props.ruleDefinition.field2ErrorMsg?.operationAmountExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationAmountExpr: newVal}});
+                })}    
+
+                {cellData("Information", props.ruleDefinition.operationRule.operationDescriptionExpr, props.ruleDefinition.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
+                    return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationDescriptionExpr: newVal}});
+                })} 
+                </Box>          
+            )}
         </Box>
         <Box margin="small" border="all" background="light-1" align="center">
-            <Heading level="3">Mon Portefeuille</Heading>
-            <Box direction="row-responsive">
-                {cellData("Valeur", props.ruleDefinition.portefeuilleValeurExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleValeurExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleValeurExpr: newVal});
-                })} 
-                {cellData("Compte", props.ruleDefinition.portefeuilleCompteExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleCompteExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleCompteExpr: newVal});
-                })} 
-                {cellData("Courtier", props.ruleDefinition.portefeuilleCourtierExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleCourtierExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleCourtierExpr: newVal});
-                })} 
-                {cellData("Ticker Google", props.ruleDefinition.portefeuilleTickerGoogleFinanceExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleTickerGoogleFinanceExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleTickerGoogleFinanceExpr: newVal});
-                })}   
-                {cellData("Pays", props.ruleDefinition.portefeuillePaysExpr, props.ruleDefinition.field2ErrorMsg?.portefeuillePaysExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuillePaysExpr: newVal});
-                })}   
-                {cellData("Secteur", props.ruleDefinition.portefeuilleSecteurExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleSecteurExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleSecteurExpr: newVal});
-                })}       
-            </Box>                
-            <Box direction="row-responsive">
-                {cellData("Industrie", props.ruleDefinition.portefeuilleIndustrieExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleIndustrieExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleIndustrieExpr: newVal});
-                })}             
-                {cellData("Eligibilité Abattement 40%", props.ruleDefinition.portefeuilleEligibiliteAbbattement40Expr, props.ruleDefinition.field2ErrorMsg?.portefeuilleEligibiliteAbbattement40Expr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleEligibiliteAbbattement40Expr: newVal});
-                })}     
-                {cellData("Type", props.ruleDefinition.portefeuilleTypeExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleTypeExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleTypeExpr: newVal});
-                })}     
-                {cellData("Prix de Revient Unitaire", props.ruleDefinition.portefeuillePrixDeRevientExpr, props.ruleDefinition.field2ErrorMsg?.portefeuillePrixDeRevientExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuillePrixDeRevientExpr: newVal});
-                })}     
-                {cellData("Quantité", props.ruleDefinition.portefeuilleQuantiteExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleQuantiteExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleQuantiteExpr: newVal});
-                })}     
-                 {cellData("Dividende annuel", props.ruleDefinition.portefeuilleDividendeAnnuelExpr, props.ruleDefinition.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr, (newVal) => {
-                    return saveRule({...props.ruleDefinition, portefeuilleDividendeAnnuelExpr: newVal});
-                })}  
-            </Box>            
+            <Box direction="row">
+                <Heading level="3">Mon Portefeuille</Heading>
+                <Box margin="none" pad="none" alignSelf="center">
+                { (props.ruleDefinition.portefeuilleRules !== undefined && props.ruleDefinition.portefeuilleRules.length < 2) // 2 portefeuille rules max, one for the valeur and one for the LIQUIDITE                    
+                    && (<Button icon={<Add size="small"/>} label="Nouveau" size="small"
+                    onClick={() => saveRule({...props.ruleDefinition, portefeuilleRules: [...props.ruleDefinition.portefeuilleRules!, {}]})}/>) }
+                </Box>
+            </Box>
+            <List data={props.ruleDefinition.portefeuilleRules}>
+                {(datanum: PortefeuilleRule) => {
+                return (
+                <>
+                <Button alignSelf="end" margin="none" icon={<Trash size="medium" color="status-critical"/>} 
+                    onClick={() => 
+                        confirmAlert({
+                            title: 'Etes vous sûr de vouloir supprimer cette règle pour le portefeuille?',                        
+                            buttons: [
+                                {
+                                    label: 'Oui',
+                                    onClick: () => saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.filter(item => item !== datanum)})
+                                },
+                                {
+                                label: 'Non',
+                                    onClick: () => {}
+                                }
+                            ]
+                            })
+                    }/>
+
+                <Box direction="row-responsive">
+                    {cellData("Valeur", datanum.portefeuilleValeurExpr, datanum.field2ErrorMsg?.portefeuilleValeurExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleValeurExpr: newVal})});
+                    })} 
+                    {cellData("Compte", datanum.portefeuilleCompteExpr, datanum.field2ErrorMsg?.portefeuilleCompteExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCompteExpr: newVal})});
+                    })} 
+                    {cellData("Courtier", datanum.portefeuilleCourtierExpr, datanum.field2ErrorMsg?.portefeuilleCourtierExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCourtierExpr: newVal})});
+                    })} 
+                    {cellData("Ticker Google", datanum.portefeuilleTickerGoogleFinanceExpr, datanum.field2ErrorMsg?.portefeuilleTickerGoogleFinanceExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTickerGoogleFinanceExpr: newVal})});
+                    })}   
+                    {cellData("Pays", datanum.portefeuillePaysExpr, datanum.field2ErrorMsg?.portefeuillePaysExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePaysExpr: newVal})});
+                    })}   
+                    {cellData("Secteur", datanum.portefeuilleSecteurExpr, datanum.field2ErrorMsg?.portefeuilleSecteurExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleSecteurExpr: newVal})});
+                    })}       
+                </Box>                
+                <Box direction="row-responsive">
+                    {cellData("Industrie", datanum.portefeuilleIndustrieExpr, datanum.field2ErrorMsg?.portefeuilleIndustrieExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleIndustrieExpr: newVal})});
+                    })}             
+                    {cellData("Eligibilité Abattement 40%", datanum.portefeuilleEligibiliteAbbattement40Expr, datanum.field2ErrorMsg?.portefeuilleEligibiliteAbbattement40Expr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleEligibiliteAbbattement40Expr: newVal})});
+                    })}     
+                    {cellData("Type", datanum.portefeuilleTypeExpr, datanum.field2ErrorMsg?.portefeuilleTypeExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTypeExpr: newVal})});
+                    })}     
+                    {cellData("Prix de Revient Unitaire", datanum.portefeuillePrixDeRevientExpr, datanum.field2ErrorMsg?.portefeuillePrixDeRevientExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePrixDeRevientExpr: newVal})});
+                    })}     
+                    {cellData("Quantité", datanum.portefeuilleQuantiteExpr, datanum.field2ErrorMsg?.portefeuilleQuantiteExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleQuantiteExpr: newVal})});
+                    })}     
+                    {cellData("Dividende annuel", datanum.portefeuilleDividendeAnnuelExpr, datanum.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleDividendeAnnuelExpr: newVal})});
+                    })}  
+                </Box>     
+                </> )}}
+            </List> 
         </Box>
 
         </>

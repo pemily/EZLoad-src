@@ -10,6 +10,7 @@ export interface RulesTabProps {
     rules: RuleDefinitionSummary[];
     deleteSelectedRule: () => void;
     saveRule: (newRule: RuleDefinition) => void;
+    duplicateRule: (newRule: RuleDefinition) => void;
     changeSelection: (newSelection: RuleDefinitionSummary) => void;
 }      
 
@@ -28,6 +29,7 @@ export function RulesTab(props: RulesTabProps){
         { props.ruleDefinitionSelected && (
             <Rule readOnly={props.readOnly}
                 saveRule={props.saveRule}
+                duplicateRule={props.duplicateRule}
                 deleteRule={props.deleteSelectedRule}
                 operation={props.operation}
                 ruleDefinition={props.ruleDefinitionSelected?.ruleDefinition}/>

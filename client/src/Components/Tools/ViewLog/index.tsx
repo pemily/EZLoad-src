@@ -35,7 +35,7 @@ export function ViewLog(props: ViewLogProps) {
                     try{
                         eval(newCommand);           
                     }
-                    catch(e2) {console.error("Error while evaluating: ", newCommand); return true;};
+                    catch(e2) {console.error("Error while evaluating: ", newCommand); window.location.reload(); return true;};
                     return false; // do not stop the streaming
                 }
                 return true; // stop the streaming

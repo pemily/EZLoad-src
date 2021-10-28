@@ -40,11 +40,11 @@ public class RulesHandler {
     }
 
     @GET
-    @Path("{broker}/{brokerFileVersion}/{ruleName}")
+    @Path("{broker}/{brokerFileVersion}")
     @Produces(MediaType.APPLICATION_JSON)
     public RuleDefinition getRule(@NotNull @PathParam("broker") EnumEZBroker broker,
                                   @NotNull @PathParam("brokerFileVersion") int brokerFileVersion,
-                                  @NotNull @PathParam("ruleName") String ruleName) throws Exception {
+                                  @NotNull @QueryParam("ruleName") String ruleName) throws Exception {
         return new RulesManager(SettingsManager.getInstance().loadProps())
                 .getAllRules()
                 .stream()

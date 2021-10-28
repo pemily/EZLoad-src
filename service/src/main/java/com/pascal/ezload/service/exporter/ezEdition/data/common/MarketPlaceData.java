@@ -9,7 +9,7 @@ public interface MarketPlaceData {
     String market_acronym = "marche.acronyme";
     String market_countryCode = "marche.codePays";
     String market_country = "marche.pays";
-    String market_googleTicker = "marche.tickerGoogle";
+    String market_googleCode = "marche.codeGoogle";
     String market_currencyCode = "marche.devise.code";
     String market_currencySymbol = "marche.devise.symbole";
 

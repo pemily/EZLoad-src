@@ -58,7 +58,7 @@ public class EZMarketPlace implements MarketPlaceData {
         data.put(market_acronym, acronym);
         data.put(market_countryCode, country.getCode());
         data.put(market_country, country.getName());
-        data.put(market_googleTicker, googleFinanceCode);
+        data.put(market_googleCode, googleFinanceCode);
         data.put(market_currencyCode, currency.getCode());
         data.put(market_currencySymbol, currency.getSymbol());
     }

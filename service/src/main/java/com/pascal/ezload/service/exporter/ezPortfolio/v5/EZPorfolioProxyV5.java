@@ -72,11 +72,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                             if (ezEdition.getEzOperationEdition() != null) {
                                 operations.newOperation(ezEdition.getEzOperationEdition());
                                 nbOperationSaved.incrementAndGet();
-                                if (ezEdition.getEzPortefeuilleEdition() != null){
-                                    ezPortfolio.getMonPortefeuille().apply(ezEdition.getEzPortefeuilleEdition());
+                                for (EzPortefeuilleEdition ezPortefeuilleEdition : ezEdition.getEzPortefeuilleEditions()){
+                                    ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition);
                                 }
                             }
-                            else if (ezEdition.getEzPortefeuilleEdition() != null){
+                            else if (!ezEdition.getEzPortefeuilleEditions().isEmpty()){
                                 throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
                                         +ezEdition.getRuleDefinitionSummary().getBroker()+"_v"+ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
                                         +ezEdition.getRuleDefinitionSummary().getName());

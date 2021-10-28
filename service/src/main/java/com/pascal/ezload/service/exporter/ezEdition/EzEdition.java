@@ -10,18 +10,18 @@ import java.util.List;
 public class EzEdition {
 
     private RuleDefinitionSummary ruleDefinitionSummary;
-    private EzOperationEdition ezOperationEdition;
-    private EzPortefeuilleEdition ezPortefeuilleEdition;
+    private EzOperationEdition ezOperationEdition; // can be null if no impact
+    private List<EzPortefeuilleEdition> ezPortefeuilleEditions;
     private List<String> errors = new LinkedList<>();
 
     private EzData data = new EzData();
 
     public EzEdition(){}
 
-    public EzEdition(EZOperation fromEzOperation, EzOperationEdition ezOperationEdition, EzPortefeuilleEdition ezPortefeuilleEdition) {
+    public EzEdition(EZOperation fromEzOperation, EzOperationEdition ezOperationEdition, List<EzPortefeuilleEdition> ezPortefeuilleEditions) {
         fromEzOperation.fill(data);
         this.ezOperationEdition = ezOperationEdition;
-        this.ezPortefeuilleEdition = ezPortefeuilleEdition;
+        this.ezPortefeuilleEditions = ezPortefeuilleEditions;
         this.errors = fromEzOperation.getErrors();
     }
 
@@ -34,12 +34,12 @@ public class EzEdition {
         this.ezOperationEdition = ezOperationEdition;
     }
 
-    public EzPortefeuilleEdition getEzPortefeuilleEdition() {
-        return ezPortefeuilleEdition;
+    public List<EzPortefeuilleEdition> getEzPortefeuilleEditions() {
+        return ezPortefeuilleEditions;
     }
 
-    public void setEzPortefeuilleEdition(EzPortefeuilleEdition ezPortefeuilleEdition) {
-        this.ezPortefeuilleEdition = ezPortefeuilleEdition;
+    public void setEzPortefeuilleEditions(List<EzPortefeuilleEdition> ezPortefeuilleEditions) {
+        this.ezPortefeuilleEditions = ezPortefeuilleEditions;
     }
 
     public List<String> getErrors() {

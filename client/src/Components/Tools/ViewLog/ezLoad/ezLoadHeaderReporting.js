@@ -54,7 +54,6 @@ export class DynamicLogger {
 
     add(elem, isError){
         var parentId = this.idQueue[this.idQueue.length-1];
-        console.log("IsError: ", elem, isError);
         $('#'+parentId).append("<li class='log'><div href='#' "+(isError? "class='error'" : "")+">"+elem+"</div></li>");
         if (isError){
             for (let i = 0; i < this.idQueue.length; i++){

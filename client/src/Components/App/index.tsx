@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List } from "grommet";
+import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } from "grommet";
 import { Upload, Configure, Clipboard, DocumentStore, Command, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
@@ -188,12 +188,14 @@ export function App(){
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
-                                        <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
-                                                    jsonCall(ezApi.engine.upload())
-                                                    .then(followProcess)
-                                                    .catch(e => console.error(e))
-                                                }
-                                                size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
+                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
+                                                jsonCall(ezApi.engine.upload())
+                                                .then(followProcess)
+                                                .catch(e => console.error(e))
+                                            }
+                                            size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
+                                    { mainSettings.ezPortfolio?.ezPortfolioUrl 
+                                        && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={mainSettings.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
@@ -209,6 +211,7 @@ export function App(){
                                                         name: op.data?.data?.['operation.type'],
                                                         broker: strToBroker(op.data?.data?.['courtier.dossier']),
                                                         brokerFileVersion: parseInt(op.data?.data?.['courtier.version']),
+                                                        condition: "operation.type == \"" + op.data?.data?.['operation.type']+"\"",
                                                         enabled: true
                                                 }};
                                             saveRuleDefinition(newSelectedRule)
@@ -261,6 +264,7 @@ export function App(){
                                             rules={rules} 
                                             changeSelection={changeRuleSelection}
                                             deleteSelectedRule={deleteSelectedRule}
+                                            duplicateRule={r =>  saveRuleDefinition({oldName: undefined, ruleDefinition: r})}
                                             saveRule={r => saveRuleDefinition({
                                                 oldName: selectedRule?.oldName,
                                                 ruleDefinition: r

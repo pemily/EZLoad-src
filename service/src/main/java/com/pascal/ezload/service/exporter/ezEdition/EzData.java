@@ -18,11 +18,7 @@ public class EzData {
     }
 
     public EzData(EzData data) {
-        try {
-            this.data = (Map<String, String>) data.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        this.data = new HashMap<>(data.data);
     }
 
     public EzData(Map<String, String> data){
