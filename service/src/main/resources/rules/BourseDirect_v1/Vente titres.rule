@@ -1,0 +1,49 @@
+---
+field2ErrorMsg: null
+broker: "BourseDirect"
+brokerFileVersion: 1
+name: "Vente titres"
+enabled: true
+description: "Mes Operations.Montant => Montant brut ou net?\nEst ce possible de calculer\
+  \ le PRU? je ne l'ai pas dans le rapport pdf\nDans monPortefeuille: La quantité\
+  \ doit etre divisé par 100 si valeur anglaise, est ce pareil dans Mes Opérations?"
+ezLoadVersion: 1
+condition: "operation.type == \"Vente titres\""
+operationRule:
+  field2ErrorMsg: null
+  operationDateExpr: " operation.date"
+  operationCompteTypeExpr: "operation.typeCompte"
+  operationBrokerExpr: "courtier.nom"
+  operationQuantityExpr: "-operation.quantite"
+  operationTypeExpr: "operation.type"
+  operationActionNameExpr: "valeur.nom"
+  operationCountryExpr: "marche.pays"
+  operationAmountExpr: "operation.montant"
+  operationDescriptionExpr: "\"Ventes de \" + operation.quantite +\" \"+ valeur.ticker"
+portefeuilleRules:
+- field2ErrorMsg: null
+  portefeuilleValeurExpr: "valeur.nom"
+  portefeuilleCompteExpr: "operation.typeCompte"
+  portefeuilleCourtierExpr: "courtier.nom"
+  portefeuilleTickerGoogleFinanceExpr: "valeur.ticker"
+  portefeuillePaysExpr: "marche.pays"
+  portefeuilleSecteurExpr: "ezportfolio.portefeuille.secteur"
+  portefeuilleIndustrieExpr: "ezportfolio.portefeuille.industrie"
+  portefeuilleEligibiliteAbbattement40Expr: "ezportfolio.portefeuille.eligibiliteAbbatement40"
+  portefeuilleTypeExpr: "ezportfolio.portefeuille.type"
+  portefeuillePrixDeRevientExpr: "ezportfolio.portefeuille.prixRevientUnitaire"
+  portefeuilleQuantiteExpr: "ezportfolio.portefeuille.quantite -  operation.quantite"
+  portefeuilleDividendeAnnuelExpr: "ezportfolio.portefeuille.dividendeAnnuel"
+- field2ErrorMsg: null
+  portefeuilleValeurExpr: "\"LIQUIDITE\""
+  portefeuilleCompteExpr: " operation.typeCompte"
+  portefeuilleCourtierExpr: "courtier.nom"
+  portefeuilleTickerGoogleFinanceExpr: "\"LIQUIDITE\""
+  portefeuillePaysExpr: "ezportfolio.portefeuille.pays"
+  portefeuilleSecteurExpr: "ezportfolio.portefeuille.secteur"
+  portefeuilleIndustrieExpr: "ezportfolio.portefeuille.industrie"
+  portefeuilleEligibiliteAbbattement40Expr: "ezportfolio.portefeuille.eligibiliteAbbatement40"
+  portefeuilleTypeExpr: "ezportfolio.portefeuille.type"
+  portefeuillePrixDeRevientExpr: "ezportfolio.portefeuille.prixRevientUnitaire"
+  portefeuilleQuantiteExpr: "ezportfolio.portefeuille.quantite + operation.montant "
+  portefeuilleDividendeAnnuelExpr: "ezportfolio.portefeuille.dividendeAnnuel"
