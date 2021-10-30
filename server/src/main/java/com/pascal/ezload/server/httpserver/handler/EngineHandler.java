@@ -47,7 +47,7 @@ public class EngineHandler {
             MainSettings mainSettings = SettingsManager.getInstance().loadProps();
             return processManager.createNewRunningProcess(mainSettings,
                     "Téléchargement des nouvelles opérations de " + courtier.getEzPortfolioName() + " et Analyse",
-                    ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.log"),
+                    ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
@@ -73,7 +73,7 @@ public class EngineHandler {
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Analyse des nouvelles opérations de " + courtier.getEzPortfolioName(),
-                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.log"),
+                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
@@ -110,7 +110,7 @@ public class EngineHandler {
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Mise à jour d'EZPortfolio avec les opérations validé",
-                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.log"),
+                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
             try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
@@ -133,7 +133,7 @@ public class EngineHandler {
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Chargement des fichiers non traité",
-                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-notLoaded.log"),
+                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-notLoaded.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);

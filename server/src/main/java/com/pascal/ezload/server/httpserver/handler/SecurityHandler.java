@@ -58,7 +58,7 @@ public class SecurityHandler {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         return processManager.createNewRunningProcess(mainSettings,
                 "Validation du fichier de sécurité Google Drive",
-                ProcessManager.getLog(mainSettings, "gDriveValidationSecretFile", ".log"),
+                ProcessManager.getLog(mainSettings, "gDriveValidationSecretFile", ".html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try{

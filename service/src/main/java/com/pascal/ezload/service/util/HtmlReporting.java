@@ -67,7 +67,7 @@ public class HtmlReporting implements Reporting {
             writer.write("<script>pushSection(\""+ escape(sectionTitle)+"\")</script>\n");
             writer.flush();
         } catch (IOException e) {
-            // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            // Ignore exception if the log file cannot be writer (html page is perhaps lost)
         }
         return this;
     }
@@ -78,7 +78,7 @@ public class HtmlReporting implements Reporting {
             writer.write("<script>pushSection(\""+ sectionTitle.format(this, fileLinkCreator)+"\")</script>\n");
             writer.flush();
         } catch (IOException e) {
-            // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            // Ignore exception if the log file cannot be writer (html page is perhaps lost)
         }
         return this;
     }
@@ -89,7 +89,7 @@ public class HtmlReporting implements Reporting {
             writer.write("<script>popSection()</script>\n");
             writer.flush();
         } catch (IOException e) {
-            // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            // Ignore exception if the log file cannot be writer (html page is perhaps lost)
         }
     }
 
@@ -100,7 +100,7 @@ public class HtmlReporting implements Reporting {
             writer.flush();
         }
         catch(IOException e){
-            // Ignore exception if the log file cannot be writter (html page is perhaps lost)
+            // Ignore exception if the log file cannot be writer (html page is perhaps lost)
         }
     }
 

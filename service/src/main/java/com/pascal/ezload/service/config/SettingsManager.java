@@ -90,6 +90,8 @@ public class SettingsManager {
     }
 
     private static MainSettings getInitialSettings(String configFilePath) throws IOException {
+        String credsDir = "creds";
+
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         String ezHome = new File(configFilePath).getParentFile().getAbsolutePath();
@@ -100,11 +102,12 @@ public class SettingsManager {
         ezLoad.setDownloadDir(ezHome+File.separator+"courtiers");
         ezLoad.setRulesDir(ezHome+File.separator+"rules");
         ezLoad.setPassPhrase(genString(42));
-        ezLoad.setCourtierCredsFile(ezHome+File.separator+"ezCreds.json");
+        ezLoad.setCourtierCredsFile(ezHome+File.separator+credsDir+File.separator+"ezCreds.json");
 
         new File(ezLoad.getDownloadDir()).mkdirs();
         new File(ezLoad.getRulesDir()).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
+        new File(ezLoad.getCourtierCredsFile()).getParentFile().mkdirs();
         FileOutputStream output = new FileOutputStream(ezLoad.getCourtierCredsFile());
         output.write("{}".getBytes(StandardCharsets.UTF_8));
         output.close();
@@ -122,7 +125,8 @@ public class SettingsManager {
         EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
         mainSettings.setEzPortfolio(ezPortfolioSettings);
         ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
-        ezPortfolioSettings.setGdriveCredsFile(ezHome+File.separator+"gdrive-access.json");
+        ezPortfolioSettings.setGdriveCredsFile(ezHome+File.separator+credsDir+File.separator+"gdrive-access.json");
+        new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
         output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile());
         output.write("{}".getBytes(StandardCharsets.UTF_8));
         output.close();

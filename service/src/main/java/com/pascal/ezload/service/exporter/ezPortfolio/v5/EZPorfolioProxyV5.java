@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
@@ -123,7 +124,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
 
-    public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) {
+    public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {
         try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio avec EZLoad")){
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
@@ -131,11 +132,10 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             try {
                 s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
             }
-            catch(Exception e){
-                // TODO catcher l'exception sur le token expired
+            catch(TokenResponseException e){
                 String errorMsg = "Il y a un problème pour se connecter à EzPortfolio ou alors vous devez recréer votre fichier de sécurité. "+sheets.getEzPortfolioUrl();
                 reporting.error(errorMsg);
-                throw new IllegalStateException(errorMsg, e);
+                throw e;
             }
 
             reporting.info("Valeur trouvée: "+ s.getValues().get(0).getValueStr(0));

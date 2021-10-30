@@ -88,7 +88,7 @@ public class HomeHandler {
             MainSettings mainSettings = SettingsManager.getInstance().loadProps();
             return processManager.createNewRunningProcess(mainSettings,
                     "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
-                    ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.log"),
+                    ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     List<BourseDirectEZAccountDeclaration> accountsExtracted =

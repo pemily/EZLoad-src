@@ -48,7 +48,7 @@ public class ProcessManager {
             EzProcess p = new EzProcess(title, logFile);
             serverState.setProcessRunning(true);
             ezProcesses.add(p);
-            Writer fileWriter = new BufferedWriter(new FileWriter(logFile));
+            Writer fileWriter = new FileWriter(logFile);
 
             executor.submit(() -> {
                 try (HttpProcessRunner processLogger = new HttpProcessRunner(fileWriter, server.fileLinkCreator(mainSettings))) {

@@ -98,7 +98,7 @@ export function App(){
     }
 
     function changeRuleSelection(newRule: RuleDefinitionSummary) : void {
-        jsonCall(ezApi.rule.getRule(newRule.broker!, newRule.brokerFileVersion!, newRule.name!))
+        jsonCall(ezApi.rule.getRule({broker: newRule.broker!, brokerFileVersion: newRule.brokerFileVersion!, ruleName: newRule.name!}))
         .then(ruleDef => {            
             if (ruleDef === undefined)
                 setSelectedRule(undefined);                
@@ -229,7 +229,7 @@ export function App(){
                                             }
                                             setActiveIndex(RULES_TAB_INDEX);
                                             setEditOperation(op); 
-                                            jsonCall(ezApi.rule.getRule(broker, version, name))
+                                            jsonCall(ezApi.rule.getRule({broker: broker, brokerFileVersion: version, ruleName: name}))
                                             .then(r => setSelectedRule({oldName: r.name, ruleDefinition: r})) }}
                                             />
                         </Box>
