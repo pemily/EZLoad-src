@@ -65,7 +65,7 @@ public class RulesEngine {
                     ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
                     ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
                 }
-                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezOperationEdition))) {
+                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEdition))) {
                     if (StringUtils.isBlank(ezOperationEdition.getDate())) {
                         ezEdition.getErrors().add("Cette opération n'a pas de date");
                         ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré

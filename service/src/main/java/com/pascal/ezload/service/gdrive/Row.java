@@ -20,11 +20,6 @@ public class Row {
         this.values = Arrays.asList(values);
     }
 
-    public Row(int nbOfCol){
-        this.values = new ArrayList<>(nbOfCol);
-        for (int i = 0; i < nbOfCol; i++)
-            this.values.add(i, "");
-    }
 
     public EZDate valueDate(int colIndex) {
         String date = getValueStr(colIndex);
@@ -46,6 +41,10 @@ public class Row {
     }
 
     public void setValue(int colIndex, String s) {
+        if (values.size() <= colIndex) {
+            for (int i = values.size(); i <= colIndex; i++)
+                this.values.add("");
+        }
         values.set(colIndex, s);
     }
 

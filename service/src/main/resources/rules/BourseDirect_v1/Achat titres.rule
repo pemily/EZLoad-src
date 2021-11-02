@@ -19,7 +19,8 @@ operationRule:
   operationActionNameExpr: "valeur.nom"
   operationCountryExpr: "marche.pays"
   operationAmountExpr: " operation.montant"
-  operationDescriptionExpr: "\"Achat de \" + operation.quantite +\" \"+ valeur.ticker"
+  operationDescriptionExpr: "\"Achat de \" + operation.quantite +\" titre(s) de: \"\
+    + valeur.ticker + \" au prix de \" +  operation.cours"
 portefeuilleRules:
 - field2ErrorMsg: null
   portefeuilleValeurExpr: "valeur.nom"

@@ -11,7 +11,7 @@ public class EzEdition {
 
     private RuleDefinitionSummary ruleDefinitionSummary;
     private EzOperationEdition ezOperationEdition; // can be null if no impact
-    private List<EzPortefeuilleEdition> ezPortefeuilleEditions;
+    private List<EzPortefeuilleEdition> ezPortefeuilleEditions = new LinkedList<>();
     private List<String> errors = new LinkedList<>();
 
     private EzData data = new EzData();

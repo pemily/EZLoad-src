@@ -36,7 +36,9 @@ public class EZPortfolioManager {
             reporting.info("Récupération des données de Google Drive...");
             // ici detection de la version de EZPortfolio
             if (EZPorfolioProxyV5.isCompatible(reporting, sheets)) {
-                return new EZPorfolioProxyV5(reporting, sheets);
+                EZPorfolioProxyV5 proxy = new EZPorfolioProxyV5(reporting, sheets);
+                proxy.load();
+                return proxy;
             }
 
             // the default version

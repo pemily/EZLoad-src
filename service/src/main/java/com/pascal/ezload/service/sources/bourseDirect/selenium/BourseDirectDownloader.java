@@ -116,7 +116,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     // return false if we should continue
     private void extractMonthActivities(BourseDirectEZAccountDeclaration account, String cptIndex, Month month) {
         reporting.info("Checking all days to find files to download...");
-        List<WebElement> allDayActivities = getAllElements("a", "linkE");
+        List<WebElement> allDayActivities = getAllElements("div[@id='avis']//a", "linkE");
 
         List<EZDate> allDays = allDayActivities.stream()
                 .map(webElt -> new EZDate(month.getYear(), month.getMonth(), Integer.parseInt(webElt.getText())))
@@ -148,7 +148,12 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         // si proleme, changer l'url plutot que de cliquer sur precedent avec goToMonth
         String currentUrl = getDriver().getCurrentUrl();
         click(findByHref("javascript:MoisPrecedent"));
-        waitUrlIsNot(currentUrl);
+        try{
+            waitUrlIsNot(currentUrl);
+        }
+        catch(TimeoutException te){
+            return null;// impossible d'aller plus loin dans le passé
+        }
         Month dateFromPage = extractDateFromPage();
         Month dateFromUrl = extractMonthYearFromUrl();
         if (dateFromPage.getMonth() != dateFromUrl.getMonth() || dateFromPage.getYear() != dateFromUrl.getYear())
@@ -162,7 +167,12 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         // si proleme, changer l'url plutot que de cliquer sur suivant avec goToMonth
         String currentUrl = getDriver().getCurrentUrl();
         click(findByHref("javascript:MoisSuivant"));
-        waitUrlIsNot(currentUrl);
+        try {
+            waitUrlIsNot(currentUrl);
+        }
+        catch(TimeoutException te){
+            return null; // impossible d'aller dans le futur
+        }
         Month dateFromPage = extractDateFromPage();
         Month dateFromUrl = extractMonthYearFromUrl();
         if (dateFromPage.getMonth() != dateFromUrl.getMonth() || dateFromPage.getYear() != dateFromUrl.getYear())

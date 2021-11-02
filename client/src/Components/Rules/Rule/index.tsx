@@ -5,14 +5,14 @@ import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
 import { CheckBoxField } from '../../Tools/CheckBoxField';
 import { EzDataField, EzSingleData } from '../../Tools/EzDataField';
-import { EzEdition, RuleDefinition, PortefeuilleRule } from '../../../ez-api/gen-api/EZLoadApi';
+import { EzData, RuleDefinition, PortefeuilleRule } from '../../../ez-api/gen-api/EZLoadApi';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface RuleProps {
     readOnly: boolean;
-    operation: EzEdition|undefined;
+    data: EzData|undefined;
     ruleDefinition: RuleDefinition;
     saveRule: (newRule: RuleDefinition) => void;
     duplicateRule: (newRule: RuleDefinition) => void;
@@ -41,7 +41,7 @@ export function Rule(props: RuleProps){
             <Box direction="column" align="center" margin="small">
                 <Box direction="row" align="center">
                     <Text>{colName}</Text>
-                    <EzDataField value={props.operation?.data} iconInfo={false}
+                    <EzDataField value={props.data} iconInfo={false}
                         onSelect={ d => saveNewValue(append(value,d))}/>
                 </Box>
                 <Box>
@@ -118,7 +118,7 @@ export function Rule(props: RuleProps){
                 onChange={newValue => {
                     saveRule({ ...props.ruleDefinition, condition: newValue})
                 }}/>
-            <EzDataField value={props.operation?.data} iconInfo={false}
+            <EzDataField value={props.data} iconInfo={false}
                  onSelect={ d => saveRule({...props.ruleDefinition, condition: append(props.ruleDefinition.condition,d)})}/>
         </Box>
 
@@ -150,39 +150,39 @@ export function Rule(props: RuleProps){
             { props.ruleDefinition.operationRule
                 && (
                 <Box direction="row-responsive">
-                {cellData("Date", props.ruleDefinition.operationRule.operationDateExpr, props.ruleDefinition.field2ErrorMsg?.operationDateExpr, (newVal) => {
+                {cellData("Date", props.ruleDefinition.operationRule.operationDateExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationDateExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule, operationDateExpr: newVal}});
                 })}
 
-                {cellData("Compte", props.ruleDefinition.operationRule.operationCompteTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
+                {cellData("Compte", props.ruleDefinition.operationRule.operationCompteTypeExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationCompteTypeExpr: newVal}});
                 })}
                         
-                {cellData("Courtier", props.ruleDefinition.operationRule.operationBrokerExpr, props.ruleDefinition.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
+                {cellData("Courtier", props.ruleDefinition.operationRule.operationBrokerExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationBrokerExpr: newVal}});
                 })}
 
-                {cellData("Quantité", props.ruleDefinition.operationRule.operationQuantityExpr, props.ruleDefinition.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
+                {cellData("Quantité", props.ruleDefinition.operationRule.operationQuantityExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationQuantityExpr: newVal}});
                 })}
 
-                {cellData("Opération", props.ruleDefinition.operationRule.operationTypeExpr, props.ruleDefinition.field2ErrorMsg?.operationTypeExpr, (newVal) => {
+                {cellData("Opération", props.ruleDefinition.operationRule.operationTypeExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationTypeExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationTypeExpr: newVal}});
                 })}            
                 
-                {cellData("Valeur", props.ruleDefinition.operationRule.operationActionNameExpr, props.ruleDefinition.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
+                {cellData("Valeur", props.ruleDefinition.operationRule.operationActionNameExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationActionNameExpr: newVal}});
                 })}
                 
-                {cellData("Pays", props.ruleDefinition.operationRule.operationCountryExpr, props.ruleDefinition.field2ErrorMsg?.operationCountryExpr, (newVal) => {
+                {cellData("Pays", props.ruleDefinition.operationRule.operationCountryExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationCountryExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationCountryExpr: newVal}});
                 })}
 
-                {cellData("Montant", props.ruleDefinition.operationRule.operationAmountExpr, props.ruleDefinition.field2ErrorMsg?.operationAmountExpr, (newVal) => {
+                {cellData("Montant", props.ruleDefinition.operationRule.operationAmountExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationAmountExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationAmountExpr: newVal}});
                 })}    
 
-                {cellData("Information", props.ruleDefinition.operationRule.operationDescriptionExpr, props.ruleDefinition.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
+                {cellData("Information", props.ruleDefinition.operationRule.operationDescriptionExpr, props.ruleDefinition.operationRule.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
                     return saveRule({...props.ruleDefinition, operationRule: {...props.ruleDefinition.operationRule,  operationDescriptionExpr: newVal}});
                 })} 
                 </Box>          

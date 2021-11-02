@@ -1,11 +1,11 @@
 import { Box, Select } from "grommet";
 import { ruleTitle, SelectedRule } from '../../../ez-api/tools';
-import { EzEdition, RuleDefinitionSummary, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
+import { EzData, RuleDefinitionSummary, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
 import { Rule } from '../../Rules/Rule';
 
 export interface RulesTabProps {
     readOnly : boolean;
-    operation: EzEdition|undefined;
+    data: EzData|undefined;
     ruleDefinitionSelected: SelectedRule|undefined;
     rules: RuleDefinitionSummary[];
     deleteSelectedRule: () => void;
@@ -31,7 +31,7 @@ export function RulesTab(props: RulesTabProps){
                 saveRule={props.saveRule}
                 duplicateRule={props.duplicateRule}
                 deleteRule={props.deleteSelectedRule}
-                operation={props.operation}
+                data={props.data}
                 ruleDefinition={props.ruleDefinitionSelected?.ruleDefinition}/>
         )}
         </>

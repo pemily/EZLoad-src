@@ -13,8 +13,9 @@ import java.util.Optional;
 
 public class MonPortefeuille implements MonPortefeuilleData {
 
+    private static final String TOTAL = "TOTAL";
+
     private final SheetValues portefeuille;
-    private final List<Row> newValeurs = new ArrayList<>();
 
     public static final int VALEUR_COL = 0;
     public static final int ACCOUNT_TYPE_COL = 1;
@@ -40,26 +41,24 @@ public class MonPortefeuille implements MonPortefeuilleData {
     }
 
     public Optional<Row> searchRow(String valeur){
-        Optional<Row> existingRow = this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
-        if (existingRow.isPresent()) return existingRow;
-        return newValeurs.stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
+        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
     }
 
-    public Row addNewRow(String share) {
-        Row row = createRow(share);
-        this.newValeurs.add(row);
-        return row;
-    }
 
-    private static Row createRow(String share){
-        Row row = new Row(NB_OF_COLUMNS);
-        row.setValue(VALEUR_COL, share);
-        return row;
+    private Row createRow(String share){
+        Optional<Row> row = this.portefeuille.getValues().stream()
+                .filter(r -> r.getValueStr(VALEUR_COL) == null
+                            || Objects.equals(r.getValueStr(VALEUR_COL), "")
+                            || Objects.equals(r.getValueStr(VALEUR_COL), TOTAL)).findFirst();
+        if (!row.isPresent()) throw new IllegalStateException("Impossible de trouver une nouvelle ligne dans 'MonPortefeuille'");
+        if (Objects.equals(row.get().getValueStr(VALEUR_COL), TOTAL)) throw new IllegalStateException("Il n'y a plus de ligne disponible dans MonPortefeuille pour la nouvelle valeur: "+share);
+        row.get().setValue(VALEUR_COL, share);
+        return row.get();
     }
 
     public void apply(EzPortefeuilleEdition ezPortefeuilleEdition) {
         Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getValeur());
-        Row row = rowOpt.orElse(addNewRow(ezPortefeuilleEdition.getValeur()));
+        Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getValeur()));
         row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccountType());
         row.setValue(BROKER_COL, ezPortefeuilleEdition.getBroker());
         row.setValue(TICKER_COL, ezPortefeuilleEdition.getTickerGoogleFinance());

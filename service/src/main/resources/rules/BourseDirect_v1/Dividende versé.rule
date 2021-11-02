@@ -13,7 +13,7 @@ operationRule:
   operationDateExpr: "operation.date"
   operationCompteTypeExpr: "operation.typeCompte"
   operationBrokerExpr: "courtier.nom"
-  operationQuantityExpr: "operation.quantite"
+  operationQuantityExpr: "-operation.quantite"
   operationTypeExpr: "operation.type"
   operationActionNameExpr: "valeur.nom"
   operationCountryExpr: "marche.pays"

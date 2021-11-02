@@ -188,7 +188,7 @@ export function App(){
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
-                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || reports[0].error !== null} onClick={() =>
+                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)} onClick={() =>
                                                 jsonCall(ezApi.engine.upload())
                                                 .then(followProcess)
                                                 .catch(e => console.error(e))
@@ -260,7 +260,7 @@ export function App(){
                     { mainSettings.ezLoad?.admin?.showRules && (
                         <Tab title="Règles" icon={<Services size='small'/>}>
                             <Box fill overflow="auto">
-                                <RulesTab readOnly={processRunning} operation={editOperation} ruleDefinitionSelected={selectedRule}
+                                <RulesTab readOnly={processRunning} data={editOperation?.data} ruleDefinitionSelected={selectedRule}
                                             rules={rules} 
                                             changeSelection={changeRuleSelection}
                                             deleteSelectedRule={deleteSelectedRule}

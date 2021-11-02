@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GDriveSheets {
+    private static final int RETRY_NB = 20;
+
     private final String ezPortfolioUrl;
     private final String spreadsheetId;
     private final Sheets service;
@@ -41,7 +43,7 @@ public class GDriveSheets {
 
     public SheetValues getCells(final String range) throws Exception {
         reporting.info("Google Drive lecture des données: "+range);
-        List<List<Object>> r = retryOnTimeout(10, () -> {
+        List<List<Object>> r = retryOnTimeout(RETRY_NB, () -> {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
@@ -55,7 +57,7 @@ public class GDriveSheets {
     public int update(String range, List<Row> values) throws Exception {
         reporting.info("Mise à jour de Google Drive: "+range);
         List<List<Object>> objValues = values.stream().map(Row::getValues).collect(Collectors.toList());
-        int r = retryOnTimeout(10, () -> {
+        int r = retryOnTimeout(RETRY_NB, () -> {
             UpdateValuesResponse resp = service.spreadsheets().values().update(spreadsheetId, range, new ValueRange().setValues(objValues))
                     .setValueInputOption("USER_ENTERED")
                     .execute();
@@ -70,7 +72,7 @@ public class GDriveSheets {
     }
 
     public List<SheetValues> batchGet(List<String> ranges) throws Exception {
-        return retryOnTimeout(10, () -> {
+        return retryOnTimeout(RETRY_NB, () -> {
             BatchGetValuesResponse resp = service.spreadsheets()
                     .values()
                     .batchGet(spreadsheetId)
@@ -89,7 +91,7 @@ public class GDriveSheets {
     }
 
     public int batchUpdate(List<SheetValues> sheetValues) throws Exception {
-        return retryOnTimeout(15, () -> {
+        return retryOnTimeout(RETRY_NB, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
             buvr.setValueInputOption("USER_ENTERED");
 
@@ -116,8 +118,8 @@ public class GDriveSheets {
                     reporting.info("Relance maximum atteinte");
                     throw new BRException("Google Drive API n'est pas accessible, re-essayez plus tard");
                 }
-                reporting.info("Delai dépassé. attendre un peu... puis relance");
-                Sleep.waitSeconds(60);
+                reporting.info("Delai dépassé. attendre 30 secondes... puis relance");
+                Sleep.waitSeconds(30);
                 reporting.info("Relance n°: "+n);
                 return retryOnTimeout(n - 1, fct);
             }

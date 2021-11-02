@@ -19,7 +19,8 @@ operationRule:
   operationActionNameExpr: "valeur.nom"
   operationCountryExpr: "marche.pays"
   operationAmountExpr: "operation.montant"
-  operationDescriptionExpr: "\"Ventes de \" + operation.quantite +\" \"+ valeur.ticker"
+  operationDescriptionExpr: "\"Ventes de \" + (-operation.quantite) +\" titre(s) de\
+    \ \"+ valeur.ticker + \" au prix de \" +  operation.cours"
 portefeuilleRules:
 - field2ErrorMsg: null
   portefeuilleValeurExpr: "valeur.nom"
@@ -32,7 +33,7 @@ portefeuilleRules:
   portefeuilleEligibiliteAbbattement40Expr: "ezportfolio.portefeuille.eligibiliteAbbatement40"
   portefeuilleTypeExpr: "ezportfolio.portefeuille.type"
   portefeuillePrixDeRevientExpr: "ezportfolio.portefeuille.prixRevientUnitaire"
-  portefeuilleQuantiteExpr: "ezportfolio.portefeuille.quantite -  operation.quantite"
+  portefeuilleQuantiteExpr: "ezportfolio.portefeuille.quantite +  operation.quantite"
   portefeuilleDividendeAnnuelExpr: "ezportfolio.portefeuille.dividendeAnnuel"
 - field2ErrorMsg: null
   portefeuilleValeurExpr: "\"LIQUIDITE\""

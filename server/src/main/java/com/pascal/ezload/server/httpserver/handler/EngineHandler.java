@@ -73,7 +73,7 @@ public class EngineHandler {
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Analyse des nouvelles opérations de " + courtier.getEzPortfolioName(),
-                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
+                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-analyze.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
@@ -110,10 +110,10 @@ public class EngineHandler {
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
                 "Mise à jour d'EZPortfolio avec les opérations validé",
-                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
+                ProcessManager.getLog(mainSettings, courtier.getDirName(), "-upload.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
-            try (Reporting rep = reporting.pushSection("Updating EZPortfolio")) {
+            try (Reporting rep = reporting.pushSection("Mise à jour de EZPortfolio")) {
                 EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
                 EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
                 serverState.setEzReports(ezPortfolioProxy.save(serverState.getEzReports()));

@@ -1,6 +1,8 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -28,7 +30,7 @@ public class MesOperations  {
     private static final int COUNTRY_COL = 6;
     private static final int AMOUNT_COL = 7;
     private static final int INFORMATION_COL = 8;
-    private static final int ACCOUNT_DECLARED_NAME_COL = 9;
+    private static final int ACCOUNT_DECLARED_NUMBER_COL = 9;
     private static final int AUTOMATIC_UPD_COL = 10;
 
 
@@ -54,7 +56,7 @@ public class MesOperations  {
                 && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
                 && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
                 && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
-                && operation.getValueStr(ACCOUNT_DECLARED_NAME_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NAME_COL))
+                && operation.getValueStr(ACCOUNT_DECLARED_NUMBER_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL))
                 && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
                 && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
                 && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
@@ -62,26 +64,27 @@ public class MesOperations  {
         ).count() > 1;
     }
 
-    public static Row newOperationRow(EzOperationEdition operationEdition) {
+    public static Row newOperationRow(EzData ezData, EzOperationEdition operationEdition) {
         return new Row(operationEdition.getDate(), operationEdition.getAccountType(), operationEdition.getBroker(),
                         operationEdition.getQuantity(), operationEdition.getOperationType(), operationEdition.getShareName(),
                         operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
+                        ezData.get(AccountData.account_number),
                         BIENTOT_RENTIER_OPERATION);
     }
 
-    public void newOperation(EzOperationEdition operationEdition){
-        newOperations.add(newOperationRow(operationEdition));
+    public void newOperation(EzData ezData, EzOperationEdition operationEdition){
+        newOperations.add(newOperationRow(ezData, operationEdition));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
-        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastDate -> lastDate.isBeforeOrEquals(fileDate)).orElse(false);
+        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastOpDate -> fileDate.isBeforeOrEquals(lastOpDate)).orElse(false);
     }
 
-    public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration) {
+    public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration ezAccountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
                 .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
                         && courtier.getEzPortfolioName().equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
-                        && EZAccountDeclaration.getName().equals(row.getValueStr(ACCOUNT_DECLARED_NAME_COL)))
+                        && ezAccountDeclaration.getNumber().equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL)))
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);

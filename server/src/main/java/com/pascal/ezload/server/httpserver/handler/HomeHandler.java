@@ -123,9 +123,9 @@ public class HomeHandler {
     @Path("/viewProcess")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public void viewLogProcess() throws IOException {
-        Writer writer = response.getWriter();
-        processManager.viewLogProcess(writer);
-        writer.close();
+        try(Writer writer = response.getWriter()) {
+            processManager.viewLogProcess(writer);
+        }
     }
 
 }

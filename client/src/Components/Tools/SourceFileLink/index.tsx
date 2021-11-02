@@ -1,5 +1,5 @@
 
-import { View } from 'grommet-icons';
+import { DocumentText } from 'grommet-icons';
 import { Text, Anchor } from "grommet";
 import { ezApi } from '../../../ez-api/tools';
 
@@ -15,7 +15,7 @@ export function SourceFileLink(props: SourceFileLinkProps) {
         <Text margin="xxsmall">{props.sourceFile}</Text>
         <Anchor style={{padding: 2, boxShadow: "none"}} target="source" 
                 href={ezApi.baseUrl+"/explorer/file?source="+encodeURIComponent(props.sourceFile ? props.sourceFile : "")} 
-                icon={<View size="small"/>} onClick={(e) => {                                                                     
+                icon={<DocumentText size="small"/>} onClick={(e) => {                                                                     
                     e.stopPropagation();
                     } }/>
       </>

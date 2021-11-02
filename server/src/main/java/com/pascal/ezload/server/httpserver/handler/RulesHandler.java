@@ -52,7 +52,6 @@ public class RulesHandler {
                                     && ruleDef.getBrokerFileVersion() == brokerFileVersion
                                     && ruleDef.getBroker() == broker)
                 .findFirst()
-                .map(r -> {r.validate(); return r; })
                 .orElse(null);
     }
 
