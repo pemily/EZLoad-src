@@ -1,35 +1,37 @@
----
-field2ErrorMsg: null
-broker: "BourseDirect"
-brokerFileVersion: 1
-name: "Versement fonds"
-enabled: true
-description: ""
-ezLoadVersion: 1
-condition: "operation.type == \"Versement fonds\""
-operationRules:
-- field2ErrorMsg: null
-  operationDateExpr: "rapport.date"
-  operationCompteTypeExpr: "operation.typeCompte"
-  operationBrokerExpr: "courtier.nom"
-  operationQuantityExpr: "operation.montant"
-  operationTypeExpr: "operation.type"
-  operationActionNameExpr: "\"LIQUIDITE\""
-  operationCountryExpr: "\"\""
-  operationAmountExpr: "operation.montant"
-  operationDescriptionExpr: "\"Versement sur \" + compte.nom + \" de \"+operation.montant+\
-    \ operation.devise.symbole"
-portefeuilleRules:
-- field2ErrorMsg: null
-  portefeuilleValeurExpr: "\"LIQUIDITE\""
-  portefeuilleCompteExpr: " operation.typeCompte"
-  portefeuilleCourtierExpr: "courtier.nom"
-  portefeuilleTickerGoogleFinanceExpr: "\"LIQUIDITE\""
-  portefeuillePaysExpr: "ezportfolio.portefeuille.pays"
-  portefeuilleSecteurExpr: "ezportfolio.portefeuille.secteur"
-  portefeuilleIndustrieExpr: "ezportfolio.portefeuille.industrie"
-  portefeuilleEligibiliteAbbattement40Expr: "ezportfolio.portefeuille.eligibiliteAbbatement40"
-  portefeuilleTypeExpr: "ezportfolio.portefeuille.type"
-  portefeuillePrixDeRevientExpr: "ezportfolio.portefeuille.prixRevientUnitaire"
-  portefeuilleQuantiteExpr: "ezportfolio.portefeuille.quantite + operation.montant "
-  portefeuilleDividendeAnnuelExpr: "ezportfolio.portefeuille.dividendeAnnuel"
+{
+  "field2ErrorMsg" : { },
+  "broker" : "BourseDirect",
+  "brokerFileVersion" : 1,
+  "name" : "Versement fonds",
+  "enabled" : true,
+  "description" : "",
+  "ezLoadVersion" : 1,
+  "condition" : "operation.type == \"Versement fonds\"",
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "operationDateExpr" : "rapport.date",
+    "operationCompteTypeExpr" : "operation.typeCompte",
+    "operationBrokerExpr" : "courtier.nom",
+    "operationQuantityExpr" : "operation.montant",
+    "operationTypeExpr" : "operation.type",
+    "operationActionNameExpr" : "\"LIQUIDITE\"",
+    "operationCountryExpr" : "\"\"",
+    "operationAmountExpr" : "operation.montant",
+    "operationDescriptionExpr" : "\"Versement sur \" + compte.nom + \" de \"+operation.montant+ operation.devise.symbole"
+  } ],
+  "portefeuilleRules" : [ {
+    "field2ErrorMsg" : { },
+    "portefeuilleValeurExpr" : "\"LIQUIDITE\"",
+    "portefeuilleCompteExpr" : " operation.typeCompte",
+    "portefeuilleCourtierExpr" : "courtier.nom",
+    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuillePaysExpr" : "ezportfolio.portefeuille.pays",
+    "portefeuilleSecteurExpr" : "ezportfolio.portefeuille.secteur",
+    "portefeuilleIndustrieExpr" : "ezportfolio.portefeuille.industrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezportfolio.portefeuille.eligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "ezportfolio.portefeuille.type",
+    "portefeuillePrixDeRevientExpr" : "ezportfolio.portefeuille.prixRevientUnitaire",
+    "portefeuilleQuantiteExpr" : "ezportfolio.portefeuille.quantite + operation.montant ",
+    "portefeuilleDividendeAnnuelExpr" : "ezportfolio.portefeuille.dividendeAnnuel"
+  } ]
+}

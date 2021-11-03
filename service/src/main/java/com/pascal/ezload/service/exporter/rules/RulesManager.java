@@ -1,18 +1,21 @@
 package com.pascal.ezload.service.exporter.rules;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.FileProcessor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
 
 public class RulesManager {
 
     private final static String RULE_FILE_EXTENSION = ".rule";
+    private final static String COMMON_FUNCTIONS_EXTENSION = ".script";
 
     private final MainSettings mainSettings;
 
@@ -32,7 +35,7 @@ public class RulesManager {
     }
 
     public synchronized RuleDefinition readRule(String filepath) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         try(Reader reader = new FileReader(filepath)) {
             RuleDefinition ruleDefinition = mapper.readValue(reader, RuleDefinition.class);
             ruleDefinition.validate();
@@ -60,10 +63,12 @@ public class RulesManager {
         }
 
         new File(newFilePath).getParentFile().mkdirs();
-
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         ruleDef.clearErrors();
-        mapper.writeValue(new FileWriter(newFilePath), ruleDef);
+
+        JsonFactory jsonFactory = new JsonFactory();
+        jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
+        ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
+        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(newFilePath), ruleDef);
 
         if (isRenaming){
             // it is a rename, remove the old file
@@ -88,5 +93,37 @@ public class RulesManager {
         if (f.exists()){
             f.delete();
         }
+    }
+
+    private String getCommonFilePath(EnumEZBroker broker, int borkerFileVersion){
+        return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+borkerFileVersion+COMMON_FUNCTIONS_EXTENSION;
+    }
+
+    public synchronized CommonFunctions readCommonScript(EnumEZBroker broker, int brokerFileVersion) throws IOException {
+        String commonFile = getCommonFilePath(broker, brokerFileVersion);
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+        if (new File(commonFile).exists()) {
+            try (Reader reader = new FileReader(commonFile)) {
+                CommonFunctions content = mapper.readValue(reader, CommonFunctions.class);
+                return content;
+            }
+        }
+        else{
+            CommonFunctions commonFunctions = new CommonFunctions();
+            commonFunctions.setBrokerFileVersion(brokerFileVersion);
+            commonFunctions.setBroker(broker);
+            commonFunctions.setScript("// Liste de fonctions utilisables dans toutes les expressions de "+broker+" v"+brokerFileVersion
+                    +"\n\n\n");
+            return commonFunctions;
+        }
+    }
+
+    public synchronized CommonFunctions saveCommonScript(CommonFunctions function) throws IOException {
+        String commonFile = getCommonFilePath(function.getBroker(), function.getBrokerFileVersion());
+        JsonFactory jsonFactory = new JsonFactory();
+        jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
+        ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
+        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(commonFile), function);
+        return function;
     }
 }

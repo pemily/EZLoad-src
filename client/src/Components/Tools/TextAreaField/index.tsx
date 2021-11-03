@@ -13,6 +13,7 @@ export interface ConfigTextAreaFieldProps {
   isRequired?: boolean;
   isPassword?: boolean;
   readOnly: boolean;
+  isFormField?: boolean;
 }
 
 
@@ -28,18 +29,27 @@ export function TextAreaField(props: ConfigTextAreaFieldProps) {
                          setValue(newValue);
                        }, []);
 
-    return (          
-              <Box direction="column" pad="none" margin="xsmall" fill>
-                <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
-                      required={props.isRequired} margin="none" error={props.errorMsg}>
-                <TextArea id={props.id}                           
-                           name={props.id}
-                           value={ value === null ? undefined : value}
-                           placeholder={props.isRequired ? "Champ Obligatoire" : ""}                           
-                           onChange={onChangeLocal}
-                           onBlur={evt => props.onChange(evt.target.value)}
-                           disabled={props.readOnly}/>
-               </FormField>
-              </Box>
-          );
+
+    const textArea = (): JSX.Element => {
+        return (<TextArea  id={props.id}                           
+                name={props.id}
+                value={ value === null ? undefined : value}
+                placeholder={props.isRequired ? "Champ Obligatoire" : ""}                           
+                onChange={onChangeLocal}
+                onBlur={evt => props.onChange(evt.target.value)}
+                disabled={props.readOnly}
+                fill/> );
+    }
+
+    if (props.isFormField === undefined || props.isFormField === true){
+      return (
+                <Box direction="column" pad="none" margin="xsmall" fill>
+                  <FormField name={props.id} htmlFor={props.id} label={props.label} help={props.description}
+                        required={props.isRequired} margin="none" error={props.errorMsg}>
+                    {textArea()}
+                </FormField>
+                </Box>
+            );
+    }
+    else return textArea();
 }

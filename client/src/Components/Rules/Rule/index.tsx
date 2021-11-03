@@ -3,6 +3,7 @@ import { Trash, HelpOption, Add, Duplicate } from 'grommet-icons';
 import { Box, Heading, Text, Button, Anchor, List } from "grommet";
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
+import { CommonFunctionsEditor } from '../CommonFunctionsEditor';
 import { CheckBoxField } from '../../Tools/CheckBoxField';
 import { EzDataField, EzSingleData } from '../../Tools/EzDataField';
 import { EzData, RuleDefinition, PortefeuilleRule, OperationRule } from '../../../ez-api/gen-api/EZLoadApi';
@@ -16,7 +17,7 @@ export interface RuleProps {
     ruleDefinition: RuleDefinition;
     saveRule: (newRule: RuleDefinition) => void;
     duplicateRule: (newRule: RuleDefinition) => void;
-    deleteRule: () => void;
+    deleteRule: () => void; 
 }      
 
 export function Rule(props: RuleProps){
@@ -55,8 +56,11 @@ export function Rule(props: RuleProps){
     
     return (
         <>
-        <Box> 
-            <Anchor margin={{right: "medium"}} alignSelf="end" label="Syntaxe" target="jexl" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html" icon={<HelpOption size="medium"/>}/>                    
+        <Box>
+            <Box direction="row" align="end" alignSelf="end" margin="small">
+                <CommonFunctionsEditor visible={false} readOnly={props.readOnly} broker={props.ruleDefinition.broker} brokerFileVersion={props.ruleDefinition.brokerFileVersion}/>
+                <Anchor margin={{right: "medium"}} alignSelf="end" label="Syntaxe" target="jexl" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html" icon={<HelpOption size="medium"/>}/>                    
+            </Box>
             <Box direction="row" align="center" margin="small">
                 <CheckBoxField label="Active"
                             value={props.ruleDefinition.enabled!}

@@ -1,0 +1,23 @@
+{
+  "field2ErrorMsg" : { },
+  "broker" : "BourseDirect",
+  "brokerFileVersion" : 1,
+  "name" : "Dividende versé",
+  "enabled" : true,
+  "description" : "Quoi faire?\nPourquoi la quantité est un chiffre négatif? Prendre le montant net ou brut?\nFaut il faire qqchose dans mon portefeuille?",
+  "ezLoadVersion" : 1,
+  "condition" : "operation.type == \"Dividende versé\" &&  operation.description !=  \"REINVESTISSEMENT\"",
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "operationDateExpr" : "operation.date",
+    "operationCompteTypeExpr" : "operation.typeCompte",
+    "operationBrokerExpr" : "courtier.nom",
+    "operationQuantityExpr" : "-operation.quantite",
+    "operationTypeExpr" : "operation.type",
+    "operationActionNameExpr" : "operation.valeur.nom",
+    "operationCountryExpr" : "marché.pays",
+    "operationAmountExpr" : "operation.montant",
+    "operationDescriptionExpr" : "operation.type + \" de \" +  operation.valeur.ticker"
+  } ],
+  "portefeuilleRules" : [ ]
+}

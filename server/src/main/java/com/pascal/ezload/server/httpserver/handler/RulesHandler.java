@@ -4,12 +4,12 @@ import com.pascal.ezload.server.EZLoad;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.exporter.rules.CommonFunctions;
 import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
@@ -83,4 +83,24 @@ public class RulesHandler {
         new RulesManager(SettingsManager.getInstance().loadProps())
                 .delete(ruleDefinition);
     }
+
+
+    @GET
+    @Path("common/{broker}/{brokerFileVersion}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CommonFunctions getCommonFunction(@NotNull @PathParam("broker") EnumEZBroker broker,
+                                             @NotNull @PathParam("brokerFileVersion") int brokerFileVersion) throws Exception {
+        return new RulesManager(SettingsManager.getInstance().loadProps())
+                .readCommonScript(broker, brokerFileVersion);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/saveCommon")
+    public CommonFunctions saveCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
+        return new RulesManager(SettingsManager.getInstance().loadProps())
+                .saveCommonScript(commonFunction);
+    }
+
 }
