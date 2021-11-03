@@ -4,30 +4,42 @@ broker: "BourseDirect"
 brokerFileVersion: 1
 name: "Vente titres"
 enabled: true
-description: "Mes Operations.Montant => Montant brut ou net?\nEst ce possible de calculer\
-  \ le PRU? je ne l'ai pas dans le rapport pdf\nDans monPortefeuille: La quantité\
-  \ doit etre divisé par 100 si valeur anglaise, est ce pareil dans Mes Opérations?"
+description: "Mes Operations.Montant => Montant brut ou net?\nFaut il remplir la quantité\
+  \ de la ligne \"Frais de courtage\", en negative ou positive?\nEst ce possible de\
+  \ calculer le PRU? je ne l'ai pas dans le rapport pdf\nDans monPortefeuille: La\
+  \ quantité doit etre divisé par 100 si valeur anglaise, est ce pareil dans Mes Opé\
+  rations?"
 ezLoadVersion: 1
 condition: "operation.type == \"Vente titres\""
-operationRule:
-  field2ErrorMsg: null
-  operationDateExpr: " operation.date"
+operationRules:
+- field2ErrorMsg: null
+  operationDateExpr: "operation.date"
   operationCompteTypeExpr: "operation.typeCompte"
   operationBrokerExpr: "courtier.nom"
   operationQuantityExpr: "-operation.quantite"
-  operationTypeExpr: "operation.type"
-  operationActionNameExpr: "valeur.nom"
-  operationCountryExpr: "marche.pays"
+  operationTypeExpr: "\"Vente titres\""
+  operationActionNameExpr: "operation.valeur.nom"
+  operationCountryExpr: "marché.pays"
   operationAmountExpr: "operation.montant"
   operationDescriptionExpr: "\"Ventes de \" + (-operation.quantite) +\" titre(s) de\
-    \ \"+ valeur.ticker + \" au prix de \" +  operation.cours"
+    \ \"+ operation.valeur.ticker + \" @ \" +  operation.cours + compte.devise.symbole"
+- field2ErrorMsg: null
+  operationDateExpr: "operation.date"
+  operationCompteTypeExpr: "operation.typeCompte"
+  operationBrokerExpr: "courtier.nom"
+  operationQuantityExpr: "-operation.quantite"
+  operationTypeExpr: "\"Courtage sur vente de titres\""
+  operationActionNameExpr: "operation.valeur.nom"
+  operationCountryExpr: "marché.pays"
+  operationAmountExpr: "operation.fraisCourtage"
+  operationDescriptionExpr: "\"Frais de courtage sur vente de \"+operation.valeur.ticker"
 portefeuilleRules:
 - field2ErrorMsg: null
-  portefeuilleValeurExpr: "valeur.nom"
+  portefeuilleValeurExpr: "operation.valeur.nom"
   portefeuilleCompteExpr: "operation.typeCompte"
   portefeuilleCourtierExpr: "courtier.nom"
-  portefeuilleTickerGoogleFinanceExpr: "valeur.ticker"
-  portefeuillePaysExpr: "marche.pays"
+  portefeuilleTickerGoogleFinanceExpr: "operation.valeur.ticker"
+  portefeuillePaysExpr: "marché.pays"
   portefeuilleSecteurExpr: "ezportfolio.portefeuille.secteur"
   portefeuilleIndustrieExpr: "ezportfolio.portefeuille.industrie"
   portefeuilleEligibiliteAbbattement40Expr: "ezportfolio.portefeuille.eligibiliteAbbatement40"

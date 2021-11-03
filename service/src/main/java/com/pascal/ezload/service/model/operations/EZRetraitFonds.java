@@ -1,14 +1,16 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
+import com.pascal.ezload.service.model.EZDevise;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZOperationType;
 
-public class EZVersementFonds extends EZOperation implements BourseDirectV1Data {
+public class EZRetraitFonds extends EZOperation {
     private EZDevise devise;
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.VERSEMENT_FONDS;
+        return EZOperationType.RETRAIT_FONDS;
     }
 
     public EZDevise getDevise() {
@@ -24,4 +26,5 @@ public class EZVersementFonds extends EZOperation implements BourseDirectV1Data 
         data.put(operation_codeDevise, devise.getCode());
         data.put(operation_symbolDevise, devise.getSymbol());
     }
+
 }

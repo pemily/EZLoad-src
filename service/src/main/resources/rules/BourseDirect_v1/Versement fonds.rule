@@ -7,8 +7,8 @@ enabled: true
 description: ""
 ezLoadVersion: 1
 condition: "operation.type == \"Versement fonds\""
-operationRule:
-  field2ErrorMsg: null
+operationRules:
+- field2ErrorMsg: null
   operationDateExpr: "rapport.date"
   operationCompteTypeExpr: "operation.typeCompte"
   operationBrokerExpr: "courtier.nom"
@@ -17,7 +17,8 @@ operationRule:
   operationActionNameExpr: "\"LIQUIDITE\""
   operationCountryExpr: "\"\""
   operationAmountExpr: "operation.montant"
-  operationDescriptionExpr: "operation.type + \" sur \" + compte.nom"
+  operationDescriptionExpr: "\"Versement sur \" + compte.nom + \" de \"+operation.montant+\
+    \ operation.devise.symbole"
 portefeuilleRules:
 - field2ErrorMsg: null
   portefeuilleValeurExpr: "\"LIQUIDITE\""

@@ -11,7 +11,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
 
     private int ezLoadVersion; // the version of EzLoad when this RuleDefinition was created/edited
     private String condition;
-    private OperationRule operationRule; // can be null si le repport pdf n'a aucun impact sur le portefeuille ou les opérations.
+    private List<OperationRule> operationRules = new LinkedList<>();
     private List<PortefeuilleRule> portefeuilleRules = new LinkedList<>();
 
     public String getCondition() {
@@ -39,31 +39,30 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.portefeuilleRules = portefeuilleRules;
     }
 
-    public OperationRule getOperationRule() {
-        return operationRule;
+    public List<OperationRule> getOperationRules() {
+        return operationRules;
     }
 
-    public void setOperationRule(OperationRule operationRule) {
-        this.operationRule = operationRule;
+    public void setOperationRules(List<OperationRule> operationRules) {
+        this.operationRules = operationRules;
     }
 
     @Override
     public void clearErrors(){
         setField2ErrorMsg(null);
         portefeuilleRules.forEach(PortefeuilleRule::clearErrors);
-        if (operationRule != null) operationRule.clearErrors();
+        operationRules.forEach(OperationRule::clearErrors);
     }
 
 
     public void validate(){
         // TODO ici vérifiez que chaque expression n'utilise pas une variable qui n'existe pas et que l'expression est correcte
-        // faire une dummy operation est l'executer sur chaque expression?
 
         new StringValue(true).validate(this, Field.name.name(), getName());
         new StringValue(false).validate(this, Field.description.name(), getDescription());
         new StringValue(true).validate(this, Field.condition.name(), condition);
 
-        if (operationRule != null) operationRule.validate();
+        operationRules.forEach(OperationRule::validate);
         portefeuilleRules.forEach(PortefeuilleRule::validate);
     }
 }

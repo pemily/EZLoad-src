@@ -2,12 +2,12 @@ package com.pascal.ezload.service.model;
 
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class EZOperation implements BourseDirectV1Data {
+public abstract class EZOperation implements OperationData {
 
     protected List<String> errors = new LinkedList<>();
     private EZDate date;
@@ -101,7 +101,7 @@ public abstract class EZOperation implements BourseDirectV1Data {
 
 
     public void fill(EzData data) {
-        data.put(operation_type, getOperationType().getEZPortfolioName());
+        data.put(operation_type, getOperationType().getValue());
         data.put(operation_date, date.toEzPortoflioDate());
         data.put(operation_amount, amount);
         data.put(operation_description, description);

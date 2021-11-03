@@ -1,6 +1,6 @@
 import { Box, Text, List, Table, TableHeader, TableRow, TableCell, TableBody } from "grommet";
 import { BorderType } from "grommet/utils";
-import {  EzEdition, EzPortefeuilleEdition } from '../../ez-api/gen-api/EZLoadApi';
+import {  EzEdition, EzPortefeuilleEdition, EzOperationEdition } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface OperationProps {
     operation: EzEdition;
@@ -27,40 +27,44 @@ export function Operation(props: OperationProps){
                      {(error: string, index: number) => getOperationError(index, error)}      
                 </List>
             )}
-            { props.operation.errors!.length === 0 && (props.operation.ezOperationEdition === undefined || props.operation.ezOperationEdition === null) &&
+            { props.operation.errors!.length === 0 && (props.operation.ezOperationEditions?.length === 0) &&
                 (<Text>Cette opération n'a pas d'impact dans EzPortfolio</Text>)}
 
-            { props.operation.errors!.length === 0 && props.operation.ezOperationEdition !== undefined && props.operation.ezOperationEdition !== null && (
+            { props.operation.errors!.length === 0 && (
                 <>
-                <Table margin="small" caption="Nouvelle Ligne dans l'onglet MesOperations">
-                <TableHeader>
-                    <TableRow>
-                        <TableCell><Text>Date</Text></TableCell>
-                        <TableCell><Text>Compte</Text></TableCell>
-                        <TableCell><Text>Courtier</Text></TableCell>
-                        <TableCell><Text>Quantité</Text></TableCell>
-                        <TableCell><Text>Opération</Text></TableCell>
-                        <TableCell><Text>Valeur</Text></TableCell>
-                        <TableCell><Text>Pays</Text></TableCell>
-                        <TableCell><Text>Montant</Text></TableCell>
-                        <TableCell><Text>Information</Text></TableCell>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow>
-                        <TableCell><Text>{props.operation.ezOperationEdition.date}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.accountType}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.broker}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.quantity}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.operationType}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.shareName}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.country}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.amount}</Text></TableCell>
-                        <TableCell><Text>{props.operation.ezOperationEdition.description}</Text></TableCell>
-                    </TableRow>
-                </TableBody>
-                </Table>
-                
+                <List data={props.operation.ezOperationEditions}>   
+                    {(datanum: EzOperationEdition) => 
+                        <Table margin="small" caption="Nouvelle Ligne dans l'onglet MesOperations">
+                        <TableHeader>
+                            <TableRow>
+                                <TableCell><Text>Date</Text></TableCell>
+                                <TableCell><Text>Compte</Text></TableCell>
+                                <TableCell><Text>Courtier</Text></TableCell>
+                                <TableCell><Text>Quantité</Text></TableCell>
+                                <TableCell><Text>Opération</Text></TableCell>
+                                <TableCell><Text>Valeur</Text></TableCell>
+                                <TableCell><Text>Pays</Text></TableCell>
+                                <TableCell><Text>Montant</Text></TableCell>
+                                <TableCell><Text>Information</Text></TableCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell><Text>{datanum.date}</Text></TableCell>
+                                <TableCell><Text>{datanum.accountType}</Text></TableCell>
+                                <TableCell><Text>{datanum.broker}</Text></TableCell>
+                                <TableCell><Text>{datanum.quantity}</Text></TableCell>
+                                <TableCell><Text>{datanum.operationType}</Text></TableCell>
+                                <TableCell><Text>{datanum.shareName}</Text></TableCell>
+                                <TableCell><Text>{datanum.country}</Text></TableCell>
+                                <TableCell><Text>{datanum.amount}</Text></TableCell>
+                                <TableCell><Text>{datanum.description}</Text></TableCell>
+                            </TableRow>
+                        </TableBody>
+                        </Table>
+                    }
+                </List>
+
                 <List data={props.operation.ezPortefeuilleEditions}>   
                 {(datanum: EzPortefeuilleEdition) => 
                     datanum.valeur && (

@@ -77,10 +77,15 @@ public class ExpressionEvaluator {
         if (resultObj == null){
             throw new IllegalStateException("L'expression: "+lineToEval+" retourne null!!");
         }
-        if (resultObj instanceof Float || resultObj instanceof Double){
+        if (resultObj instanceof Float){
             // simplify if possible, in case the result of the expression is a float: 5000.00
             // convert it into an int if possible to obtain a string: 5000
-            return ModelUtils.normalizeAmount(resultObj + "");
+            return ModelUtils.float2Str((Float)resultObj );
+        }
+        if (resultObj instanceof Double){
+            // simplify if possible, in case the result of the expression is a float: 5000.00
+            // convert it into an int if possible to obtain a string: 5000
+            return ModelUtils.double2Str((Double)resultObj );
         }
         return resultObj+"";
     }

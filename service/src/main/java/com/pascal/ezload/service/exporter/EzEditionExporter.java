@@ -7,7 +7,6 @@ import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.model.EZVersementFonds;
 import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.sources.Reporting;
 

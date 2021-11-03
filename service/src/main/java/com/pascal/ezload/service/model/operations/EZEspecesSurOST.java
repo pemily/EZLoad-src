@@ -1,14 +1,18 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZOperationType;
+import com.pascal.ezload.service.model.IOperationWithAction;
 
-public class EZEspeceSurOST extends EZOperation implements IOperationWithAction {
+public class EZEspecesSurOST extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.DIVIDENDE_VERSE; // ?? Pas sûr de moi ??
+        return EZOperationType.ESPECES_SUR_OST;
     }
 
     @Override

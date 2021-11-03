@@ -40,60 +40,51 @@ public class RulesEngine {
                 .collect(Collectors.toList());
         if (compatibleRules.size() == 0){
             ezEdition.getErrors().add(NO_RULE_FOUND);
-            new EzOperationEdition().fill(ezData); // même si erreur, je rajoute des data, pour pouvoir voir dans la UI ce que l'on a récupéré
-            ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
+            // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+            ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
         }
         else if (compatibleRules.size() > 1){
             ezEdition.getErrors().add("Il y a plusieurs règles de transformation pour cette opération: "+compatibleRules);
-            new EzOperationEdition().fill(ezData); // même si erreur, je rajoute des data, pour pouvoir voir dans la UI ce que l'on a récupéré
-            ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
-
+            // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+            ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
         }
         else {
             RuleDefinition ruleDef = compatibleRules.get(0);
             reporting.info("Utilisation de la règle "+ruleDef.getBroker().getEzPortfolioName()+": "+ruleDef.getName());
             ezEdition.setRuleDefinitionSummary(ruleDef);
             try {
-                EzOperationEdition ezOperationEdition = applyRuleForOperation(ruleDef, ezData);
-                if (ezOperationEdition == null){
+                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ruleDef, ezData);
+                if (ezOperationEditions.isEmpty()){
                     reporting.info("Cette opération n'a pas d'impact sur le portefeuille");
-                    new EzOperationEdition().fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
-                    ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
+                    // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+                    ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
                 }
-                else if (ezOperationEdition.hasErrors()){
-                    ezEdition.getErrors().addAll(ezOperationEdition.errorsAsList());
-                    ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
-                    ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
+                else if (ezOperationEditions.stream().anyMatch(WithErrors::hasErrors)){
+                    ezEdition.getErrors().addAll(ezOperationEditions.stream().flatMap(op -> op.errorsAsList().stream()).collect(Collectors.toList()));
+                    // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+                    ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
                 }
-                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEdition))) {
-                    if (StringUtils.isBlank(ezOperationEdition.getDate())) {
-                        ezEdition.getErrors().add("Cette opération n'a pas de date");
-                        ezOperationEdition.fill(ezData); // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
-                        ezPortfolioProxy.fillFromMonPortefeuille(ezData, ""); // et je rajoute les données du portefeuille pour la meme raison
-                    } else {
-                        ezEdition.setEzOperationEdition(ezOperationEdition);
-                        ezEdition.getEzOperationEdition().fill(ezData);
-                        List<EzPortefeuilleEdition> ezPortefeuilleEditions = applyRuleForPortefeuille(ruleDef, ezPortfolioProxy, ezData);
-                        List<String> allErrors = ezPortefeuilleEditions.stream().flatMap(p -> p.errorsAsList().stream()).collect(Collectors.toList());
-                        if (ezPortefeuilleEditions.isEmpty()){
-                             // Cette opération n'a pas d'impact sur le portefeuille
-                        }
-                        else if (!allErrors.isEmpty()){
-                            ezEdition.setEzOperationEdition(null);
-                            ezEdition.setEzPortefeuilleEditions(null);
-                            ezEdition.getErrors().addAll(allErrors);
-                        }
-                        else{
-                            ezEdition.setEzPortefeuilleEditions(ezPortefeuilleEditions);
-                            reporting.info("Nouvelle operation " + ezOperationEdition.getDate() + " " + ezOperationEdition.getOperationType() + " " + ezOperationEdition.getAmount());
-                        }
+                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEditions.get(0)))) { // test if the first generated operations already exists, if yes, we already loaded this operation
+                    ezEdition.setEzOperationEditions(ezOperationEditions);
+                    List<EzPortefeuilleEdition> ezPortefeuilleEditions = applyRuleForPortefeuille(ruleDef, ezPortfolioProxy, ezData);
+                    List<String> allErrors = ezPortefeuilleEditions.stream().flatMap(p -> p.errorsAsList().stream()).collect(Collectors.toList());
+                    if (ezPortefeuilleEditions.isEmpty()){
+                         // Cette EZOperation n'a pas d'impact sur le portefeuille
+                    }
+                    else if (!allErrors.isEmpty()){
+                        ezEdition.setEzOperationEditions(new LinkedList<>());
+                        ezEdition.setEzPortefeuilleEditions(new LinkedList<>());
+                        ezEdition.getErrors().addAll(allErrors);
+                    }
+                    else{
+                        ezEdition.setEzPortefeuilleEditions(ezPortefeuilleEditions);
                     }
                 }
             }
             catch(Exception e){
                 reporting.error(e);
-                ezEdition.setEzOperationEdition(null);
-                ezEdition.setEzPortefeuilleEditions(null);
+                ezEdition.setEzOperationEditions(new LinkedList<>());
+                ezEdition.setEzPortefeuilleEditions(new LinkedList<>());
                 ezEdition.getErrors().add("Il y a eu une erreur de transformation pour cette opération");
                 ezEdition.getErrors().add(e.getMessage());
                 ezEdition.getErrors().add("Voir le rapport pour plus de détails");
@@ -119,22 +110,22 @@ public class RulesEngine {
         return ezPortfolioProxy.getEzPortfolioVersion() == 5 && ruleDefinition.getEzLoadVersion() == 1;
     }
 
-    private EzOperationEdition applyRuleForOperation(RuleDefinition ruleDefinition, EzData data) {
-        EzOperationEdition result = null;
+    private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data) {
+        List<EzOperationEdition> result = new LinkedList<>();
 
-        if (ruleDefinition.getOperationRule() != null) {
-            OperationRule opRule = ruleDefinition.getOperationRule();
-            result = new EzOperationEdition();
-            result.setDate(eval(result, opRule.getOperationDateExpr(), data));
-            result.setAccountType(eval(result, opRule.getOperationCompteTypeExpr(), data));
-            result.setBroker(eval(result, opRule.getOperationBrokerExpr(), data));
-            result.setQuantity(eval(result, opRule.getOperationQuantityExpr(), data));
-            result.setOperationType(eval(result, opRule.getOperationTypeExpr(), data));
-            result.setShareName(eval(result, opRule.getOperationActionNameExpr(), data));
-            result.setCountry(eval(result, opRule.getOperationCountryExpr(), data));
-            result.setAmount(eval(result, opRule.getOperationAmountExpr(), data));
-            result.setDescription(eval(result, opRule.getOperationDescriptionExpr(), data));
-        }
+        ruleDefinition.getOperationRules().forEach(opRule -> {
+            EzOperationEdition ezOperationEdition = new EzOperationEdition();
+            ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data));
+            ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data));
+            ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data));
+            ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data));
+            ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data));
+            ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data));
+            ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data));
+            ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data));
+            ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data));
+            result.add(ezOperationEdition);
+        });
 
         return result;
     }
@@ -142,7 +133,7 @@ public class RulesEngine {
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
         List<EzPortefeuilleEdition> result = new LinkedList<>();
 
-        for (PortefeuilleRule portRule : ruleDefinition.getPortefeuilleRules()) {
+        ruleDefinition.getPortefeuilleRules().forEach(portRule -> {
             EzData data2 = new EzData(data);
             EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
@@ -158,7 +149,7 @@ public class RulesEngine {
                 }
                 result.add(ezPortefeuilleEdition);
             }
-        }
+        });
 
         // fill the parent data with empty values to always have values in the UI
         portfolioProxy.fillFromMonPortefeuille(data, "");

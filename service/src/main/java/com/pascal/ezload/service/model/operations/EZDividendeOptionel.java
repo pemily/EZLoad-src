@@ -1,6 +1,11 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZOperationType;
+import com.pascal.ezload.service.model.IOperationWithAction;
 
 public class EZDividendeOptionel extends EZOperation implements IOperationWithAction {
 
@@ -17,7 +22,7 @@ public class EZDividendeOptionel extends EZOperation implements IOperationWithAc
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.DIVIDENDE_VERSE;
+        return EZOperationType.DIVIDENDE_OPTIONEL;
     }
 
     @Override
@@ -32,6 +37,6 @@ public class EZDividendeOptionel extends EZOperation implements IOperationWithAc
     @Override
     protected void fillData(EzData data) {
         action.fill(data);
-        data.put("operation.cours", cours);
+        data.put(OperationData.operation_cours, cours);
     }
 }

@@ -1,4 +1,6 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
+
+import com.pascal.ezload.service.model.EZOperationType;
 
 public class EZAchatEtranger extends EZAchat {
 
@@ -23,7 +25,7 @@ public class EZAchatEtranger extends EZAchat {
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.ACHAT_TITRES;
+        return EZOperationType.ACHAT_TITRES_ETRANGER;
     }
 
 }

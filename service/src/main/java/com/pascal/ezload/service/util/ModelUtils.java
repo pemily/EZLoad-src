@@ -51,6 +51,10 @@ public class ModelUtils {
 
 
     public static String float2Str(float v) {
-        return normalizeAmount(v+"");
+        return normalizeAmount(String.format("%.6f", v)); // 5 digit apres la virgule
+    }
+
+    public static String double2Str(double v) {
+        return normalizeAmount(String.format("%.6f", v)); // 5 digit apres la virgule
     }
 }

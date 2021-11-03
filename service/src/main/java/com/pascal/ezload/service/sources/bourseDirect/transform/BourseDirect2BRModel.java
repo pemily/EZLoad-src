@@ -3,6 +3,7 @@ package com.pascal.ezload.service.sources.bourseDirect.transform;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.model.operations.*;
 import com.pascal.ezload.service.parsers.bourseDirect.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
@@ -156,7 +157,7 @@ public class BourseDirect2BRModel {
         }
         else if (operation instanceof EspecesSurOST){
             EspecesSurOST op = (EspecesSurOST) operation;
-            EZEspeceSurOST brOp = new EZEspeceSurOST();
+            EZEspecesSurOST brOp = new EZEspecesSurOST();
             EZOperation = brOp;
             brOp.setAction(FinanceTools.getInstance().get(reporting, op.getId()));
             brOp.setDescription(op.getDetails());

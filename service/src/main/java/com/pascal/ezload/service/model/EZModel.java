@@ -1,14 +1,13 @@
 package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class EZModel implements BourseDirectV1Data, ReportData {
+public class EZModel implements ReportData {
 
     private EnumEZBroker broker;
     private int brokerFileVersion;

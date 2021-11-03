@@ -2,6 +2,7 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.util.LoggerReporting;
 import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.jexl3.JexlException;
@@ -16,8 +17,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "debut");
-        ezdata.put("ezload.two", "fin");
+        ezdata.put(new EzDataKey("ezload.one"), "debut");
+        ezdata.put(new EzDataKey("ezload.two"), "fin");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("debutfin", result);
     }
@@ -29,8 +30,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "debut");
-        ezdata.put("ezload.two", "2500");
+        ezdata.put(new EzDataKey("ezload.one"), "debut");
+        ezdata.put(new EzDataKey("ezload.two"), "2500");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("debut2500", result);
     }
@@ -41,8 +42,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "debut");
-        ezdata.put("ezload.two", ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("ezload.one"), "debut");
+        ezdata.put(new EzDataKey("ezload.two"), ModelUtils.float2Str(2500.5f));
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("debut2500.5", result);
     }
@@ -53,8 +54,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "debut");
-        ezdata.put("ezload.two", "2500.50");
+        ezdata.put(new EzDataKey("ezload.one"), "debut");
+        ezdata.put(new EzDataKey("ezload.two"), "2500.50");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("debut2500.5", result);
     }
@@ -65,8 +66,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "debut");
-        ezdata.put("ezload.two", "2500,50");
+        ezdata.put(new EzDataKey("ezload.one"), "debut");
+        ezdata.put(new EzDataKey("ezload.two"), "2500,50");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("debut2500.5", result);
     }
@@ -78,8 +79,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "2500");
-        ezdata.put("ezload.two", "2500");
+        ezdata.put(new EzDataKey("ezload.one"), "2500");
+        ezdata.put(new EzDataKey("ezload.two"), "2500");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5000", result);
     }
@@ -90,8 +91,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", ModelUtils.float2Str(2500.5f));
-        ezdata.put("ezload.two", "2500");
+        ezdata.put(new EzDataKey("ezload.one"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("ezload.two"), "2500");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5000,5", result);
     }
@@ -101,8 +102,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", ModelUtils.float2Str(2500.5f));
-        ezdata.put("ezload.two", ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("ezload.one"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("ezload.two"), ModelUtils.float2Str(2500.5f));
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5001", result);
     }
@@ -113,8 +114,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "+2 500.0");
-        ezdata.put("ezload.two", "+2 500.0");
+        ezdata.put(new EzDataKey("ezload.one"), "+2 500.0");
+        ezdata.put(new EzDataKey("ezload.two"), "+2 500.0");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5000", result);
     }
@@ -125,8 +126,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "+2 500.5");
-        ezdata.put("ezload.two", "+2 500.5");
+        ezdata.put(new EzDataKey("ezload.one"), "+2 500.5");
+        ezdata.put(new EzDataKey("ezload.two"), "+2 500.5");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5001", result);
     }
@@ -137,8 +138,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "+2 500,5");
-        ezdata.put("ezload.two", "+2 500,5");
+        ezdata.put(new EzDataKey("ezload.one"), "+2 500,5");
+        ezdata.put(new EzDataKey("ezload.two"), "+2 500,5");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("5001", result);
     }
@@ -149,8 +150,8 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "-2 500,5");
-        ezdata.put("ezload.two", "+2 500,5");
+        ezdata.put(new EzDataKey("ezload.one"), "-2 500,5");
+        ezdata.put(new EzDataKey("ezload.two"), "+2 500,5");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
         assertEquals("0", result);
     }
@@ -161,7 +162,7 @@ public class ExpressionEvaluatorTest {
         MainSettings mainSettings = new MainSettings();
 
         EzData ezdata = new EzData();
-        ezdata.put("ezload.one", "20");
+        ezdata.put(new EzDataKey("ezload.one"), "20");
         assertThrows(ExpressionEvaluator.ExpressionException.class, () -> ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "achat de ezload.one action", ezdata));
     }
 }

@@ -34,12 +34,12 @@ public class EzData {
     }
 
     @JsonIgnore
-    public void put(String key, String value){
+    public void put(EzDataKey key, String value){
         String val = value == null ? "" : value;
-        if (containsKey(key) && !Objects.equals(val, data.get(key)))
+        if (containsKey(key.getName()) && !Objects.equals(val, get(key)))
             throw new RuntimeException("There is already a variable with this key: "+key+" current Value:"
-                    +this.data.get(key)+" new Value: "+val);
-        this.data.put(key, val);
+                    +get(key)+" new Value: "+val);
+        this.data.put(key.getName(), val);
     }
 
     @JsonIgnore
@@ -48,18 +48,23 @@ public class EzData {
     }
 
     @JsonIgnore
-    public int getInt(String name){
-        return str2Int(get(name));
+    public String get(EzDataKey k) {
+        return this.data.get(k.getName());
     }
 
     @JsonIgnore
-    public float getFloat(String name){
-        return str2Float(get(name));
+    public int getInt(EzDataKey k){
+        return str2Int(get(k));
     }
 
     @JsonIgnore
-    public EZDate getDate(String name) {
-        String date = get(name);
+    public float getFloat(EzDataKey k){
+        return str2Float(get(k));
+    }
+
+    @JsonIgnore
+    public EZDate getDate(EzDataKey k) {
+        String date = get(k);
         if (date == null) return null;
         return EZDate.parseFrenchDate(date, '/');
     }

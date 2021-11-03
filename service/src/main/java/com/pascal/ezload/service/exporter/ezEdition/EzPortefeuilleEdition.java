@@ -1,8 +1,6 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.exporter.ezEdition.data.common.EzLoadPortfolioPortefeuilleData;
-
-public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, WithErrors {
+public class EzPortefeuilleEdition implements WithErrors {
 
     private String errors;
 
@@ -113,21 +111,6 @@ public class EzPortefeuilleEdition implements EzLoadPortfolioPortefeuilleData, W
 
     public void setAnnualDividend(String annualDividend) {
         this.annualDividend = annualDividend;
-    }
-
-
-    public void fill(EzData data) {
-        data.put(ezLoad_portefeuille_account_type, accountType);
-        data.put(ezLoad_portefeuille_broker, broker);
-        data.put(ezLoad_portefeuille_tickerGoogle, tickerGoogleFinance);
-        data.put(ezLoad_portefeuille_country, country);
-        data.put(ezLoad_portefeuille_sector, sector);
-        data.put(ezLoad_portefeuille_industry, industry);
-        data.put(ezLoad_portefeuille_eligibilityDeduction40, eligibilityDeduction40);
-        data.put(ezLoad_portefeuille_type, type);
-        data.put(ezLoad_portefeuille_costPriceUnit, costPrice);
-        data.put(ezLoad_portefeuille_quantity, quantity);
-        data.put(ezLoad_portefeuille_annualDividend, annualDividend);
     }
 
     @Override

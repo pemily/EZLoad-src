@@ -1,4 +1,6 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
+
+import com.pascal.ezload.service.model.EZOperationType;
 
 public class EZVenteEtranger extends EZVente {
 
@@ -23,7 +25,7 @@ public class EZVenteEtranger extends EZVente {
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.VENTE_TITRES;
+        return EZOperationType.VENTE_TITRES_ETRANGER;
     }
 
 }

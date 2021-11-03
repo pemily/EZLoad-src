@@ -1,8 +1,6 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.exporter.ezEdition.data.common.EzLoadOperationEditionData;
-
-public class EzOperationEdition implements EzLoadOperationEditionData, WithErrors {
+public class EzOperationEdition implements WithErrors {
 
     private String errors;
 
@@ -86,18 +84,6 @@ public class EzOperationEdition implements EzLoadOperationEditionData, WithError
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void fill(EzData ezData) {
-        ezData.put(ezLoad_operation_date, date);
-        ezData.put(ezLoad_operation_accountType, accountType);
-        ezData.put(ezLoad_operation_broker, broker);
-        ezData.put(ezLoad_operation_quantity, quantity);
-        ezData.put(ezLoad_operation_operationType, operationType);
-        ezData.put(ezLoad_operation_shareName, shareName);
-        ezData.put(ezLoad_operation_country, country);
-        ezData.put(ezLoad_operation_amount, amount);
-        ezData.put(ezLoad_operation_description, description);
     }
 
     public String getErrors() {

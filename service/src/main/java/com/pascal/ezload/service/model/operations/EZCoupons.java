@@ -1,9 +1,12 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZOperationType;
+import com.pascal.ezload.service.model.IOperationWithAction;
 
-public class EZCoupons extends EZOperation implements IOperationWithAction, BourseDirectV1Data {
+public class EZCoupons extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
     private String prixUnitaireBrut;
@@ -63,7 +66,7 @@ public class EZCoupons extends EZOperation implements IOperationWithAction, Bour
 
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.DIVIDENDE_VERSE;
+        return EZOperationType.COUPONS;
     }
 
     @Override

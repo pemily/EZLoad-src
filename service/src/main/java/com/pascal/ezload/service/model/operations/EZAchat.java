@@ -1,9 +1,12 @@
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.model.operations;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.BourseDirectV1Data;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZOperationType;
+import com.pascal.ezload.service.model.IOperationWithAction;
 
-public class EZVente extends EZOperation implements IOperationWithAction, BourseDirectV1Data {
+public class EZAchat extends EZOperation implements IOperationWithAction {
 
     private EZAction action;
     private String cours;
@@ -43,9 +46,10 @@ public class EZVente extends EZOperation implements IOperationWithAction, Bourse
         this.tva = tva;
     }
 
+
     @Override
     public EZOperationType getOperationType() {
-        return EZOperationType.VENTE_TITRES;
+        return EZOperationType.ACHAT_TITRES;
     }
 
     @Override
