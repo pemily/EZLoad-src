@@ -27,7 +27,7 @@ public class EzEditionExporter {
     public EzEditionExporter(MainSettings mainSettings, Reporting reporting) throws IOException {
         this.reporting = reporting;
         this.mainSettings = mainSettings;
-        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(mainSettings).getAllRules());
+        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(mainSettings));
     }
 
     /**

@@ -6,19 +6,20 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.jexl3.JexlContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class VariableResolver  implements JexlContext {
 
     public static final String VARIABLE_SYSTEM_NAME = "ez";
 
     private final EzData allVariables;
-    private final MainSettings mainSettings;
-    private final Reporting reporting;
 
-    public VariableResolver(EzData allVariables, Reporting reporting, MainSettings mainSettings){
+    private final Map<String, Object> scriptVariables = new HashMap<>();
+
+    public VariableResolver(EzData allVariables){
         this.allVariables = allVariables;
-        this.mainSettings = mainSettings;
-        this.reporting = reporting;
     }
 
     @Override
@@ -43,12 +44,13 @@ public class VariableResolver  implements JexlContext {
                 }
             }
         }
-        return v;
+
+        return scriptVariables.get(name);
     }
 
     @Override
     public void set(String name, Object value) {
-        throw new RuntimeException("Vous ne devez pas changer la valeur d'une variable");
+        scriptVariables.put(name, value);
     }
 
     @Override

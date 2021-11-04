@@ -200,7 +200,7 @@ export function App(){
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
                                         createRule={op =>{ 
-                                            if (op.data?.data?.['courtier.version'] === undefined){
+                                            if (op.data?.data?.['ezBrokerVersion'] === undefined){
                                                 console.error("Il manque des données dans l'opération");
                                                 return;
                                             }         
@@ -208,10 +208,10 @@ export function App(){
                                                 {
                                                     oldName: undefined,
                                                     ruleDefinition: {
-                                                        name: op.data?.data?.['operation.type'],
-                                                        broker: strToBroker(op.data?.data?.['courtier.dossier']),
-                                                        brokerFileVersion: parseInt(op.data?.data?.['courtier.version']),
-                                                        condition: "operation.type == \"" + op.data?.data?.['operation.type']+"\"",
+                                                        name: op.data?.data?.['ezOperationType'],
+                                                        broker: strToBroker(op.data?.data?.['ezBrokerName']),
+                                                        brokerFileVersion: parseInt(op.data?.data?.['ezBrokerVersion']),
+                                                        condition: "ezOperationType == \"" + op.data?.data?.['ezOperationType']+"\"",
                                                         enabled: true
                                                 }};
                                             saveRuleDefinition(newSelectedRule)

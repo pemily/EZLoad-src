@@ -1,10 +1,7 @@
 package com.pascal.ezload.service.exporter;
 
 
-import com.pascal.ezload.service.model.EZAction;
-import com.pascal.ezload.service.model.EZModel;
-import com.pascal.ezload.service.model.EZOperation;
-import com.pascal.ezload.service.model.IOperationWithAction;
+import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,15 +55,18 @@ public class EZModelChecker {
 
     // return true if error found
     private void validateModel(EZOperation operation){
+
+        validateAccount(operation);
+
+        if (operation.getOperationType() == null) {
+            addError(operation, "Le type de l'opération n'a pas été trouvé! "+operation);
+        }
+
         if (operation.getDate() == null){
-            addError(operation, "La date de l'opération n'a pas été trouvé.");
+            addError(operation, "La date de l'opération n'a pas été trouvé! "+operation);
         }
         else if (!operation.getDate().isValid()) {
             addError(operation, "La date de l'opération est invalide. "+operation);
-        }
-
-        if (operation.getAccountType() == null) {
-            addError(operation, "Le type de compte d'une opération n'a pas été trouvé! "+operation);
         }
 
         if (operation.getBroker() == null) {
@@ -80,6 +80,22 @@ public class EZModelChecker {
         if (operation instanceof IOperationWithAction){
             IOperationWithAction opWithTitre = (IOperationWithAction) operation;
             validateAction(opWithTitre);
+        }
+    }
+
+    private void validateAccount(EZOperation operation) {
+        EZAccount account = operation.getAccount();
+
+        if (StringUtils.isBlank(account.getAccountNumber())){
+            addError(operation, "Le numéro de compte n'a pas été trouvé! "+operation);
+        }
+
+        if (StringUtils.isBlank(account.getAccountType())){
+            addError(operation, "Le type de compte n'a pas été trouvé! "+operation);
+        }
+
+        if (account.getDevise() == null){
+            addError(operation, "La devise du compte n'a pas été trouvé! "+operation);
         }
     }
 

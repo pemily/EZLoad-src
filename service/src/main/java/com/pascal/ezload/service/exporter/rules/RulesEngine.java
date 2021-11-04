@@ -10,6 +10,7 @@ import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +22,14 @@ public class RulesEngine {
 
     private Reporting reporting;
     private MainSettings mainSettings;
+    private RulesManager rulesManager;
     private List<RuleDefinition> allRules;
 
-    public RulesEngine(Reporting reporting, MainSettings mainSettings, List<RuleDefinition> allRules){
+    public RulesEngine(Reporting reporting, MainSettings mainSettings, RulesManager rulesManager) throws IOException {
         this.reporting = reporting;
         this.mainSettings = mainSettings;
-        this.allRules = allRules;
+        this.allRules = rulesManager.getAllRules();
+        this.rulesManager = rulesManager;
     }
 
     public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData){
@@ -101,7 +104,7 @@ public class RulesEngine {
                 data.get(BrokerData.broker_name).equals(ruleDefinition.getBroker().getEzPortfolioName()) &&
                 data.getInt(broker_version) == ruleDefinition.getBrokerFileVersion() &&
                 isRuleDefinitionCompatibleWithEzPortfolio(ruleDefinition, portfolioProxy) &&
-                ExpressionEvaluator.getSingleton().evaluateAsBoolean(reporting, mainSettings, ruleDefinition.getCondition(), data);
+                ExpressionEvaluator.getSingleton().evaluateAsBoolean(reporting, ruleDefinition.getCondition(), data);
     }
 
     private boolean isRuleDefinitionCompatibleWithEzPortfolio(RuleDefinition ruleDefinition, EZPortfolioProxy ezPortfolioProxy){
@@ -111,19 +114,21 @@ public class RulesEngine {
     }
 
     private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data) {
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition);
+
         List<EzOperationEdition> result = new LinkedList<>();
 
         ruleDefinition.getOperationRules().forEach(opRule -> {
             EzOperationEdition ezOperationEdition = new EzOperationEdition();
-            ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data));
-            ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data));
-            ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data));
-            ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data));
-            ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data));
-            ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data));
-            ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data));
-            ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data));
-            ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data));
+            ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data, functions));
+            ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data, functions));
+            ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data, functions));
+            ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data, functions));
+            ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data, functions));
+            ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data, functions));
+            ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data, functions));
+            ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data, functions));
+            ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data, functions));
             result.add(ezOperationEdition);
         });
 
@@ -132,19 +137,19 @@ public class RulesEngine {
 
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
         List<EzPortefeuilleEdition> result = new LinkedList<>();
-
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition);
         ruleDefinition.getPortefeuilleRules().forEach(portRule -> {
             EzData data2 = new EzData(data);
             EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
-            String valeur = eval(ezPortefeuilleEdition, portRule.getPortefeuilleValeurExpr(), data2);
+            String valeur = eval(ezPortefeuilleEdition, portRule.getPortefeuilleValeurExpr(), data2, functions);
             portfolioProxy.fillFromMonPortefeuille(data2, valeur);
 
             if (StringUtils.isBlank(valeur)) {
                 reporting.info("Pas d'impact sur l'onglet MonPortefeuille pour cette opération");
             } else {
                 if (!ezPortefeuilleEdition.hasErrors()) {
-                    applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2);
+                    applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2, functions);
                     portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
                 }
                 result.add(ezPortefeuilleEdition);
@@ -157,20 +162,20 @@ public class RulesEngine {
         return result;
     }
 
-    private EzPortefeuilleEdition applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , PortefeuilleRule portefeuilleRule, EzData data) {
+    private EzPortefeuilleEdition applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , PortefeuilleRule portefeuilleRule, EzData data, CommonFunctions functions) {
 
-        ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleValeurExpr(), data));
-        ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCompteExpr(), data));
-        ezPortefeuilleEdition.setBroker(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCourtierExpr(), data));
-        ezPortefeuilleEdition.setTickerGoogleFinance(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTickerGoogleFinanceExpr(), data));
-        ezPortefeuilleEdition.setCountry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePaysExpr(), data));
-        ezPortefeuilleEdition.setSector(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleSecteurExpr(), data));
-        ezPortefeuilleEdition.setIndustry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleIndustrieExpr(), data));
-        ezPortefeuilleEdition.setEligibilityDeduction40(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleEligibiliteAbbattement40Expr(), data));
-        ezPortefeuilleEdition.setType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTypeExpr(), data));
-        ezPortefeuilleEdition.setCostPrice(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePrixDeRevientExpr(), data));
-        ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data));
-        ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleDividendeAnnuelExpr(), data));
+        ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleValeurExpr(), data, functions));
+        ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCompteExpr(), data, functions));
+        ezPortefeuilleEdition.setBroker(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCourtierExpr(), data, functions));
+        ezPortefeuilleEdition.setTickerGoogleFinance(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTickerGoogleFinanceExpr(), data, functions));
+        ezPortefeuilleEdition.setCountry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePaysExpr(), data, functions));
+        ezPortefeuilleEdition.setSector(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleSecteurExpr(), data, functions));
+        ezPortefeuilleEdition.setIndustry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleIndustrieExpr(), data, functions));
+        ezPortefeuilleEdition.setEligibilityDeduction40(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleEligibiliteAbbattement40Expr(), data, functions));
+        ezPortefeuilleEdition.setType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTypeExpr(), data, functions));
+        ezPortefeuilleEdition.setCostPrice(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePrixDeRevientExpr(), data, functions));
+        ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
+        ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleDividendeAnnuelExpr(), data, functions));
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)
         // I comment the following line, because it add confusion in the variable we can use in the rule
@@ -179,16 +184,19 @@ public class RulesEngine {
         return ezPortefeuilleEdition;
     }
 
-    private String eval(WithErrors entity, String expression, EzData data) {
+    private String eval(WithErrors entity, String expression, EzData data, CommonFunctions functions) {
         try {
             if (expression == null){
                 entity.addError("Une expression n'est pas renseignée, vous devez la corriger dans l'éditeur de règles");
                 return "";
             }
-            else return format(ExpressionEvaluator.getSingleton().evaluateAsString(reporting, mainSettings, expression, data));
+            else {
+                String script = functions.getScript() + ";\n"+ expression;
+                return format(ExpressionEvaluator.getSingleton().evaluateAsString(reporting, script, data));
+            }
         }
         catch(Exception e){
-            entity.addError("Expression: "+expression+" generates :" +e.getMessage());
+            entity.addError("L'expression '"+expression+"' provoque l'erreur: " +e.getMessage());
             return "<Error "+e.getMessage()+">";
         }
     }

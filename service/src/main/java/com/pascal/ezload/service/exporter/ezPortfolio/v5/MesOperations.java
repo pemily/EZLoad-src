@@ -77,7 +77,7 @@ public class MesOperations  {
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
-        return getLastOperationDate(courtier, EZAccountDeclaration).map(lastOpDate -> fileDate.isBeforeOrEquals(lastOpDate)).orElse(false);
+        return getLastOperationDate(courtier, EZAccountDeclaration).map(fileDate::isBeforeOrEquals).orElse(false);
     }
 
     public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration ezAccountDeclaration) {

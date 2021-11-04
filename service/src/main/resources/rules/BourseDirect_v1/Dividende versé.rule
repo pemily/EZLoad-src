@@ -6,18 +6,18 @@
   "enabled" : true,
   "description" : "Quoi faire?\nPourquoi la quantité est un chiffre négatif? Prendre le montant net ou brut?\nFaut il faire qqchose dans mon portefeuille?",
   "ezLoadVersion" : 1,
-  "condition" : "operation.type == \"Dividende versé\" &&  operation.description !=  \"REINVESTISSEMENT\"",
+  "condition" : "ezOperationType == \"Dividende versé\" &&  operation.description !=  \"REINVESTISSEMENT\"",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
-    "operationDateExpr" : "operation.date",
-    "operationCompteTypeExpr" : "operation.typeCompte",
-    "operationBrokerExpr" : "courtier.nom",
-    "operationQuantityExpr" : "-operation.quantite",
-    "operationTypeExpr" : "operation.type",
-    "operationActionNameExpr" : "operation.valeur.nom",
-    "operationCountryExpr" : "marché.pays",
-    "operationAmountExpr" : "operation.montant",
-    "operationDescriptionExpr" : "operation.type + \" de \" +  operation.valeur.ticker"
+    "operationDateExpr" : "ezOperationDate",
+    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "-ezOperationQuantity",
+    "operationTypeExpr" : "ezOperationType",
+    "operationActionNameExpr" : "ezOperationShareName",
+    "operationCountryExpr" : "ezMarketCountry",
+    "operationAmountExpr" : "ezOperationAmount",
+    "operationDescriptionExpr" : "ezOperationType + \" de \" +  ezShareCode()"
   } ],
   "portefeuilleRules" : [ ]
 }

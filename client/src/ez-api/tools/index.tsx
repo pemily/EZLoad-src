@@ -90,8 +90,8 @@ export function ruleTitle(rule: RuleDefinitionSummary|undefined): string{
   return rule.broker+" v"+rule.brokerFileVersion+" - "+rule.name;
 }
 
-export function strToBroker(str: string | undefined) : 'BourseDirect'|undefined{
-  if (str === undefined) return undefined;
-  if (str === 'BourseDirect') return 'BourseDirect';
+export function strToBroker(brokerName: string | undefined) : 'BourseDirect'|undefined{
+  if (brokerName === undefined) return undefined;
+  if (brokerName === 'Bourse Direct') return 'BourseDirect';
   return undefined;
 }

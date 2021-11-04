@@ -93,7 +93,7 @@ public class EZModel implements ReportData {
 
         data.put(BrokerData.broker_version, brokerFileVersion+"");
         data.put(report_source, sourceFile);
-        data.put(report_date, reportDate == null ? null : reportDate.toEzPortoflioDate());
+        // data.put(report_date, reportDate == null ? null : reportDate.toEzPortoflioDate());
     }
 }
 

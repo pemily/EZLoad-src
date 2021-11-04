@@ -14,7 +14,6 @@ public abstract class EZOperation implements OperationData {
     private String amount;
     private Integer quantity;
     private String description;
-    private EnumEZAccountType accountType;
     private EnumEZBroker broker;
     private EZAccount account;
     private EZAccountDeclaration ezAccountDeclaration;
@@ -43,14 +42,6 @@ public abstract class EZOperation implements OperationData {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public EnumEZAccountType getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(EnumEZAccountType accountType) {
-        this.accountType = accountType;
     }
 
     public EnumEZBroker getBroker() {
@@ -92,7 +83,6 @@ public abstract class EZOperation implements OperationData {
                 ", amount='" + amount + '\'' +
                 ", quantity='" + quantity + '\'' +
                 ", description='" + description + '\'' +
-                ", compteType=" + accountType +
                 ", account Name=" + account.getOwnerName() +
                 ", account Number=" + account.getAccountNumber() +
                 ", courtier='" + broker + '\'' +
@@ -105,7 +95,6 @@ public abstract class EZOperation implements OperationData {
         data.put(operation_date, date.toEzPortoflioDate());
         data.put(operation_amount, amount);
         data.put(operation_description, description);
-        data.put(operation_accountType, accountType.getEZPortfolioName());
         data.put(operation_quantity, quantity == null ? null : quantity+"");
         fillData(data); // force the subtype to implements the fillData method
         broker.fill(data);

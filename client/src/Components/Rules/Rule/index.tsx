@@ -58,7 +58,7 @@ export function Rule(props: RuleProps){
         <>
         <Box>
             <Box direction="row" align="end" alignSelf="end" margin="small">
-                <CommonFunctionsEditor visible={false} readOnly={props.readOnly} broker={props.ruleDefinition.broker} brokerFileVersion={props.ruleDefinition.brokerFileVersion}/>
+                <CommonFunctionsEditor readOnly={props.readOnly} broker={props.ruleDefinition.broker} brokerFileVersion={props.ruleDefinition.brokerFileVersion}/>
                 <Anchor margin={{right: "medium"}} alignSelf="end" label="Syntaxe" target="jexl" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html" icon={<HelpOption size="medium"/>}/>                    
             </Box>
             <Box direction="row" align="center" margin="small">
@@ -75,7 +75,7 @@ export function Rule(props: RuleProps){
                     isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.name}
                     readOnly={readOnly}
                     onChange={newValue => {
-                        saveRule({ ...props.ruleDefinition, name: newValue})
+                        saveRule({ ...props.ruleDefinition, name: newValue.trim()})
                     }}/>
                 
                 <Button key={"duplicate"} size="small" alignSelf="end"
@@ -112,7 +112,7 @@ export function Rule(props: RuleProps){
                     isRequired={false} errorMsg={props.ruleDefinition.field2ErrorMsg?.description}
                     readOnly={readOnly}
                     onChange={newValue => {
-                        saveRule({ ...props.ruleDefinition, description: newValue})
+                        saveRule({ ...props.ruleDefinition, description: newValue.trim()})
                     }}/>        
         </Box>
         <Box direction="row" align="Center" margin="small">
@@ -120,7 +120,7 @@ export function Rule(props: RuleProps){
                 isRequired={true} errorMsg={props.ruleDefinition.field2ErrorMsg?.condition}
                 readOnly={readOnly}
                 onChange={newValue => {
-                    saveRule({ ...props.ruleDefinition, condition: newValue})
+                    saveRule({ ...props.ruleDefinition, condition: newValue.trim()})
                 }}/>
             <EzDataField value={props.data} iconInfo={false}
                  onSelect={ d => saveRule({...props.ruleDefinition, condition: append(props.ruleDefinition.condition,d)})}/>
@@ -129,15 +129,48 @@ export function Rule(props: RuleProps){
         <Box margin="small"  border="all" background="light-1" align="center">
             <Box direction="row">
                 <Heading level="3">Mes Opérations</Heading>
-                <Box margin="none" pad="none" alignSelf="center">
-                <Button icon={<Add size="small"/>} label="Nouveau" size="small"
-                    onClick={() =>  saveRule({...props.ruleDefinition, operationRules: [...props.ruleDefinition.operationRules!, {}]})}/>
-                </Box>
             </Box>
             <List data={props.ruleDefinition.operationRules}>
             {(datanum: OperationRule) => 
-                ( <>
-                    <Button alignSelf="end" margin="none" icon={<Trash size="medium" color="status-critical"/>} onClick={() =>
+                ( <Box direction="row">   
+                    <Box direction="row-responsive">
+                    {cellData("Date", datanum.operationDateExpr, datanum.field2ErrorMsg?.operationDateExpr, (newVal) => {                    
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationDateExpr: newVal.trim()})});
+                    })}
+
+                    {cellData("Compte", datanum.operationCompteTypeExpr, datanum.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationCompteTypeExpr: newVal.trim()})});
+                    })}
+                            
+                    {cellData("Courtier", datanum.operationBrokerExpr, datanum.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationBrokerExpr: newVal.trim()})});
+                    })}
+
+                    {cellData("Quantité", datanum.operationQuantityExpr, datanum.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationQuantityExpr: newVal.trim()})});
+                    })}
+
+                    {cellData("Opération", datanum.operationTypeExpr, datanum.field2ErrorMsg?.operationTypeExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationTypeExpr: newVal.trim()})});
+                    })}            
+                    
+                    {cellData("Valeur", datanum.operationActionNameExpr, datanum.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationActionNameExpr: newVal.trim()})});
+                    })}
+                    
+                    {cellData("Pays", datanum.operationCountryExpr, datanum.field2ErrorMsg?.operationCountryExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationCountryExpr: newVal.trim()})});
+                    })}
+
+                    {cellData("Montant", datanum.operationAmountExpr, datanum.field2ErrorMsg?.operationAmountExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationAmountExpr: newVal.trim()})});
+                    })}    
+
+                    {cellData("Information", datanum.operationDescriptionExpr, datanum.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
+                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationDescriptionExpr: newVal.trim()})});
+                    })} 
+                    </Box>  
+                    <Button alignSelf="center" margin="none" icon={<Trash size="medium" color="status-critical"/>} onClick={() =>
                         confirmAlert({
                             title: 'Etes vous sûr de vouloir supprimer cette règle pour l\'opération?',                        
                             buttons: [
@@ -150,60 +183,64 @@ export function Rule(props: RuleProps){
                                     onClick: () => {}
                                 }
                             ]
-                    })}/>       
-                    <Box direction="row-responsive">
-                    {cellData("Date", datanum.operationDateExpr, datanum.field2ErrorMsg?.operationDateExpr, (newVal) => {                    
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationDateExpr: newVal})});
-                    })}
-
-                    {cellData("Compte", datanum.operationCompteTypeExpr, datanum.field2ErrorMsg?.operationCompteTypeExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationCompteTypeExpr: newVal})});
-                    })}
-                            
-                    {cellData("Courtier", datanum.operationBrokerExpr, datanum.field2ErrorMsg?.operationBrokerExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationBrokerExpr: newVal})});
-                    })}
-
-                    {cellData("Quantité", datanum.operationQuantityExpr, datanum.field2ErrorMsg?.operationQuantityExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationQuantityExpr: newVal})});
-                    })}
-
-                    {cellData("Opération", datanum.operationTypeExpr, datanum.field2ErrorMsg?.operationTypeExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationTypeExpr: newVal})});
-                    })}            
-                    
-                    {cellData("Valeur", datanum.operationActionNameExpr, datanum.field2ErrorMsg?.operationActionNameExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationActionNameExpr: newVal})});
-                    })}
-                    
-                    {cellData("Pays", datanum.operationCountryExpr, datanum.field2ErrorMsg?.operationCountryExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationCountryExpr: newVal})});
-                    })}
-
-                    {cellData("Montant", datanum.operationAmountExpr, datanum.field2ErrorMsg?.operationAmountExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationAmountExpr: newVal})});
-                    })}    
-
-                    {cellData("Information", datanum.operationDescriptionExpr, datanum.field2ErrorMsg?.operationDescriptionExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, operationRules: props.ruleDefinition.operationRules?.map(item => item !== datanum ? item : {...item, operationDescriptionExpr: newVal})});
-                    })} 
-                    </Box>          
-                </>)}
-            </List>            
+                    })}/>                                
+                </Box>)}
+            </List>       
+            <Box margin="small" pad="none" alignSelf="start">
+                <Button icon={<Add size="small"/>} label="Nouveau" size="small"
+                    onClick={() =>  saveRule({...props.ruleDefinition, operationRules: [...props.ruleDefinition.operationRules!, {}]})}/>
+            </Box>                 
         </Box>
         <Box margin="small" border="all" background="light-1" align="center">
             <Box direction="row">
                 <Heading level="3">Mon Portefeuille</Heading>
-                <Box margin="none" pad="none" alignSelf="center">
-                { (props.ruleDefinition.portefeuilleRules !== undefined && props.ruleDefinition.portefeuilleRules.length < 2) // 2 portefeuille rules max, one for the valeur and one for the LIQUIDITE                    
-                    && (<Button icon={<Add size="small"/>} label="Nouveau" size="small"
-                    onClick={() => saveRule({...props.ruleDefinition, portefeuilleRules: [...props.ruleDefinition.portefeuilleRules!, {}]})}/>) }
-                </Box>
             </Box>
             <List data={props.ruleDefinition.portefeuilleRules}>
                 {(datanum: PortefeuilleRule) => 
-                ( <>
-                <Button alignSelf="end" margin="none" icon={<Trash size="medium" color="status-critical"/>} 
+                ( <Box direction="row">
+                <Box>
+                    <Box direction="row-responsive">
+                        {cellData("Valeur", datanum.portefeuilleValeurExpr, datanum.field2ErrorMsg?.portefeuilleValeurExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleValeurExpr: newVal.trim()})});
+                        })} 
+                        {cellData("Compte", datanum.portefeuilleCompteExpr, datanum.field2ErrorMsg?.portefeuilleCompteExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCompteExpr: newVal.trim()})});
+                        })} 
+                        {cellData("Courtier", datanum.portefeuilleCourtierExpr, datanum.field2ErrorMsg?.portefeuilleCourtierExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCourtierExpr: newVal.trim()})});
+                        })} 
+                        {cellData("Ticker Google", datanum.portefeuilleTickerGoogleFinanceExpr, datanum.field2ErrorMsg?.portefeuilleTickerGoogleFinanceExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTickerGoogleFinanceExpr: newVal.trim()})});
+                        })}   
+                        {cellData("Pays", datanum.portefeuillePaysExpr, datanum.field2ErrorMsg?.portefeuillePaysExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePaysExpr: newVal.trim()})});
+                        })}   
+                        {cellData("Secteur", datanum.portefeuilleSecteurExpr, datanum.field2ErrorMsg?.portefeuilleSecteurExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleSecteurExpr: newVal.trim()})});
+                        })}       
+                    </Box>                
+                    <Box direction="row-responsive">
+                        {cellData("Industrie", datanum.portefeuilleIndustrieExpr, datanum.field2ErrorMsg?.portefeuilleIndustrieExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleIndustrieExpr: newVal.trim()})});
+                        })}             
+                        {cellData("Eligibilité Abattement 40%", datanum.portefeuilleEligibiliteAbbattement40Expr, datanum.field2ErrorMsg?.portefeuilleEligibiliteAbbattement40Expr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleEligibiliteAbbattement40Expr: newVal.trim()})});
+                        })}     
+                        {cellData("Type", datanum.portefeuilleTypeExpr, datanum.field2ErrorMsg?.portefeuilleTypeExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTypeExpr: newVal.trim()})});
+                        })}     
+                        {cellData("Prix de Revient Unitaire", datanum.portefeuillePrixDeRevientExpr, datanum.field2ErrorMsg?.portefeuillePrixDeRevientExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePrixDeRevientExpr: newVal.trim()})});
+                        })}     
+                        {cellData("Quantité", datanum.portefeuilleQuantiteExpr, datanum.field2ErrorMsg?.portefeuilleQuantiteExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleQuantiteExpr: newVal.trim()})});
+                        })}     
+                        {cellData("Dividende annuel", datanum.portefeuilleDividendeAnnuelExpr, datanum.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr, (newVal) => {
+                            return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleDividendeAnnuelExpr: newVal.trim()})});
+                        })}  
+                    </Box>     
+                </Box>
+                <Button alignSelf="center" margin="none" icon={<Trash size="medium" color="status-critical"/>} 
                     onClick={() => 
                         confirmAlert({
                             title: 'Etes vous sûr de vouloir supprimer cette règle pour le portefeuille?',                        
@@ -220,48 +257,13 @@ export function Rule(props: RuleProps){
                             })
                     }/>
 
-                <Box direction="row-responsive">
-                    {cellData("Valeur", datanum.portefeuilleValeurExpr, datanum.field2ErrorMsg?.portefeuilleValeurExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleValeurExpr: newVal})});
-                    })} 
-                    {cellData("Compte", datanum.portefeuilleCompteExpr, datanum.field2ErrorMsg?.portefeuilleCompteExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCompteExpr: newVal})});
-                    })} 
-                    {cellData("Courtier", datanum.portefeuilleCourtierExpr, datanum.field2ErrorMsg?.portefeuilleCourtierExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleCourtierExpr: newVal})});
-                    })} 
-                    {cellData("Ticker Google", datanum.portefeuilleTickerGoogleFinanceExpr, datanum.field2ErrorMsg?.portefeuilleTickerGoogleFinanceExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTickerGoogleFinanceExpr: newVal})});
-                    })}   
-                    {cellData("Pays", datanum.portefeuillePaysExpr, datanum.field2ErrorMsg?.portefeuillePaysExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePaysExpr: newVal})});
-                    })}   
-                    {cellData("Secteur", datanum.portefeuilleSecteurExpr, datanum.field2ErrorMsg?.portefeuilleSecteurExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleSecteurExpr: newVal})});
-                    })}       
-                </Box>                
-                <Box direction="row-responsive">
-                    {cellData("Industrie", datanum.portefeuilleIndustrieExpr, datanum.field2ErrorMsg?.portefeuilleIndustrieExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleIndustrieExpr: newVal})});
-                    })}             
-                    {cellData("Eligibilité Abattement 40%", datanum.portefeuilleEligibiliteAbbattement40Expr, datanum.field2ErrorMsg?.portefeuilleEligibiliteAbbattement40Expr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleEligibiliteAbbattement40Expr: newVal})});
-                    })}     
-                    {cellData("Type", datanum.portefeuilleTypeExpr, datanum.field2ErrorMsg?.portefeuilleTypeExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleTypeExpr: newVal})});
-                    })}     
-                    {cellData("Prix de Revient Unitaire", datanum.portefeuillePrixDeRevientExpr, datanum.field2ErrorMsg?.portefeuillePrixDeRevientExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuillePrixDeRevientExpr: newVal})});
-                    })}     
-                    {cellData("Quantité", datanum.portefeuilleQuantiteExpr, datanum.field2ErrorMsg?.portefeuilleQuantiteExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleQuantiteExpr: newVal})});
-                    })}     
-                    {cellData("Dividende annuel", datanum.portefeuilleDividendeAnnuelExpr, datanum.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr, (newVal) => {
-                        return saveRule({...props.ruleDefinition, portefeuilleRules: props.ruleDefinition.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleDividendeAnnuelExpr: newVal})});
-                    })}  
-                </Box>     
-                </> )}
+                </Box> )}
             </List> 
+            <Box margin="small" pad="none" alignSelf="start">
+                { (props.ruleDefinition.portefeuilleRules !== undefined && props.ruleDefinition.portefeuilleRules.length < 2) // 2 portefeuille rules max, one for the valeur and one for the LIQUIDITE                    
+                    && (<Button icon={<Add size="small"/>} label="Nouveau" size="small"
+                    onClick={() => saveRule({...props.ruleDefinition, portefeuilleRules: [...props.ruleDefinition.portefeuilleRules!, {}]})}/>) }
+                </Box>
         </Box>
 
         </>

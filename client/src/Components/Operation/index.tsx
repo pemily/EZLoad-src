@@ -14,25 +14,25 @@ function getBorder(errors: string[]) : BorderType {
     return {color: "status-warning", side: "start", size: "large"};    
 }
 
-function getOperationError(index: number, error: string){
-    if (error === 'NO_RULE_FOUND') return (<Text key={index} margin="none">Pas de règle trouvé pour cette opération</Text>);
-    return (<Text key={index} margin="none">{error}</Text>);
+function getOperationError(id: number, index: number, error: string){
+    if (error === 'NO_RULE_FOUND') return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">Pas de règle trouvé pour cette opération</Text>);
+    return (<Text id={"operationError"+id+"_"+index} margin="none">{error}</Text>);
 }
 
 export function Operation(props: OperationProps){
     return (
-        <Box key={props.id} border={getBorder(props.operation.errors!)}>            
+        <Box key={"operation"+props.id} border={getBorder(props.operation.errors!)}>            
             { props.operation.errors!.length > 0 && (
-                <List data={props.operation.errors} margin="xsmall" pad="none" border={false} >
-                     {(error: string, index: number) => getOperationError(index, error)}      
+                <List key={"opErrorList"+props.id} data={props.operation.errors} margin="xsmall" pad="none" border={false} >
+                     {(error: string, index: number) => getOperationError(props.id, index, error)}      
                 </List>
             )}
             { props.operation.errors!.length === 0 && (props.operation.ezOperationEditions?.length === 0) &&
-                (<Text>Cette opération n'a pas d'impact dans EzPortfolio</Text>)}
+                (<Text key={"operationNoImpact"+props.id}>Cette opération n'a pas d'impact dans EzPortfolio</Text>)}
 
             { props.operation.errors!.length === 0 && (
                 <>
-                <List data={props.operation.ezOperationEditions}>   
+                <List key={"opMesOp"+props.id} data={props.operation.ezOperationEditions}>   
                     {(datanum: EzOperationEdition) => 
                         <Table margin="small" caption="Nouvelle Ligne dans l'onglet MesOperations">
                         <TableHeader>
@@ -65,7 +65,7 @@ export function Operation(props: OperationProps){
                     }
                 </List>
 
-                <List data={props.operation.ezPortefeuilleEditions}>   
+                <List key={"opPortefeuille"+props.id} data={props.operation.ezPortefeuilleEditions}>   
                 {(datanum: EzPortefeuilleEdition) => 
                     datanum.valeur && (
                     <Table margin="small" caption={"Mise à jour de la valeur: " + datanum.valeur + " dans l'onglet MonPortefeuille"}>

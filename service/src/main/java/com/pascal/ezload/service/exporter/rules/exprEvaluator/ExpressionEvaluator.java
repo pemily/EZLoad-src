@@ -4,10 +4,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ModelUtils;
-import org.apache.commons.jexl3.JexlBuilder;
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.*;
 
 import java.util.Map;
 
@@ -29,41 +26,40 @@ public class ExpressionEvaluator {
 
     private ExpressionEvaluator(){ }
 
-    public Object evaluateAsObj(Reporting reporting, MainSettings mainSettings, String lineToEval, EzData allVariables) {
+    public Object evaluateAsObj(Reporting reporting, String lineToEval, EzData allVariables) {
         Object result;
         try {
             // try to create an expression with the line to eval
-            JexlExpression expression = jexl.createExpression(lineToEval);
-            JexlContext jexlContext = new VariableResolver(allVariables, reporting, mainSettings);
-            result = expression.evaluate(jexlContext);
+            JexlScript script = jexl.createScript(lineToEval);
+            JexlContext jexlContext = new VariableResolver(allVariables);
+            result = script.execute(jexlContext);
         }
         catch(org.apache.commons.jexl3.JexlException.Tokenization e1){
             // oups, it was not an expression
-            throw new ExpressionException("Evaluate: "+lineToEval+ " => tokenization problem: "+ e1.getMessage(), e1);
+            throw new ExpressionException(" => Problème de tokenization: "+ e1.getMessage(), e1);
         }
         catch(org.apache.commons.jexl3.JexlException.Parsing e2){
             // oups, it was not an expression => use directly the lineToEval
-            throw new ExpressionException("Evaluate: "+lineToEval+ " => parsing problem: "+ e2.getMessage(), e2);
+            throw new ExpressionException(" => Problème de parsing: "+ e2.getMessage(), e2);
         }
         catch(org.apache.commons.jexl3.JexlException.Variable e3){
             // the line contains a variable that does not exists (or it is not a variable)
-            throw new ExpressionException("Evaluate: "+lineToEval+ " => not a variable: "+ e3.getMessage(), e3);
+            throw new ExpressionException(" => Variable inconnue: "+ e3.getMessage(), e3);
         }
         catch(Exception e){
-            throw new ExpressionException("Evaluate: "+lineToEval+ " => problem: "+ e.getMessage(), e);
+            throw new ExpressionException(" => Probleme inconnu: "+ e.getMessage(), e);
         }
-        reporting.info("L'evaluation de: "+lineToEval+ " donne: "+ result);
         return result;
     }
 
-    public boolean evaluateAsBoolean(Reporting reporting, MainSettings mainSettings, String lineToEval, EzData allVariables) {
-        Object resultObj = evaluateAsObj(reporting, mainSettings, lineToEval, allVariables);
+    public boolean evaluateAsBoolean(Reporting reporting, String lineToEval, EzData allVariables) {
+        Object resultObj = evaluateAsObj(reporting, lineToEval, allVariables);
 
         if (resultObj != null && !(resultObj instanceof Boolean)) {
-            throw new IllegalStateException("La condition: "+lineToEval+" ne retourne pas un boolean, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
+            throw new IllegalStateException("La condition ne retourne pas un boolean, elle retourne un type: "+resultObj.getClass().getSimpleName()+" dont la valeur est => "+resultObj);
         }
         if (resultObj == null){
-            throw new IllegalStateException("La condition: "+lineToEval+" retourne null!!");
+            throw new IllegalStateException("La condition retourne null!!");
         }
         boolean result = (Boolean) resultObj;
 
@@ -71,11 +67,11 @@ public class ExpressionEvaluator {
     }
 
 
-    public String evaluateAsString(Reporting reporting, MainSettings mainSettings, String lineToEval, EzData allVariables) {
-        Object resultObj = evaluateAsObj(reporting, mainSettings, lineToEval, allVariables);
+    public String evaluateAsString(Reporting reporting, String lineToEval, EzData allVariables) {
+        Object resultObj = evaluateAsObj(reporting, lineToEval, allVariables);
 
         if (resultObj == null){
-            throw new IllegalStateException("L'expression: "+lineToEval+" retourne null!!");
+            throw new IllegalStateException("L'expression retourne null!!");
         }
         if (resultObj instanceof Float){
             // simplify if possible, in case the result of the expression is a float: 5000.00

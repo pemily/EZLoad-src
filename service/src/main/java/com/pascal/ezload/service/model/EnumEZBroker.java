@@ -23,7 +23,7 @@ public enum EnumEZBroker implements BrokerData {
 
     public void fill(EzData data) {
         data.put(broker_name, getEzPortfolioName());
-        data.put(broker_dir, getDirName());
+        // data.put(broker_dir, getDirName());
     }
 
 }

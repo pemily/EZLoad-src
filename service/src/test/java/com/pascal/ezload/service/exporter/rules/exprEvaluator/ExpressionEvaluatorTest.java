@@ -14,12 +14,10 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void testStringVariableConcatenation(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "debut");
-        ezdata.put(new EzDataKey("ezload.two"), "fin");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "debut");
+        ezdata.put(new EzDataKey("varTwo"), "fin");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debutfin", result);
     }
 
@@ -27,48 +25,40 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void testStringVariableConcatWithInteger(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "debut");
-        ezdata.put(new EzDataKey("ezload.two"), "2500");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "debut");
+        ezdata.put(new EzDataKey("varTwo"), "2500");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debut2500", result);
     }
 
 
     @Test
     public void testStringVariableConcatWithFloat(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "debut");
-        ezdata.put(new EzDataKey("ezload.two"), ModelUtils.float2Str(2500.5f));
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "debut");
+        ezdata.put(new EzDataKey("varTwo"), ModelUtils.float2Str(2500.5f));
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debut2500.5", result);
     }
 
 
     @Test
     public void testStringVariableNumberDot(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "debut");
-        ezdata.put(new EzDataKey("ezload.two"), "2500.50");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "debut");
+        ezdata.put(new EzDataKey("varTwo"), "2500.50");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debut2500.5", result);
     }
 
 
     @Test
     public void testStringVariableNumberComma(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "debut");
-        ezdata.put(new EzDataKey("ezload.two"), "2500,50");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "debut");
+        ezdata.put(new EzDataKey("varTwo"), "2500,50");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debut2500.5", result);
     }
 
@@ -76,93 +66,84 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void testAdditionIntegers(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "2500");
-        ezdata.put(new EzDataKey("ezload.two"), "2500");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "2500");
+        ezdata.put(new EzDataKey("varTwo"), "2500");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(),  "varOne + varTwo", ezdata);
         assertEquals("5000", result);
     }
 
 
     @Test
     public void testAdditionFloatAndInteger(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), ModelUtils.float2Str(2500.5f));
-        ezdata.put(new EzDataKey("ezload.two"), "2500");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varTwo"), "2500");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5000,5", result);
     }
 
     @Test
     public void testAdditionFloats(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), ModelUtils.float2Str(2500.5f));
-        ezdata.put(new EzDataKey("ezload.two"), ModelUtils.float2Str(2500.5f));
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varTwo"), ModelUtils.float2Str(2500.5f));
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5001", result);
     }
 
 
     @Test
     public void testAdditionIntegerAsString(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "+2 500.0");
-        ezdata.put(new EzDataKey("ezload.two"), "+2 500.0");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "+2 500.0");
+        ezdata.put(new EzDataKey("varTwo"), "+2 500.0");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(),  "varOne + varTwo", ezdata);
         assertEquals("5000", result);
     }
 
 
     @Test
     public void testAdditionFloatAsString(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "+2 500.5");
-        ezdata.put(new EzDataKey("ezload.two"), "+2 500.5");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "+2 500.5");
+        ezdata.put(new EzDataKey("varTwo"), "+2 500.5");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5001", result);
     }
 
 
     @Test
     public void testAdditionFloatAsString2(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "+2 500,5");
-        ezdata.put(new EzDataKey("ezload.two"), "+2 500,5");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "+2 500,5");
+        ezdata.put(new EzDataKey("varTwo"), "+2 500,5");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5001", result);
     }
 
 
     @Test
     public void testAdditionWithNegativeNumber(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "-2 500,5");
-        ezdata.put(new EzDataKey("ezload.two"), "+2 500,5");
-        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "ezload.one + ezload.two", ezdata);
+        ezdata.put(new EzDataKey("varOne"), "-2 500,5");
+        ezdata.put(new EzDataKey("varTwo"), "+2 500,5");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("0", result);
     }
 
 
     @Test
     public void testExpression(){
-        MainSettings mainSettings = new MainSettings();
-
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("ezload.one"), "20");
-        assertThrows(ExpressionEvaluator.ExpressionException.class, () -> ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), mainSettings, "achat de ezload.one action", ezdata));
+        ezdata.put(new EzDataKey("varOne"), "20");
+        assertThrows(ExpressionEvaluator.ExpressionException.class, () -> ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "achat de varOne action", ezdata));
     }
+
+    @Test
+    public void testExpression2(){
+        EzData ezdata = new EzData();
+        ezdata.put(new EzDataKey("varOne"), "20,5");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "-varOne", ezdata);
+        assertEquals("-20,5", result);    }
 }

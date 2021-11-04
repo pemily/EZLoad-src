@@ -3,11 +3,16 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.server.EZLoad;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.rules.CommonFunctions;
 import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
+import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.service.util.TextReporting;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -96,11 +101,32 @@ public class RulesHandler {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("/saveCommon")
-    public CommonFunctions saveCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
-        return new RulesManager(SettingsManager.getInstance().loadProps())
-                .saveCommonScript(commonFunction);
+    // return the execution report, to check the syntax
+    public String saveCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
+        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+        new RulesManager(mainSettings).saveCommonScript(commonFunction);
+        return validateCommonFunction(commonFunction);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/validate")
+    // return the execution report, to check the syntax
+    public String validateCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
+        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+        TextReporting reporting = new TextReporting();
+        try {
+            return ExpressionEvaluator.getSingleton().evaluateAsString(reporting, commonFunction.getScript(), new EzData());
+        }
+        catch(Exception e){
+            String errorMsg = e.getMessage();
+            int index = errorMsg.lastIndexOf("=>");
+            if (index == -1) return errorMsg;
+            return errorMsg.substring(index+"=>".length());
+        }
     }
 
 }

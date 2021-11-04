@@ -170,9 +170,6 @@ public class BourseDirect2BRModel {
         EZOperation.setAmount(ModelUtils.normalizeAmount(amount));
         EZOperation.setDate(date);
         EZOperation.setBroker(EnumEZBroker.BourseDirect);
-        if (EZModel.getAccount().getAccountType().equals("Ordinaire")){
-            EZOperation.setAccountType(EnumEZAccountType.COMPTE_TITRES_ORDINAIRE);
-        }
         EZOperation.setAccount(EZModel.getAccount());
         EZOperation.setEzAccountDeclaration(EZModel.getAccountDeclaration());
 

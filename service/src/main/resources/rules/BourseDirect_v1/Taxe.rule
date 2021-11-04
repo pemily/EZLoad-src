@@ -1,0 +1,23 @@
+{
+  "field2ErrorMsg" : { },
+  "broker" : "BourseDirect",
+  "brokerFileVersion" : 1,
+  "name" : "Taxe",
+  "enabled" : true,
+  "description" : "Est ce que je dois remplir la quantité?\nEst ce que le montant doit bien etre en négatif?",
+  "ezLoadVersion" : 1,
+  "condition" : "ezOperationType == \"Taxe\"",
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "operationDateExpr" : "ezOperationDate",
+    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "\"\"",
+    "operationTypeExpr" : "\"Taxe sur les Transactions\"",
+    "operationActionNameExpr" : "ezOperationShareName",
+    "operationCountryExpr" : "ezMarketCountry",
+    "operationAmountExpr" : "-ezOperationAmount",
+    "operationDescriptionExpr" : "\"Taxe sur la transaction \" + ezMarketGoogleCode+\":\"+ezOperationTicker"
+  } ],
+  "portefeuilleRules" : [ ]
+}

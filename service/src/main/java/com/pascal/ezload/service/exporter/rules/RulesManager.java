@@ -10,7 +10,9 @@ import com.pascal.ezload.service.sources.FileProcessor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RulesManager {
 
@@ -18,6 +20,7 @@ public class RulesManager {
     private final static String COMMON_FUNCTIONS_EXTENSION = ".script";
 
     private final MainSettings mainSettings;
+    private final Map<String, CommonFunctions> borkerAndFileVersion2CommonFunctionsCache = new HashMap<>();
 
     public RulesManager(MainSettings mainSettings) {
         this.mainSettings = mainSettings;
@@ -99,6 +102,17 @@ public class RulesManager {
         return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+borkerFileVersion+COMMON_FUNCTIONS_EXTENSION;
     }
 
+    public synchronized CommonFunctions getCommonScript(RuleDefinition ruleDef){
+        return borkerAndFileVersion2CommonFunctionsCache.computeIfAbsent(ruleDef.getBroker().getDirName()+ruleDef.getBrokerFileVersion(),
+                (key) -> {
+                    try {
+                        return readCommonScript(ruleDef.getBroker(), ruleDef.getBrokerFileVersion());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
     public synchronized CommonFunctions readCommonScript(EnumEZBroker broker, int brokerFileVersion) throws IOException {
         String commonFile = getCommonFilePath(broker, brokerFileVersion);
         ObjectMapper mapper = new ObjectMapper(new JsonFactory());
@@ -124,6 +138,7 @@ public class RulesManager {
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
         ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
         mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(commonFile), function);
+        borkerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
         return function;
     }
 }
