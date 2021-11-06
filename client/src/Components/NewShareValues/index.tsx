@@ -9,7 +9,6 @@ export interface NewShareValuesProps {
 }      
 
 export function NewShareValues(props: NewShareValuesProps){
-        console.log("NewShareValues:", props.newShareValues);
     return (
         <Box margin="medium" >            
             {props.newShareValues && props.newShareValues.length > 0 

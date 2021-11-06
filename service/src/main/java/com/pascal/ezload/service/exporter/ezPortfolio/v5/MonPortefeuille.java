@@ -47,11 +47,15 @@ public class MonPortefeuille implements MonPortefeuilleData {
     }
 
     public Set<ShareValue> getShareValues(){
-        return this.portefeuille.getValues().stream()
+        Set<ShareValue> result = this.portefeuille.getValues().stream()
                 .filter(r -> r.getValueStr(TICKER_COL) != null)
                 .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(VALEUR_COL), false))
-
                 .collect(Collectors.toSet());
+        // search the LIQUDITY and create it if not present
+        if (result.stream().noneMatch(s -> s.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))){
+            result.add(new ShareValue(ShareValue.LIQUIDITY_CODE, "", false));
+        }
+        return result;
     }
 
     private Row createRow(String tickerCode){

@@ -55,7 +55,7 @@
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
     "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
-    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperationAmount ",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   } ]

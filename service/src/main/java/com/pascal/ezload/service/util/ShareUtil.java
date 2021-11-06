@@ -39,9 +39,18 @@ public class ShareUtil {
 
     public String getPRUReference(String ezTicker){
         Optional<ShareValue> shareVal = getShareValue(ezTicker);
-        if (shareVal.isPresent()){
-            return "="+pru.getPRUCellReference(shareVal.get().getUserShareName());
+        // normally always present as we add it if not found (see createIfNeeded)
+        return shareVal.map(shareValue -> "=" + pru.getPRUCellReference(shareValue.getUserShareName()))
+                .orElse("");
+    }
+
+    public void createIfNeeded(String ezTicker, String ezName) {
+        if (!getShareValue(ezTicker).isPresent()){
+            shareValues.add(new ShareValue(ezTicker, ezName, false));
         }
-        return "";
+        String cellRef = pru.getPRUCellReference(ezName);
+        if (cellRef == null){
+            pru.newPRU(ezName);
+        }
     }
 }

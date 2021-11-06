@@ -16,11 +16,11 @@ public class ShareValue {
         this.tickerCode = tickerCode;
         this.userShareName = userShareName;
         this.isDirty = isDirty;
-        if (StringUtils.isBlank(userShareName)){
-            this.isDirty = true; // on n'accepte pas de valeur vide
-        }
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
             this.userShareName = "Liquidité";
+        }
+        else if (StringUtils.isBlank(userShareName)){
+            this.isDirty = true; // on n'accepte pas de valeur vide
         }
     }
 

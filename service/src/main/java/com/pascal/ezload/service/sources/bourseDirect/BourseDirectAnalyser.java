@@ -45,9 +45,7 @@ public class BourseDirectAnalyser {
 
     private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
-        try(Reporting rep = reporting.pushSection("Chargement EZPortfolio")) {
-            ezPortfolioProxy.load();
-        }
+
         try(Reporting ignored = reporting.pushSection("Analyse des fichiers téléchargés...")) {
             reporting.info("Répertoire des fichiers à analyser: "+SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect));
               return new FileProcessor(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect),

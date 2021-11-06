@@ -14,6 +14,7 @@ public class EzServerState {
     private List<EzReport> ezReports = new LinkedList<>();
     private List<String> filesNotYetLoaded = new LinkedList<>();
     private Set<ShareValue> newShares = new HashSet<>();
+    private List<String> newPRUs = new LinkedList<>();
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -45,5 +46,13 @@ public class EzServerState {
 
     public void setNewShares(Set<ShareValue> newShares) {
         this.newShares = newShares;
+    }
+
+    public List<String> getNewPRUs() {
+        return newPRUs;
+    }
+
+    public void setNewPRUs(List<String> newPRUs) {
+        this.newPRUs = newPRUs;
     }
 }

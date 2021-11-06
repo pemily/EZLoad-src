@@ -36,4 +36,5 @@ public interface EZPortfolioProxy {
 
     PRU getPRU();
 
+    List<String> getNewPRUValues();
 }

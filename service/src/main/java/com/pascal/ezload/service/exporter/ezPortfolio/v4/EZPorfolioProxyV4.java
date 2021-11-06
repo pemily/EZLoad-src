@@ -74,4 +74,9 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
         throw new NotImplementedException();
     }
 
+    @Override
+    public List<String> getNewPRUValues() {
+        throw new NotImplementedException();
+    }
+
 }

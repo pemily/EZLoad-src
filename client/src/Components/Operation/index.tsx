@@ -16,7 +16,7 @@ function getBorder(errors: string[]) : BorderType {
 
 function getOperationError(id: number, index: number, error: string, operation: EzEdition){
     if (error === 'NO_RULE_FOUND')
-     return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">{"Pas de règle trouvé pour l'opération: "+operation.data?.data?.["ezOperationType"]}</Text>);
+     return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">{"Pas de règle trouvé pour l'opération: "+operation.data?.data?.["ezOperationType"]+" "+operation.data?.data?.["ezOperationShareName"]}</Text>);
     return (<Text id={"operationError"+id+"_"+index} margin="none">{error}</Text>);
 }
 

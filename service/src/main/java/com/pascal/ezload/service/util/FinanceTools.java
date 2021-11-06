@@ -35,6 +35,7 @@ public class FinanceTools {
         // re-apply the name outside of the cache, because the user can have changed the name
         String name = shareUtil.getEzName(result.getEzTicker());
         result.setEzName(name == null ? result.getRawName() : name);
+        shareUtil.createIfNeeded(result.getEzTicker(), result.getEzName());
         result.setPruCellReference(shareUtil.getPRUReference(result.getEzTicker()));
         return result;
     }

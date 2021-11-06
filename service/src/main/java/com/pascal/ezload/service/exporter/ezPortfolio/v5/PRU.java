@@ -5,6 +5,7 @@ import com.pascal.ezload.service.gdrive.SheetValues;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PRU {
     private static final int SHARE_NAME = 0;
@@ -50,5 +51,9 @@ public class PRU {
 
     public List<Row> getNewPRUs() {
         return newPRUs;
+    }
+
+    public List<String> getNewPRUValues() {
+        return newPRUs.stream().map(r -> r.getValueStr(SHARE_NAME)).collect(Collectors.toList());
     }
 }

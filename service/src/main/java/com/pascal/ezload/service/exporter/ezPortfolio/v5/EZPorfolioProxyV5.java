@@ -144,6 +144,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         return ezPortfolio.getPru();
     }
 
+    @Override
+    public List<String> getNewPRUValues() {
+        return ezPortfolio.getPru().getNewPRUValues();
+    }
+
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {
         try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio avec EZLoad")){
 

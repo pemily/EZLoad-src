@@ -97,14 +97,6 @@ public class EngineHandler {
                         shareValues.addAll(ezPortfolioProxy.getShareValues());
                         shareValues.addAll(serverState.getNewShares());
 
-                        // fill the PRU tab
-                        PRU pruTab = ezPortfolioProxy.getPRU();
-                        shareValues.forEach(sv -> {
-                            if (pruTab.getPRUCellReference(sv.getUserShareName()) == null){
-                                pruTab.newPRU(sv.getUserShareName());
-                            }
-                        });
-
                         ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
 
                         allEZModels = new BourseDirectAnalyser(mainSettings).start(reporting, ezPortfolioProxy, shareUtil);
@@ -115,7 +107,7 @@ public class EngineHandler {
                     }
 
                     List<EzReport> allEzReports = new EzEditionExporter(mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy);
-                    updateShareValuesAndEzReports(knownValues, allEzReports);
+                    updateShareValuesAndEzReports(ezPortfolioProxy.getNewPRUValues(), knownValues, allEzReports);
                 });
 
     }
@@ -148,10 +140,15 @@ public class EngineHandler {
 
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
                         EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
-                        updateShareValuesAndEzReports(ezPortfolioProxy.getShareValues(), ezPortfolioProxy.save(serverState.getEzReports()));
+
+                        // transfert all the new PRU row created in the previous analysis in this new just loaded PRU
+                        serverState.getNewPRUs().forEach(pru -> ezPortfolioProxy.getPRU().newPRU(pru));
+
+                        List<EzReport> result = ezPortfolioProxy.save(serverState.getEzReports());
+                        updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
 
                         // get the new version, and update the list of file not yet loaded
-                        ezPortfolioProxy = ezPortfolioManager.load();
+                        ezPortfolioProxy.load();
                         updateNotYetLoaded(mainSettings, reporting, ezPortfolioProxy);
                     }
                 }
@@ -181,8 +178,9 @@ public class EngineHandler {
         serverState.setFilesNotYetLoaded(notYetLoaded);
     }
 
-    private void updateShareValuesAndEzReports(Set<ShareValue> knownShareValues, List<EzReport> newReports){
+    private void updateShareValuesAndEzReports(List<String> newPRUs, Set<ShareValue> knownShareValues, List<EzReport> newReports){
         serverState.setEzReports(newReports);
+        serverState.setNewPRUs(newPRUs);
         // recupere les valeurs analysé
         Set<ShareValue> newShareValues = newReports.stream()
                                                     .flatMap(r -> r.getEzEditions().stream())
