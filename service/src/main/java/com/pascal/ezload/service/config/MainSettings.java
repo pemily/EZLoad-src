@@ -4,6 +4,10 @@ import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.*;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 public class MainSettings {
 
     private BourseDirectSettings bourseDirect;

@@ -4,6 +4,8 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class EZPorfolioProxyV4 implements EZPortfolioProxy {
 
@@ -60,4 +63,15 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     public void fillFromMonPortefeuille(EzData data, String valeur) {
         throw new NotImplementedException();
     }
+
+    @Override
+    public Set<ShareValue> getShareValues() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public PRU getPRU() {
+        throw new NotImplementedException();
+    }
+
 }

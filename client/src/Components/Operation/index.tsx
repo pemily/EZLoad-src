@@ -14,8 +14,9 @@ function getBorder(errors: string[]) : BorderType {
     return {color: "status-warning", side: "start", size: "large"};    
 }
 
-function getOperationError(id: number, index: number, error: string){
-    if (error === 'NO_RULE_FOUND') return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">Pas de règle trouvé pour cette opération</Text>);
+function getOperationError(id: number, index: number, error: string, operation: EzEdition){
+    if (error === 'NO_RULE_FOUND')
+     return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">{"Pas de règle trouvé pour l'opération: "+operation.data?.data?.["ezOperationType"]}</Text>);
     return (<Text id={"operationError"+id+"_"+index} margin="none">{error}</Text>);
 }
 
@@ -24,7 +25,7 @@ export function Operation(props: OperationProps){
         <Box key={"operation"+props.id} border={getBorder(props.operation.errors!)}>            
             { props.operation.errors!.length > 0 && (
                 <List key={"opErrorList"+props.id} data={props.operation.errors} margin="xsmall" pad="none" border={false} >
-                     {(error: string, index: number) => getOperationError(props.id, index, error)}      
+                     {(error: string, index: number) => getOperationError(props.id, index, error, props.operation)}      
                 </List>
             )}
             { props.operation.errors!.length === 0 && (props.operation.ezOperationEditions?.length === 0) &&

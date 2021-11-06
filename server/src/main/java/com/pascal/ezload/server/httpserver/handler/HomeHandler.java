@@ -9,6 +9,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -59,6 +60,7 @@ public class HomeHandler {
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
+                            ezServerState.getNewShares(),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(mainSettings).getAllRules()
                                     .stream()
@@ -74,6 +76,18 @@ public class HomeHandler {
     public MainSettings saveSettings(MainSettings mainSettings) throws IOException {
         SettingsManager.getInstance().saveConfigFile(mainSettings);
         return mainSettings.validate();
+    }
+
+    @POST
+    @Path("/saveNewShareValue")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void saveNewShareValue(ShareValue shareValue) {
+        ezServerState.getNewShares().stream()
+            .filter(s -> s.getTickerCode().equals(shareValue.getTickerCode()))
+            .forEach(s -> {
+                s.setUserShareName(shareValue.getUserShareName());
+                s.setDirty(true);
+            });
     }
 
     @GET

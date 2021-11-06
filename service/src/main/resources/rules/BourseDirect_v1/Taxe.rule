@@ -10,7 +10,7 @@
   "operationRules" : [ {
     "field2ErrorMsg" : { },
     "operationDateExpr" : "ezOperationDate",
-    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "\"\"",
     "operationTypeExpr" : "\"Taxe sur les Transactions\"",

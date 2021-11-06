@@ -3,9 +3,11 @@ package com.pascal.ezload.server.httpserver;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 
 import java.util.List;
+import java.util.Set;
 
 public class WebData {
 
@@ -14,10 +16,11 @@ public class WebData {
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
+    private Set<ShareValue> newShareValues;
     private boolean processRunning;
 
     public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
-                   List<EzReport> reports, List<String> filesNotYetLoaded,
+                   List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules){
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
@@ -25,6 +28,7 @@ public class WebData {
         this.reports = reports;
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
+        this.newShareValues = newShareValues;
     }
 
     public MainSettings getMainSettings() {
@@ -73,5 +77,13 @@ public class WebData {
 
     public void setFilesNotYetLoaded(List<String> filesNotYetLoaded) {
         this.filesNotYetLoaded = filesNotYetLoaded;
+    }
+
+    public Set<ShareValue> getNewShareValues() {
+        return newShareValues;
+    }
+
+    public void setNewShareValues(Set<ShareValue> newShareValues) {
+        this.newShareValues = newShareValues;
     }
 }

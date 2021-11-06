@@ -10,53 +10,53 @@
   "operationRules" : [ {
     "field2ErrorMsg" : { },
     "operationDateExpr" : "ezOperationDate",
-    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperationQuantity",
     "operationTypeExpr" : "\"Achat titres\"",
     "operationActionNameExpr" : "ezOperationShareName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperationGrossAmount",
-    "operationDescriptionExpr" : "\"Achat de \" + ezOperationQuantity +\" titre(s) \"+ ezShareCode() + \" @ \" +  ezOperationPrice +   ezAccountCurrencySymbol"
+    "operationDescriptionExpr" : "\"Achat de \" + ezOperationQuantity +\" titre(s) \"+ ezShareCode + \" @ \" +  ezOperationPrice +   ezAccountCurrencySymbol"
   }, {
     "field2ErrorMsg" : { },
     "operationDateExpr" : "ezOperationDate",
-    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperationQuantity",
     "operationTypeExpr" : "\"Courtage sur achat de titres\"",
     "operationActionNameExpr" : "ezOperationShareName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperationBrokerageFees",
-    "operationDescriptionExpr" : "\"Frais de courtage sur achat de \" + ezShareCode() "
+    "operationDescriptionExpr" : "\"Frais de courtage sur achat de \" + ezShareCode "
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
     "portefeuilleValeurExpr" : "ezOperationShareName",
-    "portefeuilleCompteExpr" : "ezAccountType()",
+    "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "ezShareCode()",
+    "portefeuilleTickerGoogleFinanceExpr" : "ezShareCode",
     "portefeuillePaysExpr" : "ezMarketCountry",
-    "portefeuilleSecteurExpr" : "ezPortfolioSecteur",
-    "portefeuilleIndustrieExpr" : "ezPortfolioIndustrie",
-    "portefeuilleEligibiliteAbbattement40Expr" : "ezPortfolioEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezPortfolioType",
-    "portefeuillePrixDeRevientExpr" : "ezPortfolioPrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezPortfolioQuantite +  ezOperationQuantity",
-    "portefeuilleDividendeAnnuelExpr" : "ezPortfolioDividendeAnnuel"
+    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite +  ezOperationQuantity",
+    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   }, {
     "field2ErrorMsg" : { },
-    "portefeuilleValeurExpr" : "\"LIQUIDITE\"",
-    "portefeuilleCompteExpr" : " ezAccountType()",
+    "portefeuilleValeurExpr" : "ezLiquidityName",
+    "portefeuilleCompteExpr" : " ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
     "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
-    "portefeuillePaysExpr" : "ezPortfolioPays",
-    "portefeuilleSecteurExpr" : "ezPortfolioSecteur",
-    "portefeuilleIndustrieExpr" : "ezPortfolioIndustrie",
-    "portefeuilleEligibiliteAbbattement40Expr" : "ezPortfolioEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezPortfolioType",
-    "portefeuillePrixDeRevientExpr" : "ezPortfolioPrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezPortfolioQuantite - ezOperationAmount ",
-    "portefeuilleDividendeAnnuelExpr" : "ezPortfolioDividendeAnnuel"
+    "portefeuillePaysExpr" : "ezMonPortefeuillePays",
+    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperationAmount ",
+    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   } ]
 }

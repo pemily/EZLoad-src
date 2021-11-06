@@ -10,28 +10,28 @@
   "operationRules" : [ {
     "field2ErrorMsg" : { },
     "operationDateExpr" : "ezOperationDate",
-    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperationAmount",
     "operationTypeExpr" : "ezOperationType",
-    "operationActionNameExpr" : "\"LIQUIDITE\"",
+    "operationActionNameExpr" : "ezLiquidityName",
     "operationCountryExpr" : "\"\"",
     "operationAmountExpr" : "ezOperationAmount",
     "operationDescriptionExpr" : "\"Versement sur \" + ezAccountName + \" de \"+ezOperationAmount+ ezOperationCurrencySymbol"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
-    "portefeuilleValeurExpr" : "\"LIQUIDITE\"",
-    "portefeuilleCompteExpr" : " ezAccountType()",
+    "portefeuilleValeurExpr" : "ezLiquidityName",
+    "portefeuilleCompteExpr" : " ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
     "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
-    "portefeuillePaysExpr" : "ezPortfolioPays",
-    "portefeuilleSecteurExpr" : "ezPortfolioSecteur",
-    "portefeuilleIndustrieExpr" : "ezPortfolioIndustrie",
-    "portefeuilleEligibiliteAbbattement40Expr" : "ezPortfolioEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezPortfolioType",
-    "portefeuillePrixDeRevientExpr" : "ezPortfolioPrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezPortfolioQuantite + ezOperationAmount ",
-    "portefeuilleDividendeAnnuelExpr" : "ezPortfolioDividendeAnnuel"
+    "portefeuillePaysExpr" : "ezMonPortefeuillePays",
+    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperationAmount ",
+    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   } ]
 }

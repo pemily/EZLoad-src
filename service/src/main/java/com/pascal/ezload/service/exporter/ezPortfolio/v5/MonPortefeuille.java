@@ -2,18 +2,21 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.MonPortefeuilleData;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MonPortefeuille implements MonPortefeuilleData {
 
-    private static final String TOTAL = "TOTAL";
+    private static final String TOTAL_MARKER = "TOTAL";
 
     private final SheetValues portefeuille;
 
@@ -30,7 +33,6 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int QUANTITY_COL = 10;
     public static final int ANNUAL_DIVIDEND_COL = 11;
 
-    private static final int NB_OF_COLUMNS = 12;
 
     public MonPortefeuille(SheetValues portefeuille) {
         this.portefeuille = portefeuille;
@@ -40,28 +42,35 @@ public class MonPortefeuille implements MonPortefeuilleData {
         return portefeuille;
     }
 
-    public Optional<Row> searchRow(String valeur){
-        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(VALEUR_COL), valeur)).findFirst();
+    public Optional<Row> searchRow(String tickerCode){
+        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(TICKER_COL), tickerCode)).findFirst();
     }
 
+    public Set<ShareValue> getShareValues(){
+        return this.portefeuille.getValues().stream()
+                .filter(r -> r.getValueStr(TICKER_COL) != null)
+                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(VALEUR_COL), false))
 
-    private Row createRow(String share){
+                .collect(Collectors.toSet());
+    }
+
+    private Row createRow(String tickerCode){
+        // je cherche la 1ere ligne blanche avant celle qui a la valeur TOTAL
         Optional<Row> row = this.portefeuille.getValues().stream()
-                .filter(r -> r.getValueStr(VALEUR_COL) == null
-                            || Objects.equals(r.getValueStr(VALEUR_COL), "")
-                            || Objects.equals(r.getValueStr(VALEUR_COL), TOTAL)).findFirst();
+                .filter(r -> StringUtils.isBlank(r.getValueStr(TICKER_COL))
+                            || Objects.equals(r.getValueStr(VALEUR_COL), TOTAL_MARKER)).findFirst();
         if (!row.isPresent()) throw new IllegalStateException("Impossible de trouver une nouvelle ligne dans 'MonPortefeuille'");
-        if (Objects.equals(row.get().getValueStr(VALEUR_COL), TOTAL)) throw new IllegalStateException("Il n'y a plus de ligne disponible dans MonPortefeuille pour la nouvelle valeur: "+share);
-        row.get().setValue(VALEUR_COL, share);
+        if (Objects.equals(row.get().getValueStr(VALEUR_COL), TOTAL_MARKER)) throw new IllegalStateException("Il n'y a plus de ligne disponible dans MonPortefeuille pour la nouvelle valeur: "+tickerCode);
+        row.get().setValue(TICKER_COL, tickerCode);
         return row.get();
     }
 
     public void apply(EzPortefeuilleEdition ezPortefeuilleEdition) {
-        Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getValeur());
-        Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getValeur()));
+        Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getTickerGoogleFinance());
+        Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getTickerGoogleFinance()));
+        row.setValue(VALEUR_COL, ezPortefeuilleEdition.getValeur());
         row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccountType());
         row.setValue(BROKER_COL, ezPortefeuilleEdition.getBroker());
-        row.setValue(TICKER_COL, ezPortefeuilleEdition.getTickerGoogleFinance());
         row.setValue(COUNTRY_COL, ezPortefeuilleEdition.getCountry());
         row.setValue(SECTOR_COL, ezPortefeuilleEdition.getSector());
         row.setValue(INDUSTRY_COL, ezPortefeuilleEdition.getIndustry());
@@ -72,11 +81,11 @@ public class MonPortefeuille implements MonPortefeuilleData {
         row.setValue(ANNUAL_DIVIDEND_COL, ezPortefeuilleEdition.getAnnualDividend());
     }
 
-    public void fill(EzData data, String share){
-        Optional<Row> rowOpt = searchRow(share);
+    public void fill(EzData data, String tickerCode){
+        Optional<Row> rowOpt = searchRow(tickerCode);
         if (rowOpt.isPresent()) {
             Row row = rowOpt.get();
-            data.put(ezPortfolio_portefeuille_share, share);
+            data.put(ezPortfolio_portefeuille_share, row.getValueStr(VALEUR_COL));
             data.put(ezPortfolio_portefeuille_account_type, row.getValueStr(ACCOUNT_TYPE_COL));
             data.put(ezPortfolio_portefeuille_broker, row.getValueStr(BROKER_COL));
             data.put(ezPortfolio_portefeuille_googleTicker, row.getValueStr(TICKER_COL));

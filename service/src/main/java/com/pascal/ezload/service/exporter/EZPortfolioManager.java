@@ -27,6 +27,13 @@ public class EZPortfolioManager {
         try(Reporting rep = reporting.pushSection("Connection EZPortfolio...")){
             return load(1);
         }
+        catch(Exception e){
+            if (e instanceof IllegalStateException){
+                throw e;
+            }
+            reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème de connection", e);
+            throw new IllegalStateException("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème de connection");
+        }
     }
 
     private EZPortfolioProxy load(int retry) throws Exception {
@@ -47,6 +54,7 @@ public class EZPortfolioManager {
         catch(TokenResponseException e){
             // Token expired
             reporting.info("Le token de connection est expiré, renouvellement du token.");
+            GDriveConnection.deleteOldToken(mainSettings.getEzPortfolio().getGdriveCredsFile());
             if (retry-- > 0) {
                return load(retry);
             }

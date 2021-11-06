@@ -24,17 +24,22 @@ public class FinanceTools {
     private final Map<String, EZAction> actionCode2BRAction = new HashMap<>();
 
 
-    public EZAction get(Reporting reporting, String actionCode){
-        return actionCode2BRAction.computeIfAbsent(actionCode, code -> {
+    public EZAction get(Reporting reporting, String actionCode, ShareUtil shareUtil){
+        EZAction result = actionCode2BRAction.computeIfAbsent(actionCode, code -> {
             try {
-                return searchActionFromBourseDirect(reporting, code);
+                return searchActionFromBourseDirect(reporting, code, shareUtil);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
+        // re-apply the name outside of the cache, because the user can have changed the name
+        String name = shareUtil.getEzName(result.getEzTicker());
+        result.setEzName(name == null ? result.getRawName() : name);
+        result.setPruCellReference(shareUtil.getPRUReference(result.getEzTicker()));
+        return result;
     }
 
-    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
+    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode, ShareUtil shareUtil) throws IOException {
         URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
@@ -51,12 +56,15 @@ public class FinanceTools {
                 }
                 EZAction action = new EZAction();
                 Map<String, Object> actionData = data.get(0);
-                action.setName((String) actionData.get("name")); // WP CAREY INC
+                action.setRawName((String) actionData.get("name")); // WP CAREY INC
                 action.setTicker((String) actionData.get("ticker")); // WPC
                 action.setIsin((String) actionData.get("isin")); // US92936U1097
                 Map<String, Object> market = (Map<String, Object>) actionData.get("market");
                 Map<String, Object> currency = (Map<String, Object>) actionData.get("currency");
-                    action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
+                action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
+
+                action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());
+
                 if (!currency.get("code").equals(action.getMarketPlace().getCurrency().getCode()))
                     throw new BRException("The currency declared for this action: "+currency+ " is not the expected currency: "+action.getMarketPlace().getCurrency().getCode());
                 return action;
@@ -85,7 +93,7 @@ public class FinanceTools {
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
-            action.setName((String) actionData.get("longname")); // WP CAREY INC
+            action.setRawName((String) actionData.get("longname")); // WP CAREY INC
             action.setTicker((String) actionData.get("symbol")); // WPC
             // action.setMarketPlace(MarketPlaceUtil.foundByMic((String) actionData.get("exchange"))); // NYQ
             return action;
@@ -112,7 +120,7 @@ public class FinanceTools {
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
-            action.setName((String) actionData.get("name")); // WP CAREY INC
+            action.setRawName((String) actionData.get("name")); // WP CAREY INC
             action.setTicker((String) actionData.get("symbol")); // WPC
             Map<String, Object> exchange = (Map<String, Object>) actionData.get("stock_exchange");
             String mic = (String) exchange.get("mic"); // XNYS

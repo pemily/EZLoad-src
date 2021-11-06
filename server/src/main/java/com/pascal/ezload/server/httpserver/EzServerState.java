@@ -1,15 +1,19 @@
 package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class EzServerState {
     private boolean processRunning = false;
 
     private List<EzReport> ezReports = new LinkedList<>();
     private List<String> filesNotYetLoaded = new LinkedList<>();
+    private Set<ShareValue> newShares = new HashSet<>();
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -33,5 +37,13 @@ public class EzServerState {
 
     public void setFilesNotYetLoaded(List<String> filesNotYetLoaded) {
         this.filesNotYetLoaded = filesNotYetLoaded;
+    }
+
+    public Set<ShareValue> getNewShares() {
+        return newShares;
+    }
+
+    public void setNewShares(Set<ShareValue> newShares) {
+        this.newShares = newShares;
     }
 }

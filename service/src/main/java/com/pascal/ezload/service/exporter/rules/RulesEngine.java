@@ -4,6 +4,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EZOperation;
@@ -11,6 +12,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,7 +134,31 @@ public class RulesEngine {
             result.add(ezOperationEdition);
         });
 
-        return result;
+
+        return result.stream()
+                .sorted(Comparator.comparing(EzOperationEdition::getShareName)) // rassemble les opérations de la meme valeur
+                .sorted((e1, e2) -> {
+                    // sur les operations de liquidité place les credit en 1er et les debit en dernier
+                    String liquidityName = data.get(OperationData.operation_ezLiquidityName);
+                    if (e1.getShareName().equals(liquidityName) && e2.getShareName().equals(liquidityName)){
+                        if (e1.getAmount().startsWith("-") && e2.getAmount().startsWith("-")) return 0;
+                        if (e1.getAmount().startsWith("-")) return 1; // e1 is a debit goto last
+                        return -1; // e1 is a credit => go to first
+                    }
+                    else if (e1.getShareName().equals(liquidityName)){
+                        if (e1.getAmount().startsWith("-")) return 1;
+                        return -1;
+                    }
+                    else if (e2.getShareName().equals(liquidityName)){
+                        if (e2.getAmount().startsWith("-")) return -1;
+                        return 1;
+                    }
+                    else{
+                        return 0;
+                    }
+
+                })
+                .collect(Collectors.toList());
     }
 
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
@@ -142,11 +168,11 @@ public class RulesEngine {
             EzData data2 = new EzData(data);
             EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
-            String valeur = eval(ezPortefeuilleEdition, portRule.getPortefeuilleValeurExpr(), data2, functions);
-            portfolioProxy.fillFromMonPortefeuille(data2, valeur);
+            String tickerCode = eval(ezPortefeuilleEdition, portRule.getPortefeuilleTickerGoogleFinanceExpr(), data2, functions);
+            portfolioProxy.fillFromMonPortefeuille(data2, tickerCode);
 
-            if (StringUtils.isBlank(valeur)) {
-                reporting.info("Pas d'impact sur l'onglet MonPortefeuille pour cette opération");
+            if (StringUtils.isBlank(tickerCode)) {
+                ezPortefeuilleEdition.addError("Cette opération ne remplis pas correctement le Ticker Google Finance");
             } else {
                 if (!ezPortefeuilleEdition.hasErrors()) {
                     applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2, functions);

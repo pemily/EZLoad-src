@@ -4,12 +4,13 @@ import { Upload, Configure, Clipboard, DocumentStore, Command, Services } from '
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { Reports } from '../Reports';
+import { NewShareValues } from '../NewShareValues';
 import { Message } from '../Tools/Message';
 import { ViewLog } from '../Tools/ViewLog';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
     
@@ -26,6 +27,8 @@ export function App(){
     const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
     const [editOperation, setEditOperation] = useState<EzEdition|undefined>(undefined);
     const [selectedRule, setSelectedRule] = useState<SelectedRule|undefined>(undefined);
+    const [newShareValues, setNewShareValues] = useState<ShareValue[]|undefined>(undefined);
+    const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -41,13 +44,21 @@ export function App(){
 
     function reloadAllData(){        
         jsonCall(ezApi.home.getMainData())
-        .then(r =>  {                         
+        .then(r =>  {                  
+            console.log("ReloadData: ",r);
              setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);             
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
+             setNewShareValues(r.newShareValues);
              setFilesNotLoaded(r.filesNotYetLoaded);             
-             setMainSettings(r.mainSettings);                          
+             setMainSettings(r.mainSettings);     
+             if (newShareValues === undefined){
+                setNewShareValuesDirty(false);
+             } 
+             else{
+                setNewShareValuesDirty(newShareValues.filter(r => r.dirty).length > 0);
+             }
         })
         .catch((error) => {
             console.error("Error while loading Data.", error);
@@ -119,6 +130,14 @@ export function App(){
         }
     }
 
+    function saveShareValue(newValue: ShareValue){
+        ezApi.home.saveNewShareValue(newValue)
+            .then(r => {
+                setNewShareValuesDirty(true);
+            })
+            .catch(e => console.error(e));
+    }
+
     useEffect(() => {
         // will be executed on the load
         reloadAllData();
@@ -188,7 +207,7 @@ export function App(){
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
-                                    <Button alignSelf="start" margin="medium" disabled={processRunning || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)} onClick={() =>
+                                    <Button alignSelf="start" margin="medium" disabled={newShareValuesDirty || processRunning || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)} onClick={() =>
                                                 jsonCall(ezApi.engine.upload())
                                                 .then(followProcess)
                                                 .catch(e => console.error(e))
@@ -197,6 +216,7 @@ export function App(){
                                     { mainSettings.ezPortfolio?.ezPortfolioUrl 
                                         && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={mainSettings.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
+                                <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
                                         createRule={op =>{ 

@@ -18,14 +18,6 @@ public class EzEdition {
 
     public EzEdition(){}
 
-    public EzEdition(EZOperation fromEzOperation, List<EzOperationEdition> ezOperationEditions, List<EzPortefeuilleEdition> ezPortefeuilleEditions) {
-        fromEzOperation.fill(data);
-        this.ezOperationEditions = ezOperationEditions;
-        this.ezPortefeuilleEditions = ezPortefeuilleEditions;
-        this.errors = fromEzOperation.getErrors();
-    }
-
-
     public List<EzOperationEdition> getEzOperationEditions() {
         return ezOperationEditions;
     }

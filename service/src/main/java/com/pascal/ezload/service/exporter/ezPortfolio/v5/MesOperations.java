@@ -17,7 +17,6 @@ public class MesOperations  {
 
     private final SheetValues existingOperations;
     private final List<Row> newOperations = new ArrayList<>();
-    private int firstFreeRow = -1;
 
     private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad]";
 
@@ -36,11 +35,10 @@ public class MesOperations  {
 
     public MesOperations(SheetValues mesOperations){
         this.existingOperations = mesOperations;
-        firstFreeRow = mesOperations.getValues().size()+1;
     }
 
-    public int getFirstFreeRow(){
-        return firstFreeRow;
+    public int getNbOfExistingOperations(){
+        return existingOperations.getValues().size();
     }
 
     public List<Row> getNewOperations(){

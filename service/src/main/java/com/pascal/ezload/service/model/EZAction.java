@@ -4,17 +4,20 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
 
 public class EZAction implements ActionData {
-    private String name;
-    private String ticker;
+    private String ezName; // the name from the user preference
+    private String rawName; // the name from the site BourseDirect https://www.boursedirect.fr/api/search/
+    private String ezTicker; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
+    private String ticker; // WPC, EPA
     private String isin;
-    private EZMarketPlace marketPlace;
+    private String pruCellReference;
+    private EZMarketPlace marketPlace; // the marketPlace.googleFinanceCode contains: NYSE, EPA
 
-    public String getName() {
-        return name;
+    public String getRawName() {
+        return rawName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRawName(String rawName) {
+        this.rawName = rawName;
     }
 
     public String getTicker() {
@@ -41,10 +44,38 @@ public class EZAction implements ActionData {
         this.marketPlace = marketPlace;
     }
 
+    public String getEzName() {
+        return ezName;
+    }
+
+    public void setEzName(String ezName) {
+        this.ezName = ezName;
+    }
+
+    public String getEzTicker() {
+        return ezTicker;
+    }
+
+    public void setEzTicker(String ezTicker) {
+        this.ezTicker = ezTicker;
+    }
+
+    public String getPruCellReference() {
+        return pruCellReference;
+    }
+
+    public void setPruCellReference(String pruCellReference) {
+        this.pruCellReference = pruCellReference;
+    }
+
     public void fill(EzData data) {
-        data.put(share_name, name);
+        data.put(share_rawName, rawName);
         data.put(share_ticker, ticker);
         data.put(share_isin, isin);
+        data.put(share_ezName, ezName);
+        data.put(share_ezCode, ezTicker);
+        data.put(share_costPrice, pruCellReference);
         marketPlace.fill(data);
     }
+
 }

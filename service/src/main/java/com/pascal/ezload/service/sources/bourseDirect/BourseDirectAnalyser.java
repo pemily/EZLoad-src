@@ -15,6 +15,7 @@ import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectMode
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectPdfExtractor;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.ezload.service.util.ShareUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,8 +39,8 @@ public class BourseDirectAnalyser {
         return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(mainSettings, pdfFilePath)));
     }
 
-    public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
-        return startProcess(reporting, ezPortfolioProxy, (account, pdfFilePath) -> start(reporting, account, pdfFilePath));
+    public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, ShareUtil shareUtil) throws Exception {
+        return startProcess(reporting, ezPortfolioProxy, (account, pdfFilePath) -> start(reporting, account, pdfFilePath, shareUtil));
     }
 
     private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
@@ -68,7 +69,7 @@ public class BourseDirectAnalyser {
         }
     }
 
-    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) {
+    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath, ShareUtil shareUtil) {
         try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
 
             List<String> errors = new LinkedList<>();
@@ -80,7 +81,7 @@ public class BourseDirectAnalyser {
                 errors = new BourseDirectModelChecker(reporting, model).getErrors();
 
                 if (errors.size() == 0) {
-                    return new BourseDirect2BRModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model);
+                    return new BourseDirect2BRModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model, shareUtil);
                 }
             }
             catch(Exception e){

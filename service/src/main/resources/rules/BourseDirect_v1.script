@@ -1,5 +1,5 @@
 {
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
-  "script" : "// Liste de fonctions utilisables dans toutes les expressions de BourseDirect v1\n\n// cette fonction va utiliser la variable: ezAccountType pour déterminer si il s'agit d'un compte CTO/PEA/PEA-PME\nvar ezAccountType = () -> { \n\tif (ezAccountType == \"Ordinaire\") return \"Compte-Titres Ordinaire\";\n\t// TODO faire PEA & PEA-PME\n\treturn \"\"; \n}\n\n// cette fonction va utiliser calculer le code de l'action sous le format:  NYSE:WPC pour WP CAREY INC ou EPA:RUI pour Rubis\nvar ezShareCode = () -> {\n        return ezMarketGoogleCode+\":\"+ezOperationTicker;\n}"
+  "script" : "// Liste de fonctions utilisables dans toutes les expressions de BourseDirect v1\n\n// cette fonction va utiliser la variable: ezAccountType pour déterminer si il s'agit d'un compte CTO/PEA/PEA-PME/Assurance-Vie\nvar ezAccountTypeName = () -> { \n\tif (ezAccountType == \"Ordinaire\") return \"Compte-Titres Ordinaire\";\n\t// TODO faire PEA & PEA-PME & Assurance-Vie\n\treturn \"\"; \n}\n"
 }

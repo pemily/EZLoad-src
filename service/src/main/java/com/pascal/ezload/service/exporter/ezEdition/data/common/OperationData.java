@@ -10,9 +10,10 @@ public interface OperationData {
     EzDataKey operation_date = new EzDataKey("ezOperationDate", "la date de l'opération");
     EzDataKey operation_amount = new EzDataKey("ezOperationAmount", "Le montant de l'opération");
     EzDataKey operation_description= new EzDataKey("ezOperationDescription", "la description de l'opération");
+    EzDataKey operation_ezLiquidityName= new EzDataKey("ezLiquidityName", "Le nom de la valeur: LIQUIDITE");
 
     // specific info depends of the operation type
-    EzDataKey operation_quantity= new EzDataKey("ezOperationQuantity");
+    EzDataKey operation_quantity= new EzDataKey("ezOperationQuantity", "La quantité de l'opération");
     EzDataKey operation_cours= new EzDataKey("ezOperationPrice", "Le cours de la valeur"); // cours
     EzDataKey operation_montantBrut= new EzDataKey("ezOperationGrossAmount", "Le montant Brut"); // montant brut
     EzDataKey operation_fraisCourtage= new EzDataKey("ezOperationBrokerageFees", "Les frais de courage"); // frais de Courtage

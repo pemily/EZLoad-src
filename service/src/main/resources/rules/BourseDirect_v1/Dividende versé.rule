@@ -10,14 +10,14 @@
   "operationRules" : [ {
     "field2ErrorMsg" : { },
     "operationDateExpr" : "ezOperationDate",
-    "operationCompteTypeExpr" : "ezAccountType()",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "-ezOperationQuantity",
     "operationTypeExpr" : "ezOperationType",
     "operationActionNameExpr" : "ezOperationShareName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "ezOperationAmount",
-    "operationDescriptionExpr" : "ezOperationType + \" de \" +  ezShareCode()"
+    "operationDescriptionExpr" : "ezOperationType + \" de \" +  ezShareCode"
   } ],
   "portefeuilleRules" : [ ]
 }

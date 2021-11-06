@@ -1,9 +1,10 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 public class EZPortfolio {
+    private final String ezPortfolioVersion;
     private MesOperations mesOperations;
     private MonPortefeuille monPortefeuille;
-    private final String ezPortfolioVersion;
+    private PRU pru;
 
     public EZPortfolio(String ezPortfolioVersion){
         this.ezPortfolioVersion = ezPortfolioVersion;
@@ -29,4 +30,11 @@ public class EZPortfolio {
         return ezPortfolioVersion;
     }
 
+    public PRU getPru() {
+        return pru;
+    }
+
+    public void setPru(PRU pru) {
+        this.pru = pru;
+    }
 }

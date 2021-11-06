@@ -30,7 +30,7 @@ public class EZModelChecker {
             }
 
             if (model.getOperations().size() == 0){
-                addError(model, "Aucune operation trouvée! Si il n'y en a pas dans ce fichier, il faudra le supprimer manuellement");
+                addError(model, "Aucune operation trouvée!");
             }
             else {
                 model.getOperations().forEach(this::validateModel);
@@ -102,7 +102,7 @@ public class EZModelChecker {
     // return true if error found
     private void validateAction(IOperationWithAction operation) {
         EZAction action = operation.getAction();
-        if (StringUtils.isBlank(action.getName())) {
+        if (StringUtils.isBlank(action.getRawName())) {
             addError(operation, "L'action pour une opération n'a pas été trouvé! "+operation);
         }
 
