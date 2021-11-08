@@ -1,12 +1,11 @@
 package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.util.LoggerReporting;
 import com.pascal.ezload.service.util.ModelUtils;
-import org.apache.commons.jexl3.JexlException;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -145,5 +144,6 @@ public class ExpressionEvaluatorTest {
         EzData ezdata = new EzData();
         ezdata.put(new EzDataKey("varOne"), "20,5");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "-varOne", ezdata);
-        assertEquals("-20,5", result);    }
+        assertEquals("-20,5", result);
+    }
 }

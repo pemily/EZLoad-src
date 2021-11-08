@@ -56,4 +56,9 @@ public class PRU {
     public List<String> getNewPRUValues() {
         return newPRUs.stream().map(r -> r.getValueStr(SHARE_NAME)).collect(Collectors.toList());
     }
+
+    public void saveDone() {
+        existingPRUs.getValues().addAll(newPRUs);
+        newPRUs.clear();
+    }
 }

@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-02-26.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-02-26.pdf",
   "reportDate": {
     "day": 26,
     "month": 2,
@@ -12,41 +13,47 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "devise": {
-        "symbol": "�",
-        "code": "EUR"
-      },
+      "errors": [],
       "date": {
         "day": 26,
         "month": 2,
         "year": 2021
       },
-      "amount": "2400",
-      "description": "VIRT M. ET/OU MME",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "VIREMENT ESPECES",
+        "VIRT M. ET/OU MME"
+      ],
+      "fields": {
+        "ezOperation_CREDIT": "2400"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }

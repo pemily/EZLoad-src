@@ -25,7 +25,7 @@ public class Config {
     @GET
     @Path("/set")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response setValue(@NotNull @QueryParam("key") String key, @NotNull @QueryParam("value") String value) throws Exception {
+    public MainSettings setValue(@NotNull @QueryParam("key") String key, @NotNull @QueryParam("value") String value) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         Object currentValue = PropertyUtils.getNestedProperty(mainSettings, key);
         if (currentValue instanceof String){
@@ -38,6 +38,6 @@ public class Config {
             PropertyUtils.setNestedProperty(mainSettings, key, Integer.parseInt(value));
         }
         SettingsManager.getInstance().saveConfigFile(mainSettings);
-        return Response.temporaryRedirect(new URI("/EZLoad/api/config")).build();
+        return mainSettings;
     }
 }

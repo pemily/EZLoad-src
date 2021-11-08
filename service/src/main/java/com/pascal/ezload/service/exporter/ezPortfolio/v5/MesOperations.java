@@ -9,6 +9,7 @@ import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -89,4 +90,8 @@ public class MesOperations  {
         return Optional.of(latestRow.valueDate(DATE_COL));
     }
 
+    public void saveDone() {
+        existingOperations.getValues().addAll(newOperations);
+        newOperations.clear();
+    }
 }

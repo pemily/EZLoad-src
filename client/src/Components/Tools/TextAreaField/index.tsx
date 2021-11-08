@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, FormField, TextArea, Keyboard } from "grommet";
-import { valued } from '../../../ez-api/tools';
+import { valued } from '../../../ez-api/tools'; 
 
 
 export interface ConfigTextAreaFieldProps {
@@ -19,17 +19,22 @@ export interface ConfigTextAreaFieldProps {
 
 
 export function TextAreaField(props: ConfigTextAreaFieldProps) {
-    const [value, setValue] = useState<string>(valued(props.value));
+    const [currentValue, setCurrentValue] = useState<string>(valued(props.value));
+    const [timeoutId, setTimeoutId] = useState<number|undefined>(undefined);
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
-      setValue(valued(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
+      setCurrentValue(valued(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/      
     }, [props.value]);
     
-    const onChangeLocal = useCallback((event) => {
-                         const { value: newValue } = event.target;
-                         setValue(newValue);
-                       }, []);
-
+    
+    const onChangeLocal = (event: any) => {      
+                        window.clearTimeout(timeoutId);
+                        const { value: newValue } = event.target;                        
+                        if (currentValue !== newValue) {
+                          setCurrentValue(newValue);
+                          setTimeoutId(window.setTimeout(() => props.onChange(newValue), 1000));
+                        }
+                      }
 
     const textArea = (): JSX.Element => {
         return (
@@ -43,11 +48,15 @@ export function TextAreaField(props: ConfigTextAreaFieldProps) {
                   }
                 }}}>
                 <TextArea id={"TextArea"+props.id}                     
+                        key={"TextArea"+props.id}
                         name={props.id}
-                        value={ value === null ? undefined : value}
+                        value={ currentValue === null ? undefined : currentValue}
                         placeholder={props.isRequired ? "Champ Obligatoire" : ""}                           
                         onChange={onChangeLocal}
-                        onBlur={evt => props.onChange(evt.target.value)}
+                        onBlur={evt => {
+                          window.clearTimeout(timeoutId);
+                          props.onChange(evt.target.value);
+                        }}
                         disabled={props.readOnly}
                         fill/> 
               </Keyboard>

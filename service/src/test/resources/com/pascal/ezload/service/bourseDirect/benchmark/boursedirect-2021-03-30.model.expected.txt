@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-30.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-30.pdf",
   "reportDate": {
     "day": 30,
     "month": 3,
@@ -12,63 +13,55 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "action": {
-        "name": "L3 HARRIS TECHNOLOGIES INC",
-        "ticker": "LHX",
-        "isin": "US5024311095",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": -20,
-      "prixUnitaireBrut": "0,86682",
-      "commission": "0",
-      "prelevement": "2,21",
-      "amountBrut": "17,34",
-      "creditImpot": "2,6",
-      "contributionSocial": "2,97",
+      "errors": [],
       "date": {
         "day": 30,
         "month": 3,
         "year": 2021
       },
-      "amount": "9,55",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "COUPONS",
+        "US5024311095",
+        "L3HARRIS TECHN."
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "-20",
+        "ezOperation_CONTRI_SOC": "2,97",
+        "ezOperation_CREDIT": "9,55",
+        "ezOperation_COMMISSION": "0",
+        "ezOperation_PX_UN_BRUT": "0,86682",
+        "ezOperation_CRED__IMPOT": "2,6",
+        "ezOperation_PRELEVEM": "2,21",
+        "ezOperation_BRUT": "17,34"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }

@@ -27,7 +27,7 @@ public class FinanceTools {
     public EZAction get(Reporting reporting, String actionCode, ShareUtil shareUtil){
         EZAction result = actionCode2BRAction.computeIfAbsent(actionCode, code -> {
             try {
-                return searchActionFromBourseDirect(reporting, code, shareUtil);
+                return searchActionFromBourseDirect(reporting, code);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -40,7 +40,7 @@ public class FinanceTools {
         return result;
     }
 
-    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode, ShareUtil shareUtil) throws IOException {
+    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
         URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {

@@ -35,7 +35,7 @@ public class EZDate {
 
     public static EZDate parseFrenchDate(String date, char separator) {
         if (date == null) return null;
-        String elem[] = date.split(separator+"");
+        String elem[] = date.trim().split(separator+"");
         // la valeur de la Date en String dans une Row est: dd/mm/yyyy (a cause du choix de ezPortfolio)
         return new EZDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
     }

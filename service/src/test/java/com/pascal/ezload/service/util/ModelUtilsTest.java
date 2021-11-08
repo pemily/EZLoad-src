@@ -25,10 +25,10 @@ public class ModelUtilsTest {
 
     @Test
     public void float2Str(){
+        Assertions.assertEquals("-2400", ModelUtils.float2Str(-2400f));
         Assertions.assertEquals("0", ModelUtils.float2Str(0f));
         Assertions.assertEquals("2400", ModelUtils.float2Str(2400.00f));
         Assertions.assertEquals("2400,5", ModelUtils.float2Str(2400.50f));
-        Assertions.assertEquals("-2400", ModelUtils.float2Str(-2400f));
         Assertions.assertEquals("-2400,5", ModelUtils.float2Str(-2400.50000000001f));
         Assertions.assertEquals("-2400,554199", ModelUtils.float2Str(-2400.55426001f));
         Assertions.assertEquals("-2400,5", ModelUtils.float2Str(-2400.499999999999f));

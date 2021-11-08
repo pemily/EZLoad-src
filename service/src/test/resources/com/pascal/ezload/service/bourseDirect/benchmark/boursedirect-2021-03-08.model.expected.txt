@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-08.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-08.pdf",
   "reportDate": {
     "day": 8,
     "month": 3,
@@ -12,92 +13,88 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "changeRate": "1,18565072",
-      "coursUSD": "374,5",
-      "action": {
-        "name": "MasterCard",
-        "ticker": "MA",
-        "isin": "US57636Q1040",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 9,
-      "cours": "315,860306651",
-      "amountBrut": "2842,74",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 8,
         "month": 3,
         "year": 2021
       },
-      "amount": "2851,24",
-      "description": "19:56:56 NEW YORK STOCK EXCHANGE, INC.",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US57636Q1040",
+        "MASTERCARD CL.A"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "9",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "374,5",
+        "ezOperation_DEBIT": "2851,24",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_COURS": "315,860306651",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,18565072",
+        "ezOperation_BRUT": "2842,74",
+        "ezOperation_Heure_Execution": "19:56:56"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "devise": {
-        "symbol": "�",
-        "code": "EUR"
-      },
+      "errors": [],
       "date": {
         "day": 8,
         "month": 3,
         "year": 2021
       },
-      "amount": "2400",
-      "description": "VIRT M. ET/OU MME",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "VIREMENT ESPECES",
+        "VIRT M. ET/OU MME"
+      ],
+      "fields": {
+        "ezOperation_CREDIT": "2400"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }

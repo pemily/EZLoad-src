@@ -48,17 +48,12 @@ public class EZModelChecker {
         operation.getErrors().add(error);
     }
 
-    private void addError(IOperationWithAction operation, String error){
-        reporting.error(error);
-        operation.getErrors().add(error);
-    }
-
     // return true if error found
     private void validateModel(EZOperation operation){
 
         validateAccount(operation);
 
-        if (operation.getOperationType() == null) {
+        if (operation.getDesignation().isEmpty()) {
             addError(operation, "Le type de l'opération n'a pas été trouvé! "+operation);
         }
 
@@ -73,14 +68,6 @@ public class EZModelChecker {
             addError(operation, "Le courtier pour une opération n'a pas été trouvé! "+operation);
         }
 
-        if (StringUtils.isBlank(operation.getAmount())) {
-            addError(operation, "Le montant d'une opération n'a pas été trouvé! "+operation);
-        }
-
-        if (operation instanceof IOperationWithAction){
-            IOperationWithAction opWithTitre = (IOperationWithAction) operation;
-            validateAction(opWithTitre);
-        }
     }
 
     private void validateAccount(EZOperation operation) {
@@ -99,19 +86,4 @@ public class EZModelChecker {
         }
     }
 
-    // return true if error found
-    private void validateAction(IOperationWithAction operation) {
-        EZAction action = operation.getAction();
-        if (StringUtils.isBlank(action.getRawName())) {
-            addError(operation, "L'action pour une opération n'a pas été trouvé! "+operation);
-        }
-
-        if (StringUtils.isBlank(action.getTicker())) {
-            addError(operation,"L'action ticker pour une opération n'a pas été trouvé! "+operation);
-        }
-
-        if (action.getMarketPlace() == null) {
-            addError(operation,"La Place de Marché pour une opération n'a pas été trouvé! "+operation);
-        }
-    }
 }

@@ -7,24 +7,30 @@ import com.pascal.ezload.service.model.EZModel;
 public class ModelUtils {
 
     public static String normalizeAmount(String amount) {
+        String result = amount;
         // remove the + in front of positive number
         // the separator must be , and not .
         // the space to separate the thousands must be remove
         // example:
         //    +1 248.43 => 1248,43
-        if (amount.startsWith("+")){
-            amount = amount.substring(1);
+        if (result.startsWith("+")){
+            result = result.substring(1);
         }
-        amount = amount.replace('.', ',').replace(" ", "");
-        if (amount.contains(",")){
-            while (amount.endsWith("0")){
-                amount = amount.substring(0, amount.length()-1);
+        if (result.startsWith("-")){
+            if (result.charAt(1) < '0' || result.charAt(1) > '9') return amount; // ce n'est pas un nombre
+        }
+        else if (result.charAt(0) < '0' || result.charAt(0) > '9') return amount; // ce n'est pas un nombre
+
+        result = result.replace('.', ',').replace(" ", "");
+        if (result.contains(",")){
+            while (result.endsWith("0")){
+                result = result.substring(0, result.length()-1);
             }
         }
-        if (amount.endsWith(",")){
-            amount = amount.substring(0, amount.length()-1);
+        if (result.endsWith(",")){
+            result = result.substring(0, result.length()-1);
         }
-        return amount;
+        return result;
     }
 
     public static int normalizeNumber(String quantite) {

@@ -53,8 +53,8 @@ public class EZAccount implements AccountData {
     public void fill(EzData data) {
         data.put(account_number, accountNumber);
         data.put(account_type, accountType);
-        data.put(account_owner_address, ownerAdress);
-        data.put(account_owner_name, ownerName);
+//        data.put(account_owner_address, ownerAdress);
+//        data.put(account_owner_name, ownerName);
         if (devise != null) {
             data.put(account_devise_code, devise.getCode());
             data.put(account_devise_symbol, devise.getSymbol());

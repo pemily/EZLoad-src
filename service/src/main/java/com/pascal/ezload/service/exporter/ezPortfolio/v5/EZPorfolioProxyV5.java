@@ -103,6 +103,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                     monPortefeuille,
                     new SheetValues("PRU!A"+(ezPortfolio.getPru().getNumberOfExistingPRUs()+FIRST_ROW_PRU) + ":A",
                                 ezPortfolio.getPru().getNewPRUs()));
+            ezPortfolio.getMesOperations().saveDone();
+            ezPortfolio.getPru().saveDone();
         }
 
         reporting.info("Save done!");

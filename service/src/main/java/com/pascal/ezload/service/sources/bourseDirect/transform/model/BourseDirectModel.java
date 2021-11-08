@@ -2,7 +2,6 @@ package com.pascal.ezload.service.sources.bourseDirect.transform.model;
 
 
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.parsers.bourseDirect.Operation;
 
 import java.util.ArrayList;
 
@@ -15,9 +14,7 @@ public class BourseDirectModel {
     private EZDate dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
-    private ArrayList<Operation> operations;
-    private ArrayList<EZDate> dates;
-    private ArrayList<String> amounts;
+    private ArrayList<BourseDirectOperation> operations;
 
     public BourseDirectModel(int version){
         this.version = version;
@@ -83,27 +80,12 @@ public class BourseDirectModel {
         this.deviseDebit = deviseDebit;
     }
 
-    public ArrayList<Operation> getOperations() {
+    public ArrayList<BourseDirectOperation> getOperations() {
         return operations;
     }
 
-    public void setOperations(ArrayList<Operation> operations) {
+    public void setOperations(ArrayList<BourseDirectOperation> operations) {
         this.operations = operations;
     }
 
-    public ArrayList<EZDate> getDates() {
-        return dates;
-    }
-
-    public void setDates(ArrayList<EZDate> dates) {
-        this.dates = dates;
-    }
-
-    public ArrayList<String> getAmounts() {
-        return amounts;
-    }
-
-    public void setAmounts(ArrayList<String> amounts) {
-        this.amounts = amounts;
-    }
 }

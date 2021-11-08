@@ -15,8 +15,7 @@ public class FinanceToolsTest {
 
     @Test
     public void testSearchBourseDirect() throws IOException {
-        ShareUtil shareUtil = new ShareUtil(new PRU(new SheetValues("A1:A1", new LinkedList<>())), new HashSet<>());
-        EZAction action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "US92936U1097", shareUtil);
+        EZAction action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "US92936U1097");
         assertNotNull(action);
         Assertions.assertEquals("US92936U1097", action.getIsin());
         Assertions.assertEquals("XNYS", action.getMarketPlace().getMic());

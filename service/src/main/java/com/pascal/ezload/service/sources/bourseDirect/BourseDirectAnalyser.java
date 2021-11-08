@@ -10,7 +10,7 @@ import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.FileProcessor;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
-import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2BRModel;
+import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectPdfExtractor;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
@@ -19,8 +19,6 @@ import com.pascal.ezload.service.util.ShareUtil;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class BourseDirectAnalyser {
 
@@ -39,8 +37,8 @@ public class BourseDirectAnalyser {
         return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(mainSettings, pdfFilePath)));
     }
 
-    public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, ShareUtil shareUtil) throws Exception {
-        return startProcess(reporting, ezPortfolioProxy, (account, pdfFilePath) -> start(reporting, account, pdfFilePath, shareUtil));
+    public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
+        return startProcess(reporting, ezPortfolioProxy, (account, pdfFilePath) -> start(reporting, account, pdfFilePath));
     }
 
     private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
@@ -67,19 +65,20 @@ public class BourseDirectAnalyser {
         }
     }
 
-    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath, ShareUtil shareUtil) {
+    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) {
         try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
 
             List<String> errors = new LinkedList<>();
             try {
-                String pdfText = new BourseDirectPdfExtractor(reporting).getText(pdfFilePath);
+                BourseDirectPdfExtractor extractor = new BourseDirectPdfExtractor(reporting, pdfFilePath);
+                BourseDirectPdfExtractor.Result pdfText = extractor.process();
 
                 BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
 
-                errors = new BourseDirectModelChecker(reporting, model).getErrors();
+                errors = new BourseDirectModelChecker(reporting, model).searchErrors();
 
                 if (errors.size() == 0) {
-                    return new BourseDirect2BRModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model, shareUtil);
+                    return new BourseDirect2EZModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model);
                 }
             }
             catch(Exception e){

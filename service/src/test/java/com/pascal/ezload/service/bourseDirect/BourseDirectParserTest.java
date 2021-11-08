@@ -10,9 +10,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
+import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
+import com.pascal.ezload.service.gdrive.SheetValues;
+import com.pascal.ezload.service.model.EZModel;
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
+import com.pascal.ezload.service.util.FileUtil;
+import com.pascal.ezload.service.util.ModelUtils;
+import com.pascal.ezload.service.util.ShareUtil;
 import com.pascal.ezload.service.util.TextReporting;
 
 import org.junit.jupiter.api.Test;
@@ -142,14 +152,11 @@ public class BourseDirectParserTest {
                     +(BourseDirectParserTest.class.getPackage().getName().replace('.','/'))
                     +"/benchmark/"+filename;
             System.out.println("GENERATING BENCHMARK for "+filePath);
-            new File(filePath).getParentFile().mkdirs();
-            FileWriter fileWriter = new FileWriter(filePath);
-            fileWriter.write(result);
-            fileWriter.close();
+            FileUtil.string2file(filePath, result);
             file = new File(filePath).toURI().toURL();
         }
 
-        String text = new BufferedReader(new InputStreamReader(new FileInputStream(file.getFile()), StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
+        String text = FileUtil.file2String(file.getFile());
         assertEquals(text.trim(), result.trim());
     }
 
@@ -157,11 +164,16 @@ public class BourseDirectParserTest {
         TextReporting reporting = new TextReporting();
         BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-      //  EZModel brModel = new BourseDirectAnalyser(new MainSettings()).start(reporting, bracc, getFilePath(file +".pdf").getFile());
-       // String jsonBrModel = ModelUtils.toJson(brModel);
-        //String report = reporting.getReport();
+        ShareUtil shareUtil = new ShareUtil(new PRU(new SheetValues("a1:a", new LinkedList<>())), new HashSet<>());
+        MainSettings mainSettings = new MainSettings();
+        MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
+        ezLoad.setDownloadDir(new File(getFilePath(file +".pdf").getFile()).getParent());
+        mainSettings.setEzLoad(ezLoad);
+        EZModel brModel = new BourseDirectAnalyser(mainSettings).start(reporting, bracc, getFilePath(file +".pdf").getFile());
+        String jsonBrModel = ModelUtils.toJson(brModel);
+        String report = reporting.getReport();
 
-        // check(file +".model.expected.txt", jsonBrModel);
-         //check( file +".reporting.expected.txt", report);
+        check(file +".model.expected.txt", jsonBrModel);
+        check( file +".reporting.expected.txt", report);
     }
 }

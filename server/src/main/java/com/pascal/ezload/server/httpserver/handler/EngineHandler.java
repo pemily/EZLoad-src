@@ -93,20 +93,19 @@ public class EngineHandler {
                     try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
                         // get the new version, and update the list of file not yet loaded
                         updateNotYetLoaded(mainSettings, reporting, ezPortfolioProxy);
-                        Set<ShareValue> shareValues = new HashSet<>();
-                        shareValues.addAll(ezPortfolioProxy.getShareValues());
-                        shareValues.addAll(serverState.getNewShares());
 
-                        ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
-
-                        allEZModels = new BourseDirectAnalyser(mainSettings).start(reporting, ezPortfolioProxy, shareUtil);
+                        allEZModels = new BourseDirectAnalyser(mainSettings).start(reporting, ezPortfolioProxy);
                     }
 
                     try (Reporting ignored = reporting.pushSection("Vérification des Opérations")) {
                         new EZModelChecker(reporting).validateModels(allEZModels);
                     }
+                    Set<ShareValue> shareValues = new HashSet<>();
+                    shareValues.addAll(ezPortfolioProxy.getShareValues());
+                    shareValues.addAll(serverState.getNewShares().stream().filter(f -> !StringUtils.isBlank(f.getUserShareName())).collect(Collectors.toList()));
+                    ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
 
-                    List<EzReport> allEzReports = new EzEditionExporter(mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy);
+                    List<EzReport> allEzReports = new EzEditionExporter(mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy, shareUtil);
                     updateShareValuesAndEzReports(ezPortfolioProxy.getNewPRUValues(), knownValues, allEzReports);
                 });
 
@@ -148,7 +147,6 @@ public class EngineHandler {
                         updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
 
                         // get the new version, and update the list of file not yet loaded
-                        ezPortfolioProxy.load();
                         updateNotYetLoaded(mainSettings, reporting, ezPortfolioProxy);
                     }
                 }

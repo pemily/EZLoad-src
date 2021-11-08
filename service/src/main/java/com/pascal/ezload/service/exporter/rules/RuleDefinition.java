@@ -7,10 +7,11 @@ import java.util.List;
 
 public class RuleDefinition extends RuleDefinitionSummary {
 
-    public enum Field{name, description, condition }
+    public enum Field{name, description, condition, shareId }
 
     private int ezLoadVersion; // the version of EzLoad when this RuleDefinition was created/edited
     private String condition;
+    private String shareId; // the share id example: US5024311095 / FR0013269123
     private List<OperationRule> operationRules = new LinkedList<>();
     private List<PortefeuilleRule> portefeuilleRules = new LinkedList<>();
 
@@ -47,6 +48,14 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.operationRules = operationRules;
     }
 
+    public String getShareId() {
+        return shareId;
+    }
+
+    public void setShareId(String shareId) {
+        this.shareId = shareId;
+    }
+
     @Override
     public void clearErrors(){
         setField2ErrorMsg(null);
@@ -61,6 +70,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
         new StringValue(true).validate(this, Field.name.name(), getName());
         new StringValue(false).validate(this, Field.description.name(), getDescription());
         new StringValue(true).validate(this, Field.condition.name(), condition);
+        new StringValue(false).validate(this, Field.shareId.name(), shareId);
 
         operationRules.forEach(OperationRule::validate);
         portefeuilleRules.forEach(PortefeuilleRule::validate);

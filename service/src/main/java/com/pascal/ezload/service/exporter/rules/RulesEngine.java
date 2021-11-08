@@ -7,8 +7,10 @@ import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
-import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.FinanceTools;
+import com.pascal.ezload.service.util.ShareUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class RulesEngine {
         this.rulesManager = rulesManager;
     }
 
-    public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData){
+    public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData, ShareUtil shareUtil) {
         operation.fill(ezData);
 
         EzEdition ezEdition = new EzEdition();
@@ -58,7 +60,7 @@ public class RulesEngine {
             reporting.info("Utilisation de la règle "+ruleDef.getBroker().getEzPortfolioName()+": "+ruleDef.getName());
             ezEdition.setRuleDefinitionSummary(ruleDef);
             try {
-                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ruleDef, ezData);
+                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ruleDef, ezData, shareUtil);
                 if (ezOperationEditions.isEmpty()){
                     reporting.info("Cette opération n'a pas d'impact sur le portefeuille");
                     // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
@@ -93,6 +95,8 @@ public class RulesEngine {
                 ezEdition.getErrors().add("Il y a eu une erreur de transformation pour cette opération");
                 ezEdition.getErrors().add(e.getMessage());
                 ezEdition.getErrors().add("Voir le rapport pour plus de détails");
+                // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
+                ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
             }
         }
         return ezEdition;
@@ -115,8 +119,24 @@ public class RulesEngine {
         return ezPortfolioProxy.getEzPortfolioVersion() == 5 && ruleDefinition.getEzLoadVersion() == 1;
     }
 
-    private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data) {
+    private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data, ShareUtil shareUtil) {
         CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition);
+
+        data.put(OperationData.operation_ezLiquidityName, shareUtil.getEzLiquidityName());
+
+        // compute the share Id
+        String shareId = eval(new GetFinancialDataError(), ruleDefinition.getShareId(), data, functions);
+        if (!StringUtils.isBlank(shareId)){
+            EZAction action = FinanceTools.getInstance().get(reporting, shareId, shareUtil);
+            action.fill(data);
+        }
+        else{
+            // a stupid action just to have the variables list when creating a new rule
+            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("CC", "Country"), new EZDevise("deviseCode", "deviseSymbol"));
+            EZAction action = new EZAction();
+            action.setMarketPlace(marketPlace);
+            action.fill(data);
+        }
 
         List<EzOperationEdition> result = new LinkedList<>();
 
@@ -216,9 +236,13 @@ public class RulesEngine {
                 entity.addError("Une expression n'est pas renseignée, vous devez la corriger dans l'éditeur de règles");
                 return "";
             }
+            else if (StringUtils.isBlank(expression)){
+                return "";
+            }
             else {
                 String script = functions.getScript() + ";\n"+ expression;
-                return format(ExpressionEvaluator.getSingleton().evaluateAsString(reporting, script, data));
+                String result = ExpressionEvaluator.getSingleton().evaluateAsString(reporting, script, data);
+                return format(result);
             }
         }
         catch(Exception e){
@@ -233,5 +257,19 @@ public class RulesEngine {
 
     public void validateRules() {
         allRules.forEach(RuleDefinition::validate);
+    }
+
+    private class GetFinancialDataError implements WithErrors {
+        private String errors;
+
+        @Override
+        public String getErrors() {
+            return errors;
+        }
+
+        @Override
+        public void setErrors(String errors) {
+            this.errors = errors;
+        }
     }
 }

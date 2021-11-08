@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-01.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-01.pdf",
   "reportDate": {
     "day": 1,
     "month": 3,
@@ -12,143 +13,129 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "changeRate": "1,20433576",
-      "coursUSD": "79,75",
-      "action": {
-        "name": "BOOZ ALLEN HAMILTON HLDG CORP",
-        "ticker": "BAH",
-        "isin": "US0995021062",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 45,
-      "cours": "66,219074986",
-      "amountBrut": "2979,86",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 1,
         "month": 3,
         "year": 2021
       },
-      "amount": "2988,36",
-      "description": "21:18:23 NEW YORK STOCK EXCHANGE, INC.",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US0995021062",
+        "BOOZ ALLEN CL.A"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "45",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "79,75",
+        "ezOperation_DEBIT": "2988,36",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_COURS": "66,219074986",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,20433576",
+        "ezOperation_BRUT": "2979,86",
+        "ezOperation_Heure_Execution": "21:18:23"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "changeRate": "1,20433576",
-      "coursUSD": "185,6799",
-      "action": {
-        "name": "L3 HARRIS TECHNOLOGIES INC",
-        "ticker": "LHX",
-        "isin": "US5024311095",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 20,
-      "cours": "154,176190866",
-      "amountBrut": "3083,52",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 1,
         "month": 3,
         "year": 2021
       },
-      "amount": "3092,02",
-      "description": "21:14:44 NEW YORK STOCK EXCHANGE, INC.",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US5024311095",
+        "L3HARRIS TECHN."
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "20",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "185,6799",
+        "ezOperation_DEBIT": "3092,02",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_COURS": "154,176190866",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,20433576",
+        "ezOperation_BRUT": "3083,52",
+        "ezOperation_Heure_Execution": "21:14:44"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "devise": {
-        "symbol": "�",
-        "code": "EUR"
-      },
+      "errors": [],
       "date": {
         "day": 1,
         "month": 3,
         "year": 2021
       },
-      "amount": "2400",
-      "description": "VIRT M. ET/OU MME",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "VIREMENT ESPECES",
+        "VIRT M. ET/OU MME"
+      ],
+      "fields": {
+        "ezOperation_CREDIT": "2400"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }

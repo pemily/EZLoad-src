@@ -14,7 +14,7 @@
 
     <build>
         <plugins>
-
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -49,8 +49,8 @@
                                 <java jar="javacc21-compiler/javacc-full.jar"
                                       failonerror="true"
                                       fork="true">
-                                    <!-- https://github.com/javacc21/javacc21/blob/master/src/java/com/javacc/Main.java -->
-                                    <arg value="-n"/> <!-- no check if new version exists -->
+                                    <! - - https://github.com/javacc21/javacc21/blob/master/src/java/com/javacc/Main.java - - >
+                                    <arg value="-n"/> <! - - no check if new version exists - - >
                                     <arg value="-jdk8"/>
                                     <arg value="-d"/>
                                     <arg value="${project.build.directory}/generated-sources/javacc"/>
@@ -74,13 +74,14 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <!-- ajoute les sources generés de javacc dans le classpath pour intellij -->
+                                <! - - ajoute les sources generés de javacc dans le classpath pour intellij - - >
                                 <source>${project.build.directory}/generated-sources/javacc</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+        -->
         </plugins>
     </build>
 

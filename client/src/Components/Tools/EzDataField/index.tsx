@@ -49,8 +49,10 @@ export function EzDataField(props: EzDataProps) {
                   columns={columns}
                   data={data}
                   onClickRow={(event) => {                
-                    props.onSelect && props.onSelect(event.datum);
-                    setOpen(false);
+                    if (props.onSelect){ 
+                      props.onSelect(event.datum);
+                      setOpen(false);
+                    }
                   }}/> )}
                 </Box>   
                 <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            

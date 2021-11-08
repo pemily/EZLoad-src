@@ -7,6 +7,10 @@ export interface OperationProps {
     id: number;
 }      
 
+function show(str: string|undefined){
+    return str === undefined ? "" : str;
+}
+
 function getBorder(errors: string[]) : BorderType {
     // if there is an error or not
     if (errors.length === 0) return { size: "none" };
@@ -16,7 +20,10 @@ function getBorder(errors: string[]) : BorderType {
 
 function getOperationError(id: number, index: number, error: string, operation: EzEdition){
     if (error === 'NO_RULE_FOUND')
-     return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">{"Pas de règle trouvé pour l'opération: "+operation.data?.data?.["ezOperationType"]+" "+operation.data?.data?.["ezOperationShareName"]}</Text>);
+     return (<Text id={"operationErrorNoRule"+id+"_"+index} margin="none">{"Pas de règle trouvé pour l'opération: "
+                                        +show(operation.data?.data?.["ezOperation_INFO1"])+" "
+                                        +show(operation.data?.data?.["ezOperation_INFO2"])+" "
+                                        +show(operation.data?.data?.["ezOperation_INFO3"])}</Text>);
     return (<Text id={"operationError"+id+"_"+index} margin="none">{error}</Text>);
 }
 

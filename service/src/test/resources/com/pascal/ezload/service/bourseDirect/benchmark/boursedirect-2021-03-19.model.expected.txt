@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-19.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-19.pdf",
   "reportDate": {
     "day": 19,
     "month": 3,
@@ -12,206 +13,169 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "action": {
-        "name": "Rubis",
-        "ticker": "RUI",
-        "isin": "FR0013269123",
-        "marketPlace": {
-          "stockExchange": "Euronext",
-          "city": "Paris",
-          "mic": "XPAR",
-          "country": {
-            "code": "FR",
-            "name": "France"
-          },
-          "googleFinanceCode": "EPA",
-          "currency": {
-            "symbol": "�",
-            "code": "EUR"
-          }
-        }
-      },
-      "number": 120,
-      "cours": "39,9",
-      "amountBrut": "4788",
-      "fraisCourtage": "4,31",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 19,
         "month": 3,
         "year": 2021
       },
-      "amount": "4792,31",
-      "description": "09:01:06 BORSE BERLIN EQUIDUCT TRADING - BERL",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT COMPTANT",
+        "FR0013269123",
+        "RUBIS"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "120",
+        "ezOperation_TVA": "0",
+        "ezOperation_DEBIT": "4792,31",
+        "ezOperation_Lieu": "BORSE BERLIN EQUIDUCT TRADING - BERL",
+        "ezOperation_COURS": "39,9",
+        "ezOperation_COURTAGE": "4,31",
+        "ezOperation_BRUT": "4788",
+        "ezOperation_Heure_Execution": "09:01:06"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "changeRate": "1,19024704",
-      "coursUSD": "222,85",
-      "action": {
-        "name": "American Tower Corporation",
-        "ticker": "AMT",
-        "isin": "US03027X1000",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 19,
-      "cours": "187,230039236",
-      "amountBrut": "3557,37",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 19,
         "month": 3,
         "year": 2021
       },
-      "amount": "3565,87",
-      "description": "14:30:03 NEW YORK STOCK EXCHANGE, INC.",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US03027X1000",
+        "AMERICAN TOWER"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "19",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "222,85",
+        "ezOperation_DEBIT": "3565,87",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_COURS": "187,230039236",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,19024704",
+        "ezOperation_BRUT": "3557,37",
+        "ezOperation_Heure_Execution": "14:30:03"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "changeRate": "1,19024704",
-      "coursUSD": "69,3",
-      "action": {
-        "name": "WP CAREY INC",
-        "ticker": "WPC",
-        "isin": "US92936U1097",
-        "marketPlace": {
-          "stockExchange": "New York Stock Exchange",
-          "city": "New York City",
-          "mic": "XNYS",
-          "acronym": "NYSE",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NYSE",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 60,
-      "cours": "58,223207176",
-      "amountBrut": "3493,39",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 19,
         "month": 3,
         "year": 2021
       },
-      "amount": "3501,89",
-      "description": "14:30:02 NEW YORK STOCK EXCHANGE, INC.",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US92936U1097",
+        "W.P. CAREY"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "60",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "69,3",
+        "ezOperation_DEBIT": "3501,89",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_COURS": "58,223207176",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,19024704",
+        "ezOperation_BRUT": "3493,39",
+        "ezOperation_Heure_Execution": "14:30:02"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "action": {
-        "name": "Rubis",
-        "ticker": "RUI",
-        "isin": "FR0013269123",
-        "marketPlace": {
-          "stockExchange": "Euronext",
-          "city": "Paris",
-          "mic": "XPAR",
-          "country": {
-            "code": "FR",
-            "name": "France"
-          },
-          "googleFinanceCode": "EPA",
-          "currency": {
-            "symbol": "�",
-            "code": "EUR"
-          }
-        }
-      },
+      "errors": [],
       "date": {
         "day": 19,
         "month": 3,
         "year": 2021
       },
-      "amount": "14,36",
-      "description": "TTF",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "TAXE TRANSACT FINANCIERES",
+        "FR0013269123",
+        "TTF"
+      ],
+      "fields": {
+        "ezOperation_DEBIT": "14,36"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }

@@ -2,27 +2,28 @@
   "field2ErrorMsg" : { },
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
-  "name" : "Versement fonds",
+  "name" : "VIREMENT ESPECES",
   "enabled" : true,
-  "description" : "",
+  "description" : "Versement de fonds sur le compte espèce",
   "ezLoadVersion" : 1,
-  "condition" : "ezOperationType == \"Versement fonds\"",
+  "condition" : "ezOperation_INFO1 == \"VIREMENT ESPECES\"",
+  "shareId" : "",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
-    "operationDateExpr" : "ezOperationDate",
+    "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
-    "operationQuantityExpr" : "ezOperationAmount",
-    "operationTypeExpr" : "ezOperationType",
-    "operationActionNameExpr" : "ezLiquidityName",
+    "operationQuantityExpr" : "ezOperation_CREDIT",
+    "operationTypeExpr" : "\"Versement fonds\"",
+    "operationActionNameExpr" : "\"LIQUIDITE\"",
     "operationCountryExpr" : "\"\"",
-    "operationAmountExpr" : "ezOperationAmount",
-    "operationDescriptionExpr" : "\"Versement sur \" + ezAccountName + \" de \"+ezOperationAmount+ ezOperationCurrencySymbol"
+    "operationAmountExpr" : "ezOperation_CREDIT",
+    "operationDescriptionExpr" : "\"Versement de \"+ezOperation_CREDIT+ ezAccountCurrencySymbol + \" sur le compte: \"+ ezAccountName"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
     "portefeuilleValeurExpr" : "ezLiquidityName",
-    "portefeuilleCompteExpr" : " ezAccountTypeName()",
+    "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
     "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
     "portefeuillePaysExpr" : "ezMonPortefeuillePays",
@@ -31,7 +32,7 @@
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
     "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperationAmount ",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite+ ezOperation_CREDIT",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   } ]
 }

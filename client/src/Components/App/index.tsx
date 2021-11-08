@@ -3,6 +3,7 @@ import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } 
 import { Upload, Configure, Clipboard, DocumentStore, Command, Services } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
+import { ConfigApp } from '../ConfigApp';
 import { Reports } from '../Reports';
 import { NewShareValues } from '../NewShareValues';
 import { Message } from '../Tools/Message';
@@ -141,7 +142,8 @@ export function App(){
     useEffect(() => {
         // will be executed on the load
         reloadAllData();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ ]);
 
     const runningTaskOrLog = (isRunning: boolean|undefined) => {
         return isRunning ? (<Spinner
@@ -150,6 +152,10 @@ export function App(){
             { side: 'horizontal', color: 'focus', size: 'small' },
           ]}
         />) : (<Clipboard size='small'/>);
+    }
+
+    function isConfigUrl(){
+        return window.location.pathname.toLowerCase().endsWith('config');
     }
 
     return (
@@ -169,7 +175,10 @@ export function App(){
                     <Heading level="3" alignSelf="center" margin="large">Chargement en cours...</Heading>
                 </Box>
             )}      
-            { mainSettings && 
+            { mainSettings && isConfigUrl() && 
+                (<ConfigApp mainSettings={mainSettings}/>)
+            }
+            { mainSettings && !isConfigUrl() && 
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
@@ -228,10 +237,11 @@ export function App(){
                                                 {
                                                     oldName: undefined,
                                                     ruleDefinition: {
-                                                        name: op.data?.data?.['ezOperationType'],
+                                                        name: op.data?.data?.['ezOperation_INFO1'],
                                                         broker: strToBroker(op.data?.data?.['ezBrokerName']),
                                                         brokerFileVersion: parseInt(op.data?.data?.['ezBrokerVersion']),
-                                                        condition: "ezOperationType == \"" + op.data?.data?.['ezOperationType']+"\"",
+                                                        condition: "ezOperation_INFO1 == \"" + op.data?.data?.['ezOperation_INFO1']+"\"",
+                                                        shareId: "ezOperation_INFO2",
                                                         enabled: true
                                                 }};
                                             saveRuleDefinition(newSelectedRule)

@@ -2,24 +2,23 @@ package com.pascal.ezload.service.model;
 
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public abstract class EZOperation implements OperationData {
+public final class EZOperation implements OperationData {
 
-    protected List<String> errors = new LinkedList<>();
+    private List<String> errors = new LinkedList<>();
     private EZDate date;
-    private String amount;
-    private Integer quantity;
-    private String description;
+    private ArrayList<String> designation;
+    private Map<String, String> fields;
     private EnumEZBroker broker;
     private EZAccount account;
     private EZAccountDeclaration ezAccountDeclaration;
-    private String ezLiquidityName;
-
-    public abstract EZOperationType getOperationType();
 
     public EZDate getDate() {
         return date;
@@ -27,22 +26,6 @@ public abstract class EZOperation implements OperationData {
 
     public void setDate(EZDate date) {
         this.date = date;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public EnumEZBroker getBroker() {
@@ -81,9 +64,6 @@ public abstract class EZOperation implements OperationData {
     public String toString() {
         return "EZOperation{" +
                 "date='" + date + '\'' +
-                ", amount='" + amount + '\'' +
-                ", quantity='" + quantity + '\'' +
-                ", description='" + description + '\'' +
                 ", account Name=" + account.getOwnerName() +
                 ", account Number=" + account.getAccountNumber() +
                 ", courtier='" + broker + '\'' +
@@ -92,34 +72,29 @@ public abstract class EZOperation implements OperationData {
 
 
     public void fill(EzData data) {
-        data.put(operation_type, getOperationType().getValue());
         data.put(operation_date, date.toEzPortoflioDate());
-        data.put(operation_amount, amount);
-        data.put(operation_description, description);
-        data.put(operation_quantity, quantity == null ? null : quantity+"");
-        data.put(operation_ezLiquidityName, ezLiquidityName);
-        fillData(data); // force the subtype to implements the fillData method
+
+        for (int i = 0; i < designation.size(); i++){
+            data.put(new EzDataKey(OperationData.EZOperationDesignation+(i+1), "Champ trouvé dans la désignation de l'opération"), designation.get(i));
+        }
+
+        this.fields.forEach((key, value) -> data.put(new EzDataKey(key, ""), value));
+
         broker.fill(data);
         account.fill(data);
         ezAccountDeclaration.fill(data);
-
     }
 
-    protected abstract void fillData(EzData data);
-
-    public Integer getQuantity() {
-        return quantity;
+    public ArrayList<String> getDesignation() {
+        return designation;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setDesignation(ArrayList<String> designation) {
+        this.designation = designation;
     }
 
-    public String getEzLiquidityName() {
-        return ezLiquidityName;
-    }
 
-    public void setEzLiquidityName(String ezLiquidityName) {
-        this.ezLiquidityName = ezLiquidityName;
+    public void setFields(Map<String, String> fields) {
+        this.fields = fields;
     }
 }

@@ -28,7 +28,7 @@ public class ShareUtil {
                 .filter(s -> s.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
                 .findFirst()
                 .map(ShareValue::getUserShareName)
-                .orElse(null);
+                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", false).getUserShareName());
     }
 
     private Optional<ShareValue> getShareValue(String ezTicker){

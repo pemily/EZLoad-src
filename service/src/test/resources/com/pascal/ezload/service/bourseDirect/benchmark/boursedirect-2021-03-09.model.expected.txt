@@ -1,6 +1,7 @@
 {
-  "source": "BourseDirect",
-  "sourceFile": "/D:/dev/src/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-09.pdf",
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-09.pdf",
   "reportDate": {
     "day": 9,
     "month": 3,
@@ -12,92 +13,88 @@
     "ownerName": "MR EMILY PASCAL",
     "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
     "devise": {
-      "symbol": "�",
+      "symbol": "€",
       "code": "EUR"
     }
   },
-  "EZAccountDeclaration": {
-    "name": "Pascal CTO"
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
   },
   "operations": [
     {
-      "changeRate": "1,18565072",
-      "coursUSD": "439,9799",
-      "action": {
-        "name": "Broadcom Inc.",
-        "ticker": "AVGO",
-        "isin": "US11135F1012",
-        "marketPlace": {
-          "stockExchange": "Nasdaq/Ngs",
-          "city": "New York City",
-          "mic": "XNGS",
-          "acronym": "NGS",
-          "country": {
-            "code": "US",
-            "name": "Etats-Unis"
-          },
-          "googleFinanceCode": "NASDAQ",
-          "currency": {
-            "symbol": "$",
-            "code": "USD"
-          }
-        }
-      },
-      "number": 7,
-      "cours": "371,087279397",
-      "amountBrut": "2597,61",
-      "fraisCourtage": "8,5",
-      "tva": "0",
+      "errors": [],
       "date": {
         "day": 9,
         "month": 3,
         "year": 2021
       },
-      "amount": "2606,11",
-      "description": "16:05:16 NASDAQ/NGS (GLOBAL SELECT MARKET)",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "ACHAT ETRANGER",
+        "US11135F1012",
+        "BROADCOM INC"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "7",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "439,9799",
+        "ezOperation_DEBIT": "2606,11",
+        "ezOperation_Lieu": "NASDAQ/NGS (GLOBAL SELECT MARKET)",
+        "ezOperation_COURS": "371,087279397",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,18565072",
+        "ezOperation_BRUT": "2597,61",
+        "ezOperation_Heure_Execution": "16:05:16"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     },
     {
-      "devise": {
-        "symbol": "�",
-        "code": "EUR"
-      },
+      "errors": [],
       "date": {
         "day": 9,
         "month": 3,
         "year": 2021
       },
-      "amount": "600",
-      "description": "VIRT M. ET/OU MME",
-      "compteType": "COMPTE_TITRES_ORDINAIRE",
-      "courtier": "BourseDirect",
+      "designation": [
+        "VIREMENT ESPECES",
+        "VIRT M. ET/OU MME"
+      ],
+      "fields": {
+        "ezOperation_CREDIT": "600"
+      },
+      "broker": "BourseDirect",
       "account": {
         "accountNumber": "508TI00085554410EUR",
         "accountType": "Ordinaire",
         "ownerName": "MR EMILY PASCAL",
         "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
         "devise": {
-          "symbol": "�",
+          "symbol": "€",
           "code": "EUR"
         }
       },
-      "EZAccountDeclaration": {
-        "name": "Pascal CTO"
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
       }
     }
-  ]
+  ],
+  "errors": []
 }
