@@ -1,5 +1,6 @@
 package com.pascal.ezload.server.httpserver;
 
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 
@@ -15,6 +16,8 @@ public class EzServerState {
     private List<String> filesNotYetLoaded = new LinkedList<>();
     private Set<ShareValue> newShares = new HashSet<>();
     private List<String> newPRUs = new LinkedList<>();
+
+    private EZPortfolioProxy ezPortfolioProxy; // cached, if null will be loaded from google, else clone it and use it
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -54,5 +57,13 @@ public class EzServerState {
 
     public void setNewPRUs(List<String> newPRUs) {
         this.newPRUs = newPRUs;
+    }
+
+    public EZPortfolioProxy getEzPortfolioProxy() {
+        return ezPortfolioProxy;
+    }
+
+    public void setEzPortfolioProxy(EZPortfolioProxy ezPortfolioProxy) {
+        this.ezPortfolioProxy = ezPortfolioProxy;
     }
 }

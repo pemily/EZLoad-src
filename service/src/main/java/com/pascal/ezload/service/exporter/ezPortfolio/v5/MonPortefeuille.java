@@ -18,8 +18,6 @@ public class MonPortefeuille implements MonPortefeuilleData {
 
     private static final String TOTAL_MARKER = "TOTAL";
 
-    private final SheetValues portefeuille;
-
     public static final int VALEUR_COL = 0;
     public static final int ACCOUNT_TYPE_COL = 1;
     public static final int BROKER_COL = 2;
@@ -33,6 +31,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int QUANTITY_COL = 10;
     public static final int ANNUAL_DIVIDEND_COL = 11;
 
+    private final SheetValues portefeuille;
 
     public MonPortefeuille(SheetValues portefeuille) {
         this.portefeuille = portefeuille;
@@ -116,5 +115,9 @@ public class MonPortefeuille implements MonPortefeuilleData {
             data.put(ezPortfolio_portefeuille_quantity, "");
             data.put(ezPortfolio_portefeuille_annualDividend, "");
         }
+    }
+
+    public MonPortefeuille createDeepCopy() {
+        return new MonPortefeuille(portefeuille.createDeepCopy());
     }
 }

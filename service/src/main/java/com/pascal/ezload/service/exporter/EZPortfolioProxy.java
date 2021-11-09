@@ -9,6 +9,7 @@ import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +19,9 @@ public interface EZPortfolioProxy {
 
     int getEzPortfolioVersion();
 
-    void load() throws Exception;
+    void load(Reporting reporting) throws Exception;
     // return the list of EzEdition operation not saved
-    List<EzReport> save(List<EzReport> operations) throws Exception;
+    List<EzReport> save(Reporting reporting, List<EzReport> operations) throws Exception;
 
     Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account);
 
@@ -37,4 +38,6 @@ public interface EZPortfolioProxy {
     PRU getPRU();
 
     List<String> getNewPRUValues();
+
+    EZPortfolioProxy createDeepCopy();
 }

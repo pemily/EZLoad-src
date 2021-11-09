@@ -4,7 +4,7 @@ import { valued } from '../../../ez-api/tools';
 
 
 export interface ConfigTextAreaFieldProps {
-  onChange: (newValue: string) => void;
+  onChange: (newValue: string) => void; 
   value: string|undefined|null;
   id: string;
   label?: string;
@@ -20,7 +20,6 @@ export interface ConfigTextAreaFieldProps {
 
 export function TextAreaField(props: ConfigTextAreaFieldProps) {
     const [currentValue, setCurrentValue] = useState<string>(valued(props.value));
-    const [timeoutId, setTimeoutId] = useState<number|undefined>(undefined);
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
       setCurrentValue(valued(props.value)); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/      
@@ -28,20 +27,16 @@ export function TextAreaField(props: ConfigTextAreaFieldProps) {
     
     
     const onChangeLocal = (event: any) => {      
-                        window.clearTimeout(timeoutId);
-                        const { value: newValue } = event.target;                        
-                        if (currentValue !== newValue) {
-                          setCurrentValue(newValue);
-                          setTimeoutId(window.setTimeout(() => props.onChange(newValue), 1000));
-                        }
-                      }
+      const { value: newValue } = event.target;                        
+      setCurrentValue(newValue);
+    }
 
     const textArea = (): JSX.Element => {
         return (
               <Keyboard onTab={(event) => {            
                 if (props.allowTab){
                   event.preventDefault();             
-                  const textAreaTmp = document.getElementById(props.id);
+                  const textAreaTmp = document.getElementById("TextArea"+props.id);
                   if (textAreaTmp){
                     const textArea = textAreaTmp as HTMLTextAreaElement;
                     textArea.setRangeText( '\t', textArea.selectionStart, textArea.selectionEnd, 'end');
@@ -53,10 +48,7 @@ export function TextAreaField(props: ConfigTextAreaFieldProps) {
                         value={ currentValue === null ? undefined : currentValue}
                         placeholder={props.isRequired ? "Champ Obligatoire" : ""}                           
                         onChange={onChangeLocal}
-                        onBlur={evt => {
-                          window.clearTimeout(timeoutId);
-                          props.onChange(evt.target.value);
-                        }}
+                        onBlur={evt => props.onChange(evt.target.value)}
                         disabled={props.readOnly}
                         fill/> 
               </Keyboard>

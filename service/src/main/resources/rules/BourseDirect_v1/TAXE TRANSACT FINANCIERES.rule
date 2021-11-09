@@ -1,0 +1,24 @@
+{
+  "field2ErrorMsg" : { },
+  "broker" : "BourseDirect",
+  "brokerFileVersion" : 1,
+  "name" : "TAXE TRANSACT FINANCIERES",
+  "enabled" : true,
+  "description" : "??je n'ai pas la quantité dans le fichier pdf, j'ai laissé vide, ok???",
+  "ezLoadVersion" : 1,
+  "condition" : "ezOperation_INFO1 == \"TAXE TRANSACT FINANCIERES\"",
+  "shareId" : "ezOperation_INFO2",
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "operationDateExpr" : "ezOperation_DATE",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "\"\"",
+    "operationTypeExpr" : "\"Taxe sur les Transactions\"",
+    "operationActionNameExpr" : "ezOperationShareUserName",
+    "operationCountryExpr" : "ezMarketCountry",
+    "operationAmountExpr" : "-ezOperation_DEBIT",
+    "operationDescriptionExpr" : "\"Taxe sur les Transactions (achat)\""
+  } ],
+  "portefeuilleRules" : [ ]
+}

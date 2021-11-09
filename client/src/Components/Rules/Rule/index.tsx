@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Trash, HelpOption, Add, Duplicate } from 'grommet-icons';
-import { Box, Heading, Text, Button, Anchor, List, Grid } from "grommet";
+import { Box, Heading, Text, Button, Anchor, List } from "grommet";
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
 import { CommonFunctionsEditor } from '../CommonFunctionsEditor';

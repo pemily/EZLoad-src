@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
 
 public class MesOperations  {
 
-    private final SheetValues existingOperations;
-    private final List<Row> newOperations = new ArrayList<>();
-
     private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad]";
 
     private static final int DATE_COL = 0;
@@ -32,6 +29,9 @@ public class MesOperations  {
     private static final int INFORMATION_COL = 8;
     private static final int ACCOUNT_DECLARED_NUMBER_COL = 9;
     private static final int AUTOMATIC_UPD_COL = 10;
+
+    private final SheetValues existingOperations;
+    private final List<Row> newOperations = new ArrayList<>();
 
 
     public MesOperations(SheetValues mesOperations){
@@ -93,5 +93,11 @@ public class MesOperations  {
     public void saveDone() {
         existingOperations.getValues().addAll(newOperations);
         newOperations.clear();
+    }
+
+    public MesOperations createDeepCopy() {
+        MesOperations copy = new MesOperations(existingOperations.createDeepCopy());
+        copy.newOperations.addAll(newOperations.stream().map(Row::createDeepCopy).collect(Collectors.toList()));
+        return copy;
     }
 }
