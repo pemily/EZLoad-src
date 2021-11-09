@@ -19,12 +19,10 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     private static final int FIRST_ROW_PRU = 5;
     private static final int FIRST_ROW_MES_OPERATIONS = 1;
 
-    private Reporting reporting;
     private GDriveSheets sheets;
     private EZPortfolio ezPortfolio;
 
-    public EZPorfolioProxyV5(Reporting reporting, GDriveSheets sheets){
-        this.reporting = reporting;
+    public EZPorfolioProxyV5(GDriveSheets sheets){
         this.sheets = sheets;
     }
 
@@ -34,10 +32,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public void load() throws Exception {
+    public void load(Reporting reporting) throws Exception {
         ezPortfolio = new EZPortfolio("v5");
 
-        List<SheetValues> ezSheets = sheets.batchGet("MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":K",
+        List<SheetValues> ezSheets = sheets.batchGet(reporting,
+                                            "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":K",
                                                     "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":L",
                                                     "PRU!A"+FIRST_ROW_PRU+":A");
 
@@ -59,7 +58,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
     @Override
     // return the list of EzEdition operation not saved
-    public List<EzReport> save(List<EzReport> operationsToAdd) throws Exception {
+    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd) throws Exception {
         reporting.info("Saving EZPortfolio...");
         MesOperations operations = ezPortfolio.getMesOperations();
 
@@ -97,7 +96,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         if (operations.getNewOperations().size() > 0) {
             reporting.info("Saving "+nbOperationSaved.get()+" operations");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
-            sheets.batchUpdate(
+            sheets.batchUpdate(reporting,
                     new SheetValues("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":K",
                                 operations.getNewOperations()),
                     monPortefeuille,
@@ -151,11 +150,18 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         return ezPortfolio.getPru().getNewPRUValues();
     }
 
+    @Override
+    public EZPortfolioProxy createDeepCopy() {
+        EZPorfolioProxyV5 copy = new EZPorfolioProxyV5(sheets);
+        copy.ezPortfolio = this.ezPortfolio.createDeepCopy();
+        return copy;
+    }
+
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {
         try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio avec EZLoad")){
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
-            SheetValues s = sheets.getCells("MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
+            SheetValues s = sheets.getCells(reporting,"MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
             reporting.info("Valeur trouvée: "+ s.getValues().get(0).getValueStr(0));
             return s.getValues().get(0).getValueStr(0).equals("Quantité");
         }

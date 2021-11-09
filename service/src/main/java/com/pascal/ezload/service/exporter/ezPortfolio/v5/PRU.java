@@ -4,6 +4,7 @@ import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,5 +61,11 @@ public class PRU {
     public void saveDone() {
         existingPRUs.getValues().addAll(newPRUs);
         newPRUs.clear();
+    }
+
+    public PRU createDeepCopy() {
+        PRU copy = new PRU(existingPRUs.createDeepCopy());
+        copy.newPRUs.addAll(newPRUs.stream().map(Row::createDeepCopy).collect(Collectors.toList()));
+        return copy;
     }
 }

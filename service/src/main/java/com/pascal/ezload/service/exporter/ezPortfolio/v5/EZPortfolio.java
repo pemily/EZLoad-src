@@ -37,4 +37,12 @@ public class EZPortfolio {
     public void setPru(PRU pru) {
         this.pru = pru;
     }
+
+    public EZPortfolio createDeepCopy(){
+        EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
+        copy.setPru(pru.createDeepCopy());
+        copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
+        copy.setMesOperations(mesOperations.createDeepCopy());
+        return copy;
+    }
 }

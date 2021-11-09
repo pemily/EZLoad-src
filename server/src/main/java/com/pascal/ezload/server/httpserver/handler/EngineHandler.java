@@ -56,8 +56,7 @@ public class EngineHandler {
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
-                        EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
-                        EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
+                        EZPortfolioProxy ezPortfolioProxy = loadEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
 
                         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
                         // Donwload the files, according to the last date retrieved from ezPortfolio
@@ -68,6 +67,16 @@ public class EngineHandler {
                         updateNotYetLoaded(mainSettings, reporting, ezPortfolioProxy);
                     });
         }
+    }
+
+    private EZPortfolioProxy loadEzPortfolioProxyOrGetFromCache(MainSettings mainSettings, Reporting reporting) throws Exception {
+        EZPortfolioProxy ezPortfolioProxy = serverState.getEzPortfolioProxy();
+        if (ezPortfolioProxy == null) {
+            EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
+            ezPortfolioProxy = ezPortfolioManager.load();
+            serverState.setEzPortfolioProxy(ezPortfolioProxy);
+        }
+        return ezPortfolioProxy.createDeepCopy();
     }
 
     @GET
@@ -82,11 +91,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
-
-                    // ATTENTION le ezPortfolio sera modifié dans, des rows du Portefeuille seront mise a jour
-                    // il faudra donc le recharger pour le upload
-                    EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
+                    EZPortfolioProxy ezPortfolioProxy = loadEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
                     Set<ShareValue> knownValues = ezPortfolioProxy.getShareValues();
 
                     List<EZModel> allEZModels;
@@ -137,13 +142,15 @@ public class EngineHandler {
                         reporting.error("La valeur: " + dirtyShare.get().getTickerCode() + " a changé de nom, vous devez relancer la génération des opérations avant de mettre à jour EzPortfolio");
                     } else {
 
+                        serverState.setEzPortfolioProxy(null); // don't use the cache version when uploading
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
                         EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
 
+                        final EZPortfolioProxy ezPortfolioProxyFinal = ezPortfolioProxy;  // because of the lambda just below
                         // transfert all the new PRU row created in the previous analysis in this new just loaded PRU
-                        serverState.getNewPRUs().forEach(pru -> ezPortfolioProxy.getPRU().newPRU(pru));
+                        serverState.getNewPRUs().forEach(pru -> ezPortfolioProxyFinal.getPRU().newPRU(pru));
 
-                        List<EzReport> result = ezPortfolioProxy.save(serverState.getEzReports());
+                        List<EzReport> result = ezPortfolioProxy.save(reporting, serverState.getEzReports());
                         updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
 
                         // get the new version, and update the list of file not yet loaded

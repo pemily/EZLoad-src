@@ -32,6 +32,9 @@ public class FinanceTools {
                 throw new RuntimeException(e);
             }
         });
+        if (result == null) {
+            throw new RuntimeException("Pas d'information trouvé sur la valeur: "+actionCode);
+        }
         // re-apply the name outside of the cache, because the user can have changed the name
         String name = shareUtil.getEzName(result.getEzTicker());
         result.setEzName(name == null ? result.getRawName() : name);
@@ -67,11 +70,11 @@ public class FinanceTools {
                 action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());
 
                 if (!currency.get("code").equals(action.getMarketPlace().getCurrency().getCode()))
-                    throw new BRException("The currency declared for this action: "+currency+ " is not the expected currency: "+action.getMarketPlace().getCurrency().getCode());
+                    throw new BRException("The currency declared for this action: "+actionCode+" is "+currency+ " and is not the expected currency: "+action.getMarketPlace().getCurrency().getCode()+" info from "+ url);
                 return action;
             }
             catch(Throwable e){
-                throw new BRException("Error when retrieving information for actionCode: "+actionCode+" url is: "+ url, e);
+                throw new BRException("Error when retrieving information for actionCode: "+actionCode+" info from: "+ url, e);
             }
         }
         finally {

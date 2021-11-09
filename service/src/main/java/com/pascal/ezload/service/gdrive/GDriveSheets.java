@@ -20,30 +20,27 @@ public class GDriveSheets {
     private final String ezPortfolioUrl;
     private final String spreadsheetId;
     private final Sheets service;
-    private final Reporting reporting;
 
-    public GDriveSheets(Reporting reporting, Sheets service, String ezPortfolioUrl){
+    public GDriveSheets(Sheets service, String ezPortfolioUrl){
         this.ezPortfolioUrl = ezPortfolioUrl;
+        this.service = service;
         try {
             String next = ezPortfolioUrl.substring(SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX.length());
             this.spreadsheetId = StringUtils.divide(next, '/')[0];
         }
         catch(Exception e){
             String errorMsg = "Impossible d'extraire l'identifiant de document de ezPortfolio "+ezPortfolioUrl;
-            reporting.error(errorMsg);
             throw new IllegalArgumentException(errorMsg, e);
         }
-        this.service = service;
-        this.reporting = reporting;
     }
 
     public String getEzPortfolioUrl(){
         return ezPortfolioUrl;
     }
 
-    public SheetValues getCells(final String range) throws Exception {
+    public SheetValues getCells(Reporting reporting, final String range) throws Exception {
         reporting.info("Google Drive lecture des données: "+range);
-        List<List<Object>> r = retryOnTimeout(RETRY_NB, () -> {
+        List<List<Object>> r = retryOnTimeout(reporting, RETRY_NB, () -> {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
@@ -54,10 +51,10 @@ public class GDriveSheets {
         return new SheetValues(range, rows);
     }
 
-    public int update(String range, List<Row> values) throws Exception {
+    public int update(Reporting reporting, String range, List<Row> values) throws Exception {
         reporting.info("Mise à jour de Google Drive: "+range);
         List<List<Object>> objValues = values.stream().map(Row::getValues).collect(Collectors.toList());
-        int r = retryOnTimeout(RETRY_NB, () -> {
+        int r = retryOnTimeout(reporting, RETRY_NB, () -> {
             UpdateValuesResponse resp = service.spreadsheets().values().update(spreadsheetId, range, new ValueRange().setValues(objValues))
                     .setValueInputOption("USER_ENTERED")
                     .execute();
@@ -67,12 +64,12 @@ public class GDriveSheets {
         return r;
     }
 
-    public List<SheetValues> batchGet(String... ranges) throws Exception {
-        return batchGet(Arrays.asList(ranges));
+    public List<SheetValues> batchGet(Reporting reporting, String... ranges) throws Exception {
+        return batchGet(reporting, Arrays.asList(ranges));
     }
 
-    public List<SheetValues> batchGet(List<String> ranges) throws Exception {
-        return retryOnTimeout(RETRY_NB, () -> {
+    public List<SheetValues> batchGet(Reporting reporting, List<String> ranges) throws Exception {
+        return retryOnTimeout(reporting, RETRY_NB, () -> {
             BatchGetValuesResponse resp = service.spreadsheets()
                     .values()
                     .batchGet(spreadsheetId)
@@ -86,12 +83,12 @@ public class GDriveSheets {
         });
     }
 
-    public int batchUpdate(SheetValues... sheetValues) throws Exception {
-        return batchUpdate(Arrays.asList(sheetValues));
+    public int batchUpdate(Reporting reporting, SheetValues... sheetValues) throws Exception {
+        return batchUpdate(reporting, Arrays.asList(sheetValues));
     }
 
-    public int batchUpdate(List<SheetValues> sheetValues) throws Exception {
-        return retryOnTimeout(RETRY_NB, () -> {
+    public int batchUpdate(Reporting reporting, List<SheetValues> sheetValues) throws Exception {
+        return retryOnTimeout(reporting, RETRY_NB, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
             buvr.setValueInputOption("USER_ENTERED");
 
@@ -108,7 +105,7 @@ public class GDriveSheets {
         });
     }
 
-    private <T> T retryOnTimeout(int n,  SupplierWithException<T> fct) throws Exception {
+    private <T> T retryOnTimeout(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
         try {
             return fct.get();
         }
@@ -121,7 +118,7 @@ public class GDriveSheets {
                 reporting.info("Delai dépassé. attendre 30 secondes... puis relance");
                 Sleep.waitSeconds(30);
                 reporting.info("Relance n°: "+n);
-                return retryOnTimeout(n - 1, fct);
+                return retryOnTimeout(reporting, n - 1, fct);
             }
             throw e;
         }

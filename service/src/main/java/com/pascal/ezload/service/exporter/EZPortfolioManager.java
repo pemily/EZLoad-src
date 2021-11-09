@@ -43,8 +43,8 @@ public class EZPortfolioManager {
             reporting.info("Récupération des données de Google Drive...");
             // ici detection de la version de EZPortfolio
             if (EZPorfolioProxyV5.isCompatible(reporting, sheets)) {
-                EZPorfolioProxyV5 proxy = new EZPorfolioProxyV5(reporting, sheets);
-                proxy.load();
+                EZPorfolioProxyV5 proxy = new EZPorfolioProxyV5(sheets);
+                proxy.load(reporting);
                 return proxy;
             }
 
@@ -68,7 +68,7 @@ public class EZPortfolioManager {
         try {
             reporting.info("Connection à votre EZPortfolio: "+mainSettings.getEzPortfolio().getEzPortfolioUrl());
             service = GDriveConnection.getService(reporting, mainSettings.getEzPortfolio().getGdriveCredsFile());
-            sheets = new GDriveSheets(reporting, service, mainSettings.getEzPortfolio().getEzPortfolioUrl());
+            sheets = new GDriveSheets(service, mainSettings.getEzPortfolio().getEzPortfolioUrl());
         }
         catch(Exception e){
             reporting.error("Impossible de se connecter à Google Drive. Vérifiez votre fichier de sécurité Google Drive");

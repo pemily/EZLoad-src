@@ -5,6 +5,7 @@ import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.pascal.ezload.service.model.EZDate;
 
@@ -50,5 +51,12 @@ public class Row {
 
     public void setValue(int colIndex, EZDate d) {
         values.set(colIndex, d.toEzPortoflioDate());
+    }
+
+    public Row createDeepCopy(){
+        return new Row(values.stream().map(v -> {
+                if (v instanceof String) return v;
+                else throw new IllegalStateException("Do I have another type in the Row??"); // I think I have only Strings
+            }).collect(Collectors.toList()));
     }
 }

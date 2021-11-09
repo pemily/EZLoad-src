@@ -1,5 +1,5 @@
 {
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
-  "script" : "// Liste de fonctions utilisables dans toutes les expressions de BourseDirect v1\n\n// cette fonction va utiliser la variable: ezAccountType pour déterminer si il s'agit d'un compte CTO/PEA/PEA-PME/Assurance-Vie\nvar ezAccountTypeName = () -> { \n\tif (ezAccountType == \"Ordinaire\") return \"Compte-Titres Ordinaire\";\n\t// TODO faire PEA & PEA-PME & Assurance-Vie\n\treturn \"\"; \n}\n"
+  "script" : "// Liste de fonctions utilisables dans toutes les expressions de BourseDirect v1\n\n// cette fonction va utiliser la variable: ezAccountType pour déterminer si il s'agit d'un compte CTO/PEA/PEA-PME/Assurance-Vie\nvar ezAccountTypeName = () -> { \n\tif (ezAccountType == \"Ordinaire\") return \"Compte-Titres Ordinaire\";\n\tif (ezAccountType == \"PEA\") return \"PEA\";\n\t// TODO faire PEA-PME & Assurance-Vie\n\treturn \"\"; \n}\n"
 }

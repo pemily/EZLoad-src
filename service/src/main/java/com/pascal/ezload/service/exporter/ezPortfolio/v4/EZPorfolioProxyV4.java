@@ -30,12 +30,12 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public void load() throws Exception {
+    public void load(Reporting reporting) throws Exception {
         throw new NotImplementedException();
     }
 
     @Override
-    public List<EzReport> save(List<EzReport> operationsToAdd){
+    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd){
         throw new NotImplementedException();
     }
 
@@ -77,6 +77,11 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     @Override
     public List<String> getNewPRUValues() {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public EZPortfolioProxy createDeepCopy() {
+        return null;
     }
 
 }

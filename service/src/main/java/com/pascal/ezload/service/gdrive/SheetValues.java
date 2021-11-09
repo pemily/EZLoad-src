@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.gdrive;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SheetValues {
     private String range;
@@ -17,5 +18,9 @@ public class SheetValues {
 
     public List<Row> getValues() {
         return values;
+    }
+
+    public SheetValues createDeepCopy() {
+        return new SheetValues(range, values.stream().map(Row::createDeepCopy).collect(Collectors.toList()));
     }
 }

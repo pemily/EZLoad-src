@@ -1,0 +1,24 @@
+{
+  "field2ErrorMsg" : { },
+  "broker" : "BourseDirect",
+  "brokerFileVersion" : 1,
+  "name" : "DROITS DE GARDE",
+  "enabled" : true,
+  "description" : null,
+  "ezLoadVersion" : 1,
+  "condition" : "ezOperation_INFO1 == \"DROITS DE GARDE\"",
+  "shareId" : "",
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "operationDateExpr" : "ezOperation_DATE",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "\"\"",
+    "operationTypeExpr" : "\"Droits de garde/Frais divers\"",
+    "operationActionNameExpr" : "\"\"",
+    "operationCountryExpr" : "\"\"",
+    "operationAmountExpr" : "-ezOperation_DEBIT",
+    "operationDescriptionExpr" : "\"Droits de Garde\""
+  } ],
+  "portefeuilleRules" : [ ]
+}
