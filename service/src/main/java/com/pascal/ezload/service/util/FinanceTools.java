@@ -65,6 +65,8 @@ public class FinanceTools {
                 action.setIsin((String) actionData.get("isin")); // US92936U1097
                 Map<String, Object> market = (Map<String, Object>) actionData.get("market");
                 Map<String, Object> currency = (Map<String, Object>) actionData.get("currency");
+                Map<String, Object> iso = (Map<String, Object>) actionData.get("iso");
+                action.setType((String)iso.get("type"));
                 action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
 
                 action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());

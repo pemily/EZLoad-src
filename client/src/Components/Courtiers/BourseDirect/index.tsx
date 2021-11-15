@@ -13,7 +13,11 @@ export interface BourseDirectProps {
 export function BourseDirect(props: BourseDirectProps){
     return (
         <Box margin="small" >
-          <Anchor target="BourseDirect" href="http://www.boursedirect.com" label="BourseDirect" />
+            <Box direction="row">
+                <Anchor margin="medium" target="BourseDirect" href="http://www.boursedirect.com" label="BourseDirect" />
+                { props.mainSettings.ezLoad?.downloadDir 
+                    && (<Anchor alignSelf="center" target="_blank" color="brand" href={props.mainSettings.ezLoad?.downloadDir} label="Voir les relevés téléchargés"/>)}
+            </Box>
             
           <Button alignSelf="start" margin="medium"
                 disabled={props.readOnly} onClick={() => 

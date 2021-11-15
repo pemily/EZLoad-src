@@ -5,10 +5,11 @@ import com.pascal.ezload.service.util.StringValue;
 
 public class OperationRule extends Checkable {
 
-    public enum Field{ operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
+    public enum Field{ condition, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
         operationQuantityExpr, operationTypeExpr, operationActionNameExpr, operationCountryExpr, operationAmountExpr,
         operationDescriptionExpr}
 
+    private String condition;
     private String operationDateExpr;
     private String operationCompteTypeExpr;
     private String operationBrokerExpr;
@@ -18,6 +19,14 @@ public class OperationRule extends Checkable {
     private String operationCountryExpr;
     private String operationAmountExpr;
     private String operationDescriptionExpr;
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
 
     public String getOperationDateExpr() {
         return operationDateExpr;
@@ -93,7 +102,7 @@ public class OperationRule extends Checkable {
 
     @Override
     public void validate() {
-
+        new StringValue(false).validate(this, Field.condition.name(), condition);
         new StringValue(true).validate(this, Field.operationDateExpr.name(), operationDateExpr);
         new StringValue(true).validate(this, Field.operationCompteTypeExpr.name(), operationCompteTypeExpr);
         new StringValue(true).validate(this, Field.operationBrokerExpr.name(), operationBrokerExpr);

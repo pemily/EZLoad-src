@@ -116,7 +116,8 @@ public class BourseDirectText2Model {
                         String charToReplace = "[. /\\\\,()]";
                         String key = text[0].replaceAll(charToReplace, " ")
                                 .trim()
-                                .replaceAll(charToReplace, "_");
+                                .replaceAll(charToReplace, "_")
+                                .replaceAll("__", "_");
                         if (op.getFields().containsKey(key))
                             throw new UnsupportedOperationException("Field " + key + " already set. Unknown pdf format near the text: " + pt.getText());
                         op.getFields().put("ezOperation_"+key, ModelUtils.normalizeAmount(text[1].trim()));

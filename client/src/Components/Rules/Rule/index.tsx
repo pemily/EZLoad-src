@@ -40,6 +40,20 @@ export function Rule(props: RuleProps){
         return expr + ' ' + data.name;
     }
 
+    
+    function conditionCell(value: string|undefined, errorMsg: string|undefined, saveNewValue: (newValue: string) => void){
+        return (
+            <Box direction="row" align="start" margin="small" >
+                <TextField id="condition" label="Condition"
+                    value={value} isRequired={false} errorMsg={errorMsg}
+                    readOnly={readOnly} onChange={newValue => saveNewValue(newValue)}/>                            
+                <Box alignSelf="end" margin="none"><EzDataField value={props.data} iconInfo={false}
+                        onSelect={ d => saveNewValue(append(value,d))}/></Box>
+            </Box>
+        );
+    }
+    
+
     function cellData(colName: string, value: string|undefined, errorMsg: string|undefined, saveNewValue: (newValue: string) => void){
         return (
             <Box direction="column" align="center" margin="small">
@@ -131,7 +145,7 @@ export function Rule(props: RuleProps){
                  onSelect={ d => saveRule({...ruleDef, condition: append(ruleDef.condition,d)})}/>
         </Box>
         <Box direction="row" align="end" margin="small">
-            <TextField id="shareId" label="Référence de la valeur" value={ruleDef.shareId}
+            <TextField id="shareId" label="Code ISIN de la valeur" value={ruleDef.shareId}
                 description="Format: US5024311095 / FR0013269123. Si cette opération n'est pas lié a une valeur, ne rien mettre. Après avoir renseigné ce champ, regénérez lez opérations pour avoir toutes les données extraites"
                 isRequired={false} errorMsg={ruleDef.field2ErrorMsg?.shareId}
                 readOnly={readOnly}
@@ -150,6 +164,9 @@ export function Rule(props: RuleProps){
             {(datanum: OperationRule) => 
                 ( <Box direction="row">   
                 <Box>
+                    {conditionCell(datanum.condition, datanum.field2ErrorMsg?.condition, (newVal) => {                    
+                        return saveRule({...ruleDef, operationRules: ruleDef.operationRules?.map(item => item !== datanum ? item : {...item, condition: newVal.trim()})});
+                    })}                    
                     <Box direction="row-responsive"  alignSelf="center" align="start">
                     {cellData("Date", datanum.operationDateExpr, datanum.field2ErrorMsg?.operationDateExpr, (newVal) => {                    
                         return saveRule({...ruleDef, operationRules: ruleDef.operationRules?.map(item => item !== datanum ? item : {...item, operationDateExpr: newVal.trim()})});
@@ -218,6 +235,9 @@ export function Rule(props: RuleProps){
                 {(datanum: PortefeuilleRule) => 
                 ( <Box direction="row">
                 <Box>
+                    {conditionCell(datanum.condition, datanum.field2ErrorMsg?.condition, (newVal) => {
+                        return saveRule({...ruleDef, portefeuilleRules: ruleDef.portefeuilleRules?.map(item => item !== datanum ? item : {...item, condition: newVal.trim()})});
+                    })}                     
                     <Box direction="row-responsive" alignSelf="center" align="start">
                         {cellData("Valeur", datanum.portefeuilleValeurExpr, datanum.field2ErrorMsg?.portefeuilleValeurExpr, (newVal) => {
                             return saveRule({...ruleDef, portefeuilleRules: ruleDef.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleValeurExpr: newVal.trim()})});

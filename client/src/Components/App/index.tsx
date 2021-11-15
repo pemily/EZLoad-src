@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } from "grommet";
-import { Upload, Configure, Clipboard, DocumentStore, Command, Services } from 'grommet-icons';
+import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { ConfigApp } from '../ConfigApp';
@@ -11,7 +11,7 @@ import { ViewLog } from '../Tools/ViewLog';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
 
 export function App(){
     
@@ -30,6 +30,7 @@ export function App(){
     const [selectedRule, setSelectedRule] = useState<SelectedRule|undefined>(undefined);
     const [newShareValues, setNewShareValues] = useState<ShareValue[]|undefined>(undefined);
     const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
+    const [reportGenerated, setReportGenerated] = useState<boolean>(false);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -41,6 +42,12 @@ export function App(){
             setProcessLaunchFail(true);
         }
         setActiveIndex(EXECUTION_TAB_INDEX); //switch to the execution tab
+    }
+
+    const saveStartDate = (date: string, account: BourseDirectEZAccountDeclaration) => {
+        jsonCall(ezApi.engine.setStartDate({date: date}, account))
+        .then(r => { setReports([]); followProcess(r); })
+        .catch(e => console.error(e) )
     }
 
     function reloadAllData(){        
@@ -212,19 +219,21 @@ export function App(){
                                     <Button alignSelf="start" margin="medium"
                                         disabled={processRunning} onClick={() => 
                                             jsonCall(ezApi.engine.analyze())
-                                            .then(followProcess)
+                                            .then(r => followProcess(r))
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
                                     <Button alignSelf="start" margin="medium" disabled={newShareValuesDirty || processRunning || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)} onClick={() =>
                                                 jsonCall(ezApi.engine.upload())
                                                 .then(followProcess)
+                                                .then(r => setReportGenerated(true))
                                                 .catch(e => console.error(e))
                                             }
                                             size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                     { mainSettings.ezPortfolio?.ezPortfolioUrl 
                                         && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={mainSettings.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
+                                { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
                                 <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
@@ -262,6 +271,15 @@ export function App(){
                                             jsonCall(ezApi.rule.getRule({broker: broker, brokerFileVersion: version, ruleName: name}))
                                             .then(r => setSelectedRule({oldName: r.name, ruleDefinition: r})) }}
                                             />
+                                { (reportGenerated || reports.length > 0) && (<Box direction="row">
+                                      <Button alignSelf="start" margin="medium" disabled={processRunning} onClick={() =>
+                                                ezApi.engine.clearCache()   
+                                                .then(r => {setReportGenerated(false); setReports([])})                                             
+                                                .catch(e => console.error(e))
+                                            }
+                                            size="small" icon={<ClearOption size='small'/>} label="Vider le cache"/> 
+                                            <Text size="xsmall" alignSelf="center">Videz le cache si vous avez modifié EzPortfolio</Text>
+                                            </Box>)}
                         </Box>
                     </Tab>                       
                     <Tab title="Rapport" icon={runningTaskOrLog(mainSettings && processRunning)}>
@@ -271,7 +289,8 @@ export function App(){
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             <ViewLog 
                                     ezProcess={lastProcess}    
-                                    processFinished={() => reloadAllData()}/>
+                                    processFinished={() => reloadAllData()}/>                            
+                            { mainSettings && !processRunning && (<Text margin="large">Le process est terminé vous pouvez continuer</Text>)}
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>
@@ -284,6 +303,7 @@ export function App(){
                                     bourseDirectAuthInfo={bourseDirectAuthInfo}
                                     bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
                                     readOnly={processRunning}
+                                    saveStartDate={saveStartDate}
                                     />
                         </Box>
                     </Tab>

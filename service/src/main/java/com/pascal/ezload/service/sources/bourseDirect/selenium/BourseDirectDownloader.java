@@ -66,31 +66,32 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         for (BourseDirectEZAccountDeclaration account : bourseDirectSettings.getAccounts()) {
-            try(Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
+            if (account.isActive()) {
+                try (Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
 
-                Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZBroker.BourseDirect, account);
-                if (fromDateOpt.isPresent()) {
-                    reporting.info("Dernière date chargé dans EZPortfolio par EZLoad pour le compte " + courtier.getEzPortfolioName() + ":" + account.getName() + "=> " + fromDateOpt.get().toEzPortoflioDate());
-                } else {
-                    reporting.info("Aucune opération chargé par EZLoad dans le compte " + courtier.getEzPortfolioName() + ":" + account.getName());
-                }
+                    Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZBroker.BourseDirect, account);
+                    if (fromDateOpt.isPresent()) {
+                        reporting.info("Dernière date chargé dans EZPortfolio par EZLoad pour le compte " + courtier.getEzPortfolioName() + ":" + account.getName() + "=> " + fromDateOpt.get().toEzPortoflioDate());
+                    } else {
+                        reporting.info("Aucune opération chargé par EZLoad dans le compte " + courtier.getEzPortfolioName() + ":" + account.getName());
+                    }
 
-                EZDate fromDate;
-                if (!fromDateOpt.isPresent()) {
-                    // BourseDirect fournit le relevé jusqu'a un an en arriere
-                    LocalDate currentdate = LocalDate.now();
-                    fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
-                } else fromDate = fromDateOpt.get();
+                    EZDate fromDate;
+                    if (!fromDateOpt.isPresent()) {
+                        // BourseDirect fournit le relevé jusqu'a un an en arriere
+                        LocalDate currentdate = LocalDate.now();
+                        fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
+                    } else fromDate = fromDateOpt.get();
 
-                String cptIndex = selectAccount(account);
+                    String cptIndex = selectAccount(account);
 
-                goToMonth(cptIndex, new Month(fromDate));
+                    goToMonth(cptIndex, new Month(fromDate));
 
-                Month dateFromPage = extractDateFromPage();
-                // just a check to be sure we are on the correct page
-                if (dateFromPage.getYear() != fromDate.getYear() || dateFromPage.getMonth() != fromDate.getMonth()) {
-                    throw new BRException("The date of the download page: " + dateFromPage + " is not the expected one: " + fromDate);
-                }
+                    Month dateFromPage = extractDateFromPage();
+                    // just a check to be sure we are on the correct page
+                    if (dateFromPage.getYear() != fromDate.getYear() || dateFromPage.getMonth() != fromDate.getMonth()) {
+                        throw new BRException("The date of the download page: " + dateFromPage + " is not the expected one: " + fromDate);
+                    }
                 /*
                 // go to the oldest page for this account
                 Month dateFromPage = extractDateFromPage();
@@ -100,14 +101,15 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 }
                 */
 
-                Month monthToDownload = dateFromPage;
-                do {
-                    extractMonthActivities(account, cptIndex, monthToDownload);
-                    monthToDownload = clickMoisSuivant();
-                }
-                while (monthToDownload != null);
+                    Month monthToDownload = dateFromPage;
+                    do {
+                        extractMonthActivities(account, cptIndex, monthToDownload);
+                        monthToDownload = clickMoisSuivant();
+                    }
+                    while (monthToDownload != null);
 
-                reporting.info("Extraction done for account: " + account.getName());
+                    reporting.info("Extraction done for account: " + account.getName());
+                }
             }
         }
     }

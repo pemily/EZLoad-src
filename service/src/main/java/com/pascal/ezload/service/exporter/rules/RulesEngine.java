@@ -71,7 +71,7 @@ public class RulesEngine {
                     // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
                     ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
                 }
-                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEditions.get(0)))) { // test if the first generated operations already exists, if yes, we already loaded this operation
+                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEditions.get(0), ruleDef))) { // test if the first generated operations already exists, if yes, we already loaded this operation
                     ezEdition.setEzOperationEditions(ezOperationEditions);
                     List<EzPortefeuilleEdition> ezPortefeuilleEditions = applyRuleForPortefeuille(ruleDef, ezPortfolioProxy, ezData);
                     List<String> allErrors = ezPortefeuilleEditions.stream().flatMap(p -> p.errorsAsList().stream()).collect(Collectors.toList());
@@ -142,16 +142,20 @@ public class RulesEngine {
 
         ruleDefinition.getOperationRules().forEach(opRule -> {
             EzOperationEdition ezOperationEdition = new EzOperationEdition();
-            ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data, functions));
-            ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data, functions));
-            ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data, functions));
-            ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data, functions));
-            ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data, functions));
-            ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data, functions));
-            ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data, functions));
-            ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data, functions));
-            ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data, functions));
-            result.add(ezOperationEdition);
+            String condition = opRule.getCondition();
+            condition = StringUtils.isBlank(condition) ? "true" : condition;
+            if (Boolean.parseBoolean(eval(ezOperationEdition, condition, data, functions))) {
+                ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data, functions));
+                ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data, functions));
+                ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data, functions));
+                ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data, functions));
+                ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data, functions));
+                ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data, functions));
+                ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data, functions));
+                ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data, functions));
+                ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data, functions));
+                result.add(ezOperationEdition);
+            }
         });
 
 
@@ -194,11 +198,14 @@ public class RulesEngine {
             if (StringUtils.isBlank(tickerCode)) {
                 ezPortefeuilleEdition.addError("Cette opération ne remplis pas correctement le Ticker Google Finance");
             } else {
+
                 if (!ezPortefeuilleEdition.hasErrors()) {
-                    applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2, functions);
-                    portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
+                    if (applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2, functions)) {
+                        portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
+                        result.add(ezPortefeuilleEdition);
+                    }
                 }
-                result.add(ezPortefeuilleEdition);
+                else result.add(ezPortefeuilleEdition);
             }
         });
 
@@ -208,7 +215,14 @@ public class RulesEngine {
         return result;
     }
 
-    private EzPortefeuilleEdition applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , PortefeuilleRule portefeuilleRule, EzData data, CommonFunctions functions) {
+    // return false if no effect
+    private boolean applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , PortefeuilleRule portefeuilleRule, EzData data, CommonFunctions functions) {
+
+        String condition = portefeuilleRule.getCondition();
+        condition = StringUtils.isBlank(condition) ? "true" : condition;
+        if (!Boolean.parseBoolean(eval(ezPortefeuilleEdition, condition, data, functions))) {
+            return false;
+        }
 
         ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleValeurExpr(), data, functions));
         ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCompteExpr(), data, functions));
@@ -227,7 +241,7 @@ public class RulesEngine {
         // I comment the following line, because it add confusion in the variable we can use in the rule
         // ezPortefeuilleEdition.fill(data);
 
-        return ezPortefeuilleEdition;
+        return true;
     }
 
     private String eval(WithErrors entity, String expression, EzData data, CommonFunctions functions) {

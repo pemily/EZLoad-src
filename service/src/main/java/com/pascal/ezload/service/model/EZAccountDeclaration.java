@@ -5,6 +5,8 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 public interface EZAccountDeclaration {
     String getName();
     String getNumber();
+    EnumEZBroker getEzBroker();
+
     boolean isActive();
 
     void fill(EzData data);

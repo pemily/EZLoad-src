@@ -1,8 +1,10 @@
-import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown } from "grommet";
-import { Add, Trash, Validate } from 'grommet-icons';
+import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer } from "grommet";
+import { Add, Trash, Validate, SchedulePlay } from 'grommet-icons';
 import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
+import { ConfigStartDate } from '../ConfigStartDate';
 import { Help } from '../Tools/Help';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -15,6 +17,7 @@ export interface ConfigProps {
   bourseDirectAuthInfoSetter: (authInfo: AuthInfo) => void;
   readOnly: boolean;
   followProcess: (process: EzProcess|undefined) => void;
+  saveStartDate: (date: string, account: BourseDirectEZAccountDeclaration) => void;
 }        
 
 const loginPasswordInfo = `L'identifiant & le mot de passe de votre compte BourseDirect **sont optionels**.  
@@ -73,7 +76,10 @@ const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
 `;
 
 
-export function Config(props: ConfigProps) {    
+export function Config(props: ConfigProps) {   
+    const [showConfigStartDate, setShowConfigStartDate] = useState<boolean>(false);
+    const [showStartDateForAccount, setShowStartDateForAccount] = useState<BourseDirectEZAccountDeclaration|undefined>(undefined);
+ 
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
@@ -241,11 +247,18 @@ export function Config(props: ConfigProps) {
                                           });
                                     }}/>     
                                     </TableCell>
+                                    <TableCell>
+                                        <Button size="small" disabled={props.readOnly} icon={<SchedulePlay size='medium'/>} label="Date de début"
+                                                onClick={() => {setShowConfigStartDate(true); setShowStartDateForAccount(account)}}/>
+                                    </TableCell>
                                     </TableRow>                                    
                                 )
                             }
                                 </TableBody>
                             </Table>
+                            {showConfigStartDate && showStartDateForAccount && (<Layer onEsc={() => setShowConfigStartDate(false)} onClickOutside={() => setShowConfigStartDate(false)} >
+                                <ConfigStartDate saveStartDate={props.saveStartDate} account={showStartDateForAccount} close={() => setShowConfigStartDate(false)}/>
+                            </Layer>)}
                             <Box direction="row" margin="none" pad="none">
                                 <Button size="small" icon={<Add size='small'/>} 
                                     disabled={props.readOnly}

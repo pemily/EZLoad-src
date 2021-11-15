@@ -11,6 +11,7 @@ public class EZAction implements ActionData {
     private String isin;
     private String pruCellReference;
     private EZMarketPlace marketPlace; // the marketPlace.googleFinanceCode contains: NYSE, EPA
+    private String type;
 
     public String getRawName() {
         return rawName;
@@ -68,6 +69,14 @@ public class EZAction implements ActionData {
         this.pruCellReference = pruCellReference;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
     public void fill(EzData data) {
         data.put(share_rawName, rawName);
         data.put(share_ticker, ticker);
@@ -75,6 +84,7 @@ public class EZAction implements ActionData {
         data.put(share_ezName, ezName);
         data.put(share_ezCode, ezTicker);
         data.put(share_costPrice, pruCellReference);
+        data.put(share_type, type);
         marketPlace.fill(data);
     }
 

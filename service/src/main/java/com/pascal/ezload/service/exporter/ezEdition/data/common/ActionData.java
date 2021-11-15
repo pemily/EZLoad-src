@@ -10,5 +10,6 @@ public interface ActionData {
     EzDataKey share_ezName = new EzDataKey("ezOperationShareUserName", "Le nom choisi par l'utilisateur de la valeur");
     EzDataKey share_ezCode = new EzDataKey("ezShareCode", "Le ticker Google Finance de la valeur, construit avec ezMarketGoogleCode:ezOperationTicker");
     EzDataKey share_costPrice = new EzDataKey("ezPRU", "Le PRU calculé dans l'onglet PRU de ezPortfolio");
+    EzDataKey share_type = new EzDataKey("ezShareType", "Le type d'action: stock");
     void fill(EzData data);
 }

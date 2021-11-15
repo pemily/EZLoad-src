@@ -43,7 +43,9 @@ public class PRU {
 
 
     public void newPRU(String ezShareName){
-        newPRUs.add(new Row(ezShareName));
+        Row r = new Row();
+        r.setValue(SHARE_NAME, ezShareName);
+        newPRUs.add(r);
     }
 
     public int getNumberOfExistingPRUs() {

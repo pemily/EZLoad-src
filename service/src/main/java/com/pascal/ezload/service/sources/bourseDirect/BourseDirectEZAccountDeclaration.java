@@ -3,6 +3,7 @@ package com.pascal.ezload.service.sources.bourseDirect;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
@@ -16,6 +17,11 @@ public class BourseDirectEZAccountDeclaration extends Checkable implements EZAcc
 
     public String getNumber() {
         return number;
+    }
+
+    @Override
+    public EnumEZBroker getEzBroker() {
+        return EnumEZBroker.BourseDirect;
     }
 
     public void setNumber(String number) {

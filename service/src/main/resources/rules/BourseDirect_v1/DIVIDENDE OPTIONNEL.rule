@@ -1,5 +1,6 @@
 {
   "field2ErrorMsg" : { },
+    "condition": "",
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
   "name" : "DIVIDENDE OPTIONNEL",
@@ -10,6 +11,7 @@
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -21,6 +23,7 @@
     "operationDescriptionExpr" : "\"Versement de dividende en actions (op1 sur liquidité): \" + ezOperation_QUANTITE+ \" de \" + ezOperationShareUserName + \"(\"+ezShareCode+\")\""
   }, {
     "field2ErrorMsg" : { },
+    "condition": "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -33,16 +36,17 @@
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "portefeuilleValeurExpr" : "ezOperationShareUserName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
     "portefeuilleTickerGoogleFinanceExpr" : "ezShareCode",
     "portefeuillePaysExpr" : "ezMarketCountry",
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
-    "portefeuilleIndustrieExpr" : "ezMonPortefeuillePrixRevientUnitaire",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
-    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
+    "portefeuillePrixDeRevientExpr" : "computePRU()",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_QUANTITE",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   } ]

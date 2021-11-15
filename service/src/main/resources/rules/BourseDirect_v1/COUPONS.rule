@@ -4,12 +4,13 @@
   "brokerFileVersion" : 1,
   "name" : "COUPONS",
   "enabled" : true,
-  "description" : "Versement de dividende sur le compte de liquidité\n?? Dividende brut | Dividende brut soumis a abattement | Dividende brut non soumis a abattement ???",
+  "description" : "Versement de dividende sur le compte de liquidité\n?? Quel devrait etre le nom de l'opération:   Dividende brut | Dividende brut soumis a abattement | Dividende brut non soumis a abattement ???\n?? Je n'ai pas pris en compte la commission ?? je n'ai pas d'exemple toujours a 0",
   "ezLoadVersion" : 1,
   "condition" : "ezOperation_INFO1 == \"COUPONS\"",
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
+    "condition" : "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -21,6 +22,7 @@
     "operationDescriptionExpr" : "\"Dividende versé pour \" + (-ezOperation_QUANTITE) + \" actions \" + ezShareCode"
   }, {
     "field2ErrorMsg" : { },
+    "condition" : "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -32,6 +34,7 @@
     "operationDescriptionExpr" : "\"Prélèvement sociaux pour dividende versé de \" + (-ezOperation_QUANTITE) + \" actions \" + ezShareCode"
   }, {
     "field2ErrorMsg" : { },
+    "condition" : "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -41,23 +44,22 @@
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperation_PRELEVEM",
     "operationDescriptionExpr" : "\"Retenue fiscale pour dividende versé de \" + (-ezOperation_QUANTITE) + \" actions \" + ezShareCode"
+  }, {
+    "field2ErrorMsg" : { },
+    "condition" : "ezOperation_CRED_IMPOT != 0",
+    "operationDateExpr" : "ezOperation_DATE",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "-ezOperation_QUANTITE",
+    "operationTypeExpr" : "\"Acompte Impôt sur le Revenu\"",
+    "operationActionNameExpr" : "ezOperationShareUserName",
+    "operationCountryExpr" : "ezMarketCountry",
+    "operationAmountExpr" : "ezOperation_CRED_IMPOT",
+    "operationDescriptionExpr" : "\"Crédit d'Impôt pour dividende versé de \" + (-ezOperation_QUANTITE) + \" actions \" + ezShareCode"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
-    "portefeuilleValeurExpr" : "ezOperationShareUserName",
-    "portefeuilleCompteExpr" : "ezAccountTypeName()",
-    "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "ezShareCode",
-    "portefeuillePaysExpr" : "ezMarketCountry",
-    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
-    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
-    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
-    "portefeuillePrixDeRevientExpr" : "ezPRU",
-    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite",
-    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
-  }, {
-    "field2ErrorMsg" : { },
+    "condition" : "",
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
@@ -66,7 +68,7 @@
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_CREDIT",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"

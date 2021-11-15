@@ -1,5 +1,6 @@
 {
   "field2ErrorMsg" : { },
+    "condition": "",
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
   "name" : "VENTE ETRANGER",
@@ -10,6 +11,7 @@
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -21,6 +23,7 @@
     "operationDescriptionExpr" : "\"Vente de \"+ (-ezOperation_QUANTITE) +\" \"+ezShareCode+\" @ \"+ ezOperation_COURS+ ezAccountCurrencySymbol"
   }, {
     "field2ErrorMsg" : { },
+    "condition": "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -33,6 +36,7 @@
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "portefeuilleValeurExpr" : "ezOperationShareUserName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
@@ -41,12 +45,13 @@
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
-    "portefeuillePrixDeRevientExpr" : "ezPRU",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
+    "portefeuillePrixDeRevientExpr" : "computePRU()",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_QUANTITE",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   }, {
     "field2ErrorMsg" : { },
+    "condition": "",
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
@@ -55,7 +60,7 @@
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_CREDIT",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"

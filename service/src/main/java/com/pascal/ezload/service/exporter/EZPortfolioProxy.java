@@ -20,6 +20,7 @@ public interface EZPortfolioProxy {
     int getEzPortfolioVersion();
 
     void load(Reporting reporting) throws Exception;
+
     // return the list of EzEdition operation not saved
     List<EzReport> save(Reporting reporting, List<EzReport> operations) throws Exception;
 

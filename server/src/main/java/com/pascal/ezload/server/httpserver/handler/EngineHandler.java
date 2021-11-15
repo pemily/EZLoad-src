@@ -12,14 +12,14 @@ import com.pascal.ezload.service.exporter.EZModelChecker;
 import com.pascal.ezload.service.exporter.EzEditionExporter;
 import com.pascal.ezload.service.exporter.EZPortfolioManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
-import com.pascal.ezload.service.model.EZModel;
-import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.exporter.ezEdition.*;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
+import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 
+import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.util.ShareUtil;
 import jakarta.inject.Inject;
@@ -56,7 +56,7 @@ public class EngineHandler {
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
-                        EZPortfolioProxy ezPortfolioProxy = loadEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
+                        EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
 
                         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
                         // Donwload the files, according to the last date retrieved from ezPortfolio
@@ -69,7 +69,7 @@ public class EngineHandler {
         }
     }
 
-    private EZPortfolioProxy loadEzPortfolioProxyOrGetFromCache(MainSettings mainSettings, Reporting reporting) throws Exception {
+    private EZPortfolioProxy loadOriginalEzPortfolioProxyOrGetFromCache(MainSettings mainSettings, Reporting reporting) throws Exception {
         EZPortfolioProxy ezPortfolioProxy = serverState.getEzPortfolioProxy();
         if (ezPortfolioProxy == null) {
             EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, mainSettings);
@@ -91,7 +91,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = loadEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
                     Set<ShareValue> knownValues = ezPortfolioProxy.getShareValues();
 
                     List<EZModel> allEZModels;
@@ -197,4 +197,59 @@ public class EngineHandler {
         serverState.setNewShares(newShareValues);
     }
 
+    @DELETE
+    @Path("/clearCache")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void clearCache() {
+        serverState.setEzPortfolioProxy(null);
+    }
+
+
+    @POST
+    @Path("/startDate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    // input format is: 2021-11-09T22:52:57.346Z
+    public EzProcess setStartDate(@NotNull @QueryParam("date") String startDate, @NotNull BourseDirectEZAccountDeclaration account) throws Exception {
+        String[] dateTime = com.pascal.ezload.service.util.StringUtils.divide(startDate, 'T');
+        if (dateTime == null || dateTime.length != 2){
+            throw new IllegalArgumentException("Invalid date format: "+startDate);
+        }
+        String[] date = dateTime[0].split("-");
+        if (date.length != 3){
+            throw new IllegalArgumentException("Invalid date format: "+startDate);
+        }
+        EZDate ezStartDate = EZDate.parseFrenchDate(date[2]+"/"+date[1]+"/"+date[0], '/');
+
+        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+        return processManager.createNewRunningProcess(mainSettings,
+                "Sauvegarde de la date de démarrage: "+ezStartDate.toEzPortoflioDate()+" pour le compte: "+account.getName()+" "+account.getNumber(),
+                ProcessManager.getLog(mainSettings, account.getNumber(), "-setStartDate.html"),
+                (processLogger) -> {
+                    Reporting reporting = processLogger.getReporting();
+
+                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, reporting);
+                    EzReport ezReport = new EzReport();
+                    EzEdition ezEdition = new EzEdition();
+                    RuleDefinitionSummary createStartDateRule = new RuleDefinitionSummary();
+                    createStartDateRule.setBroker(null);
+                    createStartDateRule.setBrokerFileVersion(-1);
+                    createStartDateRule.setName("Date de Départ");
+                    ezEdition.setRuleDefinitionSummary(createStartDateRule);
+                    EzData ezData = new EzData();
+                    ezData.put(AccountData.account_number, account.getNumber());
+                    ezEdition.setData(ezData);
+                    EzOperationEdition ezOperationEdition = new EzOperationEdition();
+                    ezOperationEdition.setDate(ezStartDate.toEzPortoflioDate());
+                    ezOperationEdition.setBroker(account.getEzBroker().getEzPortfolioName());
+                    ezOperationEdition.setDescription("Date de démarrage d'EZLoad pour le compte: "+account.getName());
+                    ezEdition.setEzOperationEditions(Collections.singletonList(ezOperationEdition));
+                    ezReport.setEzEditions(Collections.singletonList(ezEdition));
+                    clearCache();
+
+                    ezPortfolioProxy.save(reporting, Collections.singletonList(ezReport));
+
+                    reporting.info("Date sauvegardé dans l'onglet 'MesOpérations'");
+                });
+    }
 }

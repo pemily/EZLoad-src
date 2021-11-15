@@ -77,7 +77,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                             if (ezEdition.getEzOperationEditions() != null) {
                                 ezEdition.getEzOperationEditions()
                                         .forEach(ezOperation -> {
-                                            operations.newOperation(ezEdition.getData(), ezOperation);
+                                            operations.newOperation(ezEdition.getData(), ezOperation, ezEdition.getRuleDefinitionSummary());
                                             nbOperationSaved.incrementAndGet();
                                         });
 

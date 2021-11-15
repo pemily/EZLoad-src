@@ -3,6 +3,8 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
+import com.pascal.ezload.service.exporter.rules.RuleDefinition;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class MesOperations  {
 
-    private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad]";
+    private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad %s - %s]"; // EZLoad BourseDirect v1 - ACHAT COMPTANT
 
     private static final int DATE_COL = 0;
     private static final int COMPTE_TYPE_COL = 1;
@@ -49,30 +51,41 @@ public class MesOperations  {
     public boolean isOperationsExists(Row operation){
         return existingOperations.getValues().stream().filter(
             row ->
-                BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
-                && operation.valueDate(DATE_COL).equals(row.valueDate(DATE_COL))
-                && operation.getValueStr(AMOUNT_COL).equals(row.getValueStr(AMOUNT_COL))
-                && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
+                 operation.valueDate(DATE_COL).equals(row.valueDate(DATE_COL))
+//                && operation.getValueStr(AMOUNT_COL).equals(row.getValueStr(AMOUNT_COL))
+//                && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
                 && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
-                && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
+//                && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
                 && operation.getValueStr(ACCOUNT_DECLARED_NUMBER_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL))
-                && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
-                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
-                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
-                && operation.getValueStr(ACTION_NAME_COL).equals(row.getValueStr(ACTION_NAME_COL))
+//                && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
+//                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
+//                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
+//                && operation.getValueStr(ACTION_NAME_COL).equals(row.getValueStr(ACTION_NAME_COL))
         ).count() > 1;
     }
 
-    public static Row newOperationRow(EzData ezData, EzOperationEdition operationEdition) {
-        return new Row(operationEdition.getDate(), operationEdition.getAccountType(), operationEdition.getBroker(),
-                        operationEdition.getQuantity(), operationEdition.getOperationType(), operationEdition.getShareName(),
-                        operationEdition.getCountry(), operationEdition.getAmount(), operationEdition.getDescription(),
-                        ezData.get(AccountData.account_number),
-                        BIENTOT_RENTIER_OPERATION);
+    public static Row newOperationRow(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef) {
+        Row r = new Row();
+        r.setValue(DATE_COL, operationEdition.getDate());
+        r.setValue(COMPTE_TYPE_COL, operationEdition.getAccountType());
+
+        r.setValue(COURTIER_DISPLAY_NAME_COL, operationEdition.getBroker());
+        r.setValue(QUANTITE_COL, operationEdition.getQuantity());
+        r.setValue(OPERATION_TYPE_COL, operationEdition.getOperationType());
+        r.setValue(ACTION_NAME_COL,operationEdition.getShareName());
+        r.setValue(COUNTRY_COL, operationEdition.getCountry());
+        r.setValue(AMOUNT_COL, operationEdition.getAmount());
+        r.setValue(INFORMATION_COL, operationEdition.getDescription());
+        r.setValue(ACCOUNT_DECLARED_NUMBER_COL, ezData.get(AccountData.account_number));
+        r.setValue(AUTOMATIC_UPD_COL, String.format(BIENTOT_RENTIER_OPERATION,
+                                ruleDef.getBroker() == null ? "" : ruleDef.getBroker()+ // can be null when we set the startDate in the config panel
+                                        (ruleDef.getBrokerFileVersion() == -1 ? "" : " v"+ruleDef.getBrokerFileVersion()),  // can be -1 when we set the startDate in the config panel
+                                ruleDef.getName()));
+        return r;
     }
 
-    public void newOperation(EzData ezData, EzOperationEdition operationEdition){
-        newOperations.add(newOperationRow(ezData, operationEdition));
+    public void newOperation(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef){
+        newOperations.add(newOperationRow(ezData, operationEdition, ruleDef));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
@@ -81,8 +94,7 @@ public class MesOperations  {
 
     public Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration ezAccountDeclaration) {
         List<Row> courtierOps = existingOperations.getValues().stream()
-                .filter(row -> BIENTOT_RENTIER_OPERATION.equals(row.getValueStr(AUTOMATIC_UPD_COL))
-                        && courtier.getEzPortfolioName().equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
+                .filter(row -> courtier.getEzPortfolioName().equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
                         && ezAccountDeclaration.getNumber().equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL)))
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();

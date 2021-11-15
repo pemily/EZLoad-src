@@ -10,6 +10,7 @@
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
+    "condition" : "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -20,5 +21,20 @@
     "operationAmountExpr" : "-ezOperation_DEBIT",
     "operationDescriptionExpr" : "\"Taxe sur les Transactions (achat)\""
   } ],
-  "portefeuilleRules" : [ ]
+  "portefeuilleRules" : [ {
+    "field2ErrorMsg" : { },
+    "condition" : "",
+    "portefeuilleValeurExpr" : "ezLiquidityName",
+    "portefeuilleCompteExpr" : "ezAccountTypeName()",
+    "portefeuilleCourtierExpr" : "ezBrokerName",
+    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuillePaysExpr" : "ezMonPortefeuillePays",
+    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
+    "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperation_DEBIT",
+    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
+  } ]
 }

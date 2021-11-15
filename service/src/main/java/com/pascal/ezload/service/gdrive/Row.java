@@ -4,27 +4,28 @@ import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.pascal.ezload.service.model.EZDate;
+import org.apache.commons.lang3.StringUtils;
 
 public class Row {
 
     private final List<Object> values;
 
+    public Row(){
+        this.values = new LinkedList<>();
+    }
+
     public Row(List<Object> values){
         this.values = values;
     }
 
-    public Row(String... values){
-        this.values = Arrays.asList(values);
-    }
-
-
     public EZDate valueDate(int colIndex) {
         String date = getValueStr(colIndex);
-        if (date == null) return null;
+        if (StringUtils.isBlank(date)) return null;
         return EZDate.parseFrenchDate(date, '/');
     }
 
@@ -33,7 +34,7 @@ public class Row {
     }
 
     public String getValueStr(int colIndex){
-        return colIndex >= values.size() ? null : (String) values.get(colIndex);
+        return colIndex >= values.size() ? "" : (String) values.get(colIndex);
     }
 
     public float getValueFloat(int colIndex) {
@@ -46,7 +47,7 @@ public class Row {
             for (int i = values.size(); i <= colIndex; i++)
                 this.values.add("");
         }
-        values.set(colIndex, s);
+        values.set(colIndex, s == null ? "" : s);
     }
 
     public void setValue(int colIndex, EZDate d) {

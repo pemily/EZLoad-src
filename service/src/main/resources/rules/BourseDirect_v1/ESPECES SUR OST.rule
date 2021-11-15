@@ -4,10 +4,37 @@
   "brokerFileVersion" : 1,
   "name" : "ESPECES SUR OST",
   "enabled" : true,
-  "description" : "Cette opération donne sur le relevé le montant de l'opération: DIVIDENDE OPTIONNEL (==dividende versé en action) \nComme l'opération du dividende optionnel est enregistré, il n'y a plus rien à faire sur celle ci",
+  "description" : "?? Pourquoi cette somme en négatif sur mon compte espèce ??? voir mon relevé du 2021-07-08\n?? Quoi mettre dans les opérations ???",
   "ezLoadVersion" : 1,
   "condition" : "ezOperation_INFO1 == \"ESPECES SUR OST\"",
   "shareId" : "ezOperation_INFO2",
-  "operationRules" : [ ],
-  "portefeuilleRules" : [ ]
+  "operationRules" : [ {
+    "field2ErrorMsg" : { },
+    "condition" : null,
+    "operationDateExpr" : "ezOperation_DATE",
+    "operationCompteTypeExpr" : "ezAccountTypeName()",
+    "operationBrokerExpr" : "ezBrokerName",
+    "operationQuantityExpr" : "ezOperation_DEBIT",
+    "operationTypeExpr" : "\"Divers\"",
+    "operationActionNameExpr" : "ezLiquidityName",
+    "operationCountryExpr" : "\"\"",
+    "operationAmountExpr" : "ezOperation_DEBIT",
+    "operationDescriptionExpr" : "\"A REVOIR? Pas Compris voir relevé 16/06\""
+  } ],
+  "portefeuilleRules" : [ {
+    "field2ErrorMsg" : { },
+    "condition" : "",
+    "portefeuilleValeurExpr" : "ezLiquidityName",
+    "portefeuilleCompteExpr" : "ezAccountTypeName()",
+    "portefeuilleCourtierExpr" : "ezBrokerName",
+    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuillePaysExpr" : "ezMonPortefeuillePays",
+    "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
+    "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
+    "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
+    "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperation_DEBIT",
+    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
+  } ]
 }

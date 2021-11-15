@@ -11,7 +11,7 @@ import java.util.Map;
 public class EzReport {
 
     private List<EzEdition> ezEditions = new LinkedList<>();
-    private List<String> errors;
+    private List<String> errors = new LinkedList<>();
     private String sourceFile;
 
     public EzReport(){

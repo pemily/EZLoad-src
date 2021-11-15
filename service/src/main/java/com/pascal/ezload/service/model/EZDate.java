@@ -37,7 +37,13 @@ public class EZDate {
         if (date == null) return null;
         String elem[] = date.trim().split(separator+"");
         // la valeur de la Date en String dans une Row est: dd/mm/yyyy (a cause du choix de ezPortfolio)
-        return new EZDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
+        if (elem.length != 3) return null;
+        try {
+            return new EZDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
+        }
+        catch(NumberFormatException ne){
+            return null;
+        }
     }
 
     public boolean isValid(){

@@ -1,5 +1,6 @@
 {
   "field2ErrorMsg" : { },
+    "condition": "",
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
   "name" : "INVESTISSEMENT ESPECES",
@@ -10,6 +11,7 @@
   "shareId" : "",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -22,6 +24,7 @@
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
+    "condition": "",
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
@@ -30,7 +33,7 @@
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
-    "portefeuilleTypeExpr" : "ezMonPortefeuilleType",
+    "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
     "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_CREDIT",
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"

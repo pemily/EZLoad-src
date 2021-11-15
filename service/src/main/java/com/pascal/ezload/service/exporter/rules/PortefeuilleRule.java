@@ -5,11 +5,13 @@ import com.pascal.ezload.service.util.StringValue;
 
 public class PortefeuilleRule extends Checkable {
 
-    public enum Field{ portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
+    public enum Field{ condition, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
         portefeuilleTickerGoogleFinanceExpr, portefeuillePaysExpr, portefeuilleSecteurExpr, portefeuilleIndustrieExpr,
         portefeuilleEligibiliteAbbattement40Expr, portefeuilleTypeExpr, portefeuillePrixDeRevientExpr,
         portefeuilleQuantiteExpr, portefeuilleDividendeAnnuelExpr}
 
+
+    private String condition;
     private String portefeuilleValeurExpr;
     private String portefeuilleCompteExpr;
     private String portefeuilleCourtierExpr;
@@ -22,6 +24,15 @@ public class PortefeuilleRule extends Checkable {
     private String portefeuillePrixDeRevientExpr;
     private String portefeuilleQuantiteExpr;
     private String portefeuilleDividendeAnnuelExpr;
+
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
 
     public String getPortefeuilleDividendeAnnuelExpr() {
         return portefeuilleDividendeAnnuelExpr;
@@ -121,7 +132,7 @@ public class PortefeuilleRule extends Checkable {
 
     @Override
     public void validate() {
-
+        new StringValue(false).validate(this, Field.condition.name(), condition);
         new StringValue(true).validate(this, Field.portefeuilleValeurExpr.name(), portefeuilleValeurExpr);
         new StringValue(true).validate(this, Field.portefeuilleCompteExpr.name(), portefeuilleCompteExpr);
         new StringValue(true).validate(this, Field.portefeuilleCourtierExpr.name(), portefeuilleCourtierExpr);
