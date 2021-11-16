@@ -1,6 +1,5 @@
 {
   "field2ErrorMsg" : { },
-    "condition": "",
   "broker" : "BourseDirect",
   "brokerFileVersion" : 1,
   "name" : "ACHAT COMPTANT",
@@ -11,7 +10,7 @@
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
-    "condition": "",
+    "condition" : "",
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "ezAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
@@ -51,7 +50,7 @@
     "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
   }, {
     "field2ErrorMsg" : { },
-    "condition": "",
+    "condition" : "",
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "ezAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",

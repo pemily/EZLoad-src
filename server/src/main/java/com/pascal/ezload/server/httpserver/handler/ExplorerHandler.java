@@ -3,13 +3,11 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,9 +35,9 @@ public class ExplorerHandler {
     @GET
     @Path("/dir")
     @Produces("application/json")
-    public List<Item> list(String dir) throws Exception {
+    public List<Item> list(@Nullable @QueryParam("dirpath") String dir) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        String subDir = StringUtils.isBlank(dir) ? "" : (dir.startsWith(".") ? "" : File.separator+dir);
+        String subDir = StringUtils.isBlank(dir) ? "" : (dir.startsWith(".") || dir.startsWith("..") ? "" : File.separator+dir);
         File file = new File(mainSettings.getEzLoad().getDownloadDir()+subDir);
         if (file.isDirectory()){
             return Arrays.stream(file.listFiles())
