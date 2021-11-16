@@ -14,7 +14,7 @@ public class FileUtil {
 
     public static void string2file(String file, String content) throws IOException {
         new File(file).getParentFile().mkdirs();
-        FileWriter fileWriter = new FileWriter(file);
+        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8);
         fileWriter.write(content);
         fileWriter.close();
     }

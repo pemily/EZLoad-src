@@ -168,7 +168,7 @@ export function App(){
     return (
         <Box>
             <Header direction="column" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
-                <Heading level="3" self-align="center" margin="xxsmall">EZLoad</Heading>
+                <Heading level="3" self-align="center" margin="xxsmall">EZLoad v1.0.0</Heading>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 
@@ -287,10 +287,10 @@ export function App(){
                             {processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
-                            <ViewLog 
+                            { /*<ViewLog 
                                     ezProcess={lastProcess}    
                                     processFinished={() => reloadAllData()}/>                            
-                            { mainSettings && !processRunning && (<Text margin="large">Le process est terminé vous pouvez continuer</Text>)}
+                            { mainSettings && !processRunning && (<Text margin="large">Vous pouvez retourner à l'onglet de départ</Text>)} */}
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>

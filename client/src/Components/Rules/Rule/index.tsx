@@ -228,8 +228,9 @@ export function Rule(props: RuleProps){
             </Box>                 
         </Box>
         <Box margin="small" border="all" background="light-1" align="center">
-            <Box direction="row">
+            <Box align="center">
                 <Heading level="3">Mon Portefeuille</Heading>
+                <Text size="xxsmall">Si aucune opération n'est générée, les actions sur le portefeuille ne seront pas executés</Text>
             </Box>
             <List data={ruleDef.portefeuilleRules}>
                 {(datanum: PortefeuilleRule) => 

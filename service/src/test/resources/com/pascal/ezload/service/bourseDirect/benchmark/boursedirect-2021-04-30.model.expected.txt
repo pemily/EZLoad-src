@@ -40,8 +40,8 @@
         "ezOperation_CONTRI_SOC": "3,32",
         "ezOperation_CREDIT": "10,72",
         "ezOperation_COMMISSION": "0",
+        "ezOperation_CRED_IMPOT": "2,92",
         "ezOperation_PX_UN_BRUT": "1,02347",
-        "ezOperation_CRED__IMPOT": "2,92",
         "ezOperation_PRELEVEM": "2,48",
         "ezOperation_BRUT": "19,45"
       },
