@@ -4,15 +4,27 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.pascal</groupId>
-        <artifactId>EZLoad</artifactId>
+        <artifactId>EZLoadRoot</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>service</artifactId>
+    <artifactId>ezService</artifactId>
 
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>target/rules.zip</include>
+                </includes>
+                <excludes>
+                    <exclude>rules/**/*</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
 <!--
             <plugin>
@@ -82,6 +94,32 @@
                 </executions>
             </plugin>
         -->
+
+            <!-- Zip all rules  -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>rules</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>rules</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <formats>
+                                <format>zip</format>
+                            </formats>
+                            <descriptors>
+                                <descriptor>rules-assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- End Zip all rules  -->
         </plugins>
     </build>
 

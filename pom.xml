@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pascal</groupId>
-    <artifactId>EZLoad</artifactId>
+    <artifactId>EZLoadRoot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -19,6 +19,7 @@
         <module>service</module>
         <module>server</module>
         <module>client</module>
+        <module>main</module>
     </modules>
 
     <build>

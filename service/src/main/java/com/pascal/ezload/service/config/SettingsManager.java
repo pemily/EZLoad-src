@@ -12,6 +12,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
+import com.pascal.ezload.service.util.FileUtil;
 
 public class SettingsManager {
     private final String configFile;
@@ -136,6 +137,8 @@ public class SettingsManager {
         bourseDirectSettings.setAccounts(new LinkedList<>());
         mainSettings.setBourseDirect(bourseDirectSettings);
 
+        copyRulesTo(ezLoad.getRulesDir());
+
         return mainSettings;
     }
 
@@ -149,4 +152,10 @@ public class SettingsManager {
                 .toString();
     }
 
+    private static void copyRulesTo(String rulesDir) throws IOException {
+        InputStream stream = SettingsManager.class.getResourceAsStream("rules.zip");
+        if (stream != null) {
+            FileUtil.unzip(stream, rulesDir, false);
+        }
+    }
 }
