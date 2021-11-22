@@ -1,0 +1,133 @@
+{
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-07-08.pdf",
+  "reportDate": {
+    "day": 8,
+    "month": 7,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
+  },
+  "operations": [
+    {
+      "errors": [],
+      "date": {
+        "day": 8,
+        "month": 7,
+        "year": 2021
+      },
+      "designation": [
+        "COUPONS",
+        "FR0013269123",
+        "RUBIS"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "-120",
+        "ezOperation_CONTRI_SOC": "37,15",
+        "ezOperation_CREDIT": "151,21",
+        "ezOperation_COMMISSION": "0",
+        "ezOperation_CRED_IMPOT": "0",
+        "ezOperation_PX_UN_BRUT": "1,8",
+        "ezOperation_PRELEVEM": "27,64",
+        "ezOperation_BRUT": "216"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    },
+    {
+      "errors": [],
+      "date": {
+        "day": 16,
+        "month": 6,
+        "year": 2021
+      },
+      "designation": [
+        "DIVIDENDE OPTIONNEL",
+        "FR0013269123",
+        "RUBIS"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "6",
+        "ezOperation_DEBIT": "0",
+        "ezOperation_COURS": "36,2"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    },
+    {
+      "errors": [],
+      "date": {
+        "day": 16,
+        "month": 6,
+        "year": 2021
+      },
+      "designation": [
+        "ESPECES SUR OST",
+        "FR0013269123",
+        "REINVESTISSEMENT"
+      ],
+      "fields": {
+        "ezOperation_DEBIT": "217,2"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    }
+  ],
+  "errors": []
+}

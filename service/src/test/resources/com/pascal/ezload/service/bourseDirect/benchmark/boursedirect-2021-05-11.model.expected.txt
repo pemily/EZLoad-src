@@ -1,0 +1,67 @@
+{
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-05-11.pdf",
+  "reportDate": {
+    "day": 11,
+    "month": 5,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
+  },
+  "operations": [
+    {
+      "errors": [],
+      "date": {
+        "day": 11,
+        "month": 5,
+        "year": 2021
+      },
+      "designation": [
+        "COUPONS",
+        "US57636Q1040",
+        "MASTERCARD CL.A"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "-9",
+        "ezOperation_CONTRI_SOC": "0,55",
+        "ezOperation_CREDIT": "1,82",
+        "ezOperation_COMMISSION": "0",
+        "ezOperation_CRED_IMPOT": "0,49",
+        "ezOperation_PX_UN_BRUT": "0,36528",
+        "ezOperation_PRELEVEM": "0,42",
+        "ezOperation_BRUT": "3,29"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    }
+  ],
+  "errors": []
+}

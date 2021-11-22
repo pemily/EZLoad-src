@@ -1,7 +1,7 @@
 import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
 
-console.log("TODO change the url");
-export const ezApi = new Api({baseUrl:"http://localhost:3000/EZLoad/api"}); // TODO update => remove the 3000 before the production, the port is dynamically computed
+console.log("API Url is: http://localhost:"+window.location.port+"/api");
+export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
 
 export interface SelectedRule {
   ruleDefinition: RuleDefinition;

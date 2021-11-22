@@ -35,7 +35,7 @@ public class HomeHandler {
     private HttpServletResponse response;
 
     @Inject
-    EZHttpServer server;
+    private EZHttpServer server;
 
     @Inject
     private ProcessManager processManager;
@@ -45,10 +45,10 @@ public class HomeHandler {
 
     @GET
     @Path("/ping")
+    @Produces(MediaType.TEXT_PLAIN)
     public String ping(){
         return "pong";
     }
-
 
     @GET
     @Path("/main")

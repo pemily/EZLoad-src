@@ -1,0 +1,112 @@
+{
+  "broker": "BourseDirect",
+  "brokerFileVersion": 1,
+  "sourceFile": "t/boursedirect-2021-03-16.pdf",
+  "reportDate": {
+    "day": 16,
+    "month": 3,
+    "year": 2021
+  },
+  "account": {
+    "accountNumber": "508TI00085554410EUR",
+    "accountType": "Ordinaire",
+    "ownerName": "MR EMILY PASCAL",
+    "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+    "devise": {
+      "symbol": "€",
+      "code": "EUR"
+    }
+  },
+  "ezAccountDeclaration": {
+    "name": "Pascal CTO",
+    "active": false,
+    "field2ErrorMsg": {}
+  },
+  "operations": [
+    {
+      "errors": [],
+      "date": {
+        "day": 16,
+        "month": 3,
+        "year": 2021
+      },
+      "designation": [
+        "VENTE ETRANGER",
+        "US0995021062",
+        "BOOZ ALLEN CL.A"
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "-45",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "79,2",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_CREDIT": "2977,53",
+        "ezOperation_COURS": "66,356440254",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,19355408",
+        "ezOperation_TAXE_ETRANG": "0,01",
+        "ezOperation_BRUT": "2986,04",
+        "ezOperation_Heure_Execution": "19:50:11"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    },
+    {
+      "errors": [],
+      "date": {
+        "day": 16,
+        "month": 3,
+        "year": 2021
+      },
+      "designation": [
+        "VENTE ETRANGER",
+        "US5024311095",
+        "L3HARRIS TECHN."
+      ],
+      "fields": {
+        "ezOperation_QUANTITE": "-20",
+        "ezOperation_TVA": "0",
+        "ezOperation_COURS_EN_USD": "190,2101",
+        "ezOperation_Lieu": "NEW YORK STOCK EXCHANGE, INC.",
+        "ezOperation_CREDIT": "3178,78",
+        "ezOperation_COURS": "159,364458794",
+        "ezOperation_COURTAGE": "8,5",
+        "ezOperation_TX_USD_EUR": "1,19355408",
+        "ezOperation_TAXE_ETRANG": "0,01",
+        "ezOperation_BRUT": "3187,29",
+        "ezOperation_Heure_Execution": "19:45:03"
+      },
+      "broker": "BourseDirect",
+      "account": {
+        "accountNumber": "508TI00085554410EUR",
+        "accountType": "Ordinaire",
+        "ownerName": "MR EMILY PASCAL",
+        "ownerAdress": "MR EMILY PASCAL\n192 ROUTE DE PEGOMAS\n06130  GRASSE",
+        "devise": {
+          "symbol": "€",
+          "code": "EUR"
+        }
+      },
+      "ezAccountDeclaration": {
+        "name": "Pascal CTO",
+        "active": false,
+        "field2ErrorMsg": {}
+      }
+    }
+  ],
+  "errors": []
+}

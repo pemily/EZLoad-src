@@ -1,5 +1,6 @@
 package com.pascal.ezload.server.httpserver;
 
+import com.pascal.ezload.server.httpserver.handler.LastAccessProvider;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -17,6 +18,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 
 public class EZHttpServer {
     private Server server;
@@ -32,14 +34,14 @@ public class EZHttpServer {
 
 
         ServletContextHandler servletHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-        servletHandler.setContextPath("/EZLoad");
+        servletHandler.setContextPath("/");
         HandlerList handlers = new HandlerList();
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(false);
         resource_handler.setWelcomeFiles(new String[]{"index.html"});
-        resource_handler.setBaseResource(Resource.newClassPathResource("/webfiles"));
-        ContextHandler resourceContextHandler = new ContextHandler("/EZLoad/static");
+        resource_handler.setBaseResource(Resource.newClassPathResource("/ezClient"));
+        ContextHandler resourceContextHandler = new ContextHandler("/");
         resourceContextHandler.setHandler(resource_handler);
 
         handlers.setHandlers(new Handler[] { resourceContextHandler, servletHandler });
@@ -83,4 +85,24 @@ public class EZHttpServer {
         };
     }
 
+
+    public void killIfNoActivity(Duration duration, EzServerState serverState){
+        new Thread(() -> {
+            while(true){
+                try {
+                    Thread.sleep(duration.toMillis());
+                } catch (InterruptedException ignored) {
+                }
+                if (System.currentTimeMillis() - duration.toMillis() > LastAccessProvider.getLastAccess()
+                        && !serverState.isProcessRunning()){
+                    try {
+                        this.stop();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    System.exit(0);
+                }
+            }
+        }).start();
+    }
 }

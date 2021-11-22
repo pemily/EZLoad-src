@@ -1,0 +1,11 @@
+===== Fichier en cours d'analyse: /D:/dev/src/EZLoad-vscode/EZLoad/service/target/test-classes/com/pascal/ezload/service/bourseDirect/boursedirect-2021-03-18.pdf
+    info: Reading pdf...
+    info: pdf read => ok
+    info: BourseDirect model transformation
+    info: BourseDirect model transformation => ok
+    ===== Vérification du Model extrait du PDF de BourseDirect...
+        info: => Pas d'erreur détecté
+    =====
+    info: Creating Standard Model...
+    info: Standard Model => ok
+=====

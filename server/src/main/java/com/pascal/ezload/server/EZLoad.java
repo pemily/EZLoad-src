@@ -8,6 +8,7 @@ import org.glassfish.jersey.internal.inject.AbstractBinder;
 
 import java.awt.*;
 import java.net.URI;
+import java.time.Duration;
 
 
 public class EZLoad {
@@ -25,11 +26,11 @@ public class EZLoad {
                 bind(server).to(EZHttpServer.class);
                 bind(new ProcessManager(server, serverState)).to(ProcessManager.class);
                 bind(serverState).to(EzServerState.class);
+                server.killIfNoActivity(Duration.ofMinutes(1), serverState);
             }
         });
-        String homePage = "http://localhost:"+port+"/EZLoad/api/home";
-        System.out.println("HomePage: "+homePage);
-        System.out.println("ApiPage: http://localhost:"+port+"/EZLoad/api/home/settings");
+        String homePage = "http://localhost:"+port;
+        System.out.println("EZLoad: "+homePage);
         Desktop.getDesktop().browse(new URI(homePage));
 
     }

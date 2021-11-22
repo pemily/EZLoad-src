@@ -3,13 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>EZLoad</artifactId>
+        <artifactId>EZLoadRoot</artifactId>
         <groupId>com.pascal</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ezServer</artifactId>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>
@@ -44,7 +45,7 @@
         <dependency>
             <groupId>com.pascal</groupId>
             <artifactId>ezService</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- jetty / jersey / jaxrs -->
@@ -134,7 +135,6 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
         </dependency>
-
     </dependencies>
 
 </project>

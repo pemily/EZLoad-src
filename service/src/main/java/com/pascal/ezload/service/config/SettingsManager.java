@@ -55,10 +55,10 @@ public class SettingsManager {
     }
 
     public static String getConfigFilePath(){
-        String configFile = System.getProperty("ezloadfile");
-        if (configFile == null) configFile = System.getenv("ezloadfile");
+        String configFile = System.getProperty("ezloadConfig");
+        if (configFile == null) configFile = System.getenv("ezloadConfig");
         if (configFile == null){
-            String userDir = System.getProperty("user.dir");
+            String userDir = System.getProperty("user.home");
             String brDir = userDir + File.separator + "EZLoad";
             new File(brDir).mkdirs();
             configFile = brDir + File.separator + "ezload-config.yaml";

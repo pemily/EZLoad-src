@@ -42,6 +42,18 @@
                             <arguments>run gen-client-api</arguments>
                         </configuration>
                     </execution>
+
+                    <!-- to build the final step, will generate a EZLoad/client/build directory -->
+                    <execution>
+                        <id>npm run build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
                 </executions>
 
                 <configuration>
@@ -54,9 +66,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
                 <configuration>
                     <filesets>
+                        <fileset>
+                            <directory>build</directory>
+                        </fileset>
                         <fileset>
                             <directory>src/ez-api/gen-api</directory>
                             <includes>
@@ -67,6 +81,27 @@
                         </fileset>
                     </filesets>
                 </configuration>
+            </plugin>
+
+            <!-- copy tout le repertoire build dans un zip -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>create-archive</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -7,7 +7,6 @@ import { ConfigApp } from '../ConfigApp';
 import { Reports } from '../Reports';
 import { NewShareValues } from '../NewShareValues';
 import { Message } from '../Tools/Message';
-import { ViewLog } from '../Tools/ViewLog';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
@@ -19,7 +18,6 @@ export function App(){
     const RULES_TAB_INDEX = 4;
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
-    const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
     const [filesNotLoaded, setFilesNotLoaded] = useState<string[]|undefined>(undefined);
@@ -35,7 +33,6 @@ export function App(){
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
             setProcessLaunchFail(false);
-            setLastProcess(process);
             setProcessRunning(true);
         }
         else {
@@ -53,8 +50,7 @@ export function App(){
     function reloadAllData(){        
         jsonCall(ezApi.home.getMainData())
         .then(r =>  {                  
-            console.log("ReloadData: ",r);
-             setLastProcess(r.latestProcess === null ? undefined : r.latestProcess);             
+            console.log("ReloadData: ",r);         
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
@@ -162,7 +158,7 @@ export function App(){
     }
 
     function isConfigUrl(){
-        return window.location.pathname.toLowerCase().endsWith('config');
+        return window.location.href.toLowerCase().endsWith('config');
     }
 
     return (

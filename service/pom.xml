@@ -10,20 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ezService</artifactId>
+    <packaging>jar</packaging>
 
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>target/rules.zip</include>
-                </includes>
-                <excludes>
-                    <exclude>rules/**/*</exclude>
-                </excludes>
-            </resource>
-        </resources>
 
         <plugins>
 <!--
@@ -98,7 +88,6 @@
             <!-- Zip all rules  -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.2</version>
                 <executions>
                     <execution>
                         <id>rules</id>

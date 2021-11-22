@@ -10,31 +10,54 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>EZLoad</artifactId>
-
+    <artifactId>ezLoad-exec</artifactId>
 
     <build>
         <plugins>
-            <!-- Create the main jar -->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>install-ezClient</id>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>unpack-dependencies</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.pascal.ezload.server.EZLoad</mainClass>
-                                </transformer>
-                            </transformers>
+                            <outputDirectory>${project.build.directory}/ezClient</outputDirectory>
+                            <includeArtifactIds>ezClient</includeArtifactIds>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>-->
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <!-- Create the main jar -->
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.pascal.ezload.server.EZLoad</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>EZLoad-${project.version}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
             </plugin>
             <!-- end of Create the main jar -->
         </plugins>
@@ -45,16 +68,20 @@
         <dependency>
             <groupId>com.pascal</groupId>
             <artifactId>ezService</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.pascal</groupId>
             <artifactId>ezServer</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.pascal</groupId>
             <artifactId>ezClient</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
