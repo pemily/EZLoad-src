@@ -118,7 +118,7 @@ public class SettingsManager {
         chromeSettings.setUserDataDir(ezHome+File.separator+"chrome"+File.separator+"data");
         // chromeDriver is a file that does not exists, so next time it will be downloaded
         chromeSettings.setDriverPath(ezHome+File.separator+"chrome"+File.separator+"driver"+File.separator+"chromedriver");
-        chromeSettings.setDefaultTimeout(20);
+        chromeSettings.setDefaultTimeout(5);
         new File(chromeSettings.getUserDataDir()).mkdirs();
         new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
         mainSettings.setChrome(chromeSettings);
@@ -154,8 +154,9 @@ public class SettingsManager {
 
     private static void copyRulesTo(String rulesDir) throws IOException {
         InputStream stream = SettingsManager.class.getResourceAsStream("rules.zip");
-        if (stream != null) {
-            FileUtil.unzip(stream, rulesDir, false);
+        if (stream == null){
+            stream = new FileInputStream("service/target/rules.zip");
         }
+        FileUtil.unzip(stream, rulesDir, false);
     }
 }

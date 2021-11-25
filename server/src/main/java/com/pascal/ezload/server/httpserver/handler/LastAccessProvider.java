@@ -13,7 +13,7 @@ public class LastAccessProvider implements ContainerRequestFilter {
     private static AtomicLong lastAccess = new AtomicLong(System.currentTimeMillis());
 
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+    public void filter(ContainerRequestContext containerRequestContext) {
         lastAccess.set(System.currentTimeMillis());
     }
 

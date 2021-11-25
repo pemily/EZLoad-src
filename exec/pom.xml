@@ -5,12 +5,12 @@
 
     <parent>
         <artifactId>EZLoadRoot</artifactId>
-        <groupId>com.pascal</groupId>
+        <groupId>com.pascal.ezload</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ezLoad-exec</artifactId>
+    <artifactId>ezExec</artifactId>
 
     <build>
         <plugins>
@@ -55,6 +55,9 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <descriptors>
+                        <descriptor>main-assembly.xml</descriptor>
+                    </descriptors>
                     <finalName>EZLoad-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
@@ -66,23 +69,24 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.pascal</groupId>
+            <groupId>com.pascal.ezload</groupId>
             <artifactId>ezService</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.pascal</groupId>
+            <groupId>com.pascal.ezload</groupId>
             <artifactId>ezServer</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.pascal</groupId>
+            <groupId>com.pascal.ezload</groupId>
             <artifactId>ezClient</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
+
     </dependencies>
 
 </project>

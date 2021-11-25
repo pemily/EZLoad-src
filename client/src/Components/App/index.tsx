@@ -18,6 +18,7 @@ export function App(){
     const RULES_TAB_INDEX = 4;
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
+    const [configFile, setConfigFile] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
     const [filesNotLoaded, setFilesNotLoaded] = useState<string[]|undefined>(undefined);
@@ -29,6 +30,7 @@ export function App(){
     const [newShareValues, setNewShareValues] = useState<ShareValue[]|undefined>(undefined);
     const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
     const [reportGenerated, setReportGenerated] = useState<boolean>(false);
+    const [exited, setExited] = useState<boolean>(false);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -51,6 +53,7 @@ export function App(){
         jsonCall(ezApi.home.getMainData())
         .then(r =>  {                  
             console.log("ReloadData: ",r);         
+             setConfigFile(r.configFile);
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
@@ -143,6 +146,8 @@ export function App(){
     }
 
     useEffect(() => {
+        setInterval(() => ezApi.home.ping(), 20000);    // every 20 seconds call the ping
+
         // will be executed on the load
         reloadAllData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,10 +166,14 @@ export function App(){
         return window.location.href.toLowerCase().endsWith('config');
     }
 
-    return (
+    function main(){
+        return (
         <Box>
-            <Header direction="column" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
+            <Header direction="row" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
                 <Heading level="3" self-align="center" margin="xxsmall">EZLoad v1.0.0</Heading>
+                <Box align="stretch">
+                <Anchor alignSelf="end" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
+                </Box>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 
@@ -294,7 +303,7 @@ export function App(){
                             { processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                                                        
-                                <Config mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
+                                <Config configFile={configFile} mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
                                     followProcess={followProcess}
                                     bourseDirectAuthInfo={bourseDirectAuthInfo}
                                     bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
@@ -319,6 +328,11 @@ export function App(){
                         </Tab> )}
                 </Tabs>
             </Box> )}
-        </Box>
-    );
+        </Box>)
+    };
+    
+    return (<>
+        { exited && <Box alignContent="center" margin="large"><Heading size="3" alignSelf="center">Vous pouvez fermer cette fenêtre</Heading></Box>}
+        { !exited &&  main()}        
+    </>);
 }

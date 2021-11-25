@@ -11,6 +11,7 @@ import java.util.Set;
 
 public class WebData {
 
+    private String configFile;
     private MainSettings mainSettings;
     private EzProcess latestEzProcess;
     private List<EzReport> reports;
@@ -19,9 +20,10 @@ public class WebData {
     private Set<ShareValue> newShareValues;
     private boolean processRunning;
 
-    public WebData(MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
+    public WebData(String configFile, MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
                    List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules){
+        this.configFile = configFile;
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
         this.processRunning = processRunning;
@@ -85,5 +87,13 @@ public class WebData {
 
     public void setNewShareValues(Set<ShareValue> newShareValues) {
         this.newShareValues = newShareValues;
+    }
+
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
     }
 }

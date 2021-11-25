@@ -11,6 +11,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface ConfigProps {
+  configFile: string;
   mainSettings: MainSettings;
   mainSettingsStateSetter: (settings: MainSettings) => void;
   bourseDirectAuthInfo: AuthInfo|undefined;
@@ -83,7 +84,7 @@ export function Config(props: ConfigProps) {
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Heading level="5" >EZPortfolio</Heading>
+                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile})</Text></Box>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
                             <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.mainSettings?.ezPortfolio?.ezPortfolioUrl}

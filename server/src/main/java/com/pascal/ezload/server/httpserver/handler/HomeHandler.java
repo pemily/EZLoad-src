@@ -56,7 +56,8 @@ public class HomeHandler {
     public WebData getMainData() throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps().validate();
 
-        return new WebData(mainSettings,
+        return new WebData(SettingsManager.getConfigFilePath(),
+                            mainSettings,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
@@ -127,7 +128,7 @@ public class HomeHandler {
 
     @POST
     @Path("/exit")
-    public void exit() throws Exception {
+    public void exit() {
         processManager.kill();
         server.stop();
     }

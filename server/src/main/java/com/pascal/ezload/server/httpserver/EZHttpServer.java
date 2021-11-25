@@ -37,14 +37,18 @@ public class EZHttpServer {
         servletHandler.setContextPath("/");
         HandlerList handlers = new HandlerList();
 
-        ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setDirectoriesListed(false);
-        resource_handler.setWelcomeFiles(new String[]{"index.html"});
-        resource_handler.setBaseResource(Resource.newClassPathResource("/ezClient"));
-        ContextHandler resourceContextHandler = new ContextHandler("/");
-        resourceContextHandler.setHandler(resource_handler);
+        Resource staticPages = Resource.newClassPathResource("/ezClient");
+        if (staticPages != null) {
+            ResourceHandler resource_handler = new ResourceHandler();
+            resource_handler.setDirectoriesListed(false);
+            resource_handler.setWelcomeFiles(new String[]{"index.html"});
+            resource_handler.setBaseResource(staticPages);
+            ContextHandler resourceContextHandler = new ContextHandler("/");
+            resourceContextHandler.setHandler(resource_handler);
+            handlers.addHandler(resourceContextHandler);
+        }
 
-        handlers.setHandlers(new Handler[] { resourceContextHandler, servletHandler });
+        handlers.addHandler(servletHandler);
         server.setHandler(handlers);
 
         ResourceConfig config = new ResourceConfig();
@@ -62,8 +66,15 @@ public class EZHttpServer {
         if (server != null) server.join();
     }
 
-    public void stop() throws Exception {
-        server.stop();
+    public void stop() {
+        try {
+            server.stop();
+        }
+        catch (Exception e){
+        }
+        finally {
+            System.exit(0);
+        }
     }
 
 
@@ -95,12 +106,7 @@ public class EZHttpServer {
                 }
                 if (System.currentTimeMillis() - duration.toMillis() > LastAccessProvider.getLastAccess()
                         && !serverState.isProcessRunning()){
-                    try {
                         this.stop();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    System.exit(0);
                 }
             }
         }).start();
