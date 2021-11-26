@@ -28,8 +28,8 @@ public class EZHttpServer {
     private static final String LOGS_CONTEXT = "/logs";
     private static final String LOGS_TARGET = "log";
 
-    public int start(AbstractBinder configBinder) throws Exception {
-        InetSocketAddress address = new InetSocketAddress(8080);
+    public void start(int port, AbstractBinder configBinder) throws Exception {
+        InetSocketAddress address = new InetSocketAddress(port);
         server = new Server(address);
 
 
@@ -59,7 +59,6 @@ public class EZHttpServer {
         servletHandler.addServlet(serHol, "/api/*");
         server.setStopAtShutdown(true);
         server.start();
-        return server.getURI().getPort();
     }
 
     public void waitEnd() throws InterruptedException {

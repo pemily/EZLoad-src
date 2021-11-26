@@ -31,6 +31,7 @@ export function App(){
     const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
     const [reportGenerated, setReportGenerated] = useState<boolean>(false);
     const [exited, setExited] = useState<boolean>(false);
+    const [version, setVersion] = useState<string>("");
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -59,7 +60,8 @@ export function App(){
              setRules(r.rules);
              setNewShareValues(r.newShareValues);
              setFilesNotLoaded(r.filesNotYetLoaded);             
-             setMainSettings(r.mainSettings);     
+             setMainSettings(r.mainSettings);  
+             setVersion(r.ezLoadVersion);
              if (newShareValues === undefined){
                 setNewShareValuesDirty(false);
              } 
@@ -170,10 +172,10 @@ export function App(){
         return (
         <Box>
             <Header direction="row" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
-                <Heading level="3" self-align="center" margin="xxsmall">EZLoad v1.0.0</Heading>
-                <Box align="stretch">
-                <Anchor alignSelf="end" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
-                </Box>
+                <Box width="35%"></Box>
+                <Text size="large" self-align="center" margin="xxsmall">{"EZLoad v"+version}</Text>
+                <Box width="35%"></Box>
+                <Anchor margin="small" alignSelf="start" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 
@@ -222,7 +224,7 @@ export function App(){
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}              
                                 <Box margin="none" direction="row">
                                     <Button alignSelf="start" margin="medium"
-                                        disabled={processRunning} onClick={() => 
+                                        disabled={processRunning || mainSettings.bourseDirect?.accounts?.filter(ac => ac.active).length === 0} onClick={() => 
                                             jsonCall(ezApi.engine.analyze())
                                             .then(r => followProcess(r))
                                             .catch(e => console.error(e) )

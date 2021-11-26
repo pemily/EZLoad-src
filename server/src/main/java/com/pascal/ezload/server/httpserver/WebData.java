@@ -19,10 +19,11 @@ public class WebData {
     private List<String> filesNotYetLoaded;
     private Set<ShareValue> newShareValues;
     private boolean processRunning;
+    private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
                    List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
-                   List<RuleDefinitionSummary> allRules){
+                   List<RuleDefinitionSummary> allRules, String ezLoadVersion){
         this.configFile = configFile;
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
@@ -31,6 +32,7 @@ public class WebData {
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
         this.newShareValues = newShareValues;
+        this.ezLoadVersion = ezLoadVersion;
     }
 
     public MainSettings getMainSettings() {
@@ -95,5 +97,13 @@ public class WebData {
 
     public void setConfigFile(String configFile) {
         this.configFile = configFile;
+    }
+
+    public String getEzLoadVersion() {
+        return ezLoadVersion;
+    }
+
+    public void setEzLoadVersion(String ezLoadVersion) {
+        this.ezLoadVersion = ezLoadVersion;
     }
 }

@@ -4,6 +4,7 @@ import { Download } from 'grommet-icons';
 import { MainSettings, AuthInfo, EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 import { FileBrowser } from '../../Tools/FileBrowser';
+import { access } from "fs";
 
 export interface BourseDirectProps {
     mainSettings: MainSettings;
@@ -30,7 +31,7 @@ export function BourseDirect(props: BourseDirectProps){
             </Box>
             
           <Button alignSelf="start" margin="medium"
-                disabled={props.readOnly} onClick={() => 
+                disabled={props.readOnly || props.mainSettings.bourseDirect?.accounts?.filter(ac => ac.active).length === 0} onClick={() => 
                     jsonCall(ezApi.engine.download({chromeVersion: getChromeVersion(), courtier: 'BourseDirect'}))
                     .then(process => props.followProcess(process))
                     .catch(e => console.error(e))

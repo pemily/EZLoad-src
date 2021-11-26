@@ -3,6 +3,7 @@ package com.pascal.ezload.service.config;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -98,6 +99,7 @@ public class SettingsManager {
         String ezHome = new File(configFilePath).getParentFile().getAbsolutePath();
         MainSettings.Admin admin = new MainSettings.Admin();
         admin.setShowRules(false);
+        ezLoad.setPort(2180);
         ezLoad.setAdmin(admin);
         ezLoad.setLogsDir(ezHome+File.separator+"logs");
         ezLoad.setDownloadDir(ezHome+File.separator+"courtiers");
@@ -158,5 +160,11 @@ public class SettingsManager {
             stream = new FileInputStream("service/target/rules.zip");
         }
         FileUtil.unzip(stream, rulesDir, false);
+    }
+
+    public static String getVersion() throws IOException {
+        final Properties properties = new Properties();
+        properties.load(SettingsManager.class.getClassLoader().getResourceAsStream("about.properties"));
+        return properties.getProperty("version");
     }
 }

@@ -104,6 +104,7 @@ public class MainSettings {
 
         enum Field {downloadDir, logsDir, passPhrase, courtierCredFile, rulesDir}
 
+        private int port;
         private String downloadDir;
         private String rulesDir;
         private String logsDir;
@@ -157,6 +158,14 @@ public class MainSettings {
 
         public void setAdmin(Admin admin){
             this.admin = admin;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
         }
 
         @Override

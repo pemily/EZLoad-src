@@ -66,7 +66,8 @@ public class HomeHandler {
                             new RulesManager(mainSettings).getAllRules()
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)
-                                    .collect(Collectors.toList())
+                                    .collect(Collectors.toList()),
+                            SettingsManager.getVersion()
                 );
     }
 

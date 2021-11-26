@@ -12,10 +12,23 @@
     <artifactId>ezService</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <ezload.version>${project.version}</ezload.version>
+    </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/about.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
 
         <plugins>
+
 <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
