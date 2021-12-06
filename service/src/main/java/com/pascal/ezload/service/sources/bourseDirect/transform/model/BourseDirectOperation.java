@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BourseDirectOperation {
+    private int pdfPage;
     private float pdfPositionDateY;
     private EZDate date;
     private ArrayList<String> operationDescription = new ArrayList<>();
@@ -42,5 +43,13 @@ public class BourseDirectOperation {
 
     public void setPdfPositionDateY(float pdfPositionDateY) {
         this.pdfPositionDateY = pdfPositionDateY;
+    }
+
+    public int getPdfPage() {
+        return pdfPage;
+    }
+
+    public void setPdfPage(int pdfPage) {
+        this.pdfPage = pdfPage;
     }
 }

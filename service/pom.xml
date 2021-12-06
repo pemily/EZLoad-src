@@ -21,7 +21,11 @@
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
                 <includes>
-                    <include>**/about.properties</include>
+                    <include>about.properties</include>
+                    <include>*.css</include>
+                    <include>*.html</include>
+                    <include>*.js</include>
+                    <include>*.xml</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>

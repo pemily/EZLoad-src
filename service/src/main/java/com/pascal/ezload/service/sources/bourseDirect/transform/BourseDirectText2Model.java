@@ -4,10 +4,7 @@ import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectOperation;
-import com.pascal.ezload.service.util.BRException;
-import com.pascal.ezload.service.util.BRParsingException;
-import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.service.util.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,14 +29,14 @@ public class BourseDirectText2Model {
         this.reporting = reporting;
     }
 
-    public BourseDirectModel toModel(BourseDirectPdfExtractor.Result pdfText) {
+    public BourseDirectModel toModel(PdfTextExtractor.Result pdfText) {
         reporting.info("BourseDirect model transformation");
         BourseDirectModel model = analyzePdfText(pdfText);
         reporting.info("BourseDirect model transformation => ok");
         return model;
     }
 
-    private BourseDirectModel analyzePdfText(BourseDirectPdfExtractor.Result pdfResult) throws BRException {
+    private BourseDirectModel analyzePdfText(PdfTextExtractor.Result pdfResult) throws BRException {
         try {
             BourseDirectModel model = new BourseDirectModel(VERSION);
             analyzePdfText(pdfResult, model);
@@ -57,7 +54,7 @@ public class BourseDirectText2Model {
     }
 
 
-    private void analyzePdfText(BourseDirectPdfExtractor.Result pdfResult, BourseDirectModel model) {
+    private void analyzePdfText(PdfTextExtractor.Result pdfResult, BourseDirectModel model) {
         String pdfText = StringUtils.clean(pdfResult.getPdfText());
 
         String[] section = pdfText.split(TEXT_INTRO);
@@ -92,7 +89,7 @@ public class BourseDirectText2Model {
         ArrayList<BourseDirectOperation> allOperations = new ArrayList<>();
         model.setOperations(allOperations);
 
-        for (BourseDirectPdfExtractor.PositionText pt : pdfResult.getAllPositionTexts()){
+        for (PdfTextExtractor.PositionText pt : pdfResult.getAllPositionTexts()){
             if (pt.getText().startsWith("Sous réserve de bonne fin"))
                 break; // on a atteint la fin de la page
 
@@ -102,6 +99,7 @@ public class BourseDirectText2Model {
                     // une nouvelle date d'opération => une nouvelle opération
                     BourseDirectOperation op = new BourseDirectOperation();
                     op.setPdfPositionDateY(pt.getY()-1);
+                    op.setPdfPage(pt.getPage());
                     op.setDate(EZDate.parseFrenchDate(pt.getText(), '/'));
                     allOperations.add(op);
                 }
@@ -139,12 +137,16 @@ public class BourseDirectText2Model {
         }
     }
 
-    private BourseDirectOperation findOrThrow(ArrayList<BourseDirectOperation> allOps, BourseDirectPdfExtractor.PositionText textPosition){
+    private BourseDirectOperation findOrThrow(ArrayList<BourseDirectOperation> allOps, PdfTextExtractor.PositionText textPosition){
         for (int i = 0; i < allOps.size(); i++){
             BourseDirectOperation op = allOps.get(i);
-            if (textPosition.isBelow(op.getPdfPositionDateY()) || textPosition.sameY(op.getPdfPositionDateY())) {
-                if (i == allOps.size()-1 // si c'est la derniere operation
-                        || textPosition.isAbove(allOps.get(i+1).getPdfPositionDateY())) { // ou si c'est avant l'operation suivante
+            if (textPosition.isBelow(op.getPdfPage(), op.getPdfPositionDateY()) || textPosition.sameY(op.getPdfPage(), op.getPdfPositionDateY())) {
+                if (i == allOps.size() - 1) { // si c'est la derniere operation
+                    return op;
+                }
+
+                BourseDirectOperation nextOp = allOps.get(i+1);
+                if(textPosition.isAbove(nextOp.getPdfPage(), nextOp.getPdfPositionDateY())) { // si c'est avant l'operation suivante
                     return op;
                 }
             }

@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -20,6 +21,7 @@ public class BourseDirectEZAccountDeclaration extends Checkable implements EZAcc
     }
 
     @Override
+    @JsonIgnore
     public EnumEZBroker getEzBroker() {
         return EnumEZBroker.BourseDirect;
     }

@@ -1,4 +1,4 @@
-package com.pascal.ezload.service.sources.bourseDirect.transform;
+package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -12,13 +12,14 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BourseDirectPdfExtractor {
+public class PdfTextExtractor {
 
     private final Reporting reporting;
     private final String pdfFilePath;
-    LinkedList<PositionText> allTexts = new LinkedList<>();
+    private final LinkedList<PositionText> allTexts = new LinkedList<>();
+    private int currentPage = 0;
 
-    public BourseDirectPdfExtractor(Reporting reporting, String pdfFilePath){
+    public PdfTextExtractor(Reporting reporting, String pdfFilePath){
         this.reporting = reporting;
         this.pdfFilePath = pdfFilePath;
     }
@@ -48,14 +49,16 @@ public class BourseDirectPdfExtractor {
 
     private void process(float x, float y, String s){
         if (allTexts.isEmpty()){
-            allTexts.add(new PositionText(x, y, s));
+            allTexts.add(new PositionText(currentPage, x, y, s));
         }
         else {
             PositionText last = allTexts.getLast();
+            if (last.getY() > y) currentPage++;
+
             if (last.sameSentence(x, y)) {
                 last.addNext(x, y, s);
             } else {
-                allTexts.add(new PositionText(x, y, s));
+                allTexts.add(new PositionText(currentPage, x, y, s));
             }
         }
     }
@@ -65,8 +68,10 @@ public class BourseDirectPdfExtractor {
         private final StringBuilder sentence;
         private final float startX, startY;
         private float lastX, lastY;
+        private int page;
 
-        PositionText(float startX, float startY, String initText) {
+        PositionText(int page, float startX, float startY, String initText) {
+            this.page = page;
             this.lastX = this.startX = startX;
             this.lastY = this.startY = startY;
             sentence = new StringBuilder(initText);
@@ -98,8 +103,8 @@ public class BourseDirectPdfExtractor {
             return startX >= x-1 && startX <= x+1; // +1 -1 car les coordonnées sont approximatives
         }
 
-        public boolean sameY(float y){
-            return startY >= y-1 && startY <= y+1; // +1 -1 car les coordonnées sont approximatives
+        public boolean sameY(int page, float y){
+            return this.page == page && startY >= y-1 && startY <= y+1; // +1 -1 car les coordonnées sont approximatives
         }
 
         public boolean isAfter(float x){
@@ -110,13 +115,18 @@ public class BourseDirectPdfExtractor {
             return startX < x;
         }
 
-        public boolean isBelow(float y) {
-            return startY > y;
+        public boolean isBelow(int page, float y) {
+            return this.page > page || startY > y;
         }
 
-        public boolean isAbove(float y) {
-            return startY < y;
+        public boolean isAbove(int page, float y) {
+            return this.page < page || startY < y;
         }
+
+        public int getPage() {
+            return page;
+        }
+
     }
 
     public static class Result {

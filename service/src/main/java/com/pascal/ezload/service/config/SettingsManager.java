@@ -155,7 +155,7 @@ public class SettingsManager {
     }
 
     private static void copyRulesTo(String rulesDir) throws IOException {
-        InputStream stream = SettingsManager.class.getResourceAsStream("rules.zip");
+        InputStream stream = SettingsManager.class.getClassLoader().getResourceAsStream("rules.zip");
         if (stream == null){
             stream = new FileInputStream("service/target/rules.zip");
         }

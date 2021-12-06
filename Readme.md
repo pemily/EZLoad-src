@@ -1,3 +1,8 @@
+mvn clean install sur le project chapeau: EZLoadRoot
+puis lancer exec/target/EZLoad-[Version].jar
+
+
+
 # TODO
 Download => test with my latest files
 When processing (parsing), if there is one file that fail, stop everything because the operations must be done in the correct order

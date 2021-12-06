@@ -12,10 +12,9 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
-import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectPdfExtractor;
+import com.pascal.ezload.service.util.PdfTextExtractor;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
-import com.pascal.ezload.service.util.ShareUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,8 +69,8 @@ public class BourseDirectAnalyser {
 
             List<String> errors = new LinkedList<>();
             try {
-                BourseDirectPdfExtractor extractor = new BourseDirectPdfExtractor(reporting, pdfFilePath);
-                BourseDirectPdfExtractor.Result pdfText = extractor.process();
+                PdfTextExtractor extractor = new PdfTextExtractor(reporting, pdfFilePath);
+                PdfTextExtractor.Result pdfText = extractor.process();
 
                 BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
 
