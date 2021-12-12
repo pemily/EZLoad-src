@@ -44,8 +44,8 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
 
             AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumEZBroker.BourseDirect);
             if (StringUtils.isBlank(login.getText())) {
-                login.sendKeys(authInfo.getUsername());
-                password.sendKeys(authInfo.getPassword());
+                if (authInfo.getUsername() != null) login.sendKeys(authInfo.getUsername());
+                if (authInfo.getPassword() !=null) password.sendKeys(authInfo.getPassword());
                 Sleep.waitSeconds(1);
                 findById("bd_auth_login_type_submit").click();
             } else if (!StringUtils.isBlank(login.getText())) {

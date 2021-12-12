@@ -61,13 +61,13 @@ public class AuthManager {
     public void saveAuthInfo(EnumEZBroker courtier, AuthInfo authInfo) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo encrypted = new AuthInfo();
-        encrypted.setPassword(encryptPassword(authInfo.getPassword(), passPhrase));
+        encrypted.setPassword(authInfo.getPassword() != null ? encryptPassword(authInfo.getPassword(), passPhrase) : null);
         encrypted.setUsername(authInfo.getUsername());
         data.getInfo().put(courtier, encrypted);
         saveFile(authFilePath, data);
     }
 
-    private Data loadFile(String authFilePath) throws IOException {
+    private Data loadFile(String authFilePath) {
         try {
             Reader reader = new BufferedReader(new FileReader(authFilePath));
             Data map = new Gson().fromJson(reader, Data.class);

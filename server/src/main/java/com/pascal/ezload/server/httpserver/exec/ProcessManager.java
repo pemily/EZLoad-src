@@ -102,7 +102,7 @@ public class ProcessManager {
     public static String getLog(MainSettings mainSettings, String prefix, String suffix){
         File logsDir = new File(mainSettings.getEzLoad().getLogsDir());
         Date now = new Date();
-        String reportFileName =  prefix + new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + suffix;
+        String reportFileName =  new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(now) + "-" + prefix + suffix;
         return logsDir + File.separator + reportFileName;
     }
 
