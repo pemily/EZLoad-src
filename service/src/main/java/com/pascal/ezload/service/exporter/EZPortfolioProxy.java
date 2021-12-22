@@ -22,7 +22,7 @@ public interface EZPortfolioProxy {
     void load(Reporting reporting) throws Exception;
 
     // return the list of EzEdition operation not saved
-    List<EzReport> save(Reporting reporting, List<EzReport> operations) throws Exception;
+    List<EzReport> save(Reporting reporting, List<EzReport> operations, List<String> ignoreOperations) throws Exception;
 
     Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account);
 

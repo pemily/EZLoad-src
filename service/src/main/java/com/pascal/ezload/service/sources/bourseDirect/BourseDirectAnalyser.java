@@ -16,6 +16,7 @@ import com.pascal.ezload.service.util.PdfTextExtractor;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class BourseDirectAnalyser {
     }
 
     private interface IProcess<R> {
-        R execute(EZAccountDeclaration account, String pdfFilePath);
+        R execute(EZAccountDeclaration account, String pdfFilePath) throws Exception;
     }
 
     public List<String> getFilesNotYetLoaded(Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
@@ -57,14 +58,18 @@ public class BourseDirectAnalyser {
                                 && account.isActive()) {
                             // if the pdf file is valid, and is not yet processed
                             // start its analysis
-                            return process.execute(account, pdfFilePath);
+                            try {
+                                return process.execute(account, pdfFilePath);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                         return null;
                     });
         }
     }
 
-    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) {
+    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) throws IOException {
         try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
 
             List<String> errors = new LinkedList<>();

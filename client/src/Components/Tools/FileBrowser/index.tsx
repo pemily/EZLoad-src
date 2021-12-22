@@ -56,7 +56,7 @@ export function FileBrowser(props: FileBrowserProps) {
                              onClick={e => loadDir(currentDir.split('/').slice(0, -1).join('/'))}>[Parent]</Anchor>)
                     }
                     <Box direction="row"  alignContent="stretch" fill>
-                        { items.length == 0 && ( <Text margin="medium">Aucun fichier</Text>)}
+                        { items.length === 0 && ( <Text margin="medium">Aucun fichier</Text>)}
                         { items.length > 0 && (
                         <List data={items} margin={{top: "none", start:"medium"}} pad="xsmall" background={['light-2', 'light-4']} style={{width: "90%"}}
                         action={(item, index) => showItemActions(index, item) }>

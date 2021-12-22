@@ -11,6 +11,7 @@ import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { ViewLog } from "../Tools/ViewLog";
 
 export function App(){
     
@@ -32,11 +33,14 @@ export function App(){
     const [reportGenerated, setReportGenerated] = useState<boolean>(false);
     const [exited, setExited] = useState<boolean>(false);
     const [version, setVersion] = useState<string>("");
+    const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
+    const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
             setProcessLaunchFail(false);
             setProcessRunning(true);
+            setLastProcess(process);
         }
         else {
             setProcessLaunchFail(true);
@@ -80,6 +84,26 @@ export function App(){
         .catch((error) => {
             console.error("Error while loading BourseDirect Username", error);
         });
+    }
+        
+    function isOperationIgnored(op: EzEdition | undefined) : boolean {
+        return op === undefined || op.id === undefined ? false : operationIgnored.includes(op.id);
+    }
+
+    function ignoreOperation(op: EzEdition, ignore: boolean) {
+        if (op.id === undefined) return;
+        // pensez a vider le cache sur le serveur si il y a des opérations ignorés au moment de l'upload server
+        if (operationIgnored.includes(op.id)){
+            if (!ignore){
+                setOperationIgnored(operationIgnored.filter(e => e !== op.id));                
+            } 
+        }
+        else {
+            if (ignore) {                
+                operationIgnored.push(op.id);
+                setOperationIgnored(operationIgnored);
+            }
+        }     
     }
 
     function saveRuleDefinition(newRuleDef: SelectedRule) : Promise<RuleDefinition>{
@@ -230,8 +254,13 @@ export function App(){
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
-                                    <Button alignSelf="start" margin="medium" disabled={newShareValuesDirty || processRunning || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)} onClick={() =>
-                                                jsonCall(ezApi.engine.upload())
+                                    <Button alignSelf="start" margin="medium" 
+                                                disabled={newShareValuesDirty 
+                                                        || processRunning 
+                                                        // || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)
+                                                        }
+                                                onClick={() =>
+                                                jsonCall(ezApi.engine.upload(operationIgnored))
                                                 .then(followProcess)
                                                 .then(r => setReportGenerated(true))
                                                 .catch(e => console.error(e))
@@ -244,6 +273,8 @@ export function App(){
                                 <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
+                                        isOperationIgnored={isOperationIgnored}
+                                        ignoreOperation={ignoreOperation}
                                         createRule={op =>{ 
                                             if (op.data?.data?.['ezBrokerVersion'] === undefined){
                                                 console.error("Il manque des données dans l'opération");
@@ -294,10 +325,11 @@ export function App(){
                             {processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
-                            { /*<ViewLog 
+                            { <ViewLog 
                                     ezProcess={lastProcess}    
                                     processFinished={() => reloadAllData()}/>                            
-                            { mainSettings && !processRunning && (<Text margin="large">Vous pouvez retourner à l'onglet de départ</Text>)} */}
+                            }
+                            { mainSettings && !processRunning && (<Text margin="large">Vous pouvez retourner à l''onglet de départ</Text>) }
                         </Box>
                     </Tab>                    
                     <Tab title="Configuration" icon={<Configure size='small'/>}>

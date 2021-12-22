@@ -120,8 +120,9 @@ public class EngineHandler {
     @POST
     @Path("/upload")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     // upload valid operations into GoogleDriver EZPortfolio
-    public EzProcess upload() throws Exception {
+    public EzProcess upload(@NotNull List<String> ignoreEzEditionId) throws Exception {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         return processManager.createNewRunningProcess(mainSettings,
@@ -150,7 +151,8 @@ public class EngineHandler {
                         // transfert all the new PRU row created in the previous analysis in this new just loaded PRU
                         serverState.getNewPRUs().forEach(pru -> ezPortfolioProxyFinal.getPRU().newPRU(pru));
 
-                        List<EzReport> result = ezPortfolioProxy.save(reporting, serverState.getEzReports());
+                        List<EzReport> result = ezPortfolioProxy.save(reporting, serverState.getEzReports(), ignoreEzEditionId);
+
                         updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
 
                         // get the new version, and update the list of file not yet loaded
@@ -235,6 +237,7 @@ public class EngineHandler {
                     createStartDateRule.setBroker(null);
                     createStartDateRule.setBrokerFileVersion(-1);
                     createStartDateRule.setName("Date de Départ");
+                    ezEdition.setId("DATE_DE_DEPART");
                     ezEdition.setRuleDefinitionSummary(createStartDateRule);
                     EzData ezData = new EzData();
                     ezData.put(AccountData.account_number, account.getNumber());
@@ -247,7 +250,7 @@ public class EngineHandler {
                     ezReport.setEzEditions(Collections.singletonList(ezEdition));
                     clearCache();
 
-                    ezPortfolioProxy.save(reporting, Collections.singletonList(ezReport));
+                    ezPortfolioProxy.save(reporting, Collections.singletonList(ezReport), new ArrayList<>());
 
                     reporting.info("Date sauvegardé dans l'onglet 'MesOpérations'");
                 });

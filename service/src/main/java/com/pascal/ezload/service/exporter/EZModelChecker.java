@@ -5,6 +5,7 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 public class EZModelChecker {
@@ -14,13 +15,15 @@ public class EZModelChecker {
         this.reporting = reporting;
     }
 
-    public void validateModels(List<EZModel> allEZModels) {
+    public void validateModels(List<EZModel> allEZModels) throws IOException {
         try(Reporting rep = reporting.pushSection("Checking Standard Model")){
-            allEZModels.forEach(this::validateModel);
+            for (EZModel allEZModel : allEZModels) {
+                validateModel(allEZModel);
+            }
         }
     }
 
-    private void validateModel(EZModel model){
+    private void validateModel(EZModel model) throws IOException {
         try(Reporting rep = reporting.pushSection((reporting, lnkCreator) -> reporting.escape("Checking: ") + lnkCreator.createSourceLink(reporting, model.getSourceFile()))){
             if (model.getReportDate() == null){
                 addError(model, "La date du rapport n'a pas été trouvé");

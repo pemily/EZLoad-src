@@ -2,6 +2,8 @@ package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.sources.Reporting;
 
+import java.io.IOException;
+
 public class TextReporting implements Reporting {
 
     private static String SECTION_TAB = "    ";
@@ -51,4 +53,5 @@ public class TextReporting implements Reporting {
     public String getReport() {
         return report.toString();
     }
+
 }

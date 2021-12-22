@@ -3,6 +3,8 @@ package com.pascal.ezload.service.util;
 import com.pascal.ezload.service.sources.Reporting;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+
 public class LoggerReporting implements Reporting {
 
     private static final Logger logger = Logger.getLogger(LoggerReporting.class);
@@ -41,4 +43,5 @@ public class LoggerReporting implements Reporting {
     public String escape(String text) {
         return text;
     }
+
 }

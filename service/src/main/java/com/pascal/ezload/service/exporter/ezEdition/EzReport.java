@@ -10,15 +10,18 @@ import java.util.Map;
 
 public class EzReport {
 
+    public enum EnumStatus { OK, WARNING, ERROR }
     private List<EzEdition> ezEditions = new LinkedList<>();
     private List<String> errors = new LinkedList<>();
     private String sourceFile;
+    private EnumStatus status;
 
     public EzReport(){
     }
 
     public EzReport(EZModel fromEzModel){
         errors = fromEzModel.getErrors();
+        status = errors.size() > 0 ? EnumStatus.ERROR : EnumStatus.OK;
         sourceFile = fromEzModel.getSourceFile();
     }
 
@@ -30,18 +33,14 @@ public class EzReport {
         this.ezEditions = ezEditions;
         if (ezEditions.stream().anyMatch(ez -> ez.getErrors().size() > 0)){
             if (ezEditions.stream().allMatch(ez -> ez.getErrors().stream().allMatch(e-> e.equals(RulesEngine.NO_RULE_FOUND)))){
-                errors.add(RulesEngine.NO_RULE_FOUND);
+                status = status == EnumStatus.ERROR ? status : EnumStatus.WARNING;
             }
-            else errors.add("Une errreur a été détectée dans une opération");
+            else status = EnumStatus.ERROR;
         }
     }
 
     public List<String> getErrors() {
         return errors;
-    }
-
-    public void setError(List<String> errors) {
-        this.errors = errors;
     }
 
     public String getSourceFile() {
@@ -52,5 +51,15 @@ public class EzReport {
         this.sourceFile = sourceFile;
     }
 
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
 
+    public EnumStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EnumStatus status) {
+        this.status = status;
+    }
 }

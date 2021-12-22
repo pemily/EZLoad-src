@@ -43,14 +43,19 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
             WebElement password = findById("bd_auth_login_type_password");
 
             AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumEZBroker.BourseDirect);
-            if (StringUtils.isBlank(login.getText())) {
-                if (authInfo.getUsername() != null) login.sendKeys(authInfo.getUsername());
-                if (authInfo.getPassword() !=null) password.sendKeys(authInfo.getPassword());
-                Sleep.waitSeconds(1);
-                findById("bd_auth_login_type_submit").click();
-            } else if (!StringUtils.isBlank(login.getText())) {
-                findById("bd_auth_login_type_submit").click();
-            } else reporting.info("Please Enter your login/password then click on Connect");
+            if (authInfo != null || StringUtils.isBlank(login.getText())) {
+                if (authInfo != null && authInfo.getUsername() != null) login.sendKeys(authInfo.getUsername());
+                if (authInfo != null && authInfo.getPassword() !=null){
+                    password.sendKeys(authInfo.getPassword());
+                    Sleep.waitSeconds(1);
+                    findById("bd_auth_login_type_submit").click();
+                }
+                else{
+                    // Pas de password
+                    reporting.info("Entrez votre Identifiant & Mot de passe puis cliquez sur \"SE CONNECTER\"");
+                }
+            }
+            else reporting.info("Entrez votre Identifiant & Mot de passe puis cliquez sur \"SE CONNECTER\"");
 
             boolean connected = false;
             do {

@@ -10,6 +10,8 @@ import com.pascal.ezload.service.sources.FileProcessor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,7 @@ public class RulesManager {
 
     public synchronized RuleDefinition readRule(String filepath) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-        try(Reader reader = new FileReader(filepath)) {
+        try(Reader reader = new FileReader(filepath, StandardCharsets.UTF_8)) {
             RuleDefinition ruleDefinition = mapper.readValue(reader, RuleDefinition.class);
             ruleDefinition.validate();
             return ruleDefinition;
@@ -71,7 +73,7 @@ public class RulesManager {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
         ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
-        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(newFilePath), ruleDef);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
 
         if (isRenaming){
             // it is a rename, remove the old file

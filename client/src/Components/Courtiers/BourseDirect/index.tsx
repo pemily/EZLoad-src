@@ -4,7 +4,6 @@ import { Download } from 'grommet-icons';
 import { MainSettings, AuthInfo, EzProcess } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 import { FileBrowser } from '../../Tools/FileBrowser';
-import { access } from "fs";
 
 export interface BourseDirectProps {
     mainSettings: MainSettings;

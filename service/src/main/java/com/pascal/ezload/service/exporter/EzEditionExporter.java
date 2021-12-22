@@ -33,7 +33,7 @@ public class EzEditionExporter {
     /**
      * exports the allEZModels into the EZPortfolio
      */
-    public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy, ShareUtil shareUtil) {
+    public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy, ShareUtil shareUtil) throws IOException {
         rulesEngine.validateRules();
 
         try(Reporting rep = reporting.pushSection("Rapport EZPortfolio")){

@@ -3,12 +3,14 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class MesOperations  {
 
-    private static final String BIENTOT_RENTIER_OPERATION = "[EZLoad %s - %s]"; // EZLoad BourseDirect v1 - ACHAT COMPTANT
+    private static final String BIENTOT_RENTIER_OPERATION = "EZLoad %s - %s"; // EZLoad BourseDirect v1 - ACHAT COMPTANT
 
     private static final int DATE_COL = 0;
     private static final int COMPTE_TYPE_COL = 1;
@@ -31,6 +33,7 @@ public class MesOperations  {
     private static final int INFORMATION_COL = 8;
     private static final int ACCOUNT_DECLARED_NUMBER_COL = 9;
     private static final int AUTOMATIC_UPD_COL = 10;
+    private static final int SOURCE_FILE_COL = 11;
 
     private final SheetValues existingOperations;
     private final List<Row> newOperations = new ArrayList<>();
@@ -57,6 +60,7 @@ public class MesOperations  {
                 && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
 //                && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
                 && operation.getValueStr(ACCOUNT_DECLARED_NUMBER_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL))
+                && operation.getValueStr(SOURCE_FILE_COL).equals(row.getValueStr(SOURCE_FILE_COL))
 //                && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
 //                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
 //                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
@@ -78,9 +82,10 @@ public class MesOperations  {
         r.setValue(INFORMATION_COL, operationEdition.getDescription());
         r.setValue(ACCOUNT_DECLARED_NUMBER_COL, ezData.get(AccountData.account_number));
         r.setValue(AUTOMATIC_UPD_COL, String.format(BIENTOT_RENTIER_OPERATION,
-                                ruleDef.getBroker() == null ? "" : ruleDef.getBroker()+ // can be null when we set the startDate in the config panel
+                                ruleDef.getBroker() == null ? "" : ruleDef.getBroker()+ // can be null when we set the startDate in the config panel or the operation is ignored
                                         (ruleDef.getBrokerFileVersion() == -1 ? "" : " v"+ruleDef.getBrokerFileVersion()),  // can be -1 when we set the startDate in the config panel
                                 ruleDef.getName()));
+        r.setValue(SOURCE_FILE_COL, ezData.get(ReportData.report_source));
         return r;
     }
 
@@ -99,7 +104,7 @@ public class MesOperations  {
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);
-        return Optional.of(latestRow.valueDate(DATE_COL));
+        return Optional.of(latestRow.getValueStr(SOURCE_FILE_COL)).map(ModelUtils::getDateFromFile);
     }
 
     public void saveDone() {

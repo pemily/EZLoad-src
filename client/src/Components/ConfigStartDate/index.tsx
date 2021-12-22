@@ -17,7 +17,7 @@ export function ConfigStartDate(props: ConfigStartDateProps){
                 <Text margin ="xsmall" alignSelf="center" textAlign="center">Tous les relevés d'opérations avant cette date seront ignorés pour ce compte</Text>
                 <Text margin="small" alignSelf="center">{props.account?.name + " "+props.account?.number}</Text>
                 <Calendar alignSelf="center" size="small"  date={startDate} margin="medium"
-                    onSelect={(strDate) => {console.log("StartDate="+strDate+"   intialDate: "+startDate); setStartDate(strDate+"")}}/>
+                    onSelect={(strDate) => setStartDate(strDate+"")}/>
                 <Box direction="row" alignSelf="end">
                     <Button margin="small" alignSelf="center" size="small" label="Sauvegarder" onClick={(e) =>{ 
                             props.close(); 

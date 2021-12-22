@@ -2,7 +2,13 @@ package com.pascal.ezload.service.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZModel;
+import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public class ModelUtils {
 
@@ -62,5 +68,19 @@ public class ModelUtils {
 
     public static String double2Str(double v) {
         return normalizeAmount(String.format("%.6f", v)); // 5 digit apres la virgule
+    }
+
+
+    public static EZDate getDateFromFile(String sourceFile){
+        Optional<EnumEZBroker> optBroker = fromSourceFile(sourceFile);
+        if (optBroker.isEmpty()) throw new IllegalStateException("Impossible to determine broker from source file: "+sourceFile);
+        switch(optBroker.get()) {
+            case BourseDirect: return BourseDirectDownloader.getDateFromPdfFilePath(sourceFile);
+            default: throw new IllegalStateException("Unkown broker");
+        }
+    }
+
+    public static Optional<EnumEZBroker> fromSourceFile(String reportSource){
+        return Arrays.stream(EnumEZBroker.values()).filter(e -> reportSource.startsWith(e.getDirName())).findFirst();
     }
 }

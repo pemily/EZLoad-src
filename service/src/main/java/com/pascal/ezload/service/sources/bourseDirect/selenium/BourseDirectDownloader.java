@@ -12,6 +12,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -42,7 +43,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
-    public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolioProxy ezPortfolioProxy) {
+    public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolioProxy ezPortfolioProxy) throws IOException {
         try(Reporting ignored = reporting.pushSection("Downloading BourseDirect Reports...")) {
 
             try {

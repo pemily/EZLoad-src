@@ -11,12 +11,14 @@ export interface ReportsProps {
     showRules: boolean;
     createRule: (from: EzEdition) => void;
     viewRule: (from: EzEdition) => void;
+    isOperationIgnored: (fom: EzEdition) => boolean;
+    ignoreOperation: (from: EzEdition, ignore: boolean) => void;
 }      
 
-function getAccordionBorder(errors: string[]) : BorderType {
+function getAccordionBorder(status: "OK" | "WARNING" | "ERROR" | undefined) : BorderType {
     // if there is an error or not
-    if (errors.length === 0) return  {color: "background", side: "start", size: "large"};
-    if (errors.findIndex(e => e !== 'NO_RULE_FOUND') >= 0) return {color: "status-error", side: "start", size: "large"};            
+    if (status === undefined || status === "OK") return  {color: "background", side: "start", size: "large"};
+    if (status === "ERROR") return {color: "status-error", side: "start", size: "large"};            
     return {color: "status-warning", side: "start", size: "large"};    
 }
 
@@ -46,15 +48,14 @@ type ListBorderType =
       size?: SizeType;
     };
 
-function getListBorder(errors: string[]) : ListBorderType{
-    // if there is an error or not
-    if (errors.length === 0) return  { size: "none" };
-    if (errors.findIndex(e => e !== 'NO_RULE_FOUND') >= 0) return {color: "status-error", side: "left", size: "large"};            
+function getListBorder(status: "OK" | "WARNING" | "ERROR" | undefined) : ListBorderType{
+    // if there is an error or not    
+    if (status === undefined || status === "OK") return  { size: "none" };
+    if (status === "ERROR") return {color: "status-error", side: "left", size: "large"};            
     return {color: "status-warning", side: "left", size: "large"};    
 }
 
 function getReportError(index: number, error: string){
-    if (error === 'NO_RULE_FOUND') return (<></>);
     return (<Text key={index} margin={{ horizontal: 'medium'}}>{error}</Text>);      
 }
 
@@ -64,12 +65,12 @@ export function Reports(props: ReportsProps){
             <Accordion animate={true} multiple>            
              { props.reports.map((report, index) => {                 
                      return (
-                        <AccordionPanel key={index} label={(<Box direction="row" border={getAccordionBorder(report.errors!)} >
+                        <AccordionPanel key={index} label={(<Box direction="row" border={getAccordionBorder(report.status)} >
                                                     <SourceFileLink sourceFile={report.sourceFile!}/>
                                                 </Box>)}>
                             {report.errors!.length > 0 && (                                    
                                 <List data={report.errors} margin="none" pad="none" 
-                                    border={getListBorder(report.errors!)}>
+                                    border={getListBorder(report.status)}>
                                     {(error: string, index: number) => getReportError(index, error)}
                                 </List>
                             )}
@@ -79,7 +80,9 @@ export function Reports(props: ReportsProps){
                                 showRules={props.showRules}
                                 createRule={props.createRule}
                                 viewRule={props.viewRule}
-                                operations={report.ezEditions}/>)}
+                                operations={report.ezEditions}
+                                isIgnored={props.isOperationIgnored}
+                                setIgnored={props.ignoreOperation}/>)}
                         </AccordionPanel>
                      );
                  })}          

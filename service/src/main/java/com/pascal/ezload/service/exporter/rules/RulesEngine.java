@@ -40,6 +40,7 @@ public class RulesEngine {
         operation.fill(ezData);
 
         EzEdition ezEdition = new EzEdition();
+        ezEdition.setId(ezData.generateId());
         ezEdition.setData(ezData);
 
         List<RuleDefinition> compatibleRules = allRules.stream()

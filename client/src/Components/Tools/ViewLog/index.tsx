@@ -15,7 +15,7 @@ export interface ViewLogProps {
 
 export function ViewLog(props: ViewLogProps) {    
 
-    function showLog(){                   
+    function showLog(){        
         if (props.ezProcess !== undefined){
             const dynLogger = new DynamicLogger();
 
@@ -28,7 +28,6 @@ export function ViewLog(props: ViewLogProps) {
             function pushSection(s: string){
                 dynLogger.pushSection(s);
             }
-
             stream(ezApi.home.viewLogProcess(), (update) => { 
                 if (!dynLogger.isStopped()){
                     const newCommand = update.replaceAll('<script>', '').replaceAll('</script>', ';');
@@ -50,7 +49,10 @@ export function ViewLog(props: ViewLogProps) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(showLog, []) // Le [] fait que le useEffect ne sera appelé qu'une fois apres le 1er rendu
-
+/*  useEffect(() => {        
+    showLog();
+    })
+*/
     
     return (<Box id="ProcessOutput" pad="medium" >   
             <Text margin="small" size="xlarge" alignSelf="center">{valued(props.ezProcess?.title)}</Text>

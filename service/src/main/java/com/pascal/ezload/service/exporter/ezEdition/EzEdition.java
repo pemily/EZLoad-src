@@ -6,9 +6,12 @@ import com.pascal.ezload.service.model.EZOperation;
 import java.util.LinkedList;
 import java.util.List;
 
-// une operation qui impact la feuille MesOperations & Portefeuille
+// une EzEdition represente le resultat d'une régle
+// c'est a dire plusieurs operations sur les les feuilles MesOperations & Portefeuille
+// une EzEdition est le resultat d'une operation du relevé de banque
 public class EzEdition {
 
+    private String id;
     private RuleDefinitionSummary ruleDefinitionSummary;
     private List<EzOperationEdition> ezOperationEditions = new LinkedList<>();
     private List<EzPortefeuilleEdition> ezPortefeuilleEditions = new LinkedList<>();
@@ -16,7 +19,16 @@ public class EzEdition {
 
     private EzData data = new EzData();
 
-    public EzEdition(){}
+    public EzEdition(){
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public void setId(String id){
+        this.id = id;
+    }
 
     public List<EzOperationEdition> getEzOperationEditions() {
         return ezOperationEditions;

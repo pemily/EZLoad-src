@@ -3,6 +3,7 @@ package com.pascal.ezload.service.sources;
 import com.pascal.ezload.service.util.TitleWithFileRef;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 public interface Reporting extends Closeable {
 
@@ -24,7 +25,7 @@ public interface Reporting extends Closeable {
 
      String escape(String text);
 
-     default void close(){
+     default void close() throws IOException {
           popSection();
      }
 }

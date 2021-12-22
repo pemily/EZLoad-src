@@ -42,7 +42,7 @@ public class AuthManager {
         AuthInfo result = new AuthInfo();
         result.setUsername(info.getUsername());
         String dummyPassword = "";
-        if (passPhrase != null)
+        if (passPhrase != null && info.getPassword() != null)
             for (int i = 0; i < decryptPassword(info.getPassword(),passPhrase).length(); i++) dummyPassword += "@";
         result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : dummyPassword); // to send it to the browser
         return result;
@@ -87,6 +87,7 @@ public class AuthManager {
 
     // Get a encrypted password using PBKDF2 hash algorithm
     private static String encryptPassword(String clearPassword, String passPhrase) throws Exception {
+        if (clearPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(passPhrase));
         return byteArrayToHexStr(cipher.doFinal(clearPassword.getBytes(StandardCharsets.UTF_8)));
@@ -94,6 +95,7 @@ public class AuthManager {
 
     // Get a decrypted password
     private static String decryptPassword(String encryptedPassword, String passPhrase) throws Exception {
+        if (encryptedPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(passPhrase));
         return new String(cipher.doFinal(hexStrToByteArray(encryptedPassword)));

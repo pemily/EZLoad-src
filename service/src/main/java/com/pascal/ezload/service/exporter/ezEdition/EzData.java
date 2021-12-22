@@ -73,4 +73,8 @@ public class EzData {
     public boolean containsKey(String name) {
         return this.data.containsKey(name);
     }
+
+    public String generateId(){
+        return this.data.hashCode()+"";
+    }
 }

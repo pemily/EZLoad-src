@@ -35,7 +35,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd){
+    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd,  List<String> ignoreEzEditionId){
         throw new NotImplementedException();
     }
 

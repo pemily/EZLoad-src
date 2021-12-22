@@ -2,6 +2,10 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
+import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -9,6 +13,7 @@ import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.ModelUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +63,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
     @Override
     // return the list of EzEdition operation not saved
-    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd) throws Exception {
+    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId) throws Exception {
         reporting.info("Saving EZPortfolio...");
         MesOperations operations = ezPortfolio.getMesOperations();
 
@@ -68,26 +73,43 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         for (EzReport ezReportToAdd : operationsToAdd){
             if (ezReportToAdd.getErrors().size() > 0) errorFound = true;
             if (errorFound){
-                // if one of the operations is in error the report will be also in error (see the setter of the EzEdition in EzReport)
                 notSaved.add(ezReportToAdd);
             }
             else {
                 ezReportToAdd.getEzEditions()
                         .forEach(ezEdition -> {
-                            if (ezEdition.getEzOperationEditions() != null) {
-                                ezEdition.getEzOperationEditions()
-                                        .forEach(ezOperation -> {
-                                            operations.newOperation(ezEdition.getData(), ezOperation, ezEdition.getRuleDefinitionSummary());
-                                            nbOperationSaved.incrementAndGet();
-                                        });
-
-                                ezEdition.getEzPortefeuilleEditions().forEach(ezPortefeuilleEdition ->
-                                        ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition));
+                            if (ignoreEzEditionId.contains(ezEdition.getId())){
+                                EzOperationEdition ignoredOperation = new EzOperationEdition();
+                                ignoredOperation.setDescription("Operation Ignorée");
+                                String sourceFile = ezEdition.getData().get(ReportData.report_source);
+                                Optional<EnumEZBroker> broker = ModelUtils.fromSourceFile(sourceFile);
+                                ignoredOperation.setBroker(broker.map(EnumEZBroker::getEzPortfolioName).orElse(null));
+                                ignoredOperation.setDate(ModelUtils.getDateFromFile(sourceFile).toEzPortoflioDate());
+                                RuleDefinitionSummary ruleDefinitionSummary = new RuleDefinitionSummary();
+                                ruleDefinitionSummary.setBroker(broker.orElse(null));
+                                ruleDefinitionSummary.setName("IGNOREE");
+                                operations.newOperation(ezEdition.getData(), ignoredOperation, ruleDefinitionSummary);
+                                nbOperationSaved.incrementAndGet();
                             }
-                            else if (!ezEdition.getEzPortefeuilleEditions().isEmpty()){
-                                throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
-                                        +ezEdition.getRuleDefinitionSummary().getBroker()+"_v"+ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
-                                        +ezEdition.getRuleDefinitionSummary().getName());
+                            else {
+                                if (ezEdition.getErrors().size() > 0){
+                                    // if an operation is in error, but not ignored, stop the process
+                                    throw new IllegalStateException("Il y a une opération en erreur, vous devez la corriger ou l'ignorer. Voir le rapport: "+ezEdition.getData().get(ReportData.report_source));
+                                }
+                                else if (ezEdition.getEzOperationEditions() != null) {
+                                    ezEdition.getEzOperationEditions()
+                                            .forEach(ezOperation -> {
+                                                operations.newOperation(ezEdition.getData(), ezOperation, ezEdition.getRuleDefinitionSummary());
+                                                nbOperationSaved.incrementAndGet();
+                                            });
+
+                                    ezEdition.getEzPortefeuilleEditions().forEach(ezPortefeuilleEdition ->
+                                            ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition));
+                                } else if (!ezEdition.getEzPortefeuilleEditions().isEmpty()) {
+                                    throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
+                                            + ezEdition.getRuleDefinitionSummary().getBroker() + "_v" + ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
+                                            + ezEdition.getRuleDefinitionSummary().getName());
+                                }
                             }
                         });
             }

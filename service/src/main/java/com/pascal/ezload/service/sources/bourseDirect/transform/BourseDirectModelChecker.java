@@ -4,6 +4,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class BourseDirectModelChecker {
         this.model = model;
     }
 
-    public List<String> searchErrors(){
+    public List<String> searchErrors() throws IOException {
         try(Reporting ignored = reporting.pushSection("Vérification du Model extrait du PDF de BourseDirect...")){
 
             if (!"€".equals(model.getDeviseCredit())) {

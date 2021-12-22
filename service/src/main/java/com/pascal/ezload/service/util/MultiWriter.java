@@ -37,14 +37,7 @@ public class MultiWriter extends Writer {
 
     @Override
     public void close() {
-        for (Writer w : writers) {
-            try {
-                w.close();
-            }
-            catch (IOException e){
-                // Ignore exception if the log file cannot be writter (html page is perhaps lost)
-            }
-        }
+
     }
 
 };

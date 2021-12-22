@@ -115,4 +115,8 @@ public class HtmlReporting implements Reporting {
                 ;
     }
 
+    @Override
+    public void close() throws IOException {
+        Reporting.super.close();
+    }
 }

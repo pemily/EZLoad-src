@@ -42,7 +42,7 @@ public class EZLoad {
             // in this case, print, and relaunch a browser
             // TODO: faire un check sur le ping, si ca ne retourne pas pong => dialog swing pour dire de changer le port + display exception?
             String content = HttpUtil.urlContent(homePage+"/api/home/ping");
-            if ("pong".equals("pong")){
+            if ("pong".equals(content)){
                 openPage(homePage);
             }
             throw e;

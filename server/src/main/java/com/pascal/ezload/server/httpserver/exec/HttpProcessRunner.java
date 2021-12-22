@@ -37,6 +37,5 @@ public class HttpProcessRunner implements Closeable {
         reporting.close();
         logFileWriter.write("\n"+FILE_FOOTER+"\n</body></html>\n");
         logFileWriter.flush();
-        logFileWriter.close();
     }
 }

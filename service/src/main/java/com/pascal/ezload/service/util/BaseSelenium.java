@@ -3,6 +3,7 @@ package com.pascal.ezload.service.util;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -94,7 +95,14 @@ public class BaseSelenium {
     }
 
     protected void closeChrome(){
-        if (driver != null) driver.close();
+        if (driver != null){
+            try{
+                driver.close();
+            }
+            catch(RuntimeException ignore){
+                // ignore, nothing to do (Perhaps the browser was already closed by the user)
+            }
+        }
     }
 
     public WebDriver getDriver(){
@@ -136,6 +144,12 @@ public class BaseSelenium {
     public void waitUrlIsNot(String url){
         reporting.info("Waiting that url is no more: "+url);
         new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void waitPageLoaded(){
+        reporting.info("Waiting page is loaded");
+        new WebDriverWait(driver, defaultTimeoutInSec).until(
+                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
     }
 
     public WebElement findById(String id){
