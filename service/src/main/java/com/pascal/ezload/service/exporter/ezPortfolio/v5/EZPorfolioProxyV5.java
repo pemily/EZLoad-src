@@ -41,7 +41,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         ezPortfolio = new EZPortfolio("v5");
 
         List<SheetValues> ezSheets = sheets.batchGet(reporting,
-                                            "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":K",
+                                            "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":L",
                                                     "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":L",
                                                     "PRU!A"+FIRST_ROW_PRU+":A");
 
@@ -119,7 +119,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             reporting.info("Saving "+nbOperationSaved.get()+" operations");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
             sheets.batchUpdate(reporting,
-                    new SheetValues("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":K",
+                    new SheetValues("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
                     monPortefeuille,
                     new SheetValues("PRU!A"+(ezPortfolio.getPru().getNumberOfExistingPRUs()+FIRST_ROW_PRU) + ":A",

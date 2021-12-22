@@ -257,13 +257,15 @@ export function App(){
                                     <Button alignSelf="start" margin="medium" 
                                                 disabled={newShareValuesDirty 
                                                         || processRunning 
-                                                        // || reports.length === 0 || (reports[0].errors !== undefined && reports[0].errors.length > 0)
+                                                        || reports.length === 0 
+                                                        || reports[0].ezEditions === undefined
+                                                        || reports[0].ezEditions.length === 0
                                                         }
                                                 onClick={() =>
                                                 jsonCall(ezApi.engine.upload(operationIgnored))
                                                 .then(followProcess)
                                                 .then(r => setReportGenerated(true))
-                                                .catch(e => console.error(e))
+                                                .catch(e => console.error(e)) 
                                             }
                                             size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                     { mainSettings.ezPortfolio?.ezPortfolioUrl 
