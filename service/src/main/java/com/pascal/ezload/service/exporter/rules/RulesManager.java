@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.FileProcessor;
+import com.pascal.ezload.service.util.FileProcessor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;

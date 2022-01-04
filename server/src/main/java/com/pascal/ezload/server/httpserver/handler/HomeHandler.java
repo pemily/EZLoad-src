@@ -5,16 +5,14 @@ import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.WebData;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.exporter.EZPortfolioManager;
-import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
 import jakarta.inject.Inject;
@@ -54,10 +52,12 @@ public class HomeHandler {
     @Path("/main")
     @Produces(MediaType.APPLICATION_JSON)
     public WebData getMainData() throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps().validate();
-
-        return new WebData(SettingsManager.getConfigFilePath(),
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps().validate();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        return new WebData(SettingsManager.searchConfigFilePath(),
                             mainSettings,
+                             ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
@@ -72,12 +72,24 @@ public class HomeHandler {
     }
 
     @POST
-    @Path("/saveSettings")
+    @Path("/saveMainSettings")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public MainSettings saveSettings(MainSettings mainSettings) throws IOException {
-        SettingsManager.getInstance().saveConfigFile(mainSettings);
+    public MainSettings saveMainSettings(MainSettings mainSettings) throws IOException {
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        settingsManager.saveMainSettingsFile(mainSettings);
         return mainSettings.validate();
+    }
+
+    @POST
+    @Path("/saveEzProfil")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProfil saveEzProfil(EzProfil ezProfil) throws Exception {
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        String ezProfilName = settingsManager.loadProps().getActiveEzProfilFilename();
+        settingsManager.saveEzProfilFile(ezProfilName, ezProfil);
+        return ezProfil.validate();
     }
 
     @POST
@@ -101,16 +113,19 @@ public class HomeHandler {
             throw new IllegalArgumentException("Cette operation n'est pas encore développé pour le courtier: "+courtier.getEzPortfolioName());
         }
         else {
-            MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-            return processManager.createNewRunningProcess(mainSettings,
+            SettingsManager settingsManager = SettingsManager.getInstance();
+            MainSettings mainSettings = settingsManager.loadProps();
+            EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+            return processManager.createNewRunningProcess(mainSettings, ezProfil,
                     "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
                     ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     List<BourseDirectEZAccountDeclaration> accountsExtracted =
-                            new BourseDirectSearchAccounts(mainSettings, reporting).extract(chromeVersion, SettingsManager.saveNewChromeDriver());
+                            new BourseDirectSearchAccounts(mainSettings, ezProfil, reporting).extract(chromeVersion, settingsManager.saveNewChromeDriver());
                     // copy the accounts into the main settings
-                    List<BourseDirectEZAccountDeclaration> accountsDefined = mainSettings.getBourseDirect().getAccounts();
+
+                    List<BourseDirectEZAccountDeclaration> accountsDefined = ezProfil.getBourseDirect().getAccounts();
                     reporting.info(accountsDefined.size()+" Compte(s) trouvé(s)");
                     accountsExtracted.stream()
                             .filter(acc ->
@@ -119,9 +134,9 @@ public class HomeHandler {
                                             .noneMatch(accDefined -> accDefined.getNumber().equals(acc.getNumber())))
                             .forEach(newAccount -> {
                                         reporting.info("Ajout du compte: "+newAccount.getNumber()+" de "+newAccount.getName());
-                                        mainSettings.getBourseDirect().getAccounts().add(newAccount);
+                                        ezProfil.getBourseDirect().getAccounts().add(newAccount);
                                     });
-                    SettingsManager.getInstance().saveConfigFile(mainSettings);
+                    settingsManager.saveEzProfilFile(mainSettings.getActiveEzProfilFilename(), ezProfil);
                 }
             );
         }

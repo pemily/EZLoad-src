@@ -8,7 +8,7 @@ import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
-public class BourseDirectEZAccountDeclaration extends Checkable implements EZAccountDeclaration, AccountData {
+public class BourseDirectEZAccountDeclaration extends Checkable<BourseDirectEZAccountDeclaration> implements EZAccountDeclaration, AccountData {
 
     public enum Field{name, number}
 
@@ -52,9 +52,10 @@ public class BourseDirectEZAccountDeclaration extends Checkable implements EZAcc
         this.active = active;
     }
 
-    public void validate(){
+    public BourseDirectEZAccountDeclaration validate(){
         new StringValue(true).validate(this, Field.name.name(), name);
         new StringValue(true).validate(this, Field.number.name(), number);
+        return this;
     }
 
 }

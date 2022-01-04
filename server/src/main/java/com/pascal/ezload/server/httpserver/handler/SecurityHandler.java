@@ -3,6 +3,7 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.AuthInfo;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
@@ -27,8 +28,10 @@ public class SecurityHandler {
     public void createUserPassword(
             @NotNull @QueryParam("courtier") EnumEZBroker courtier,
             @NotNull AuthInfo authParam) throws Exception {
-
-        AuthManager authManager = SettingsManager.getAuthManager();
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps().validate();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
         AuthInfo authInfo = authManager.getAuthInfo(courtier);
         if (authInfo == null){
             authManager.saveAuthInfo(courtier, authParam);
@@ -47,7 +50,11 @@ public class SecurityHandler {
     @Path("/info")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
-        return SettingsManager.getAuthManager().getAuthWithDummyPassword(courtier);
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps().validate();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
+        return authManager.getAuthWithDummyPassword(courtier);
     }
 
     @GET
@@ -55,14 +62,16 @@ public class SecurityHandler {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public EzProcess gDriveCheck() throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        return processManager.createNewRunningProcess(mainSettings,
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        return processManager.createNewRunningProcess(mainSettings, ezProfil,
                 "Validation du fichier de sécurité Google Drive",
                 ProcessManager.getLog(mainSettings, "gDriveValidationSecretFile", ".html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try{
-                        GDriveConnection.getService(reporting, SettingsManager.getInstance().loadProps().getEzPortfolio().getGdriveCredsFile());
+                        GDriveConnection.getService(reporting, SettingsManager.getInstance().getActiveEzProfil(mainSettings).getEzPortfolio().getGdriveCredsFile());
                         // si pas d'exception
                         reporting.info("La connection est validé, vous pouvez utiliser EZLoad");
                     }

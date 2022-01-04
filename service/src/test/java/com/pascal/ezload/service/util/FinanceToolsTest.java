@@ -3,6 +3,7 @@ package com.pascal.ezload.service.util;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZAction;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

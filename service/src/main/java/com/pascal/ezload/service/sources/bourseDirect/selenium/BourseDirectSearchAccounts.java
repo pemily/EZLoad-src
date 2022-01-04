@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
@@ -13,8 +14,8 @@ import java.util.stream.Collectors;
 
 public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
 
-    public BourseDirectSearchAccounts(MainSettings mainSettings, Reporting reporting) {
-        super(reporting, mainSettings);
+    public BourseDirectSearchAccounts(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting) {
+        super(reporting, mainSettings, ezProfil);
     }
 
     // the devise and owner address will not be filled

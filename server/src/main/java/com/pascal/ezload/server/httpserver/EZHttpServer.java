@@ -1,11 +1,11 @@
 package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.server.httpserver.handler.LastAccessProvider;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.FileLinkCreator;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -77,10 +77,10 @@ public class EZHttpServer {
     }
 
 
-    public FileLinkCreator fileLinkCreator(MainSettings mainSettings){
+    public FileLinkCreator fileLinkCreator(MainSettings mainSettings, EzProfil ezProfil){
         return (reporting, sourceFile) -> {
-            if (sourceFile.startsWith(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect))){
-                String file = sourceFile.substring(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect).length());
+            if (sourceFile.startsWith(SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect))){
+                String file = sourceFile.substring(SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect).length());
                 file = file.replace('\\', '/'); // pour windows
                 return "<a target='"+PDF_BOURSE_DIRECT_TARGET+"' href='"+PDF_BOURSE_DIRECT_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
             }

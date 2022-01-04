@@ -1,7 +1,7 @@
 import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer } from "grommet";
 import { Add, Trash, Validate, SchedulePlay } from 'grommet-icons';
-import { saveSettings, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { saveEzProfil, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
+import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
 import { ConfigStartDate } from '../ConfigStartDate';
@@ -14,6 +14,8 @@ export interface ConfigProps {
   configFile: string;
   mainSettings: MainSettings;
   mainSettingsStateSetter: (settings: MainSettings) => void;
+  ezProfil: EzProfil;
+  ezProfilStateSetter: (settings: EzProfil) => void;
   bourseDirectAuthInfo: AuthInfo|undefined;
   bourseDirectAuthInfoSetter: (authInfo: AuthInfo) => void;
   readOnly: boolean;
@@ -87,35 +89,35 @@ export function Config(props: ConfigProps) {
                     <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile})</Text></Box>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
-                            <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.mainSettings?.ezPortfolio?.ezPortfolioUrl}
-                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
+                            <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.ezProfil?.ezPortfolio?.ezPortfolioUrl}
+                                errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
                                 readOnly={props.readOnly}
                                 onChange={newValue  => 
-                                saveSettings({ ...props.mainSettings,
-                                      ezPortfolio: { ...props.mainSettings.ezPortfolio, ezPortfolioUrl: newValue }
-                               }, props.mainSettingsStateSetter)
+                                    saveEzProfil({ ...props.ezProfil,
+                                      ezPortfolio: { ...props.ezProfil.ezPortfolio, ezPortfolioUrl: newValue }
+                               }, props.ezProfilStateSetter)
                                }/>
                         </Box>
 
                         <Box margin="none" pad="none" direction="row">
-                            <TextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.mainSettings?.ezPortfolio?.gdriveCredsFile}
-                                errorMsg={props.mainSettings?.ezPortfolio?.field2ErrorMsg?.gdriveCredsFile}
+                            <TextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.ezProfil?.ezPortfolio?.gdriveCredsFile}
+                                errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.gdriveCredsFile}
                                 readOnly={props.readOnly}
-                                onChange={newValue  => saveSettings(
-                                    { ...props.mainSettings,
-                                          ezPortfolio: { ...props.mainSettings.ezPortfolio, gdriveCredsFile: newValue }
-                                   }, props.mainSettingsStateSetter)}/>
+                                onChange={newValue  => saveEzProfil(
+                                    { ...props.ezProfil,
+                                          ezPortfolio: { ...props.ezProfil.ezPortfolio, gdriveCredsFile: newValue }
+                                   }, props.ezProfilStateSetter)}/>
                            <Help title="Comment obtenir son fichier de sécurité?">
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">                                   
-                                <Markdown>{genSecurityFile(props.mainSettings?.ezPortfolio?.gdriveCredsFile)}</Markdown>
-                                {valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === "" &&
+                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>
+                                {valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === "" &&
                                     (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner l'url de EZPortfolio</span>"}</Markdown>)}
-                                {valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === "" &&
+                                {valued(props.ezProfil?.ezPortfolio?.gdriveCredsFile) === "" &&
                                     (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner le fichier de sécurité</span>"}</Markdown>)}
                                 <Button 
                                     disabled={ props.readOnly 
-                                        || valued(props.mainSettings?.ezPortfolio?.ezPortfolioUrl) === ""
-                                        || valued(props.mainSettings?.ezPortfolio?.gdriveCredsFile) === ""} 
+                                        || valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === ""
+                                        || valued(props.ezProfil?.ezPortfolio?.gdriveCredsFile) === ""}
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
                                             .then(props.followProcess)
@@ -128,13 +130,13 @@ export function Config(props: ConfigProps) {
 
                     <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">
-                        <TextField id="ezDownloadDir" label="Emplacement des rapports" value={props.mainSettings.ezLoad?.downloadDir}
+                        <TextField id="ezDownloadDir" label="Emplacement des rapports" value={props.ezProfil.downloadDir}
                             isRequired={true} errorMsg={props.mainSettings.ezLoad?.field2ErrorMsg?.downloadDir}
                             readOnly={props.readOnly}
-                            onChange={newValue  => saveSettings(
-                                { ...props.mainSettings,
-                                      ezLoad: { ...props.mainSettings.ezLoad, downloadDir: newValue }
-                               }, props.mainSettingsStateSetter)}/>
+                            onChange={newValue  => saveEzProfil(
+                                { ...props.ezProfil,
+                                    downloadDir: newValue
+                               }, props.ezProfilStateSetter)}/>
                     </Box>
                     <Box>
                         <Box direction="row" justify="start">
@@ -166,23 +168,23 @@ export function Config(props: ConfigProps) {
                                 </TableHeader>
                                 <TableBody>
                             {                                                                
-                                props.mainSettings?.bourseDirect?.accounts?.map((account, index) =>                                     
+                                props.ezProfil?.bourseDirect?.accounts?.map((account, index) =>
                                     <TableRow key={"BD"+index} >
                                     <TableCell scope="row" pad="xsmall" margin="none">
                                     <TextField key={"nameBD"+index} isRequired={true} id={'BourseDirectAccount'+index} value={account.name}
                                      readOnly={props.readOnly}
                                      errorMsg={account.field2ErrorMsg?.name}
                                      onChange={newValue => 
-                                        saveSettings(
-                                            { ...props.mainSettings,
+                                        saveEzProfil(
+                                            { ...props.ezProfil,
                                                   bourseDirect: {
-                                                      ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
+                                                      ...props.ezProfil.bourseDirect,
+                                                            accounts: [ ...props?.ezProfil?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, name: newValue},
-                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.ezProfil?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
-                                           }, props.mainSettingsStateSetter)
+                                           }, props.ezProfilStateSetter)
                                     }/>
                                     </TableCell>
                                     <TableCell scope="row" pad="xsmall" margin="none">
@@ -190,32 +192,32 @@ export function Config(props: ConfigProps) {
                                      readOnly={props.readOnly}
                                      errorMsg={account.field2ErrorMsg?.number}
                                      onChange={newValue => 
-                                         saveSettings(
-                                            { ...props.mainSettings,
+                                        saveEzProfil(
+                                            { ...props.ezProfil,
                                                   bourseDirect: {
-                                                      ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
+                                                      ...props.ezProfil.bourseDirect,
+                                                            accounts: [ ...props?.ezProfil?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, number: newValue},
-                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.ezProfil?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
-                                           }, props.mainSettingsStateSetter)                                    
+                                           }, props.ezProfilStateSetter)                                    
                                     }/>
                                     </TableCell>
                                     <TableCell scope="row" pad="xsmall" margin="none">
                                     <CheckBox key={"activeBD"+index} reverse checked={account.active}
                                         disabled={props.readOnly}
                                         onChange={evt => 
-                                         saveSettings(
-                                            { ...props.mainSettings,
+                                            saveEzProfil(
+                                            { ...props.ezProfil,
                                                   bourseDirect: {
-                                                      ...props.mainSettings.bourseDirect,
-                                                            accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),
+                                                      ...props.ezProfil.bourseDirect,
+                                                            accounts: [ ...props?.ezProfil?.bourseDirect!.accounts!.slice(0,index),
                                                                 {...account, active: evt.target.checked},
-                                                                ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1),
+                                                                ...props?.ezProfil?.bourseDirect!.accounts!.slice(index+1),
                                                             ]
                                                     }
-                                           }, props.mainSettingsStateSetter)     
+                                           }, props.ezProfilStateSetter)     
                                     }/>
                                     </TableCell>
                                     <TableCell scope="row" pad="xsmall" margin="none">
@@ -229,15 +231,15 @@ export function Config(props: ConfigProps) {
                                               {
                                                 label: 'Oui',
                                                 onClick: () => {
-                                                    saveSettings(
-                                                        { ...props.mainSettings,
+                                                    saveEzProfil(
+                                                        { ...props.ezProfil,
                                                               bourseDirect: {
-                                                                  ...props.mainSettings.bourseDirect,
-                                                                        accounts: [ ...props?.mainSettings?.bourseDirect!.accounts!.slice(0,index),                                                                            
-                                                                            ...props?.mainSettings?.bourseDirect!.accounts!.slice(index+1)
+                                                                  ...props.ezProfil.bourseDirect,
+                                                                        accounts: [ ...props?.ezProfil?.bourseDirect!.accounts!.slice(0,index),
+                                                                            ...props?.ezProfil?.bourseDirect!.accounts!.slice(index+1)
                                                                         ]
                                                                 }
-                                                       }, props.mainSettingsStateSetter)                                                         
+                                                       }, props.ezProfilStateSetter)                                                         
                                                 }
                                               },
                                               {
@@ -263,12 +265,12 @@ export function Config(props: ConfigProps) {
                             <Box direction="row" margin="none" pad="none">
                                 <Button size="small" icon={<Add size='small'/>} 
                                     disabled={props.readOnly}
-                                    label="Nouveau" onClick={() => saveSettings(
-                                    {...props.mainSettings,
-                                        bourseDirect: { ...props.mainSettings?.bourseDirect,
-                                            accounts: props.mainSettings?.bourseDirect?.accounts === undefined ?
-                                                    [{name: '', number: '', active: false}] : [...props.mainSettings?.bourseDirect?.accounts, {name: '', number: '', active: false}]
-                                        }}, props.mainSettingsStateSetter
+                                    label="Nouveau" onClick={() => saveEzProfil(
+                                    {...props.ezProfil,
+                                        bourseDirect: { ...props.ezProfil?.bourseDirect,
+                                            accounts: props.ezProfil?.bourseDirect?.accounts === undefined ?
+                                                    [{name: '', number: '', active: false}] : [...props.ezProfil?.bourseDirect?.accounts, {name: '', number: '', active: false}]
+                                        }}, props.ezProfilStateSetter
                                 )} />
                                 <Box margin="small" pad="none"></Box>
                                 <Button

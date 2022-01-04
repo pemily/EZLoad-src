@@ -5,7 +5,7 @@ import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.HttpValue;
 
-public class EZPortfolioSettings extends Checkable {
+public class EZPortfolioSettings extends Checkable<EZPortfolioSettings> {
 
     public enum Field {gdriveCredsFile, ezPortfolioUrl}
 
@@ -29,9 +29,10 @@ public class EZPortfolioSettings extends Checkable {
     }
 
     @Override
-    public void validate() {
+    public EZPortfolioSettings validate() {
         new FileValue(true).validate(this, Field.gdriveCredsFile.name(), gdriveCredsFile);
         new HttpValue(true, SettingsManager.EZPORTFOLIO_GDRIVE_URL_PREFIX).validate(this, Field.ezPortfolioUrl.name(), ezPortfolioUrl);
+        return this;
     }
 
 }

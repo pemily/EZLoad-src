@@ -64,7 +64,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
     }
 
 
-    public void validate(){
+    public RuleDefinition validate(){
         // TODO ici vérifiez que chaque expression n'utilise pas une variable qui n'existe pas et que l'expression est correcte
 
         new StringValue(true).validate(this, Field.name.name(), getName());
@@ -74,5 +74,6 @@ public class RuleDefinition extends RuleDefinitionSummary {
 
         operationRules.forEach(OperationRule::validate);
         portefeuilleRules.forEach(PortefeuilleRule::validate);
+        return this;
     }
 }

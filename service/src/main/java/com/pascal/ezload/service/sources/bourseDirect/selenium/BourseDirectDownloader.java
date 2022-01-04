@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
-import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.model.EZDate;
@@ -27,8 +27,8 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     public static final String BOURSE_DIRECT_PDF_PREFIX = "boursedirect-";
     public static final String BOURSE_DIRECT_PDF_SUFFIX = ".pdf";
 
-    public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings) {
-        super(reporting, mainSettings);
+    public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings, EzProfil ezProfil) {
+        super(reporting, mainSettings, ezProfil);
     }
 
     public static Predicate<File> fileFilter(){
@@ -37,10 +37,11 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 && getDateFromPdfFilePath(file.getName()) != null;
     }
 
-    public static Predicate<File> dirFilter(MainSettings mainSettings){
-        return dir -> mainSettings.getBourseDirect().getAccounts()
-                .stream()
-                .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
+    public static Predicate<File> dirFilter(EzProfil ezProfil){
+        return dir ->
+                ezProfil.getBourseDirect().getAccounts()
+                        .stream()
+                        .anyMatch(acc -> dir.getAbsolutePath().contains(acc.getName()));
     }
 
     public void start(String currentChromeVersion, Consumer<String> newDriverPathSaver, EZPortfolioProxy ezPortfolioProxy) throws IOException {
@@ -104,7 +105,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
                     Month monthToDownload = dateFromPage;
                     do {
-                        extractMonthActivities(account, cptIndex, monthToDownload);
+                        extractMonthActivities(ezProfil.getDownloadDir(), account, cptIndex, monthToDownload);
                         monthToDownload = clickMoisSuivant();
                     }
                     while (monthToDownload != null);
@@ -117,7 +118,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
     // return true if we must stop the download of the previous monthes
     // return false if we should continue
-    private void extractMonthActivities(BourseDirectEZAccountDeclaration account, String cptIndex, Month month) {
+    private void extractMonthActivities(String downloadDir, BourseDirectEZAccountDeclaration account, String cptIndex, Month month) throws IOException {
         reporting.info("Checking all days to find files to download...");
         List<WebElement> allDayActivities = getAllElements("div[@id='avis']//a", "linkE");
 
@@ -127,8 +128,8 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 .collect(Collectors.toList());
 
         for (EZDate d : allDays) {
-            if (!new File(getNewFilename(account, d)).exists()) { // si le fichier pdf n'existe pas deja
-                downloadPdf(account, cptIndex, d);
+            if (!new File(getNewFilename(downloadDir, account, d)).exists()) { // si le fichier pdf n'existe pas deja
+                downloadPdf(downloadDir, account, cptIndex, d);
             }
         }
     }
@@ -215,22 +216,22 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
     }
 
 
-    private void downloadPdf(BourseDirectEZAccountDeclaration account, String cptIndex, EZDate d) {
+    private void downloadPdf(String downloadDir, BourseDirectEZAccountDeclaration account, String cptIndex, EZDate d) throws IOException {
         String month = EZDate.leadingZero(d.getMonth());
         String day = EZDate.leadingZero(d.getDay());
         String downloadUrl = "https://www.boursedirect.fr/priv/releveOpe.php?nc="+cptIndex+"&type=RO&year="+d.getYear()+"&month="+month+"&day="+day+"&trash=/avis.pdf&pdf=1";
 
-        String newFile = getNewFilename(account, d);
+        String newFile = getNewFilename(downloadDir, account, d);
         reporting.info("Download pdf file from URL: "+downloadUrl);
         reporting.info("Creating file "+newFile);
         download(downloadUrl, newFile);
     }
 
 
-    private String getNewFilename(BourseDirectEZAccountDeclaration account, EZDate d){
+    private String getNewFilename(String downloadDir, BourseDirectEZAccountDeclaration account, EZDate d) throws IOException {
         String month = EZDate.leadingZero(d.getMonth());
         String day = EZDate.leadingZero(d.getDay());
-        return SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect)
+        return downloadDir
                 + File.separator + account.getName() // if this change, review the method  getAccountNameFromPdfFilePath
                 + File.separator + d.getYear()
                 + File.separator +

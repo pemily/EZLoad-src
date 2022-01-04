@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.download;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
@@ -31,8 +32,9 @@ public class BourseDirectDownloaderTest {
         BourseDirectEZAccountDeclaration aaaaa = new BourseDirectEZAccountDeclaration();
         aaaaa.setName("AAAAA");
         bourseDircectSettings.setAccounts(Arrays.asList(aaaa,aaa,aaaaa));
-        mainSettings.setBourseDirect(bourseDircectSettings);
-        BourseDirectDownloader bdd = new BourseDirectDownloader(new LoggerReporting(), mainSettings);
+        EzProfil ezProfil = new EzProfil();
+        ezProfil.setBourseDirect(bourseDircectSettings);
+        BourseDirectDownloader bdd = new BourseDirectDownloader(new LoggerReporting(), mainSettings, ezProfil);
         Assertions.assertEquals("AAAA", bdd.getAccountFromPdfFilePath("/AAAA/2021/boursedirect-2021-01-23.pdf").getName());
         Assertions.assertEquals("AAA", bdd.getAccountFromPdfFilePath("/AAA/2021/boursedirect-2021-01-23.pdf").getName());
         Assertions.assertEquals("AAAAA", bdd.getAccountFromPdfFilePath("/AAAAA/2021/boursedirect-2021-01-23.pdf").getName());

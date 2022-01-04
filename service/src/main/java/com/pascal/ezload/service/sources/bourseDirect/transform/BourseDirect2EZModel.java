@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
-import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
@@ -9,6 +9,7 @@ import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDire
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectOperation;
 import com.pascal.ezload.service.util.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +17,16 @@ import java.util.List;
 public class BourseDirect2EZModel {
 
     private Reporting reporting;
-    private MainSettings mainSettings;
+    private EzProfil ezProfil;
 
-    public BourseDirect2EZModel(MainSettings mainSettings, Reporting reporting){
+    public BourseDirect2EZModel(EzProfil ezProfil, Reporting reporting){
         this.reporting = reporting;
-        this.mainSettings = mainSettings;
+        this.ezProfil = ezProfil;
     }
     
-    public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) {
+    public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) throws IOException {
         reporting.info("Creating Standard Model...");
-        EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, model.getBrokerFileVersion(), BourseDirectAnalyser.getSourceRef(mainSettings, sourceFile));
+        EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, model.getBrokerFileVersion(), BourseDirectAnalyser.getSourceRef(ezProfil, sourceFile));
         ezModel.setReportDate(model.getDateAvisOperation());
 
         EZAccount EZAccount = new EZAccount();

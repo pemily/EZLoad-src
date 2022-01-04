@@ -8,10 +8,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.apache.commons.beanutils.PropertyUtils;
-
-import java.net.URI;
 
 @Path("config")
 public class Config {
@@ -58,7 +55,7 @@ public class Config {
         else if (currentValue instanceof Integer){
             PropertyUtils.setNestedProperty(mainSettings, key, Integer.parseInt(value));
         }
-        SettingsManager.getInstance().saveConfigFile(mainSettings);
+        SettingsManager.getInstance().saveMainSettingsFile(mainSettings);
         return mainSettings;
     }
 }

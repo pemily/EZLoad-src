@@ -2,18 +2,13 @@ package com.pascal.ezload.service.bourseDirect;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
 import com.pascal.ezload.service.gdrive.SheetValues;
@@ -167,9 +162,11 @@ public class BourseDirectParserTest {
         ShareUtil shareUtil = new ShareUtil(new PRU(new SheetValues("a1:a", new LinkedList<>())), new HashSet<>());
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
-        ezLoad.setDownloadDir(new File(getFilePath(file +".pdf").getFile()).getParent());
         mainSettings.setEzLoad(ezLoad);
-        EZModel brModel = new BourseDirectAnalyser(mainSettings).start(reporting, bracc, getFilePath(file +".pdf").getFile());
+
+        EzProfil ezProfil = new EzProfil();
+        ezProfil.setDownloadDir(new File(getFilePath(file +".pdf").getFile()).getParent());
+        EZModel brModel = new BourseDirectAnalyser(mainSettings, ezProfil).start(reporting, bracc, getFilePath(file +".pdf").getFile());
         String jsonBrModel = ModelUtils.toJson(brModel);
         String report = reporting.getReport();
 

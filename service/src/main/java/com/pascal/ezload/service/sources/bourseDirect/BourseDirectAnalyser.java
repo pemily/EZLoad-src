@@ -1,20 +1,21 @@
 package com.pascal.ezload.service.sources.bourseDirect;
 
+import com.pascal.ezload.service.config.EzProfil;
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.FileProcessor;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
-import com.pascal.ezload.service.util.PdfTextExtractor;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.ezload.service.util.FileProcessor;
+import com.pascal.ezload.service.util.PdfTextExtractor;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -23,10 +24,12 @@ import java.util.List;
 public class BourseDirectAnalyser {
 
     private final MainSettings mainSettings;
+    private final EzProfil ezProfil;
     private final static int UNKNOWN_VERSION = -1;
 
-    public BourseDirectAnalyser(MainSettings mainSettings) {
+    public BourseDirectAnalyser(MainSettings mainSettings, EzProfil ezProfil) {
         this.mainSettings = mainSettings;
+        this.ezProfil = ezProfil;
     }
 
     private interface IProcess<R> {
@@ -34,7 +37,7 @@ public class BourseDirectAnalyser {
     }
 
     public List<String> getFilesNotYetLoaded(Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
-        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(mainSettings, pdfFilePath)));
+        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(ezProfil, pdfFilePath)));
     }
 
     public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
@@ -42,12 +45,13 @@ public class BourseDirectAnalyser {
     }
 
     private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
-        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings);
+        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings, ezProfil);
 
         try(Reporting ignored = reporting.pushSection("Analyse des fichiers téléchargés...")) {
-            reporting.info("Répertoire des fichiers à analyser: "+SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect));
-              return new FileProcessor(SettingsManager.getDownloadDir(mainSettings, EnumEZBroker.BourseDirect),
-                                        BourseDirectDownloader.dirFilter(mainSettings), BourseDirectDownloader.fileFilter())
+            String downloadDir = SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect);
+            reporting.info("Répertoire des fichiers à analyser: "+downloadDir);
+              return new FileProcessor(downloadDir,
+                                        BourseDirectDownloader.dirFilter(ezProfil), BourseDirectDownloader.fileFilter())
                     .mapFile(pdfFilePath -> {
                         EZAccountDeclaration account = bourseDirectDownloader.getAccountFromPdfFilePath(pdfFilePath);
                         EZDate pdfDate = BourseDirectDownloader.getDateFromPdfFilePath(pdfFilePath);
@@ -82,21 +86,21 @@ public class BourseDirectAnalyser {
                 errors = new BourseDirectModelChecker(reporting, model).searchErrors();
 
                 if (errors.size() == 0) {
-                    return new BourseDirect2EZModel(mainSettings, reporting).create(pdfFilePath, EZAccountDeclaration, model);
+                    return new BourseDirect2EZModel(ezProfil, reporting).create(pdfFilePath, EZAccountDeclaration, model);
                 }
             }
             catch(Exception e){
                 reporting.error("Erreur pendant l'analyze", e);
                 errors.add("Erreur pendant l'analyze: "+e.getMessage());
             }
-            EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, getSourceRef(mainSettings, pdfFilePath));
+            EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, getSourceRef(ezProfil, pdfFilePath));
             ezModel.setErrors(errors);
             return ezModel;
         }
     }
 
-    public static String getSourceRef(MainSettings mainSettings, String pdfFilePath) {
-        String file = pdfFilePath.substring(mainSettings.getEzLoad().getDownloadDir().length()).replace('\\', '/');
+    public static String getSourceRef(EzProfil ezProfil, String pdfFilePath) {
+        String file = pdfFilePath.substring(ezProfil.getDownloadDir().length()).replace('\\', '/');
         if (file.startsWith("/")) file = file.substring(1);
         return file;
     }

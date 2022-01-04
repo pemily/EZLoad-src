@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
 import com.pascal.ezload.service.config.AuthInfo;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -18,12 +19,14 @@ import java.util.function.Consumer;
 public class BourseDirectSeleniumHelper extends BaseSelenium {
 
     protected final MainSettings mainSettings;
+    protected final EzProfil ezProfil;
     protected final BourseDirectSettings bourseDirectSettings;
 
-    public BourseDirectSeleniumHelper(Reporting reporting, MainSettings mainSettings) {
+    public BourseDirectSeleniumHelper(Reporting reporting, MainSettings mainSettings, EzProfil ezProfil) {
         super(reporting);
         this.mainSettings = mainSettings;
-        this.bourseDirectSettings = mainSettings.getBourseDirect();
+        this.ezProfil = ezProfil;
+        this.bourseDirectSettings = ezProfil.getBourseDirect();
     }
 
     public void login(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
@@ -42,7 +45,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
             WebElement login = findById("bd_auth_login_type_login");
             WebElement password = findById("bd_auth_login_type_password");
 
-            AuthInfo authInfo = SettingsManager.getAuthManager().getAuthInfo(EnumEZBroker.BourseDirect);
+            AuthInfo authInfo = SettingsManager.getAuthManager(mainSettings, ezProfil).getAuthInfo(EnumEZBroker.BourseDirect);
             if (authInfo != null || StringUtils.isBlank(login.getText())) {
                 if (authInfo != null && authInfo.getUsername() != null) login.sendKeys(authInfo.getUsername());
                 if (authInfo != null && authInfo.getPassword() !=null){

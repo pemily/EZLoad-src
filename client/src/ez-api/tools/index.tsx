@@ -1,4 +1,4 @@
-import { Api, MainSettings, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -60,11 +60,16 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-
-export function saveSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){      
-  jsonCall(ezApi.home.saveSettings(settings))
+export function saveEzProfil(settings: EzProfil, updModel: (settings: EzProfil) => void){      
+  jsonCall(ezApi.home.saveEzProfil(settings))
     .then(r => updModel(r))
-    .catch(e => console.error("Save Settings Error: ", e));
+    .catch(e => console.error("Save Profil Error: ", e));
+}
+
+export function saveMainSettings(settings: MainSettings, updModel: (settings: MainSettings) => void){      
+  jsonCall(ezApi.home.saveMainSettings(settings))
+    .then(r => updModel(r))
+    .catch(e => console.error("Save Main Settings Error: ", e));
 }
 
 export function savePassword(courtier: 'BourseDirect', username: string|undefined, password: string|undefined, updModel: (authInfo: AuthInfo) => void){

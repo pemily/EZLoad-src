@@ -2,6 +2,7 @@ package com.pascal.ezload.server.httpserver.exec;
 
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.server.httpserver.EzServerState;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.util.Tail;
 
@@ -42,7 +43,7 @@ public class ProcessManager {
         void run(HttpProcessRunner processRunner) throws Exception;
     }
 
-    public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, String title, String logFile, RunnableWithException runnable) throws IOException {
+    public synchronized EzProcess createNewRunningProcess(MainSettings mainSettings, EzProfil ezProfil, String title, String logFile, RunnableWithException runnable) throws IOException {
         EzProcess latestProcess = getLatestProcess();
         if (latestProcess == null || !serverState.isProcessRunning()){
             EzProcess p = new EzProcess(title, logFile);
@@ -51,7 +52,7 @@ public class ProcessManager {
             ezProcesses.add(p);
 
             executor.submit(() -> {
-                try (HttpProcessRunner processLogger = new HttpProcessRunner(fileWriter, server.fileLinkCreator(mainSettings))) {
+                try (HttpProcessRunner processLogger = new HttpProcessRunner(fileWriter, server.fileLinkCreator(mainSettings, ezProfil))) {
                     try {
                         processLogger.header(processLogger.getReporting().escape(title));
                         runnable.run(processLogger);

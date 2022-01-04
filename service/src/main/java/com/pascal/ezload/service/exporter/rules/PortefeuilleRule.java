@@ -3,7 +3,7 @@ package com.pascal.ezload.service.exporter.rules;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
-public class PortefeuilleRule extends Checkable {
+public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
 
     public enum Field{ condition, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
         portefeuilleTickerGoogleFinanceExpr, portefeuillePaysExpr, portefeuilleSecteurExpr, portefeuilleIndustrieExpr,
@@ -131,7 +131,7 @@ public class PortefeuilleRule extends Checkable {
     }
 
     @Override
-    public void validate() {
+    public PortefeuilleRule validate() {
         new StringValue(false).validate(this, Field.condition.name(), condition);
         new StringValue(true).validate(this, Field.portefeuilleValeurExpr.name(), portefeuilleValeurExpr);
         new StringValue(true).validate(this, Field.portefeuilleCompteExpr.name(), portefeuilleCompteExpr);
@@ -145,6 +145,6 @@ public class PortefeuilleRule extends Checkable {
         new StringValue(true).validate(this, Field.portefeuillePrixDeRevientExpr.name(), portefeuillePrixDeRevientExpr);
         new StringValue(true).validate(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr);
         new StringValue(true).validate(this, Field.portefeuilleDividendeAnnuelExpr.name(), portefeuilleDividendeAnnuelExpr);
-
+        return this;
     }
 }

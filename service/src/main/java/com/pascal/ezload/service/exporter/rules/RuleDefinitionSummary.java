@@ -3,7 +3,7 @@ package com.pascal.ezload.service.exporter.rules;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.Checkable;
 
-public class RuleDefinitionSummary extends Checkable {
+public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
 
     private EnumEZBroker broker; // part of the unique key
     private int brokerFileVersion;  // part of the unique key
@@ -53,6 +53,7 @@ public class RuleDefinitionSummary extends Checkable {
     }
 
     @Override
-    public void validate() {
+    public RuleDefinitionSummary validate() {
+        return this;
     }
 }

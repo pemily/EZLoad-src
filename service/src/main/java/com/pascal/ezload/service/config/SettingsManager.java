@@ -2,9 +2,7 @@ package com.pascal.ezload.service.config;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +11,19 @@ import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
+import com.pascal.ezload.service.util.FileProcessor;
 import com.pascal.ezload.service.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 public class SettingsManager {
+    private static final Logger logger = Logger.getLogger(SettingsManager.class);
+
     private final String configFile;
+    private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private static final String ezProfilFileExtension = "ezl";
+    private static final String defaultEzProfilFilename = "default."+ ezProfilFileExtension;
+    private static final String profilesDirectory = "profiles";
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
 
     private SettingsManager(String configFile){
@@ -24,38 +31,61 @@ public class SettingsManager {
     }
 
     public MainSettings loadProps() throws Exception {
-        MainSettings settings = readConfigFile();
+        MainSettings settings = readMainSettingsFile();
         String passphrase = settings.getEzLoad().getPassPhrase();
         if (passphrase == null){
             settings.getEzLoad().setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase());
-            saveConfigFile(settings);
+            saveMainSettingsFile(settings);
         }
         return settings;
     }
 
-    private MainSettings readConfigFile() throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private MainSettings readMainSettingsFile() throws IOException {
         try(Reader reader = new FileReader(configFile)) {
-            return mapper.readValue(reader, MainSettings.class);
+            return yamlMapper.readValue(reader, MainSettings.class);
         }
     }
 
-    public void saveConfigFile(MainSettings mainSettings) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    public void saveMainSettingsFile(MainSettings mainSettings) throws IOException {
         mainSettings.clearErrors();
-        mapper.writeValue(new FileWriter(configFile), mainSettings);
+        try(Writer writer = new FileWriter(configFile)) {
+            yamlMapper.writeValue(writer, mainSettings);
+        }
     }
 
-    public static AuthManager getAuthManager() throws Exception {
-        MainSettings mainSettings = getInstance().loadProps();
-        return new AuthManager(mainSettings.getEzLoad().getPassPhrase(), mainSettings.getEzLoad().getCourtierCredsFile());
+    private EzProfil readEzProfilFile(String ezProfilFilename) throws IOException {
+        try(Reader reader = new FileReader(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilFilename)) {
+            return yamlMapper.readValue(reader, EzProfil.class);
+        }
     }
 
-    public static String getDownloadDir(MainSettings mainSettings, EnumEZBroker brCourtier){
-        return mainSettings.getEzLoad().getDownloadDir()+ File.separator+brCourtier.getDirName();
+    public void saveEzProfilFile(String ezProfilFilename, EzProfil ezProfil) throws IOException {
+        ezProfil.clearErrors();
+        try(Writer writer = new FileWriter(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilFilename)) {
+            yamlMapper.writeValue(writer, ezProfil);
+        }
     }
 
-    public static String getConfigFilePath(){
+    public EzProfil getActiveEzProfil(MainSettings mainSettings) throws IOException {
+        String ezProfilFilename = StringUtils.isBlank(mainSettings.getActiveEzProfilFilename()) ? defaultEzProfilFilename : mainSettings.getActiveEzProfilFilename();
+        return readEzProfilFile(ezProfilFilename);
+    }
+
+
+    public List<String> listAllEzProfiles() throws IOException {
+        return new FileProcessor(getEzHome(), d -> false, f -> f.getName().endsWith("."+ ezProfilFileExtension))
+                .mapFile(f -> new File(f).getName());
+    }
+
+    public static AuthManager getAuthManager(MainSettings mainSettings, EzProfil ezProfil) {
+        return new AuthManager(mainSettings.getEzLoad().getPassPhrase(), ezProfil.getCourtierCredsFile());
+    }
+
+    public String getEzHome() {
+        return new File(configFile).getParentFile().getAbsolutePath();
+    }
+
+    public static String searchConfigFilePath(){
         String configFile = System.getProperty("ezloadConfig");
         if (configFile == null) configFile = System.getenv("ezloadConfig");
         if (configFile == null){
@@ -68,22 +98,21 @@ public class SettingsManager {
     }
 
     public static SettingsManager getInstance() throws IOException {
-        String configFilePath = getConfigFilePath();
+        String configFilePath = searchConfigFilePath();
         if (new File(configFilePath).exists()){
             return new SettingsManager(configFilePath);
         }
         SettingsManager settingsManager = new SettingsManager(configFilePath);
-        settingsManager.saveConfigFile(getInitialSettings(configFilePath));
+        settingsManager.createInitialSettings();
         return settingsManager;
     }
 
-    public static Consumer<String> saveNewChromeDriver(){
+    public Consumer<String> saveNewChromeDriver(){
         return newChromeDriver -> {
             try {
-                SettingsManager manager = getInstance();
-                MainSettings mainSettings = manager.loadProps();
+                MainSettings mainSettings = this.loadProps();
                 mainSettings.getChrome().setDriverPath(newChromeDriver);
-                manager.saveConfigFile(mainSettings);
+                this.saveMainSettingsFile(mainSettings);
             }
             catch (Exception e){
                 throw new RuntimeException(e);
@@ -91,29 +120,54 @@ public class SettingsManager {
         };
     }
 
-    private static MainSettings getInitialSettings(String configFilePath) throws IOException {
-        String credsDir = "creds";
+    public EzProfil createEzProfil(String ezProfilFilename) throws IOException {
+        String ezHome = getEzHome();
 
+        EzProfil ezProfil = new EzProfil();
+        String credsDir = "creds";
+        String ezProfilDirectory = ezHome+File.separator+profilesDirectory+File.separator+ezProfilFilename.substring(0, ezProfilFilename.length()- ezProfilFileExtension.length()-1)+File.separator;
+
+        ezProfil.setCourtierCredsFile(ezProfilDirectory+credsDir+File.separator+"ezCreds.json");
+        new File(ezProfil.getCourtierCredsFile()).getParentFile().mkdirs();
+
+        try (FileOutputStream output = new FileOutputStream(ezProfil.getCourtierCredsFile())) {
+            output.write("{}".getBytes(StandardCharsets.UTF_8));
+        }
+
+        EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
+        ezProfil.setEzPortfolio(ezPortfolioSettings);
+        ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
+        ezPortfolioSettings.setGdriveCredsFile(ezProfilDirectory+credsDir+File.separator+"gdrive-access.json");
+        new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
+        try (FileOutputStream output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile())) {
+            output.write("{}".getBytes(StandardCharsets.UTF_8));
+        }
+
+        BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
+        bourseDirectSettings.setAccounts(new LinkedList<>());
+        ezProfil.setBourseDirect(bourseDirectSettings);
+
+        ezProfil.setDownloadDir(ezProfilDirectory+"courtiers");
+        new File(ezProfil.getDownloadDir()).mkdirs();
+
+        saveEzProfilFile(ezProfilFilename, ezProfil);
+        return ezProfil;
+    }
+
+    private MainSettings createInitialSettings() throws IOException {
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
-        String ezHome = new File(configFilePath).getParentFile().getAbsolutePath();
+        String ezHome = getEzHome();
         MainSettings.Admin admin = new MainSettings.Admin();
         admin.setShowRules(false);
         ezLoad.setPort(2180);
         ezLoad.setAdmin(admin);
         ezLoad.setLogsDir(ezHome+File.separator+"logs");
-        ezLoad.setDownloadDir(ezHome+File.separator+"courtiers");
         ezLoad.setRulesDir(ezHome+File.separator+"rules");
         ezLoad.setPassPhrase(genString(42));
-        ezLoad.setCourtierCredsFile(ezHome+File.separator+credsDir+File.separator+"ezCreds.json");
 
-        new File(ezLoad.getDownloadDir()).mkdirs();
         new File(ezLoad.getRulesDir()).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
-        new File(ezLoad.getCourtierCredsFile()).getParentFile().mkdirs();
-        FileOutputStream output = new FileOutputStream(ezLoad.getCourtierCredsFile());
-        output.write("{}".getBytes(StandardCharsets.UTF_8));
-        output.close();
         mainSettings.setEzLoad(ezLoad);
 
         MainSettings.ChromeSettings chromeSettings = new MainSettings.ChromeSettings();
@@ -125,21 +179,11 @@ public class SettingsManager {
         new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
         mainSettings.setChrome(chromeSettings);
 
-        EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
-        mainSettings.setEzPortfolio(ezPortfolioSettings);
-        ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
-        ezPortfolioSettings.setGdriveCredsFile(ezHome+File.separator+credsDir+File.separator+"gdrive-access.json");
-        new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
-        output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile());
-        output.write("{}".getBytes(StandardCharsets.UTF_8));
-        output.close();
-        mainSettings.setEzLoad(ezLoad);
-
-        BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
-        bourseDirectSettings.setAccounts(new LinkedList<>());
-        mainSettings.setBourseDirect(bourseDirectSettings);
-
         copyRulesTo(ezLoad.getRulesDir());
+
+        mainSettings.setActiveEzProfilFilename(defaultEzProfilFilename);
+        createEzProfil(defaultEzProfilFilename);
+        saveMainSettingsFile(mainSettings);
 
         return mainSettings;
     }
@@ -166,5 +210,9 @@ public class SettingsManager {
         final Properties properties = new Properties();
         properties.load(SettingsManager.class.getClassLoader().getResourceAsStream("about.properties"));
         return properties.getProperty("version");
+    }
+
+    public static String getDownloadDir(EzProfil ezProfil, EnumEZBroker brCourtier) {
+        return ezProfil.getDownloadDir()+ File.separator+brCourtier.getDirName();
     }
 }

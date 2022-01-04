@@ -3,7 +3,7 @@ package com.pascal.ezload.service.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Checkable {
+public abstract class Checkable<T> {
 
     private Map<String, String> field2ErrorMsg = new HashMap<>();
 
@@ -15,7 +15,7 @@ public abstract class Checkable {
         this.field2ErrorMsg = field2ErrorMsg;
     }
 
-    public abstract void validate();
+    public abstract T validate();
 
     public String getErrorMsg(String fieldName){
         return this.getField2ErrorMsg().get(fieldName);

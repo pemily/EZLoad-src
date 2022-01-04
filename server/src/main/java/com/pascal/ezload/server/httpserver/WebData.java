@@ -1,5 +1,6 @@
 package com.pascal.ezload.server.httpserver;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
@@ -13,6 +14,7 @@ public class WebData {
 
     private String configFile;
     private MainSettings mainSettings;
+    private EzProfil ezProfil;
     private EzProcess latestEzProcess;
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
@@ -21,9 +23,10 @@ public class WebData {
     private boolean processRunning;
     private String ezLoadVersion;
 
-    public WebData(String configFile, MainSettings mainSettings, EzProcess latestEzProcess, boolean processRunning,
+    public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
                    List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules, String ezLoadVersion){
+        this.ezProfil = ezProfil;
         this.configFile = configFile;
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
@@ -105,5 +108,13 @@ public class WebData {
 
     public void setEzLoadVersion(String ezLoadVersion) {
         this.ezLoadVersion = ezLoadVersion;
+    }
+
+    public EzProfil getEzProfil() {
+        return ezProfil;
+    }
+
+    public void setEzProfil(EzProfil ezProfil) {
+        this.ezProfil = ezProfil;
     }
 }

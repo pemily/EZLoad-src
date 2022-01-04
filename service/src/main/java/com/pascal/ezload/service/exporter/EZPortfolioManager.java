@@ -2,7 +2,7 @@ package com.pascal.ezload.service.exporter;
 
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.sheets.v4.Sheets;
-import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
@@ -15,10 +15,10 @@ public class EZPortfolioManager {
 
     private Reporting reporting;
     private GDriveSheets sheets;
-    private MainSettings mainSettings;
+    private EzProfil ezProfil;
 
-    public EZPortfolioManager(Reporting reporting, MainSettings mainSettings) throws GeneralSecurityException, IOException {
-        this.mainSettings = mainSettings;
+    public EZPortfolioManager(Reporting reporting, EzProfil ezProfil) {
+        this.ezProfil = ezProfil;
         this.reporting = reporting;
     }
 
@@ -38,7 +38,7 @@ public class EZPortfolioManager {
 
     private EZPortfolioProxy load(int retry) throws Exception {
         try {
-            connect(reporting, mainSettings);
+            connect(reporting, ezProfil);
 
             reporting.info("Récupération des données de Google Drive...");
             // ici detection de la version de EZPortfolio
@@ -54,7 +54,7 @@ public class EZPortfolioManager {
         catch(TokenResponseException e){
             // Token expired
             reporting.info("Le token de connection est expiré, renouvellement du token.");
-            GDriveConnection.deleteOldToken(mainSettings.getEzPortfolio().getGdriveCredsFile());
+            GDriveConnection.deleteOldToken(ezProfil.getEzPortfolio().getGdriveCredsFile());
             if (retry-- > 0) {
                return load(retry);
             }
@@ -63,12 +63,13 @@ public class EZPortfolioManager {
         }
     }
 
-    private void connect(Reporting reporting, MainSettings mainSettings) throws IOException, GeneralSecurityException {
+    private void connect(Reporting reporting, EzProfil ezProfil) throws IOException, GeneralSecurityException {
         Sheets service;
         try {
-            reporting.info("Connection à votre EZPortfolio: "+mainSettings.getEzPortfolio().getEzPortfolioUrl());
-            service = GDriveConnection.getService(reporting, mainSettings.getEzPortfolio().getGdriveCredsFile());
-            sheets = new GDriveSheets(service, mainSettings.getEzPortfolio().getEzPortfolioUrl());
+            EZPortfolioSettings ezPortfolioSettings = ezProfil.getEzPortfolio();
+            reporting.info("Connection à votre EZPortfolio: "+ ezPortfolioSettings.getEzPortfolioUrl());
+            service = GDriveConnection.getService(reporting, ezPortfolioSettings.getGdriveCredsFile());
+            sheets = new GDriveSheets(service, ezPortfolioSettings.getEzPortfolioUrl());
         }
         catch(Exception e){
             reporting.error("Impossible de se connecter à Google Drive. Vérifiez votre fichier de sécurité Google Drive");

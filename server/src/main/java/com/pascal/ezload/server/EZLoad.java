@@ -19,7 +19,7 @@ public class EZLoad {
     public static int VERSION = 1;
 
     public static void main(String args[]) throws Exception {
-        System.out.println("Configuration file: "+ SettingsManager.getConfigFilePath());
+        System.out.println("Configuration file: "+ SettingsManager.searchConfigFilePath());
 
         int port = SettingsManager.getInstance().loadProps().getEzLoad().getPort();
         String homePage = "http://localhost:"+port;

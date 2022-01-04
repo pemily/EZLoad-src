@@ -10,7 +10,7 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
 
 export function App(){
@@ -21,6 +21,7 @@ export function App(){
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [configFile, setConfigFile] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
+    const [ezProfil, setEzProfil] = useState<EzProfil|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
     const [filesNotLoaded, setFilesNotLoaded] = useState<string[]|undefined>(undefined);
     const [bourseDirectAuthInfo, setBourseDirectAuthInfo] = useState<AuthInfo|undefined>(undefined);
@@ -65,6 +66,7 @@ export function App(){
              setNewShareValues(r.newShareValues);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
+             setEzProfil(r.ezProfil);
              setVersion(r.ezLoadVersion);
              if (newShareValues === undefined){
                 setNewShareValuesDirty(false);
@@ -216,7 +218,7 @@ export function App(){
             { mainSettings && isConfigUrl() && 
                 (<ConfigApp mainSettings={mainSettings}/>)
             }
-            { mainSettings && !isConfigUrl() && 
+            { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
@@ -225,7 +227,7 @@ export function App(){
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
                             <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
-                                <BourseDirect mainSettings={mainSettings}
+                                <BourseDirect ezProfil={ezProfil}
                                             followProcess={followProcess}
                                             bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
                                             readOnly={processRunning}/>                                
@@ -248,7 +250,7 @@ export function App(){
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}              
                                 <Box margin="none" direction="row">
                                     <Button alignSelf="start" margin="medium"
-                                        disabled={processRunning || mainSettings.bourseDirect?.accounts?.filter(ac => ac.active).length === 0} onClick={() => 
+                                        disabled={processRunning || ezProfil.bourseDirect?.accounts?.filter(ac => ac.active).length === 0} onClick={() =>
                                             jsonCall(ezApi.engine.analyze())
                                             .then(r => followProcess(r))
                                             .catch(e => console.error(e) )
@@ -268,8 +270,8 @@ export function App(){
                                                 .catch(e => console.error(e)) 
                                             }
                                             size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
-                                    { mainSettings.ezPortfolio?.ezPortfolioUrl 
-                                        && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={mainSettings.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
+                                    { ezProfil.ezPortfolio?.ezPortfolioUrl
+                                        && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={ezProfil.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
                                 { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
                                 <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>
@@ -339,7 +341,9 @@ export function App(){
                             { processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                                                        
-                                <Config configFile={configFile} mainSettings={mainSettings} mainSettingsStateSetter={setMainSettings}
+                                <Config configFile={configFile} mainSettings={mainSettings} ezProfil={ezProfil}
+                                    mainSettingsStateSetter={setMainSettings}
+                                    ezProfilStateSetter={setEzProfil}
                                     followProcess={followProcess}
                                     bourseDirectAuthInfo={bourseDirectAuthInfo}
                                     bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}

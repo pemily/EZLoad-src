@@ -1,27 +1,15 @@
 package com.pascal.ezload.service.config;
 
-import com.pascal.ezload.service.exporter.EZPortfolioSettings;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.ezload.service.util.*;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.pascal.ezload.service.util.Checkable;
+import com.pascal.ezload.service.util.DirValue;
+import com.pascal.ezload.service.util.FileValue;
+import com.pascal.ezload.service.util.StringValue;
 
 public class MainSettings {
 
-    private BourseDirectSettings bourseDirect;
     private ChromeSettings chrome;
-    private EZPortfolioSettings ezPortfolio;
     private EZLoad ezLoad;
-
-    public BourseDirectSettings getBourseDirect() {
-        return bourseDirect;
-    }
-
-    public void setBourseDirect(BourseDirectSettings bourseDirect) {
-        this.bourseDirect = bourseDirect;
-    }
+    private String activeEzProfilFilename;
 
     public ChromeSettings getChrome() {
         return chrome;
@@ -29,14 +17,6 @@ public class MainSettings {
 
     public void setChrome(ChromeSettings chrome) {
         this.chrome = chrome;
-    }
-
-    public EZPortfolioSettings getEzPortfolio() {
-        return ezPortfolio;
-    }
-
-    public void setEzPortfolio(EZPortfolioSettings ezPortfolio) {
-        this.ezPortfolio = ezPortfolio;
     }
 
     public EZLoad getEzLoad() {
@@ -47,22 +27,28 @@ public class MainSettings {
         this.ezLoad = bientotRentier;
     }
 
+
     public MainSettings validate(){
-        bourseDirect.validate();
         chrome.validate();
-        ezPortfolio.validate();
         ezLoad.validate();
         return this;
     }
 
     public void clearErrors(){
-        bourseDirect.clearErrors();
         chrome.clearErrors();
-        ezPortfolio.clearErrors();
         ezLoad.clearErrors();
     }
 
-    public static class ChromeSettings extends Checkable {
+    public String getActiveEzProfilFilename() {
+        return activeEzProfilFilename;
+    }
+
+    public void setActiveEzProfilFilename(String activeEzProfilFilename) {
+        this.activeEzProfilFilename = activeEzProfilFilename;
+    }
+
+
+    public static class ChromeSettings extends Checkable<ChromeSettings> {
 
         enum Field {driverPath, userDataDir}
         private String driverPath;
@@ -93,23 +79,22 @@ public class MainSettings {
         }
 
         @Override
-        public void validate() {
+        public ChromeSettings validate() {
             new FileValue(true).validate(this, Field.driverPath.name(), driverPath);
             new DirValue(true).validate(this, Field.userDataDir.name(), userDataDir);
+            return this;
         }
 
     }
 
-    public static class EZLoad extends Checkable {
+    public static class EZLoad extends Checkable<EZLoad> {
 
-        enum Field {downloadDir, logsDir, passPhrase, courtierCredFile, rulesDir}
+        enum Field {logsDir, passPhrase, rulesDir}
 
         private int port;
-        private String downloadDir;
         private String rulesDir;
         private String logsDir;
         private String passPhrase;
-        private String courtierCredsFile;
         public Admin admin;
 
         public String getLogsDir() {
@@ -126,22 +111,6 @@ public class MainSettings {
 
         public void setPassPhrase(String passPhrase) {
             this.passPhrase = passPhrase == null ? null : passPhrase.trim();
-        }
-
-        public String getCourtierCredsFile() {
-            return courtierCredsFile;
-        }
-
-        public void setCourtierCredsFile(String courtierCredsFile) {
-            this.courtierCredsFile = courtierCredsFile == null ? null : courtierCredsFile.trim();
-        }
-
-        public String getDownloadDir() {
-            return downloadDir;
-        }
-
-        public void setDownloadDir(String downloadDir) {
-            this.downloadDir = downloadDir == null ? null : downloadDir.trim();
         }
 
         public String getRulesDir() {
@@ -169,12 +138,11 @@ public class MainSettings {
         }
 
         @Override
-        public void validate() {
-            new FileValue(true).validate(this, Field.courtierCredFile.name(), courtierCredsFile);
-            new DirValue(true).validate(this, Field.downloadDir.name(), downloadDir);
+        public EZLoad validate() {
             new DirValue(true).validate(this, Field.logsDir.name(), logsDir);
             new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
             new DirValue(true).validate(this, Field.rulesDir.name(), rulesDir);
+            return this;
         }
     }
 

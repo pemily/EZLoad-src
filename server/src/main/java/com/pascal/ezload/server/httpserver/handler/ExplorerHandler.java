@@ -1,5 +1,6 @@
 package com.pascal.ezload.server.httpserver.handler;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +23,10 @@ public class ExplorerHandler {
     @Path("/file")
     @Produces("application/pdf")
     public Response SourceFile(@NotNull @QueryParam("source") String sourceFile) throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
-        File file = new File(mainSettings.getEzLoad().getDownloadDir()+File.separator+sourceFile);
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        File file = new File(ezProfil.getDownloadDir()+File.separator+sourceFile);
         FileInputStream fileInputStream = new FileInputStream(file);
         Response.ResponseBuilder responseBuilder = Response.ok(fileInputStream);
         responseBuilder.type("application/pdf");
@@ -36,9 +38,11 @@ public class ExplorerHandler {
     @Path("/dir")
     @Produces("application/json")
     public List<Item> list(@Nullable @QueryParam("dirpath") String dir) throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         String subDir = StringUtils.isBlank(dir) ? "" : (dir.startsWith(".") || dir.startsWith("..") ? "" : File.separator+dir);
-        File file = new File(mainSettings.getEzLoad().getDownloadDir()+subDir);
+        File file = new File(ezProfil.getDownloadDir()+subDir);
         if (file.isDirectory()){
             return Arrays.stream(file.listFiles())
                     .map(f -> f.isDirectory() ? new Item(f.getName(), true) : new Item(f.getName(), false))
