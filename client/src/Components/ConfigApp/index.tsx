@@ -26,7 +26,6 @@ export function ConfigApp(props: ConfigAppProps){
                 onClick={(e) => {
                     const str: string[] = keyValue.split("=");
                     if (str.length === 2){                   
-                        console.log(str[0], "= > ", str[1])     ;
                         jsonCall(ezApi.config.setValue({key: str[0], value: str[1]}))
                         .then(e => setCurrentSettings(e))
                         .catch(e => alert(e));

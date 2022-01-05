@@ -38,12 +38,12 @@ export function Operations(props: OperationsProps){
         if (operation.errors!.length > 0){
             // il y a une erreur ou bien aucune regle trouvée
             return (<Box margin={{horizontal: "small"}} >
-                        <CheckBox 
+                        <CheckBox
                             checked={checked[index]}
                             label="Ignorer cette opération? Vous modifiez EzPortfolio vous même"
                             onChange={(event) => {
-                                props.setIgnored(operation, event.target.checked)     
-                                setChecked(checked.map((v, i) => i === index ? event.target.checked : checked[i]))                                
+                                props.setIgnored(operation, event.target.checked)
+                                setChecked(checked.map((v, i) => i === index ? event.target.checked : checked[i]))
                             }} />
                     </Box>)
         }

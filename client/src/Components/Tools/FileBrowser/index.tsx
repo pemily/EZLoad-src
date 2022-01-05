@@ -21,7 +21,6 @@ export function FileBrowser(props: FileBrowserProps) {
     function loadDir(dir: string|undefined) : Promise<any> {
         return jsonCall(ezApi.explorer.list({dirpath: dir === undefined ? "": dir}))
         .then(items => {
-            console.log("Items: ", items)
             setCurrrentDir(dir);
             setItems(items);
         })

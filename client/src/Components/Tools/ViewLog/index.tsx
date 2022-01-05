@@ -15,7 +15,7 @@ export interface ViewLogProps {
 
 export function ViewLog(props: ViewLogProps) {    
 
-    function showLog(){        
+    function showLog(){     
         if (props.ezProcess !== undefined){
             const dynLogger = new DynamicLogger();
 

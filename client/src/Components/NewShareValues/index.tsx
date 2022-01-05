@@ -13,7 +13,8 @@ export function NewShareValues(props: NewShareValuesProps){
         <Box margin="medium" >            
             {props.newShareValues && props.newShareValues.length > 0 
                 && (<><Text>Nouvelle(s) valeur(s) detectée(s)!</Text>
-                <Text>Vous pouvez le(s) renommer maintenant, il sera plus difficile de le faire dans EZPortfolio</Text></>)}
+                <Text>Vous pouvez le(s) renommer maintenant (il sera plus difficile de le faire dans EZPortfolio)</Text>
+                <Text size="small">Puis cliquez sur "Générer les opérations" pour prendre en compte vos modifications</Text></>)}
             <List data={props.newShareValues} margin="none" pad="none"
              background={['light-2', 'light-4']}>
                 {(shareValue: ShareValue, index: number) => (
