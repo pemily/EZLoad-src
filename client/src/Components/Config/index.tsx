@@ -127,8 +127,8 @@ export function Config(props: ConfigProps) {
                            </Help>
                        </Box>                        
                     </Box>
-
-                    <Heading level="5">Téléchargements</Heading>
+{
+                  /* <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">
                         <TextField id="ezDownloadDir" label="Emplacement des rapports" value={props.ezProfil.downloadDir}
                             isRequired={true} errorMsg={props.mainSettings.ezLoad?.field2ErrorMsg?.downloadDir}
@@ -137,7 +137,8 @@ export function Config(props: ConfigProps) {
                                 { ...props.ezProfil,
                                     downloadDir: newValue
                                }, props.ezProfilStateSetter)}/>
-                    </Box>
+                    </Box> */
+}
                     <Box>
                         <Box direction="row" justify="start">
                             <Heading level="5" self-align="start">BourseDirect</Heading>

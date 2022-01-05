@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -14,10 +15,11 @@ import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.FileProcessor;
 import com.pascal.ezload.service.util.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+
+
 
 public class SettingsManager {
-    private static final Logger logger = Logger.getLogger(SettingsManager.class);
+    private static final Logger logger = Logger.getLogger("SettingsManager");
 
     private final String configFile;
     private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());

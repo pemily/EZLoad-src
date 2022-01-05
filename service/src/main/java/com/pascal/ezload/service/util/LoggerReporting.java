@@ -1,13 +1,14 @@
 package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.sources.Reporting;
-import org.apache.log4j.Logger;
 
-import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class LoggerReporting implements Reporting {
 
-    private static final Logger logger = Logger.getLogger(LoggerReporting.class);
+    private static final Logger logger = Logger.getLogger("LoggerReporting");
 
     @Override
     public Reporting pushSection(String sectionTitle) {
@@ -22,12 +23,12 @@ public class LoggerReporting implements Reporting {
 
     @Override
     public void error(Throwable error){
-        logger.error(error);
+        logger.log(Level.SEVERE, "error", error);
     }
 
     @Override
     public void error(String error){
-        logger.error(error);
+        logger.severe(error);
     }
 
     @Override
