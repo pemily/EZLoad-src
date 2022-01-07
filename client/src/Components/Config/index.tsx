@@ -1,7 +1,7 @@
-import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer } from "grommet";
-import { Add, Trash, Validate, SchedulePlay } from 'grommet-icons';
+import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput, FormField } from "grommet";
+import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
 import { saveEzProfil, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil, UploadGDriveSecurityFilePayload } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
 import { ConfigStartDate } from '../ConfigStartDate';
@@ -30,6 +30,9 @@ Si vous ne les spécifiez pas, il faudra les saisir **à chaque execution**.
 _Les mots de passe sont encryptés à l'aide d'une clé qui est généré à l'installation de EZLoad_`;
 
 const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
+### Ne doit être fait qu'une fois
+- Si vous avez déjà fait cette procédure et que vous souhaitez re-télécharger le fichier de sécurité, sur la ligne de EZLoad_Client (à coté de la poubelle) il y a un boutton pour  <a href="https://console.cloud.google.com/apis/credentials?project=ezload" target="intstall">**télécharger le client oauth**</a>.
+
 #### Etape 1 - Création du project EZLoad chez Google
 - Créer un projet <a href="https://console.cloud.google.com/projectcreate" target="install">**Ici**</a>
 - Nom du project: **EZLoad**
@@ -59,7 +62,7 @@ const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
 - Entrez **Votre Adresse Email** et Enregistrer
 - Cliquez sur "**Enregistrer et continuer**"
 
-#### Etape 5 - Creation du fichier de d'authentification
+#### Etape 5 - Creation du fichier d'authentification
 - Cliquez sur **Identifiants** ou aller <a href="https://console.cloud.google.com/apis/credentials?folder=&organizationId=&project=ezload" target="intstall">**Ici**</a>
 - Cliquez sur "**Créer des identifiants**"
 - Selectionnez "**ID client OAuth**"
@@ -67,10 +70,8 @@ const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
 - Nom: **EZLoad_Client**
 - Cliquez sur "**Créer**"
 - Cliquez sur "**Télécharger JSON**" puis sur "**OK**" pour fermer la fenêtre
-- Si vous avez perdu le fichier, vous pouvez le télécharger plus tard, sur la ligne de EZLoad_Client (à coté de la poubelle) il y a un boutton pour **télécharger le client oauth**
-`+(gdriveAccessPath != null && gdriveAccessPath !== undefined ?  `- Renommez et déplacez ce fichier ici: **`+gdriveAccessPath+`**` : `- Entrez le path complet dans le champ: "**Fichier de sécurité Google Drive**" de la config EZLoad`) +
 `
-
+const gdriveAccessStep6 = () : String =>  `
 #### Etape 6 - Activation de l'accès
 - Aller <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=ezload" target="install">**Ici**</a>
 - Cliquer sur "**Activer**"
@@ -82,11 +83,13 @@ const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
 export function Config(props: ConfigProps) {   
     const [showConfigStartDate, setShowConfigStartDate] = useState<boolean>(false);
     const [showStartDateForAccount, setShowStartDateForAccount] = useState<BourseDirectEZAccountDeclaration|undefined>(undefined);
- 
+    const [uploadGDriveSecFile, setUploadGDriveSecFile] = useState<File|undefined>(undefined);
+    const [uploadStatus, setUploadStatus] = useState<string|undefined>(undefined);
+
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile})</Text></Box>
+                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile + " - " +props.mainSettings.activeEzProfilFilename?.substring(0, props.mainSettings.activeEzProfilFilename.length-4)})</Text></Box>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
                             <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.ezProfil?.ezPortfolio?.ezPortfolioUrl}
@@ -97,19 +100,28 @@ export function Config(props: ConfigProps) {
                                       ezPortfolio: { ...props.ezProfil.ezPortfolio, ezPortfolioUrl: newValue }
                                }, props.ezProfilStateSetter)
                                }/>
-                        </Box>
 
-                        <Box margin="none" pad="none" direction="row">
-                            <TextField id="gDriveCredsFile" label="Fichier de sécurité Google Drive" value={props.ezProfil?.ezPortfolio?.gdriveCredsFile}
-                                errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.gdriveCredsFile}
-                                readOnly={props.readOnly}
-                                onChange={newValue  => saveEzProfil(
-                                    { ...props.ezProfil,
-                                          ezPortfolio: { ...props.ezProfil.ezPortfolio, gdriveCredsFile: newValue }
-                                   }, props.ezProfilStateSetter)}/>
-                           <Help title="Comment obtenir son fichier de sécurité?">
+                           <Help title="Créer le fichier d'accès Google Drive?">
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">                                   
-                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>
+                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>                            
+                                <FileInput  name="gdriveSec" id="gdriveSec" messages={{dropPrompt: "Glisser le fichier téléchargé içi", browse: "Parcourir" }} 
+                                        onChange={(e) => setUploadGDriveSecFile(e.target.files?.[0])}/>                                
+                                <Markdown>- Cliquez sur le boutton 'Envoyer' ci-dessous</Markdown>    
+                                <Button size="small"  icon={<Upload size="small"/>} label="Envoyer" onClick={( ) => {
+                                            if (uploadGDriveSecFile) 
+                                                ezApi.home.uploadGDriveSecurityFile({file: uploadGDriveSecFile})
+                                                .then(() => {
+                                                    setUploadStatus("Ok");
+                                                })
+                                                .catch((e: any) => {
+                                                    setUploadStatus("Erreur "+e);
+                                                });
+                                        }}/>              
+                                {valued(uploadStatus) === "Ok" &&
+                                    (<Markdown>{"<span>Ok</span>"}</Markdown>)}                                                           
+                                {valued(uploadStatus) !== "Ok" && valued(uploadStatus) !== "" &&
+                                    (<Markdown>{"<span style='background-color:orange'>"+uploadStatus+"</span>"}</Markdown>)}                                                                                               
+                                <Markdown>{gdriveAccessStep6()}</Markdown>
                                 {valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === "" &&
                                     (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner l'url de EZPortfolio</span>"}</Markdown>)}
                                 {valued(props.ezProfil?.ezPortfolio?.gdriveCredsFile) === "" &&

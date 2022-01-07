@@ -24,7 +24,7 @@ public class SettingsManager {
     private final String configFile;
     private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private static final String ezProfilFileExtension = "ezl";
-    private static final String defaultEzProfilFilename = "default."+ ezProfilFileExtension;
+    private static final String defaultEzProfilFilename = "defaut."+ ezProfilFileExtension;
     private static final String profilesDirectory = "profiles";
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
 

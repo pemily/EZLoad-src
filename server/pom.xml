@@ -95,6 +95,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
             <version>11.0.6</version>

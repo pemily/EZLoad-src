@@ -11,7 +11,11 @@ import java.util.zip.ZipInputStream;
 public class FileUtil {
 
     public static String file2String(String file) throws FileNotFoundException {
-        String text = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))
+        return inputStream2String(new FileInputStream(file));
+    }
+
+    public static String inputStream2String(InputStream inputStream) {
+        String text = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines().collect(Collectors.joining("\n"));
         return text;
     }

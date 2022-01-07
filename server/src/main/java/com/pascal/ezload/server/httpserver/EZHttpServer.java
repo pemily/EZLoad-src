@@ -14,6 +14,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -52,6 +53,7 @@ public class EZHttpServer {
         server.setHandler(handlers);
 
         ResourceConfig config = new ResourceConfig();
+        config.register(MultiPartFeature.class); // pour activer le upload de fichier
         config.register(configBinder);
         config.packages(EZHttpServer.class.getPackage().getName());
 

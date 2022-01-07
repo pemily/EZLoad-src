@@ -15,15 +15,17 @@ import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
+import com.pascal.ezload.service.util.FileUtil;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,16 @@ public class HomeHandler {
         String ezProfilName = settingsManager.loadProps().getActiveEzProfilFilename();
         settingsManager.saveEzProfilFile(ezProfilName, ezProfil);
         return ezProfil.validate();
+    }
+
+    @POST
+    @Path("/gdrive-security-file")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public void uploadGDriveSecurityFile( @FormDataParam("file")  InputStream file) throws Exception {
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        FileUtil.string2file(ezProfil.getEzPortfolio().getGdriveCredsFile(), FileUtil.inputStream2String(file));
     }
 
     @POST
