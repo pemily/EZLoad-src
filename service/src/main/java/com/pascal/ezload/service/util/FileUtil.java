@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.util;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,5 +48,9 @@ public class FileUtil {
                 }
             }
         }
+    }
+
+    public static void rmdir(File profilDir) throws IOException {
+        FileUtils.deleteDirectory(profilDir);
     }
 }

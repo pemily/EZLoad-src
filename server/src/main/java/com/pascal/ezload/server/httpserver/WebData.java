@@ -20,12 +20,13 @@ public class WebData {
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
     private Set<ShareValue> newShareValues;
+    private List<String> allProfiles;
     private boolean processRunning;
     private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
                    List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
-                   List<RuleDefinitionSummary> allRules, String ezLoadVersion){
+                   List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles){
         this.ezProfil = ezProfil;
         this.configFile = configFile;
         this.mainSettings = mainSettings;
@@ -36,6 +37,7 @@ public class WebData {
         this.rules = allRules;
         this.newShareValues = newShareValues;
         this.ezLoadVersion = ezLoadVersion;
+        this.allProfiles = allProfiles;
     }
 
     public MainSettings getMainSettings() {
@@ -116,5 +118,13 @@ public class WebData {
 
     public void setEzProfil(EzProfil ezProfil) {
         this.ezProfil = ezProfil;
+    }
+
+    public List<String> getAllProfiles() {
+        return allProfiles;
+    }
+
+    public void setAllProfiles(List<String> allProfiles) {
+        this.allProfiles = allProfiles;
     }
 }

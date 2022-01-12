@@ -3,6 +3,7 @@ import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } 
 import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
+import { ProfileSelector } from '../ProfileSelector';
 import { ConfigApp } from '../ConfigApp';
 import { Reports } from '../Reports';
 import { NewShareValues } from '../NewShareValues';
@@ -36,6 +37,7 @@ export function App(){
     const [version, setVersion] = useState<string>("");
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
+    const [allProfiles, setAllProfiles] = useState<string[]>([]);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -68,6 +70,7 @@ export function App(){
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);
              setVersion(r.ezLoadVersion);
+             setAllProfiles(r.allProfiles);
              if (newShareValues === undefined){
                 setNewShareValuesDirty(false);
              } 
@@ -197,11 +200,36 @@ export function App(){
     function main(){
         return (
         <Box>
-            <Header direction="row" background="background" margin="none" pad="none" justify="center" border={{ size: 'xsmall' }}>
-                <Box width="35%"></Box>
-                <Text size="large" self-align="center" margin="xxsmall">{"EZLoad v"+version}</Text>
-                <Box width="35%"></Box>
-                <Anchor margin="small" alignSelf="start" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
+            <Header direction="row" background="background" margin="none" pad="none" justify-content="space-between" border={{ size: 'xsmall' }}>
+                <span>{ mainSettings && ezProfil && !isConfigUrl() && 
+                    <ProfileSelector 
+                            currentProfile={mainSettings?.activeEzProfilName}
+                            allProfiles={allProfiles}
+                            readOnly={processRunning}
+                            newProfile={() => setAllProfiles(allProfiles.concat([""]))}
+                            activate={(profile) => jsonCall(ezApi.home.saveMainSettings({
+                                                        ...mainSettings,
+                                                        activeEzProfilName: profile
+                                                    }))
+                                                    .then(r => reloadAllData())
+                                                    .catch(e => console.error(e))
+                            }
+                            deleteProfile={(profile) => {
+                                ezApi.home.deleteEzProfile({profile})
+                                .then(r =>
+                                    setAllProfiles(allProfiles.filter(p => p !== profile))
+                                )
+                                .catch(e => console.error(e));
+                            }}
+                            rename={(oldName, newName) => {
+                                ezApi.home.renameEzProfile({oldProfile: oldName, newProfile: newName})
+                                .then(r => reloadAllData())
+                                .catch(e => console.error(e));
+                            }}/> 
+                } 
+                </span>       
+                <Text size="large" >{"EZLoad v"+version}</Text>
+                <Anchor margin="small" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 
@@ -217,7 +245,7 @@ export function App(){
             )}      
             { mainSettings && isConfigUrl() && 
                 (<ConfigApp mainSettings={mainSettings}/>)
-            }
+            }        
             { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>

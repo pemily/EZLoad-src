@@ -1,7 +1,7 @@
-import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput, FormField } from "grommet";
+import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
 import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
-import { saveEzProfil, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
-import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil, UploadGDriveSecurityFilePayload } from '../../ez-api/gen-api/EZLoadApi';
+import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
+import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
 import { ConfigStartDate } from '../ConfigStartDate';
@@ -89,23 +89,23 @@ export function Config(props: ConfigProps) {
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile + " - " +props.mainSettings.activeEzProfilFilename?.substring(0, props.mainSettings.activeEzProfilFilename.length-4)})</Text></Box>
+                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile + " - " +props.mainSettings.activeEzProfilName})</Text></Box>
                     <Box direction="column" margin="small">
                         <Box margin="none" pad="none" direction="row">
                             <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.ezProfil?.ezPortfolio?.ezPortfolioUrl}
                                 errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
                                 readOnly={props.readOnly}
                                 onChange={newValue  => 
-                                    saveEzProfil({ ...props.ezProfil,
+                                    saveEzProfile({ ...props.ezProfil,
                                       ezPortfolio: { ...props.ezProfil.ezPortfolio, ezPortfolioUrl: newValue }
                                }, props.ezProfilStateSetter)
                                }/>
 
                            <Help title="Créer le fichier d'accès Google Drive?">
-                               <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">                                   
-                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>                            
+                               <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
+                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>
                                 <FileInput  name="gdriveSec" id="gdriveSec" messages={{dropPrompt: "Glisser le fichier téléchargé içi", browse: "Parcourir" }} 
-                                        onChange={(e) => setUploadGDriveSecFile(e.target.files?.[0])}/>                                
+                                        onChange={(e) => setUploadGDriveSecFile(e.target.files?.[0])}/>
                                 <Markdown>- Cliquez sur le boutton 'Envoyer' ci-dessous</Markdown>    
                                 <Button size="small"  icon={<Upload size="small"/>} label="Envoyer" onClick={( ) => {
                                             if (uploadGDriveSecFile) 
@@ -188,7 +188,7 @@ export function Config(props: ConfigProps) {
                                      readOnly={props.readOnly}
                                      errorMsg={account.field2ErrorMsg?.name}
                                      onChange={newValue => 
-                                        saveEzProfil(
+                                        saveEzProfile(
                                             { ...props.ezProfil,
                                                   bourseDirect: {
                                                       ...props.ezProfil.bourseDirect,
@@ -205,7 +205,7 @@ export function Config(props: ConfigProps) {
                                      readOnly={props.readOnly}
                                      errorMsg={account.field2ErrorMsg?.number}
                                      onChange={newValue => 
-                                        saveEzProfil(
+                                        saveEzProfile(
                                             { ...props.ezProfil,
                                                   bourseDirect: {
                                                       ...props.ezProfil.bourseDirect,
@@ -221,7 +221,7 @@ export function Config(props: ConfigProps) {
                                     <CheckBox key={"activeBD"+index} reverse checked={account.active}
                                         disabled={props.readOnly}
                                         onChange={evt => 
-                                            saveEzProfil(
+                                            saveEzProfile(
                                             { ...props.ezProfil,
                                                   bourseDirect: {
                                                       ...props.ezProfil.bourseDirect,
@@ -244,7 +244,7 @@ export function Config(props: ConfigProps) {
                                               {
                                                 label: 'Oui',
                                                 onClick: () => {
-                                                    saveEzProfil(
+                                                    saveEzProfile(
                                                         { ...props.ezProfil,
                                                               bourseDirect: {
                                                                   ...props.ezProfil.bourseDirect,
@@ -278,7 +278,7 @@ export function Config(props: ConfigProps) {
                             <Box direction="row" margin="none" pad="none">
                                 <Button size="small" icon={<Add size='small'/>} 
                                     disabled={props.readOnly}
-                                    label="Nouveau" onClick={() => saveEzProfil(
+                                    label="Nouveau" onClick={() => saveEzProfile(
                                     {...props.ezProfil,
                                         bourseDirect: { ...props.ezProfil?.bourseDirect,
                                             accounts: props.ezProfil?.bourseDirect?.accounts === undefined ?

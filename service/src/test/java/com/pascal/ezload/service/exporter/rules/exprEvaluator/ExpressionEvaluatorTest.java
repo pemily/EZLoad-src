@@ -146,4 +146,13 @@ public class ExpressionEvaluatorTest {
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "-varOne", ezdata);
         assertEquals("-20,5", result);
     }
+
+
+    @Test
+    public void testExpression3(){
+        EzData ezdata = new EzData();
+        ezdata.put(new EzDataKey("varOne"), "2988,36");
+        String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "-varOne", ezdata);
+        assertEquals("-2988,36", result);
+    }
 }

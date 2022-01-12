@@ -2,6 +2,7 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -105,7 +106,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
                     Month monthToDownload = dateFromPage;
                     do {
-                        extractMonthActivities(ezProfil.getDownloadDir(), account, cptIndex, monthToDownload);
+                        extractMonthActivities(SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect), account, cptIndex, monthToDownload);
                         monthToDownload = clickMoisSuivant();
                     }
                     while (monthToDownload != null);

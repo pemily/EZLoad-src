@@ -2,8 +2,6 @@ package com.pascal.ezload.service.gdrive;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +21,7 @@ public class Row {
         this.values = values;
     }
 
-    public EZDate valueDate(int colIndex) {
+    public EZDate getValueDate(int colIndex) {
         String date = getValueStr(colIndex);
         if (StringUtils.isBlank(date)) return null;
         return EZDate.parseFrenchDate(date, '/');

@@ -22,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.io.*;
@@ -59,7 +59,7 @@ public class HomeHandler {
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         return new WebData(SettingsManager.searchConfigFilePath(),
                             mainSettings,
-                             ezProfil,
+                            ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
@@ -69,7 +69,8 @@ public class HomeHandler {
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)
                                     .collect(Collectors.toList()),
-                            SettingsManager.getVersion()
+                            SettingsManager.getVersion(),
+                            settingsManager.listAllEzProfiles()
                 );
     }
 
@@ -84,15 +85,40 @@ public class HomeHandler {
     }
 
     @POST
-    @Path("/saveEzProfil")
+    @Path("/renameEzProfile")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void renameEzProfile(@NotNull @QueryParam("oldProfile") String oldProfileName,
+                             @NotNull @QueryParam("newProfile") String newProfileName) throws Exception {
+        if (oldProfileName.equals(newProfileName) || StringUtils.isBlank(newProfileName)) return;
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        if (StringUtils.isBlank(oldProfileName)){
+            settingsManager.newEzProfil(newProfileName);
+        }
+        else{
+            settingsManager.renameEzProfile(oldProfileName, newProfileName);
+        }
+    }
+
+    @PUT
+    @Path("/saveEzProfile")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public EzProfil saveEzProfil(EzProfil ezProfil) throws Exception {
+    public EzProfil saveEzProfile(EzProfil ezProfil) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        String ezProfilName = settingsManager.loadProps().getActiveEzProfilFilename();
+        String ezProfilName = settingsManager.loadProps().getActiveEzProfilName();
         settingsManager.saveEzProfilFile(ezProfilName, ezProfil);
         return ezProfil.validate();
     }
+
+    @DELETE
+    @Path("/deleteEzProfile")
+    public void deleteEzProfile(@NotNull @QueryParam("profile") String ezProfilName) throws Exception {
+        if (!StringUtils.isBlank(ezProfilName)) {
+            SettingsManager settingsManager = SettingsManager.getInstance();
+            settingsManager.deleteEzProfil(ezProfilName);
+        }
+    }
+
 
     @POST
     @Path("/gdrive-security-file")
@@ -148,7 +174,7 @@ public class HomeHandler {
                                         reporting.info("Ajout du compte: "+newAccount.getNumber()+" de "+newAccount.getName());
                                         ezProfil.getBourseDirect().getAccounts().add(newAccount);
                                     });
-                    settingsManager.saveEzProfilFile(mainSettings.getActiveEzProfilFilename(), ezProfil);
+                    settingsManager.saveEzProfilFile(mainSettings.getActiveEzProfilName(), ezProfil);
                 }
             );
         }

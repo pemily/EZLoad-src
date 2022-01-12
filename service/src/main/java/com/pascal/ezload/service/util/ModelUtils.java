@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class ModelUtils {
+    private static final int NB_AFTER_COMMA = 6; // 6 chiffres apres la virgule max
 
     public static String normalizeAmount(String amount) {
         String result = amount;
@@ -19,6 +20,8 @@ public class ModelUtils {
         // the space to separate the thousands must be remove
         // example:
         //    +1 248.43 => 1248,43
+        // maximum 6 number after the comma
+
         if (result.startsWith("+")){
             result = result.substring(1);
         }
@@ -28,7 +31,12 @@ public class ModelUtils {
         else if (result.charAt(0) < '0' || result.charAt(0) > '9') return amount; // ce n'est pas un nombre
 
         result = result.replace('.', ',').replace(" ", "");
-        if (result.contains(",")){
+        int commaIndex = result.indexOf(",");
+        if (commaIndex != -1){
+            if (result.length() > commaIndex+NB_AFTER_COMMA){
+                result = result.substring(0, commaIndex+NB_AFTER_COMMA+1);
+            }
+
             while (result.endsWith("0")){
                 result = result.substring(0, result.length()-1);
             }
@@ -63,11 +71,11 @@ public class ModelUtils {
 
 
     public static String float2Str(float v) {
-        return normalizeAmount(String.format("%.6f", v)); // 5 digit apres la virgule
+        return normalizeAmount(String.format("%s", v)); // 5 digit apres la virgule
     }
 
     public static String double2Str(double v) {
-        return normalizeAmount(String.format("%.6f", v)); // 5 digit apres la virgule
+        return normalizeAmount(String.format("%s", v)); // 5 digit apres la virgule
     }
 
 

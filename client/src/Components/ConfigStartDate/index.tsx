@@ -23,7 +23,7 @@ export function ConfigStartDate(props: ConfigStartDateProps){
                             props.close(); 
                             props.saveStartDate(startDate, props.account);                            
                     } } />
-                    <Button margin="small" alignSelf="center" size="small" label="close" onClick={(e) => props.close()} />
+                    <Button margin="small" alignSelf="center" size="small" label="Fermer" onClick={(e) => props.close()} />
                 </Box>
             </Box>
     )

@@ -9,7 +9,7 @@ public class MainSettings {
 
     private ChromeSettings chrome;
     private EZLoad ezLoad;
-    private String activeEzProfilFilename;
+    private String activeEzProfilName;
 
     public ChromeSettings getChrome() {
         return chrome;
@@ -39,12 +39,12 @@ public class MainSettings {
         ezLoad.clearErrors();
     }
 
-    public String getActiveEzProfilFilename() {
-        return activeEzProfilFilename;
+    public String getActiveEzProfilName() {
+        return activeEzProfilName;
     }
 
-    public void setActiveEzProfilFilename(String activeEzProfilFilename) {
-        this.activeEzProfilFilename = activeEzProfilFilename;
+    public void setActiveEzProfilName(String activeEzProfilName) {
+        this.activeEzProfilName = activeEzProfilName;
     }
 
 

@@ -60,8 +60,8 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-export function saveEzProfil(settings: EzProfil, updModel: (settings: EzProfil) => void){      
-  jsonCall(ezApi.home.saveEzProfil(settings))
+export function saveEzProfile(settings: EzProfil, updModel: (settings: EzProfil) => void){      
+  jsonCall(ezApi.home.saveEzProfile(settings))
     .then(r => updModel(r))
     .catch(e => console.error("Save Profil Error: ", e));
 }

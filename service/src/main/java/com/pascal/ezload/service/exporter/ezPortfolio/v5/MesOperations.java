@@ -4,7 +4,6 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
-import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
@@ -13,7 +12,6 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,7 +52,7 @@ public class MesOperations  {
     public boolean isOperationsExists(Row operation){
         return existingOperations.getValues().stream().filter(
             row ->
-                 operation.valueDate(DATE_COL).equals(row.valueDate(DATE_COL))
+                 operation.getValueDate(DATE_COL).equals(row.getValueDate(DATE_COL))
 //                && operation.getValueStr(AMOUNT_COL).equals(row.getValueStr(AMOUNT_COL))
 //                && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
                 && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
@@ -65,7 +63,7 @@ public class MesOperations  {
 //                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
 //                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
 //                && operation.getValueStr(ACTION_NAME_COL).equals(row.getValueStr(ACTION_NAME_COL))
-        ).count() > 1;
+        ).count() > 0;
     }
 
     public static Row newOperationRow(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef) {
@@ -104,6 +102,12 @@ public class MesOperations  {
                 .collect(Collectors.toList());
         if (courtierOps.isEmpty()) return Optional.empty();
         Row latestRow = courtierOps.get(courtierOps.size()-1);
+        // the file can contains a very old date (pour une opération de régulatisation par exemple)
+        // donc je ne prends pas la colonne date, mais je déduis la date a partir du fichier stocké dans ezPortfolio
+        // mais si je n'ai pas de fichier, (pour une initialisation de Date de Départ par exemple) dans ce cas je prends la colonne date
+        if (latestRow.getValueStr(SOURCE_FILE_COL).equals("")){
+            return Optional.of(latestRow.getValueDate(DATE_COL));
+        }
         return Optional.of(latestRow.getValueStr(SOURCE_FILE_COL)).map(ModelUtils::getDateFromFile);
     }
 
