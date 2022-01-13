@@ -71,7 +71,10 @@ public class SettingsManager {
     }
 
     public void newEzProfil(String ezProfilName) throws IOException {
-        createEzProfil(ezProfilName);
+        MainSettings settings = readMainSettingsFile();
+        EzProfil defaultProfil = readEzProfilFile(settings.getActiveEzProfilName());
+        // comme le fichier de gdrive est pénible a faire, je le recupere du profil par defaut.
+        createEzProfil(ezProfilName, defaultProfil.getEzPortfolio().getGdriveCredsFile());
     }
 
     public void saveEzProfilFile(String ezProfilName, EzProfil ezProfil) throws IOException {
@@ -162,7 +165,7 @@ public class SettingsManager {
         };
     }
 
-    public EzProfil createEzProfil(String ezProfilName) throws IOException {
+    public EzProfil createEzProfil(String ezProfilName, String initGDriveCredsFile) throws IOException {
         String ezHome = getEzHome();
         String ezProfilDirectory = ezHome+File.separator+profilesDirectory+File.separator+ezProfilName+File.separator;
 
@@ -183,8 +186,12 @@ public class SettingsManager {
         ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
         ezPortfolioSettings.setGdriveCredsFile(ezProfilDirectory+credsDir+File.separator+"gdrive-access.json");
         new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
-        try (FileOutputStream output = new FileOutputStream(ezPortfolioSettings.getGdriveCredsFile())) {
-            output.write("{}".getBytes(StandardCharsets.UTF_8));
+        if (initGDriveCredsFile == null) {
+            FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), "{}");
+        }
+        else{
+            String content = FileUtil.file2String(initGDriveCredsFile);
+            if (content != null) FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), content);
         }
 
         BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
@@ -226,7 +233,7 @@ public class SettingsManager {
         copyRulesTo(ezLoad.getRulesDir());
 
         mainSettings.setActiveEzProfilName(defaultEzProfilName);
-        createEzProfil(defaultEzProfilName);
+        createEzProfil(defaultEzProfilName, null);
         saveMainSettingsFile(mainSettings);
 
         return mainSettings;

@@ -13,6 +13,7 @@ import java.util.zip.ZipInputStream;
 public class FileUtil {
 
     public static String file2String(String file) throws FileNotFoundException {
+        if (! new File(file).exists()) return null;
         return inputStream2String(new FileInputStream(file));
     }
 
