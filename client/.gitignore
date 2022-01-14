@@ -1,4 +1,3 @@
 node_modules
 src/ez-api/gen-api
-package-lock.json
 build/

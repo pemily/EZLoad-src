@@ -38,4 +38,8 @@ public class StringUtilsTest {
         assertNull(StringUtils.divide("a first test", " pas trouvé"));
     }
 
+    @Test
+    public void testCleanFilename(){
+        Assertions.assertEquals("ca-ltxt,;!avec #", StringUtils.cleanFileName("c:/\\a-l.txt,;!avec ~#*?"));
+    }
 }

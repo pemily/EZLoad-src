@@ -22,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jdk.tools.jmod.Main;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -78,8 +79,12 @@ public class HomeHandler {
     @Path("/saveMainSettings")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public MainSettings saveMainSettings(MainSettings mainSettings) throws IOException {
+    public MainSettings saveMainSettings(MainSettings mainSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings oldSettings = settingsManager.loadProps();
+        if (!oldSettings.getActiveEzProfilName().equals(mainSettings.getActiveEzProfilName())){
+            ezServerState.clear();
+        }
         settingsManager.saveMainSettingsFile(mainSettings);
         return mainSettings.validate();
     }
@@ -88,7 +93,9 @@ public class HomeHandler {
     @Path("/renameEzProfile")
     @Consumes(MediaType.APPLICATION_JSON)
     public void renameEzProfile(@NotNull @QueryParam("oldProfile") String oldProfileName,
-                             @NotNull @QueryParam("newProfile") String newProfileName) throws Exception {
+                             @NotNull @QueryParam("newProfile") String newRawProfileName) throws Exception {
+
+        String newProfileName = com.pascal.ezload.service.util.StringUtils.cleanFileName(newRawProfileName);
         if (oldProfileName.equals(newProfileName) || StringUtils.isBlank(newProfileName)) return;
         SettingsManager settingsManager = SettingsManager.getInstance();
         if (StringUtils.isBlank(oldProfileName)){

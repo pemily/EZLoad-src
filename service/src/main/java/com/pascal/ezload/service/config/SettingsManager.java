@@ -85,12 +85,12 @@ public class SettingsManager {
         }
     }
     public void renameEzProfile(String oldProfilName, String newProfilName) throws IOException {
-        File oldProfileDir = new File(getEzHome()+File.separator+profilesDirectory+File.separator+oldProfilName);
-        File newProfileDir = new File(getEzHome()+File.separator+profilesDirectory+File.separator+newProfilName);
+        String oldProfileDir = getEzProfileDirectory(oldProfilName);
+        String newProfileDir = getEzProfileDirectory(newProfilName);
 
-        if (StringUtils.isBlank(newProfilName) || newProfileDir.exists()) return;
+        if (StringUtils.isBlank(newProfilName) || new File(newProfileDir).exists()) return;
 
-        FileUtils.moveDirectory(oldProfileDir, newProfileDir);
+        FileUtils.moveDirectory(new File(oldProfileDir), new File(newProfileDir));
         FileUtils.moveFile(new File(getEzHome()+File.separator+profilesDirectory+File.separator+oldProfilName+"."+ezProfilFileExtension),
                 new File(getEzHome()+File.separator+profilesDirectory+File.separator+newProfilName+"."+ezProfilFileExtension));
 
@@ -99,6 +99,18 @@ public class SettingsManager {
             settings.setActiveEzProfilName(newProfilName);
             saveMainSettingsFile(settings);
         }
+
+        EzProfil newEzProfil = readEzProfilFile(newProfilName);
+        if (newEzProfil.getDownloadDir().startsWith(oldProfileDir)){
+            newEzProfil.setDownloadDir(newEzProfil.getDownloadDir().replace(oldProfileDir, newProfileDir));
+        }
+        if (newEzProfil.getCourtierCredsFile().startsWith(oldProfileDir)){
+            newEzProfil.setCourtierCredsFile(newEzProfil.getCourtierCredsFile().replace(oldProfileDir, newProfileDir));
+        }
+        if (newEzProfil.getEzPortfolio().getGdriveCredsFile().startsWith(oldProfileDir)){
+            newEzProfil.getEzPortfolio().setGdriveCredsFile(newEzProfil.getEzPortfolio().getGdriveCredsFile().replace(oldProfileDir, newProfileDir));
+        }
+        saveEzProfilFile(newProfilName, newEzProfil);
     }
 
     public void deleteEzProfil(String ezProfilName) throws IOException {
@@ -166,8 +178,7 @@ public class SettingsManager {
     }
 
     public EzProfil createEzProfil(String ezProfilName, String initGDriveCredsFile) throws IOException {
-        String ezHome = getEzHome();
-        String ezProfilDirectory = ezHome+File.separator+profilesDirectory+File.separator+ezProfilName+File.separator;
+        String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
 
         if (StringUtils.isBlank(ezProfilName) || new File(ezProfilDirectory).exists()) return null;
 
@@ -205,6 +216,12 @@ public class SettingsManager {
         return ezProfil;
     }
 
+    private String getEzProfileDirectory(String ezProfilName) {
+        String ezHome = getEzHome();
+        String ezProfilDirectory = ezHome+File.separator+profilesDirectory+File.separator+ ezProfilName +File.separator;
+        return ezProfilDirectory;
+    }
+
     private MainSettings createInitialSettings() throws IOException {
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
@@ -225,7 +242,7 @@ public class SettingsManager {
         chromeSettings.setUserDataDir(ezHome+File.separator+"chrome"+File.separator+"data");
         // chromeDriver is a file that does not exists, so next time it will be downloaded
         chromeSettings.setDriverPath(ezHome+File.separator+"chrome"+File.separator+"driver"+File.separator+"chromedriver");
-        chromeSettings.setDefaultTimeout(5);
+        chromeSettings.setDefaultTimeout(10);
         new File(chromeSettings.getUserDataDir()).mkdirs();
         new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
         mainSettings.setChrome(chromeSettings);

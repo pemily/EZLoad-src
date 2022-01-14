@@ -17,7 +17,7 @@ public class EzServerState {
     private Set<ShareValue> newShares = new HashSet<>();
     private List<String> newPRUs = new LinkedList<>();
 
-    private EZPortfolioProxy ezPortfolioProxy; // cached, if null will be loaded from google, else clone it and use it
+    private EZPortfolioProxy ezPortfolioProxy; // cached, if null will be loaded from google drive, else clone it and use it
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -65,5 +65,14 @@ public class EzServerState {
 
     public void setEzPortfolioProxy(EZPortfolioProxy ezPortfolioProxy) {
         this.ezPortfolioProxy = ezPortfolioProxy;
+    }
+
+    public void clear(){
+        ezPortfolioProxy = null;
+        processRunning = false;
+        ezReports = new LinkedList<>();
+        filesNotYetLoaded = new LinkedList<>();
+        newShares = new HashSet<>();
+        newPRUs = new LinkedList<>();
     }
 }

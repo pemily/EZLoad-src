@@ -5,6 +5,11 @@
     <groupId>com.pascal.ezload</groupId>
     <artifactId>EZLoadRoot</artifactId>
     <version>1.0-SNAPSHOT</version>
+        <!--
+            Pour changer la version et le faire dans tous les sous modules:
+                mvn versions:set -DnewVersion=2.0-SNAPSHOT
+                mvn versions:commit # pour supprimer les fichiers backup du pom.xml
+        -->
     <packaging>pom</packaging>
 
 

@@ -2,10 +2,7 @@ package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -48,7 +45,10 @@ public class BaseSelenium {
             reporting.info("Chrome user data dir: " + chromeSettings.getUserDataDir());
             reporting.info("Chrome download dir: " + chromeDownloadDir);
 
+            options.setPageLoadStrategy(PageLoadStrategy.NONE);
             options.addArguments("user-data-dir=" + chromeSettings.getUserDataDir());
+            options.addArguments("--disable-gpu");
+            options.addArguments("--dns-prefetch-disable");
             options.addArguments("profile-directory=Default"); // only Default works to change the download.default_directory
             //      options.addArguments("--enable-automation"); // sinon les creds service mache pas
 

@@ -139,18 +139,18 @@ export function Config(props: ConfigProps) {
                            </Help>
                        </Box>                        
                     </Box>
-{
-                  /* <Heading level="5">Téléchargements</Heading>
+{/*
+                    <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">
-                        <TextField id="ezDownloadDir" label="Emplacement des rapports" value={props.ezProfil.downloadDir}
+                        <TextField id="ezDownloadDir" label="Emplacement des rapports téléchargés" value={props.ezProfil.downloadDir}
                             isRequired={true} errorMsg={props.mainSettings.ezLoad?.field2ErrorMsg?.downloadDir}
                             readOnly={props.readOnly}
-                            onChange={newValue  => saveEzProfil(
+                            onChange={newValue  => saveEzProfile(
                                 { ...props.ezProfil,
                                     downloadDir: newValue
                                }, props.ezProfilStateSetter)}/>
-                    </Box> */
-}
+                    </Box>
+*/}
                     <Box>
                         <Box direction="row" justify="start">
                             <Heading level="5" self-align="start">BourseDirect</Heading>
@@ -169,7 +169,7 @@ export function Config(props: ConfigProps) {
                                 onChange={newValue => savePassword('BourseDirect', props?.bourseDirectAuthInfo?.username, newValue, props.bourseDirectAuthInfoSetter)}/>
                         </Box>
                         <Box align="start" margin={{left: 'large', top:'none', bottom: 'medium'}}>                           
-                            <Text size="small">Selection des comptes à traiter:</Text>
+                            <Text size="small">Sélection des comptes à traiter:</Text>
                             <Table margin="xsmall" cellPadding="none" cellSpacing="none">
                                 <TableHeader>
                                     <TableRow>
