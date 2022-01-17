@@ -299,7 +299,7 @@ export function App(){
                                             }
                                             size="small" icon={<Upload size='small'/>} label="Mettre à jour EZPortfolio"/>      
                                     { ezProfil.ezPortfolio?.ezPortfolioUrl
-                                        && (<Anchor alignSelf="center" target="ezPortfolio" color="brand" href={ezProfil.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
+                                        && (<Anchor alignSelf="center" target={"ezPortfolio"+mainSettings.activeEzProfilName} color="brand" href={ezProfil.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
                                 { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
                                 <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>

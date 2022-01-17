@@ -44,6 +44,7 @@ public class EZHttpServer {
             resource_handler.setDirectoriesListed(false);
             resource_handler.setWelcomeFiles(new String[]{"index.html"});
             resource_handler.setBaseResource(staticPages);
+            resource_handler.setCacheControl("no-store,no-cache,must-revalidate");
             ContextHandler resourceContextHandler = new ContextHandler("/");
             resourceContextHandler.setHandler(resource_handler);
             handlers.addHandler(resourceContextHandler);
@@ -59,6 +60,8 @@ public class EZHttpServer {
 
         ServletHolder serHol = new ServletHolder(new ServletContainer(config));
         servletHandler.addServlet(serHol, "/api/*");
+        servletHandler.setInitParameter("cacheControl", "max-age=0,public");
+        servletHandler.setInitParameter("useFileMappedBuffer", "false");
         server.setStopAtShutdown(true);
         server.start();
     }
