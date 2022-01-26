@@ -2,8 +2,6 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
@@ -20,9 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
-    private static final int FIRST_ROW_MON_PORTEFEUILLE = 4;
-    private static final int FIRST_ROW_PRU = 5;
-    private static final int FIRST_ROW_MES_OPERATIONS = 1;
+    public static final int FIRST_ROW_MON_PORTEFEUILLE = 4;
+    public static final int FIRST_ROW_PRU = 5;
+    public static final int FIRST_ROW_MES_OPERATIONS = 1;
 
     private GDriveSheets sheets;
     private EZPortfolio ezPortfolio;
@@ -42,7 +40,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
         List<SheetValues> ezSheets = sheets.batchGet(reporting,
                                             "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":L",
-                                                    "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":L",
+                                                    "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":O",
                                                     "PRU!A"+FIRST_ROW_PRU+":A");
 
         SheetValues allOperations = ezSheets.get(0);
@@ -119,10 +117,10 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             reporting.info("Saving "+nbOperationSaved.get()+" operations");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
             sheets.batchUpdate(reporting,
-                    new SheetValues("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
+                    SheetValues.createFromRowLists("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
                     monPortefeuille,
-                    new SheetValues("PRU!A"+(ezPortfolio.getPru().getNumberOfExistingPRUs()+FIRST_ROW_PRU) + ":A",
+                    SheetValues.createFromRowLists("PRU!A"+(ezPortfolio.getPru().getNumberOfExistingPRUs()+FIRST_ROW_PRU) + ":A",
                                 ezPortfolio.getPru().getNewPRUs()));
             ezPortfolio.getMesOperations().saveDone();
             ezPortfolio.getPru().saveDone();

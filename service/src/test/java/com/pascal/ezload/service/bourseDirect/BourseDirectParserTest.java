@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
+import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
@@ -159,7 +160,7 @@ public class BourseDirectParserTest {
         TextReporting reporting = new TextReporting();
         BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-        ShareUtil shareUtil = new ShareUtil(new PRU(new SheetValues("a1:a", new LinkedList<>())), new HashSet<>());
+        ShareUtil shareUtil = new ShareUtil(new PRU(SheetValues.createFromRowLists("a1:a", new LinkedList<>())), new HashSet<>());
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         mainSettings.setEzLoad(ezLoad);

@@ -8,7 +8,6 @@ import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class MonPortefeuille implements MonPortefeuilleData {
 
-    private static final String TOTAL_MARKER = "TOTAL";
+    private static final String TOTAL_MARKER = "TOTAL"; // marker for the last row in the MonPortefeuille sheet
 
     public static final int VALEUR_COL = 0;
     public static final int ACCOUNT_TYPE_COL = 1;
@@ -30,6 +29,9 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int COST_PRICE_UNITARY_COL = 9;
     public static final int QUANTITY_COL = 10;
     public static final int ANNUAL_DIVIDEND_COL = 11;
+    public static final int EMPTY_DO_NOT_USE = 12;
+    public static final int MONNAIE_COL = 13;
+    public static final int COURS_VALEUR_COL = 14;
 
     private final SheetValues portefeuille;
 
@@ -67,6 +69,8 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public void apply(EzPortefeuilleEdition ezPortefeuilleEdition) {
         Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getTickerGoogleFinance());
         Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getTickerGoogleFinance()));
+        int rowNumber = row.getRowNumber();
+
         row.setValue(VALEUR_COL, ezPortefeuilleEdition.getValeur());
         row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccountType());
         row.setValue(BROKER_COL, ezPortefeuilleEdition.getBroker());
@@ -78,6 +82,29 @@ public class MonPortefeuille implements MonPortefeuilleData {
         row.setValue(COST_PRICE_UNITARY_COL, ezPortefeuilleEdition.getCostPrice());
         row.setValue(QUANTITY_COL, ezPortefeuilleEdition.getQuantity());
         row.setValue(ANNUAL_DIVIDEND_COL, ezPortefeuilleEdition.getAnnualDividend());
+        //row.setValue(MONNAIE_COL, "=IFERROR(IF($D"+rowNumber+"=\"LIQUIDITE\";\"EUR\";"+ retryIfError(2,"GOOGLEFINANCE($D"+rowNumber+";\"currency\")")+");0)");
+        //row.setValue(COURS_VALEUR_COL, "=IFERROR(IF($D"+rowNumber+"=\"LIQUIDITE\";1;IF($N"+rowNumber+"=\"GBX\";"+ retryIfError(2, "GOOGLEFINANCE($D"+rowNumber+")/100")+";"+ retryIfError(2, "GOOGLEFINANCE($D"+rowNumber+")")+"));0)");
+
+        // A cause d'un bug sur la methode googlefinance qui ne s'execute pas correctement, je dois mettre cette logique de ezPortfolio ici :(
+        if (ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())){
+            // Ici on est sur la ligne LIQUIDITE
+            row.setValue(MONNAIE_COL, "EUR");
+            row.setValue(COURS_VALEUR_COL, "1");
+        }
+        else {
+            row.setValue(MONNAIE_COL, "="+retryIfError(2, "GOOGLEFINANCE(\"" +ezPortefeuilleEdition.getTickerGoogleFinance() + "\";\"currency\")"));
+            if ("GBX".equals(ezPortefeuilleEdition.getTickerGoogleFinance())){
+                row.setValue(COURS_VALEUR_COL, "="+retryIfError(2, "GOOGLEFINANCE(\"" +ezPortefeuilleEdition.getTickerGoogleFinance() + "\")/100"));
+            }
+            else{
+                row.setValue(COURS_VALEUR_COL,"="+retryIfError(2, "GOOGLEFINANCE(\"" + ezPortefeuilleEdition.getTickerGoogleFinance() + "\")"));
+            }
+        }
+    }
+
+    private static String retryIfError(int n, String function){
+        if (n == 0) return function;
+        return retryIfError(n-1,"IFERROR("+function+";"+function+")");
     }
 
     public void fill(EzData data, String tickerCode){

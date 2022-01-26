@@ -72,7 +72,7 @@ public class RulesEngine {
                     // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
                     ezPortfolioProxy.fillFromMonPortefeuille(ezData, "");
                 }
-                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(ezData, ezOperationEditions.get(0), ruleDef))) { // test if the first generated operations already exists, if yes, we already loaded this operation
+                else if (!ezPortfolioProxy.isOperationsExists(MesOperations.newOperationRow(-1, ezData, ezOperationEditions.get(0), ruleDef))) { // test if the first generated operations already exists, if yes, we already loaded this operation
                     ezEdition.setEzOperationEditions(ezOperationEditions);
                     List<EzPortefeuilleEdition> ezPortefeuilleEditions = applyRuleForPortefeuille(ruleDef, ezPortfolioProxy, ezData);
                     List<String> allErrors = ezPortefeuilleEditions.stream().flatMap(p -> p.errorsAsList().stream()).collect(Collectors.toList());

@@ -12,13 +12,16 @@ import org.apache.commons.lang3.StringUtils;
 public class Row {
 
     private final List<Object> values;
+    private int rowNumber;
 
-    public Row(){
+    public Row(int rowNumber){
         this.values = new LinkedList<>();
+        this.rowNumber = rowNumber;
     }
 
-    public Row(List<Object> values){
+    public Row(int rowNumber, List<Object> values){
         this.values = values;
+        this.rowNumber = rowNumber;
     }
 
     public EZDate getValueDate(int colIndex) {
@@ -53,9 +56,17 @@ public class Row {
     }
 
     public Row createDeepCopy(){
-        return new Row(values.stream().map(v -> {
+        return new Row(rowNumber, values.stream().map(v -> {
                 if (v instanceof String) return v;
                 else throw new IllegalStateException("Do I have another type in the Row??"); // I think I have only Strings
             }).collect(Collectors.toList()));
+    }
+
+    public int getRowNumber(){
+        return rowNumber;
+    }
+
+    public void setRowNumber(int rowNumber) {
+        this.rowNumber = rowNumber;
     }
 }

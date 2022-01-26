@@ -20,7 +20,7 @@ public class PRU {
 
 
     public String getPRUCellReference(String ezShareName){
-        int refIndex = 5; // the first row start at 5 in ezPortfolio
+        int refIndex = EZPorfolioProxyV5.FIRST_ROW_PRU; // the first row start in ezPortfolio
         boolean found = false;
         for (Row row : existingPRUs.getValues()){
             if (row.getValueStr(SHARE_NAME).equals(ezShareName)){
@@ -43,7 +43,7 @@ public class PRU {
 
 
     public void newPRU(String ezShareName){
-        Row r = new Row();
+        Row r = new Row(EZPorfolioProxyV5.FIRST_ROW_PRU+newPRUs.size());
         r.setValue(SHARE_NAME, ezShareName);
         newPRUs.add(r);
     }

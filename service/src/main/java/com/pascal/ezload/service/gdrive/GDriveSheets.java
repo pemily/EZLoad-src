@@ -10,7 +10,6 @@ import com.pascal.ezload.service.util.StringUtils;
 import com.pascal.ezload.service.util.SupplierWithException;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,8 +46,7 @@ public class GDriveSheets {
             return response.getValues();
         });
         reporting.info("Google Drive lecture OK");
-        List<Row> rows = r.stream().map(Row::new).collect(Collectors.toList());
-        return new SheetValues(range, rows);
+        return SheetValues.createFromObjectLists(range, r);
     }
 
     public int update(Reporting reporting, String range, List<Row> values) throws Exception {
@@ -75,11 +73,7 @@ public class GDriveSheets {
                     .batchGet(spreadsheetId)
                     .setRanges(ranges)
                     .execute();
-            return resp.getValueRanges().stream().map(vr -> {
-                List<Row> rows = vr.getValues() == null ? new LinkedList<>() : vr.getValues().stream().map(Row::new).collect(Collectors.toList());
-                return new SheetValues(vr.getRange(), rows);
-            }
-            ).collect(Collectors.toList());
+            return resp.getValueRanges().stream().map(vr -> SheetValues.createFromObjectLists(vr.getRange(), vr.getValues())).collect(Collectors.toList());
         });
     }
 
@@ -123,4 +117,5 @@ public class GDriveSheets {
             throw e;
         }
     }
+
 }

@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MesOperations  {
-
     private static final String BIENTOT_RENTIER_OPERATION = "EZLoad %s - %s"; // EZLoad BourseDirect v1 - ACHAT COMPTANT
 
     private static final int DATE_COL = 0;
@@ -50,24 +49,15 @@ public class MesOperations  {
     }
 
     public boolean isOperationsExists(Row operation){
-        return existingOperations.getValues().stream().filter(
-            row ->
-                 operation.getValueDate(DATE_COL).equals(row.getValueDate(DATE_COL))
-//                && operation.getValueStr(AMOUNT_COL).equals(row.getValueStr(AMOUNT_COL))
-//                && operation.getValueStr(QUANTITE_COL).equals(row.getValueStr(QUANTITE_COL))
+        return existingOperations.getValues().stream().anyMatch(row ->
+                operation.getValueDate(DATE_COL).equals(row.getValueDate(DATE_COL))
                 && operation.getValueStr(COURTIER_DISPLAY_NAME_COL).equals(row.getValueStr(COURTIER_DISPLAY_NAME_COL))
-//                && operation.getValueStr(COMPTE_TYPE_COL).equals(row.getValueStr(COMPTE_TYPE_COL))
                 && operation.getValueStr(ACCOUNT_DECLARED_NUMBER_COL).equals(row.getValueStr(ACCOUNT_DECLARED_NUMBER_COL))
-                && operation.getValueStr(SOURCE_FILE_COL).equals(row.getValueStr(SOURCE_FILE_COL))
-//                && operation.getValueStr(INFORMATION_COL).equals(row.getValueStr(INFORMATION_COL))
-//                && operation.getValueStr(OPERATION_TYPE_COL).equals(row.getValueStr(OPERATION_TYPE_COL))
-//                && operation.getValueStr(COUNTRY_COL).equals(row.getValueStr(COUNTRY_COL))
-//                && operation.getValueStr(ACTION_NAME_COL).equals(row.getValueStr(ACTION_NAME_COL))
-        ).count() > 0;
+                && operation.getValueStr(SOURCE_FILE_COL).equals(row.getValueStr(SOURCE_FILE_COL)));
     }
 
-    public static Row newOperationRow(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef) {
-        Row r = new Row();
+    public static Row newOperationRow(int rowNumber, EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef) {
+        Row r = new Row(rowNumber);
         r.setValue(DATE_COL, operationEdition.getDate());
         r.setValue(COMPTE_TYPE_COL, operationEdition.getAccountType());
 
@@ -88,7 +78,7 @@ public class MesOperations  {
     }
 
     public void newOperation(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef){
-        newOperations.add(newOperationRow(ezData, operationEdition, ruleDef));
+        newOperations.add(newOperationRow(EZPorfolioProxyV5.FIRST_ROW_MES_OPERATIONS+newOperations.size(), ezData, operationEdition, ruleDef));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {
