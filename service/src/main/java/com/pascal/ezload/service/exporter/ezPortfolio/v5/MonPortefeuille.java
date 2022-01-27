@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class MonPortefeuille implements MonPortefeuilleData {
 
-    private static final String TOTAL_MARKER = "TOTAL"; // marker for the last row in the MonPortefeuille sheet
+    public static final String TOTAL_MARKER = "TOTAL"; // marker for the last row in the MonPortefeuille sheet
 
     public static final int VALEUR_COL = 0;
     public static final int ACCOUNT_TYPE_COL = 1;
@@ -92,12 +92,11 @@ public class MonPortefeuille implements MonPortefeuilleData {
             row.setValue(COURS_VALEUR_COL, "1");
         }
         else {
-            row.setValue(MONNAIE_COL, "="+retryIfError(2, "GOOGLEFINANCE(\"" +ezPortefeuilleEdition.getTickerGoogleFinance() + "\";\"currency\")"));
-            if ("GBX".equals(ezPortefeuilleEdition.getTickerGoogleFinance())){
-                row.setValue(COURS_VALEUR_COL, "="+retryIfError(2, "GOOGLEFINANCE(\"" +ezPortefeuilleEdition.getTickerGoogleFinance() + "\")/100"));
-            }
-            else{
-                row.setValue(COURS_VALEUR_COL,"="+retryIfError(2, "GOOGLEFINANCE(\"" + ezPortefeuilleEdition.getTickerGoogleFinance() + "\")"));
+            row.setValue(MONNAIE_COL, "=GOOGLEFINANCE(\"" + ezPortefeuilleEdition.getTickerGoogleFinance() + "\";\"currency\")");
+            if ("GBX".equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
+                row.setValue(COURS_VALEUR_COL, "=GOOGLEFINANCE(\"" + ezPortefeuilleEdition.getTickerGoogleFinance() + "\")/100");
+            } else {
+                row.setValue(COURS_VALEUR_COL, "=GOOGLEFINANCE(\"" + ezPortefeuilleEdition.getTickerGoogleFinance() + "\")");
             }
         }
     }

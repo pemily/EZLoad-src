@@ -12,9 +12,12 @@ import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ModelUtils;
+import com.pascal.ezload.service.util.Sleep;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
@@ -116,6 +119,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         if (operations.getNewOperations().size() > 0) {
             reporting.info("Saving "+nbOperationSaved.get()+" operations");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
+
+            // Force la mise a jours des methods GoogleFinance dans les cellulles N&O de MonPortefeuille avant la mise a jour de toutes les autres opérations. (sinon ca bug)
+            fixGoogleFinanceBug(sheets, reporting, monPortefeuille);
+            // attend un peu pour etre sur que ce soit fait
+            Sleep.waitSeconds(2);
             sheets.batchUpdate(reporting,
                     SheetValues.createFromRowLists("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
@@ -128,6 +136,18 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
         reporting.info("Save done!");
         return notSaved;
+    }
+
+    private void fixGoogleFinanceBug(GDriveSheets sheets, Reporting reporting, SheetValues monPortefeuille) throws Exception {
+        SheetValues.CellXY[] range = monPortefeuille.getCellsRange();
+        List<Row> googleFinanceFcts = monPortefeuille.getValues().stream()
+                                                    .map(r -> {
+                                                        Row newRow = new Row(r.getRowNumber());
+                                                        newRow.setValue(0, r.getValueStr(MonPortefeuille.MONNAIE_COL));
+                                                        newRow.setValue(1, r.getValueStr(MonPortefeuille.COURS_VALEUR_COL));
+                                                        return newRow;
+                                                    }).collect(Collectors.toList());
+        sheets.update(reporting, "MonPortefeuille!N"+range[0].getRowNumber()+":O"+range[1].getRowNumber(), googleFinanceFcts);
     }
 
     @Override

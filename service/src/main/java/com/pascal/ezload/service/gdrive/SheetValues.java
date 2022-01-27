@@ -41,6 +41,10 @@ public class SheetValues {
         return range;
     }
 
+    public CellXY[] getCellsRange(){
+        return extractCells(range);
+    }
+
     public List<Row> getValues() {
         return values;
     }
@@ -78,7 +82,7 @@ public class SheetValues {
         return new CellXY(col.toString(), rowNumber);
     }
 
-    private static class CellXY {
+    public static class CellXY {
         CellXY(String colLetter, int rowNumber){
             this.colLetter = colLetter;
             this.rowNumber = rowNumber;
@@ -86,5 +90,13 @@ public class SheetValues {
 
         String colLetter;
         int rowNumber; // -1 if the Row is not specified => example: when the Range is just MesOperations!A1:L <= Toutes les lignes avec des données colonnes: A-L
+
+        public String getColLetter() {
+            return colLetter;
+        }
+
+        public int getRowNumber() {
+            return rowNumber;
+        }
     }
 }

@@ -82,6 +82,7 @@ public class GDriveSheets {
     }
 
     public int batchUpdate(Reporting reporting, List<SheetValues> sheetValues) throws Exception {
+        reporting.info("Mise à jour de Google Drive: "+sheetValues.stream().map(SheetValues::getRange).collect(Collectors.joining(" & ")));
         return retryOnTimeout(reporting, RETRY_NB, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
             buvr.setValueInputOption("USER_ENTERED");
