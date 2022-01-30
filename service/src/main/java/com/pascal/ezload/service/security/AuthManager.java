@@ -35,16 +35,13 @@ public class AuthManager {
         this.authFilePath = authFilePath;
     }
 
-    public AuthInfo getAuthWithDummyPassword(EnumEZBroker courtier) throws Exception {
+    public AuthInfo getAuthWithoutPassword(EnumEZBroker courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
         AuthInfo result = new AuthInfo();
         result.setUsername(info.getUsername());
-        String dummyPassword = "";
-        if (passPhrase != null && info.getPassword() != null)
-            for (int i = 0; i < decryptPassword(info.getPassword(),passPhrase).length(); i++) dummyPassword += "@";
-        result.setPassword(StringUtils.isBlank(info.getPassword()) ? null : dummyPassword); // to send it to the browser
+        result.setPassword(""); // to not send the password to the browser
         return result;
     }
 

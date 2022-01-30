@@ -70,7 +70,6 @@
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
     "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_CREDIT",
-    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_CREDIT"
   } ]
 }

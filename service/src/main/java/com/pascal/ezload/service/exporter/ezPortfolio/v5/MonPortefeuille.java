@@ -32,6 +32,30 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int EMPTY_DO_NOT_USE = 12;
     public static final int MONNAIE_COL = 13;
     public static final int COURS_VALEUR_COL = 14;
+    public static final int VALORISATION_NOT_USED = 15;
+    public static final int PART_DU_PORTFEUILLE_NOT_USED = 16;
+    public static final int PLUS_MOINS_VALUE_EURO_NOT_USED = 17;
+    public static final int PLUS_MOINS_VALUE_PERCENT_NOT_USED = 18;
+    public static final int MONTANT_DIV_ANNUEL_PREF_BRUT_NOT_USED = 19;
+    public static final int MONTANT_DIV_ANNUEL_PREF_VERSE_NOT_USED = 20;
+    public static final int MONTANT_DIV_ANNUEL_PREF_NET_NOT_USED = 21;
+    public static final int RENDEMENT_BRUT_NOT_USED = 22;
+    public static final int RENDEMENT_SUR_PRU_NOT_USED = 23;
+    public static final int RENDEMENT_VERSE_NOT_USED = 24;
+    public static final int RENDEMENT_NET_NOT_USED = 25;
+    public static final int IMPOT_REVENUE_NOT_USED = 26;
+    public static final int CALENDRIER_DIVIDEND_JANVIER = 27;
+    public static final int CALENDRIER_DIVIDEND_FEVRIER = 28;
+    public static final int CALENDRIER_DIVIDEND_MARS = 29;
+    public static final int CALENDRIER_DIVIDEND_AVRIL = 30;
+    public static final int CALENDRIER_DIVIDEND_MAI = 31;
+    public static final int CALENDRIER_DIVIDEND_JUIN = 32;
+    public static final int CALENDRIER_DIVIDEND_JUILLET = 33;
+    public static final int CALENDRIER_DIVIDEND_AOUT = 34;
+    public static final int CALENDRIER_DIVIDEND_SEPTEMBRE = 35;
+    public static final int CALENDRIER_DIVIDEND_OCTOBRE = 36;
+    public static final int CALENDRIER_DIVIDEND_NOVEMBRE = 37;
+    public static final int CALENDRIER_DIVIDEND_DECEMBRE = 38;
 
     private final SheetValues portefeuille;
 
@@ -82,6 +106,19 @@ public class MonPortefeuille implements MonPortefeuilleData {
         row.setValue(COST_PRICE_UNITARY_COL, ezPortefeuilleEdition.getCostPrice());
         row.setValue(QUANTITY_COL, ezPortefeuilleEdition.getQuantity());
         row.setValue(ANNUAL_DIVIDEND_COL, ezPortefeuilleEdition.getAnnualDividend());
+        row.setValue(CALENDRIER_DIVIDEND_JANVIER, ezPortefeuilleEdition.getMonthlyDividend(1));
+        row.setValue(CALENDRIER_DIVIDEND_FEVRIER, ezPortefeuilleEdition.getMonthlyDividend(2));
+        row.setValue(CALENDRIER_DIVIDEND_MARS, ezPortefeuilleEdition.getMonthlyDividend(3));
+        row.setValue(CALENDRIER_DIVIDEND_AVRIL, ezPortefeuilleEdition.getMonthlyDividend(4));
+        row.setValue(CALENDRIER_DIVIDEND_MAI, ezPortefeuilleEdition.getMonthlyDividend(5));
+        row.setValue(CALENDRIER_DIVIDEND_JUIN, ezPortefeuilleEdition.getMonthlyDividend(6));
+        row.setValue(CALENDRIER_DIVIDEND_JUILLET, ezPortefeuilleEdition.getMonthlyDividend(7));
+        row.setValue(CALENDRIER_DIVIDEND_AOUT, ezPortefeuilleEdition.getMonthlyDividend(8));
+        row.setValue(CALENDRIER_DIVIDEND_SEPTEMBRE, ezPortefeuilleEdition.getMonthlyDividend(9));
+        row.setValue(CALENDRIER_DIVIDEND_OCTOBRE, ezPortefeuilleEdition.getMonthlyDividend(10));
+        row.setValue(CALENDRIER_DIVIDEND_NOVEMBRE, ezPortefeuilleEdition.getMonthlyDividend(11));
+        row.setValue(CALENDRIER_DIVIDEND_DECEMBRE, ezPortefeuilleEdition.getMonthlyDividend(12));
+
         //row.setValue(MONNAIE_COL, "=IFERROR(IF($D"+rowNumber+"=\"LIQUIDITE\";\"EUR\";"+ retryIfError(2,"GOOGLEFINANCE($D"+rowNumber+";\"currency\")")+");0)");
         //row.setValue(COURS_VALEUR_COL, "=IFERROR(IF($D"+rowNumber+"=\"LIQUIDITE\";1;IF($N"+rowNumber+"=\"GBX\";"+ retryIfError(2, "GOOGLEFINANCE($D"+rowNumber+")/100")+";"+ retryIfError(2, "GOOGLEFINANCE($D"+rowNumber+")")+"));0)");
 

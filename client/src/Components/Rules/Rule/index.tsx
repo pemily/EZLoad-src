@@ -275,9 +275,6 @@ export function Rule(props: RuleProps){
                         {cellData("Quantité", datanum.portefeuilleQuantiteExpr, datanum.field2ErrorMsg?.portefeuilleQuantiteExpr, (newVal) => {
                             return saveRule({...ruleDef, portefeuilleRules: ruleDef.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleQuantiteExpr: newVal.trim()})});
                         })}     
-                        {cellData("Dividende annuel", datanum.portefeuilleDividendeAnnuelExpr, datanum.field2ErrorMsg?.portefeuilleDividendeAnnuelExpr, (newVal) => {
-                            return saveRule({...ruleDef, portefeuilleRules: ruleDef.portefeuilleRules?.map(item => item !== datanum ? item : {...item, portefeuilleDividendeAnnuelExpr: newVal.trim()})});
-                        })}  
                     </Box>     
                 </Box>
                 <Button alignSelf="center" margin="none" icon={<Trash size="medium" color="status-critical"/>} 

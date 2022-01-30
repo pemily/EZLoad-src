@@ -6,11 +6,11 @@ import com.pascal.ezload.service.config.SettingsManager;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,10 +27,19 @@ public class ExplorerHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         File file = new File(ezProfil.getDownloadDir()+File.separator+sourceFile);
-        FileInputStream fileInputStream = new FileInputStream(file);
-        Response.ResponseBuilder responseBuilder = Response.ok(fileInputStream);
+        BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
+        StreamingOutput output = out -> {
+            int length;
+            byte[] buffer = new byte[1024];
+            while((length = input.read(buffer)) != -1) {
+                out.write(buffer, 0, length);
+            }
+            out.flush();
+            input.close();
+        };
+        Response.ResponseBuilder responseBuilder = Response.ok(output);
         responseBuilder.type("application/pdf");
-        responseBuilder.header("Content-Disposition","filename=\"" + sourceFile + "\"");
+        responseBuilder.header("Content-Disposition", "filename=\"" + sourceFile + "\"");
         return responseBuilder.build();
     }
 

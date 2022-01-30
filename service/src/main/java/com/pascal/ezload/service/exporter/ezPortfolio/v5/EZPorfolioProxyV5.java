@@ -43,7 +43,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
         List<SheetValues> ezSheets = sheets.batchGet(reporting,
                                             "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":L",
-                                                    "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":O",
+                                                    "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":AN",
                                                     "PRU!A"+FIRST_ROW_PRU+":A");
 
         SheetValues allOperations = ezSheets.get(0);

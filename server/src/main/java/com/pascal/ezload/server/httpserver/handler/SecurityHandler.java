@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 
 @Path("security")
 public class SecurityHandler {
+    private static String BAD_PASSWORD = "***";
+
     @Inject
     private ProcessManager processManager;
 
@@ -39,7 +41,7 @@ public class SecurityHandler {
         else {
             authInfo.setUsername(authParam.getUsername());
 
-            if (!StringUtils.isBlank(authParam.getPassword())){
+            if (!StringUtils.isBlank(authParam.getPassword()) && !BAD_PASSWORD.equals(authParam.getPassword())){
                 authInfo.setPassword(authParam.getPassword());
             }
             authManager.saveAuthInfo(courtier, authInfo);
@@ -49,12 +51,14 @@ public class SecurityHandler {
     @GET
     @Path("/info")
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthInfo getAuthWithDummyPassword(@NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
+    public AuthInfo getAuthWithoutPassword(@NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
-        return authManager.getAuthWithDummyPassword(courtier);
+        AuthInfo result = authManager.getAuthWithoutPassword(courtier);
+            result.setPassword(BAD_PASSWORD);
+        return result;
     }
 
     @GET

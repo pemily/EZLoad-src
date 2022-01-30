@@ -17,6 +17,8 @@ public class EzPortefeuilleEdition implements WithErrors {
     private String quantity;
     private String annualDividend;
 
+    private String monthlyDividend[] = new String[12];
+
     public String getValeur() {
         return valeur;
     }
@@ -121,5 +123,15 @@ public class EzPortefeuilleEdition implements WithErrors {
     @Override
     public void setErrors(String errors) {
         this.errors = errors;
+    }
+
+    // month between 1 & 12
+    public String getMonthlyDividend(int month) {
+        return monthlyDividend[month-1];
+    }
+
+    // month between 1 & 12
+    public void setMonthlyDividend(int month, String monthlyDividend){
+        this.monthlyDividend[month-1] = monthlyDividend;
     }
 }

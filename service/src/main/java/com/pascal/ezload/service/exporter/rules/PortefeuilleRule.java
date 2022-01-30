@@ -8,7 +8,7 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
     public enum Field{ condition, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
         portefeuilleTickerGoogleFinanceExpr, portefeuillePaysExpr, portefeuilleSecteurExpr, portefeuilleIndustrieExpr,
         portefeuilleEligibiliteAbbattement40Expr, portefeuilleTypeExpr, portefeuillePrixDeRevientExpr,
-        portefeuilleQuantiteExpr, portefeuilleDividendeAnnuelExpr}
+        portefeuilleQuantiteExpr}
 
 
     private String condition;
@@ -23,7 +23,6 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
     private String portefeuilleTypeExpr;
     private String portefeuillePrixDeRevientExpr;
     private String portefeuilleQuantiteExpr;
-    private String portefeuilleDividendeAnnuelExpr;
 
 
     public String getCondition() {
@@ -32,14 +31,6 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
 
     public void setCondition(String condition) {
         this.condition = condition;
-    }
-
-    public String getPortefeuilleDividendeAnnuelExpr() {
-        return portefeuilleDividendeAnnuelExpr;
-    }
-
-    public void setPortefeuilleDividendeAnnuelExpr(String portefeuilleDividendeAnnuelExpr) {
-        this.portefeuilleDividendeAnnuelExpr = portefeuilleDividendeAnnuelExpr;
     }
 
     public String getPortefeuilleQuantiteExpr() {
@@ -144,7 +135,6 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
         new StringValue(true).validate(this, Field.portefeuilleTypeExpr.name(), portefeuilleTypeExpr);
         new StringValue(true).validate(this, Field.portefeuillePrixDeRevientExpr.name(), portefeuillePrixDeRevientExpr);
         new StringValue(true).validate(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr);
-        new StringValue(true).validate(this, Field.portefeuilleDividendeAnnuelExpr.name(), portefeuilleDividendeAnnuelExpr);
         return this;
     }
 }

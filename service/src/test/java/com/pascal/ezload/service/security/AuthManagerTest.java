@@ -19,7 +19,7 @@ public class AuthManagerTest {
         assertEquals("pascal", login.getUsername());
         assertEquals("motdepasse", login.getPassword());
 
-        login = authManager.getAuthWithDummyPassword(EnumEZBroker.BourseDirect);
+        login = authManager.getAuthWithoutPassword(EnumEZBroker.BourseDirect);
         assertEquals("pascal", login.getUsername());
         assertEquals("@@@@@@@@@@", login.getPassword());
     }

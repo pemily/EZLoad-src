@@ -7,6 +7,8 @@ public class EZDate {
     private int month;
     private int year;
 
+    // month => between 1 - 12
+    // day => between 1 - 31
     public EZDate(int year, int month, int day){
         this.year = year;
         this.month = month;

@@ -46,8 +46,7 @@
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
     "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "computePRU()",
-    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_QUANTITE",
-    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite + ezOperation_QUANTITE"
   }, {
     "field2ErrorMsg" : { },
     "condition" : "",
@@ -61,7 +60,6 @@
     "portefeuilleEligibiliteAbbattement40Expr" : "ezMonPortefeuilleEligibiliteAbbatement40",
     "portefeuilleTypeExpr" : "computePortefeuilleType()",
     "portefeuillePrixDeRevientExpr" : "ezMonPortefeuillePrixRevientUnitaire",
-    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperation_DEBIT",
-    "portefeuilleDividendeAnnuelExpr" : "ezMonPortefeuilleDividendeAnnuel"
+    "portefeuilleQuantiteExpr" : "ezMonPortefeuilleQuantite - ezOperation_DEBIT"
   } ]
 }

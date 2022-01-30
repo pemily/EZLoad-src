@@ -163,10 +163,10 @@ export function Config(props: ConfigProps) {
                         <Box direction="row" margin={{left:'medium', top:'none', bottom: 'none'}}>
                             <TextField id="bourseDirectLogin" label="Identifiant de votre compte BourseDirect" value={props?.bourseDirectAuthInfo?.username}                                
                                 readOnly={props.readOnly}
-                                onChange={newValue => savePassword('BourseDirect', newValue, undefined, props.bourseDirectAuthInfoSetter)}/>
-                            <TextField id="bourseDirectPasswd" label="Mot de passe" isPassword={true} value={props?.bourseDirectAuthInfo?.password}
+                                onChange={newValue => savePassword('BourseDirect', newValue, "***", props.bourseDirectAuthInfoSetter)}/> {/* Ici le *** doit etre la meme valeur que la classe: SecurityHandler.BAD_PASSWORD */}
+                            <TextField id="bourseDirectPasswd" label="Mot de passe " isPassword={true} value={props?.bourseDirectAuthInfo?.password}
                                 readOnly={props.readOnly}
-                                onChange={newValue => savePassword('BourseDirect', props?.bourseDirectAuthInfo?.username, newValue, props.bourseDirectAuthInfoSetter)}/>
+                                onChange={newValue => newValue && savePassword('BourseDirect', props?.bourseDirectAuthInfo?.username, newValue, props.bourseDirectAuthInfoSetter)}/>
                         </Box>
                         <Box align="start" margin={{left: 'large', top:'none', bottom: 'medium'}}>                           
                             <Text size="small">Sélection des comptes à traiter:</Text>

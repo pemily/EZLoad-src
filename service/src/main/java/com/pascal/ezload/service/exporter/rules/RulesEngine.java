@@ -14,9 +14,7 @@ import com.pascal.ezload.service.util.ShareUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData.broker_version;
@@ -236,7 +234,37 @@ public class RulesEngine {
         ezPortefeuilleEdition.setType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTypeExpr(), data, functions));
         ezPortefeuilleEdition.setCostPrice(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePrixDeRevientExpr(), data, functions));
         ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
-        ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleDividendeAnnuelExpr(), data, functions));
+
+        try {
+            List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(ezPortefeuilleEdition.getCountry(), ezPortefeuilleEdition.getTickerGoogleFinance());
+            List<String> yearsReversedOrder = dividends.stream().map(FinanceTools.Dividend::getYear).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+            Map<String, List<FinanceTools.Dividend>> dividendPerYear = dividends.stream()
+                    .collect(Collectors.groupingBy(FinanceTools.Dividend::getYear));
+
+            // Calcul du dividend annuelle
+            // recheche la 1ere année avec les dividendes completes
+            Optional<String> yearWithAllDivivdends = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getEx_date().getMonth()==12)).findFirst();
+
+            StringBuilder yearlyDividendsAddition = new StringBuilder();
+            dividendPerYear.get(yearWithAllDivivdends).stream().map(FinanceTools.Dividend::getAmount).collect(Collectors.joining("+"));
+
+
+// TODO            ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, "", data, functions));
+
+            // Calcul du calendrier de dividendes
+            Optional<String> yearForCalendar = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getPayDate().getMonth()==12)).findFirst();
+            Map<Integer, List<FinanceTools.Dividend>> dividendPerMonth = dividendPerYear.get(yearForCalendar)
+                                                                                    .stream().collect(Collectors.groupingBy(d -> d.getPayDate().getMonth()));
+            for (int month = 1; month <= 12; month++){
+                String amountAddition = dividendPerMonth.get(month).stream().map(d -> d.getAmount()).collect(Collectors.joining("+"));
+                ezPortefeuilleEdition.setMonthlyDividend(month, eval(ezPortefeuilleEdition, amountAddition, data, functions));
+            }
+
+
+            //ezPortefeuilleEdition.setMonthlyDividend();
+        } catch (IOException e) {
+            ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes. ("+e.getMessage()+")");
+        }
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)
         // I comment the following line, because it add confusion in the variable we can use in the rule

@@ -28,6 +28,8 @@ public class SettingsManager {
     private static final String defaultEzProfilName = getDefaultProfileName();
     private static final String profilesDirectory = "profiles";
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
+    public final static String RULE_SHARED_DIR =  "shared";
+    public final static String RULE_LOCAL_DIR =  "local";
 
 
     private SettingsManager(String configFile){
@@ -235,6 +237,8 @@ public class SettingsManager {
         ezLoad.setPassPhrase(genString(42));
 
         new File(ezLoad.getRulesDir()).mkdirs();
+        new File(ezHome+File.separator+"rules"+File.separator+RULE_SHARED_DIR).mkdirs();
+        new File(ezHome+File.separator+"rules"+File.separator+RULE_LOCAL_DIR).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
         mainSettings.setEzLoad(ezLoad);
 

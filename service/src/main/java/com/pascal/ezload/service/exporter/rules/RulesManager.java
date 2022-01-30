@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.FileProcessor;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +30,7 @@ public class RulesManager {
     }
 
     public synchronized List<RuleDefinition> getAllRules() throws IOException {
-        return new FileProcessor(mainSettings.getEzLoad().getRulesDir(), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
+        return new FileProcessor(mainSettings.getEzLoad().getRulesDir()+File.separator+SettingsManager.RULE_SHARED_DIR, d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
                 .mapFile(f -> {
                     try {
                         return readRule(f);
@@ -87,7 +89,7 @@ public class RulesManager {
     }
 
     private String getFilePath(String name, RuleDefinition ruleDef){
-        return mainSettings.getEzLoad().getRulesDir()+File.separator+ruleDef.getBroker().getDirName()+"_v"+ruleDef.getBrokerFileVersion()
+        return mainSettings.getEzLoad().getRulesDir()+File.separator+SettingsManager.RULE_SHARED_DIR+File.separator+ruleDef.getBroker().getDirName()+"_v"+ruleDef.getBrokerFileVersion()
                 +File.separator+encodeFile(name)+RULE_FILE_EXTENSION;
     }
 
@@ -100,7 +102,7 @@ public class RulesManager {
     }
 
     private String getCommonFilePath(EnumEZBroker broker, int borkerFileVersion){
-        return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+borkerFileVersion+COMMON_FUNCTIONS_EXTENSION;
+        return mainSettings.getEzLoad().getRulesDir()+File.separator+SettingsManager.RULE_SHARED_DIR+File.separator+broker.getDirName()+"_v"+borkerFileVersion+COMMON_FUNCTIONS_EXTENSION;
     }
 
     public synchronized CommonFunctions getCommonScript(RuleDefinition ruleDef){
@@ -139,7 +141,9 @@ public class RulesManager {
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
         ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
         mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(commonFile), function);
+
         borkerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
         return function;
     }
+
 }

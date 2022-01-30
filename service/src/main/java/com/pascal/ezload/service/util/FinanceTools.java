@@ -2,14 +2,14 @@ package com.pascal.ezload.service.util;
 
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // https://rapidapi.com/category/Finance
 public class FinanceTools {
@@ -89,6 +89,7 @@ public class FinanceTools {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
             con.setRequestMethod("GET");
+            con.setUseCaches(false);
             InputStream input = new BufferedInputStream(con.getInputStream());
 
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
@@ -116,6 +117,7 @@ public class FinanceTools {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
             con.setRequestMethod("GET");
+            con.setUseCaches(false);
             InputStream input = new BufferedInputStream(con.getInputStream());
 
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
@@ -136,6 +138,97 @@ public class FinanceTools {
         }
         finally {
             con.disconnect();
+        }
+    }
+
+
+    public List<Dividend> searchDividends(String country, String actionTicker) throws IOException {
+        if ("US".equals(country)){
+            URL url = new URL("https://seekingalpha.com/api/v3/symbols/"+actionTicker+"/dividend_history?&years=1");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            try {
+                con.setUseCaches(false);
+                con.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+                con.setRequestMethod("GET");
+                InputStream input = new BufferedInputStream(con.getInputStream());
+                Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
+                List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
+                if (history.size() == 0) return new LinkedList<>();
+                return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
+                        .map(attributes ->
+                            new Dividend(attributes.get("year").toString(),
+                                    attributes.get("amount").toString(),
+                                    seekingAlphaDate(attributes.get("ex_date").toString()),
+                                    seekingAlphaDate(attributes.get("declare_date").toString()),
+                                    seekingAlphaDate(attributes.get("pay_date").toString()),
+                                    seekingAlphaDate(attributes.get("record_date").toString()),
+                                    seekingAlphaDate(attributes.get("date").toString()),
+                                    attributes.get("adjusted_amount").toString()))
+                        .collect(Collectors.toList());
+            }
+            finally {
+                con.disconnect();
+            }
+        }
+        return new LinkedList<>();
+    }
+
+    private EZDate seekingAlphaDate(String date){
+        String d[] = StringUtils.divide(date, '/');
+        return new EZDate(Integer.parseInt(d[2]), Integer.parseInt(d[0]), Integer.parseInt(d[1]));
+    }
+
+    public static class Dividend {
+        String year;
+        String amount;
+        EZDate ex_date;
+        EZDate declareDate;
+        EZDate payDate;
+        EZDate recordDate;
+        EZDate date;
+        String adjustedAmount;
+
+        public Dividend(String year, String amount, EZDate ex_date, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, String adjustedAmount) {
+            this.year = year;
+            this.amount = amount;
+            this.ex_date = ex_date;
+            this.declareDate = declareDate;
+            this.payDate = payDate;
+            this.recordDate = recordDate;
+            this.date = date;
+            this.adjustedAmount = adjustedAmount;
+        }
+
+        public String getYear() {
+            return year;
+        }
+
+        public String getAmount() {
+            return amount;
+        }
+
+        public EZDate getEx_date() {
+            return ex_date;
+        }
+
+        public EZDate getDeclareDate() {
+            return declareDate;
+        }
+
+        public EZDate getPayDate() {
+            return payDate;
+        }
+
+        public EZDate getRecordDate() {
+            return recordDate;
+        }
+
+        public EZDate getDate() {
+            return date;
+        }
+
+        public String getAdjustedAmount() {
+            return adjustedAmount;
         }
     }
 }
