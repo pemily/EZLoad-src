@@ -3,6 +3,8 @@ package com.pascal.ezload.service.exporter.rules;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
+import java.util.function.Function;
+
 public class OperationRule extends Checkable<OperationRule> {
 
     public enum Field{ condition, operationDateExpr, operationCompteTypeExpr, operationBrokerExpr,
@@ -113,5 +115,18 @@ public class OperationRule extends Checkable<OperationRule> {
         new StringValue(true).validate(this, Field.operationAmountExpr.name(), operationAmountExpr);
         new StringValue(true).validate(this, Field.operationDescriptionExpr.name(), operationDescriptionExpr);
         return this;
+    }
+
+    public void beforeSave(Function<String, String> normalizer){
+      this.condition = normalizer.apply(this.condition);
+      this.operationDateExpr = normalizer.apply(this.operationDateExpr);
+      this.operationCompteTypeExpr = normalizer.apply(this.operationCompteTypeExpr);
+      this.operationBrokerExpr = normalizer.apply(this.operationBrokerExpr);
+      this.operationQuantityExpr = normalizer.apply(this.operationQuantityExpr);
+      this.operationTypeExpr = normalizer.apply(this.operationTypeExpr);
+      this.operationActionNameExpr = normalizer.apply(this.operationActionNameExpr);
+      this.operationCountryExpr = normalizer.apply(this.operationCountryExpr);
+      this.operationAmountExpr = normalizer.apply(this.operationAmountExpr);
+      this.operationDescriptionExpr = normalizer.apply(this.operationDescriptionExpr);
     }
 }

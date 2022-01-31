@@ -5,9 +5,9 @@
   "brokerFileVersion" : 1,
   "name" : "DIVIDENDE OPTIONNEL",
   "enabled" : true,
-  "description" : "Versement de dividendes en actions, cette opération est enregistré comme étant un versement du dividende en espèces puis en achat de titre\n=> j'ai mis Dividende brut ou Dividende versé?",
+  "description" : [ "Versement de dividendes en actions, cette opération est enregistré comme étant un versement du dividende en espèces puis en achat de titre\n=> j'ai mis Dividende brut ou Dividende versé?" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"DIVIDENDE OPTIONNEL\"",
+  "condition" : "ezOperation_INFO1 == 'DIVIDENDE OPTIONNEL'",
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -16,11 +16,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_QUANTITE",
-    "operationTypeExpr" : "\"Dividende versé\"",
+    "operationTypeExpr" : "'Dividende versé'",
     "operationActionNameExpr" : "ezLiquidityName",
-    "operationCountryExpr" : "\"\"",
+    "operationCountryExpr" : "''",
     "operationAmountExpr" : "ezOperation_COURS*ezOperation_QUANTITE",
-    "operationDescriptionExpr" : "\"Versement de dividende en actions (op1 sur liquidité): \" + ezOperation_QUANTITE+ \" de \" + ezOperationShareUserName + \"(\"+ezShareCode+\")\""
+    "operationDescriptionExpr" : "'Versement de dividende en actions (op1 sur liquidité): ' + ezOperation_QUANTITE+ ' de ' + ezOperationShareUserName + '('+ezShareCode+')'"
   }, {
     "field2ErrorMsg" : { },
     "condition": "",
@@ -28,11 +28,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_QUANTITE",
-    "operationTypeExpr" : "\"Achat titres\"",
+    "operationTypeExpr" : "'Achat titres'",
     "operationActionNameExpr" : "ezOperationShareUserName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperation_COURS*ezOperation_QUANTITE",
-    "operationDescriptionExpr" : "\"Versement de dividende en actions (op2 achat): \" + ezOperation_QUANTITE+ \" de \" + ezOperationShareUserName + \"(\"+ezShareCode+\")\""
+    "operationDescriptionExpr" : "'Versement de dividende en actions (op2 achat): ' + ezOperation_QUANTITE+ ' de ' + ezOperationShareUserName + '('+ezShareCode+')'"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },

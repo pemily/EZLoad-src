@@ -5,7 +5,7 @@ import com.pascal.ezload.service.model.EnumEZBroker;
 public class CommonFunctions {
     private EnumEZBroker broker;
     private int brokerFileVersion;
-    private String script;
+    private String script[];
 
     public EnumEZBroker getBroker() {
         return broker;
@@ -23,11 +23,11 @@ public class CommonFunctions {
         this.brokerFileVersion = brokerFileVersion;
     }
 
-    public String getScript() {
+    public String[] getScript() {
         return script;
     }
 
-    public void setScript(String script) {
+    public void setScript(String script[]) {
         this.script = script;
     }
 }

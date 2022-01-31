@@ -127,11 +127,11 @@ export function Rule(props: RuleProps){
             </Box>
         </Box>
         <Box align="Center" margin="small">
-            <TextAreaField id="description" label="Description" value={ruleDef.description}
+            <TextAreaField id="description" label="Description" value={ruleDef.description?.join("\n")}
                     isRequired={false} errorMsg={ruleDef.field2ErrorMsg?.description}
                     readOnly={readOnly}
                     onChange={newValue => {
-                        saveRule({ ...ruleDef, description: newValue.trim()})
+                        saveRule({ ...ruleDef, description: newValue.split("\n")})
                     }}/>        
         </Box>
         <Box direction="row" align="Center" margin="small">

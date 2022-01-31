@@ -74,12 +74,12 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
                     { busy && (<Box align="center" alignSelf="center" alignContent="center"><Text size="large">Tâche en cours, patientez...</Text><Spinner/></Box>) }
                     { commonFunctions && (
                         <>
-                            <TextAreaField id="common" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion} value={commonFunctions.script}
+                            <TextAreaField id="common" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion} value={commonFunctions.script?.join("\n")}
                                 isRequired={false} 
                                 allowTab={true}
                                 readOnly={props.readOnly || busy}
                                 isFormField={false}
-                                onChange={newValue => saveCommonFunctions({ ...commonFunctions, script: newValue})}/>                 
+                                onChange={newValue => saveCommonFunctions({ ...commonFunctions, script: newValue.split("\n")})}/>                 
                             <Box height="xsmall" width="100%">
                                 <Text size="small">Résultat Validation:</Text>
                                 <TextArea fill contentEditable={false} value={report} />

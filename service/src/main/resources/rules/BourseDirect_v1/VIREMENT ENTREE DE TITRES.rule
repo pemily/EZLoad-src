@@ -5,9 +5,9 @@
   "brokerFileVersion" : 1,
   "name" : "VIREMENT ENTREE DE TITRES",
   "enabled" : true,
-  "description" : "Transfert de titre d'un courtier vers BourseDirect\n?? dans opération j'ai mis achat titres ??",
+  "description" : [ "Transfert de titre d'un courtier vers BourseDirect\n?? dans opération j'ai mis achat titres ??" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"VIREMENT ENTREE DE TITRES\"",
+  "condition" : "ezOperation_INFO1 == 'VIREMENT ENTREE DE TITRES'",
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -16,11 +16,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_QUANTITE",
-    "operationTypeExpr" : "\"Achat titres\"",
+    "operationTypeExpr" : "'Achat titres'",
     "operationActionNameExpr" : "ezOperationShareUserName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "ezOperation_QUANTITE * ezOperation_P_A_M",
-    "operationDescriptionExpr" : "\"Transfert de \"+ ezOperation_QUANTITE+\" \"+ezShareCode"
+    "operationDescriptionExpr" : "'Transfert de '+ ezOperation_QUANTITE+' '+ezShareCode"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },

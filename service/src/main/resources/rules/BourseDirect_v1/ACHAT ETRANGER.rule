@@ -4,9 +4,9 @@
   "brokerFileVersion" : 1,
   "name" : "ACHAT ETRANGER",
   "enabled" : true,
-  "description" : "Achat d'actions étrangères \nDans monPortefeuille: La quantité doit etre divisé par 100 si valeur anglaise, est ce pareil dans Mes Opérations?",
+  "description" : [ "Achat d'actions étrangères \nDans monPortefeuille: La quantité doit etre divisé par 100 si valeur anglaise, est ce pareil dans Mes Opérations?" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"ACHAT ETRANGER\"",
+  "condition" : "ezOperation_INFO1 == 'ACHAT ETRANGER'",
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -15,11 +15,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_QUANTITE",
-    "operationTypeExpr" : "\"Achat titres\"",
+    "operationTypeExpr" : "'Achat titres'",
     "operationActionNameExpr" : "ezOperationShareUserName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperation_BRUT",
-    "operationDescriptionExpr" : "\"Achat de \"+ ezOperation_QUANTITE+\" \"+ezShareCode+\" @ \"+ ezOperation_COURS+ ezAccountCurrencySymbol"
+    "operationDescriptionExpr" : "'Achat de '+ ezOperation_QUANTITE+' '+ezShareCode+' @ '+ ezOperation_COURS+ ezAccountCurrencySymbol"
   }, {
     "field2ErrorMsg" : { },
     "condition" : "",
@@ -27,11 +27,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_QUANTITE",
-    "operationTypeExpr" : "\"Courtage sur achat de titres\"",
+    "operationTypeExpr" : "'Courtage sur achat de titres'",
     "operationActionNameExpr" : "ezOperationShareUserName",
     "operationCountryExpr" : "ezMarketCountry",
     "operationAmountExpr" : "-ezOperation_COURTAGE",
-    "operationDescriptionExpr" : "ezOperation_QUANTITE+\" \"+ezShareCode+\" @ \"+ ezOperation_COURS+ ezAccountCurrencySymbol"
+    "operationDescriptionExpr" : "ezOperation_QUANTITE+' '+ezShareCode+' @ '+ ezOperation_COURS+ ezAccountCurrencySymbol"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
@@ -53,7 +53,7 @@
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "computeEzAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuilleTickerGoogleFinanceExpr" : "'LIQUIDITE'",
     "portefeuillePaysExpr" : "ezMonPortefeuillePays",
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",

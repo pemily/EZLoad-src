@@ -19,6 +19,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +120,7 @@ public class RulesHandler {
         MainSettings mainSettings = SettingsManager.getInstance().loadProps();
         TextReporting reporting = new TextReporting();
         try {
-            return ExpressionEvaluator.getSingleton().evaluateAsString(reporting, commonFunction.getScript(), new EzData());
+            return ExpressionEvaluator.getSingleton().evaluateAsString(reporting, Arrays.stream(commonFunction.getScript()).collect(Collectors.joining("\n")), new EzData());
         }
         catch(Exception e){
             String errorMsg = e.getMessage();

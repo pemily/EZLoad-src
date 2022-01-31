@@ -4,9 +4,9 @@
   "brokerFileVersion" : 1,
   "name" : "VIREMENT ESPECES",
   "enabled" : true,
-  "description" : "Versement de fonds sur le compte espèce",
+  "description" : [ "Versement de fonds sur le compte espèce" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"VIREMENT ESPECES\"",
+  "condition" : "ezOperation_INFO1 == 'VIREMENT ESPECES'",
   "shareId" : "",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -15,11 +15,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_CREDIT",
-    "operationTypeExpr" : "\"Versement fonds\"",
+    "operationTypeExpr" : "'Versement fonds'",
     "operationActionNameExpr" : "ezLiquidityName",
-    "operationCountryExpr" : "\"\"",
+    "operationCountryExpr" : "''",
     "operationAmountExpr" : "ezOperation_CREDIT",
-    "operationDescriptionExpr" : "\"Versement de \"+ezOperation_CREDIT+ ezAccountCurrencySymbol + \" sur le compte \"+ ezAccountName"
+    "operationDescriptionExpr" : "'Versement de '+ezOperation_CREDIT+ ezAccountCurrencySymbol + ' sur le compte '+ ezAccountName"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
@@ -27,7 +27,7 @@
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "computeEzAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuilleTickerGoogleFinanceExpr" : "'LIQUIDITE'",
     "portefeuillePaysExpr" : "ezMonPortefeuillePays",
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",

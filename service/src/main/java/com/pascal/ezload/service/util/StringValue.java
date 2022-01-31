@@ -2,6 +2,8 @@ package com.pascal.ezload.service.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+
 
 public class StringValue {
 
@@ -18,4 +20,10 @@ public class StringValue {
         else checkable.setErrorMsg(field, null);
     }
 
+    public void validate(Checkable checkable, String field, String[] values){
+        if (required && Arrays.stream(values).allMatch(StringUtils::isBlank)){
+            checkable.setErrorMsg(field, "Cette valeur ne doit pas être vide");
+        }
+        else checkable.setErrorMsg(field, null);
+    }
 }

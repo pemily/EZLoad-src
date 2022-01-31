@@ -4,9 +4,9 @@
   "brokerFileVersion" : 1,
   "name" : "ESPECES SUR OST",
   "enabled" : true,
-  "description" : "?? Pourquoi cette somme en négatif sur mon compte espèce ??? voir mon relevé du 2021-07-08\n?? Quoi mettre dans les opérations ???",
+  "description" : [ "?? Pourquoi cette somme en négatif sur mon compte espèce ??? voir mon relevé du 2021-07-08\n?? Quoi mettre dans les opérations ???" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"ESPECES SUR OST\"",
+  "condition" : "ezOperation_INFO1 == 'ESPECES SUR OST'",
   "shareId" : "ezOperation_INFO2",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -15,11 +15,11 @@
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
     "operationQuantityExpr" : "ezOperation_DEBIT",
-    "operationTypeExpr" : "\"Divers\"",
+    "operationTypeExpr" : "'Divers'",
     "operationActionNameExpr" : "ezLiquidityName",
-    "operationCountryExpr" : "\"\"",
+    "operationCountryExpr" : "''",
     "operationAmountExpr" : "ezOperation_DEBIT",
-    "operationDescriptionExpr" : "\"A REVOIR? Pas Compris voir relevé 16/06\""
+    "operationDescriptionExpr" : "'A REVOIR? Pas Compris voir relevé 16/06'"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
@@ -27,7 +27,7 @@
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "computeEzAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuilleTickerGoogleFinanceExpr" : "'LIQUIDITE'",
     "portefeuillePaysExpr" : "ezMonPortefeuillePays",
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",

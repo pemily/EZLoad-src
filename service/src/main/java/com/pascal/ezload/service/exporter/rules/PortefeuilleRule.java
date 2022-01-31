@@ -3,6 +3,8 @@ package com.pascal.ezload.service.exporter.rules;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
+import java.util.function.Function;
+
 public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
 
     public enum Field{ condition, portefeuilleValeurExpr, portefeuilleCompteExpr, portefeuilleCourtierExpr,
@@ -137,4 +139,21 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
         new StringValue(true).validate(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr);
         return this;
     }
+
+
+    public void beforeSave(Function<String, String> normalizer) {
+        this.condition = normalizer.apply(this.condition);
+        this.portefeuilleValeurExpr = normalizer.apply(this.portefeuilleValeurExpr);
+        this.portefeuilleCompteExpr = normalizer.apply(this.portefeuilleCompteExpr);
+        this.portefeuilleCourtierExpr = normalizer.apply(this.portefeuilleCourtierExpr);
+        this.portefeuilleTickerGoogleFinanceExpr = normalizer.apply(this.portefeuilleTickerGoogleFinanceExpr);
+        this.portefeuillePaysExpr = normalizer.apply(this.portefeuillePaysExpr);
+        this.portefeuilleSecteurExpr = normalizer.apply(this.portefeuilleSecteurExpr);
+        this.portefeuilleIndustrieExpr = normalizer.apply(this.portefeuilleIndustrieExpr);
+        this.portefeuilleEligibiliteAbbattement40Expr = normalizer.apply(this.portefeuilleEligibiliteAbbattement40Expr);
+        this.portefeuilleTypeExpr = normalizer.apply(this.portefeuilleTypeExpr);
+        this.portefeuillePrixDeRevientExpr = normalizer.apply(this.portefeuillePrixDeRevientExpr);
+        this.portefeuilleQuantiteExpr = normalizer.apply(this.portefeuilleQuantiteExpr);
+    }
+
 }

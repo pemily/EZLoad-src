@@ -131,7 +131,7 @@ public class RulesEngine {
         }
         else{
             // a stupid action just to have the variables list when creating a new rule
-            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("CC", "Country"), new EZDevise("deviseCode", "deviseSymbol"));
+            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("", ""), new EZDevise("", ""));
             EZAction action = new EZAction();
             action.setMarketPlace(marketPlace);
             action.fill(data);
@@ -236,32 +236,36 @@ public class RulesEngine {
         ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
 
         try {
-            List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(ezPortefeuilleEdition.getCountry(), ezPortefeuilleEdition.getTickerGoogleFinance());
-            List<String> yearsReversedOrder = dividends.stream().map(FinanceTools.Dividend::getYear).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-            Map<String, List<FinanceTools.Dividend>> dividendPerYear = dividends.stream()
-                    .collect(Collectors.groupingBy(FinanceTools.Dividend::getYear));
+            if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
+                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(ezPortefeuilleEdition.getCountry(), ezPortefeuilleEdition.getTickerGoogleFinance());
+                List<String> yearsReversedOrder = dividends.stream().map(FinanceTools.Dividend::getYear).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+                Map<String, List<FinanceTools.Dividend>> dividendPerYear = dividends.stream()
+                        .collect(Collectors.groupingBy(FinanceTools.Dividend::getYear));
 
-            // Calcul du dividend annuelle
-            // recheche la 1ere année avec les dividendes completes
-            Optional<String> yearWithAllDivivdends = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getEx_date().getMonth()==12)).findFirst();
+                // Calcul du dividend annuelle
+                // recheche la 1ere année avec les dividendes completes
+                Optional<String> yearWithAllDivivdends = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getEx_date().getMonth() == 12)).findFirst();
 
-            StringBuilder yearlyDividendsAddition = new StringBuilder();
-            dividendPerYear.get(yearWithAllDivivdends).stream().map(FinanceTools.Dividend::getAmount).collect(Collectors.joining("+"));
+                StringBuilder yearlyDividendsAddition = new StringBuilder();
+                if (yearWithAllDivivdends.isPresent()) {
+                    dividendPerYear.get(yearWithAllDivivdends).stream().map(FinanceTools.Dividend::getAmount).collect(Collectors.joining("+"));
 
 
 // TODO            ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, "", data, functions));
 
-            // Calcul du calendrier de dividendes
-            Optional<String> yearForCalendar = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getPayDate().getMonth()==12)).findFirst();
-            Map<Integer, List<FinanceTools.Dividend>> dividendPerMonth = dividendPerYear.get(yearForCalendar)
-                                                                                    .stream().collect(Collectors.groupingBy(d -> d.getPayDate().getMonth()));
-            for (int month = 1; month <= 12; month++){
-                String amountAddition = dividendPerMonth.get(month).stream().map(d -> d.getAmount()).collect(Collectors.joining("+"));
-                ezPortefeuilleEdition.setMonthlyDividend(month, eval(ezPortefeuilleEdition, amountAddition, data, functions));
+                    // Calcul du calendrier de dividendes
+                    Optional<String> yearForCalendar = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getPayDate().getMonth() == 12)).findFirst();
+                    Map<Integer, List<FinanceTools.Dividend>> dividendPerMonth = dividendPerYear.get(yearForCalendar)
+                            .stream().collect(Collectors.groupingBy(d -> d.getPayDate().getMonth()));
+                    for (int month = 1; month <= 12; month++) {
+                        String amountAddition = dividendPerMonth.get(month).stream().map(d -> d.getAmount()).collect(Collectors.joining("+"));
+                        ezPortefeuilleEdition.setMonthlyDividend(month, eval(ezPortefeuilleEdition, amountAddition, data, functions));
+                    }
+
+
+                    //ezPortefeuilleEdition.setMonthlyDividend();
+                }
             }
-
-
-            //ezPortefeuilleEdition.setMonthlyDividend();
         } catch (IOException e) {
             ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes. ("+e.getMessage()+")");
         }

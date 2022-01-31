@@ -82,7 +82,7 @@ export function App(){
             console.error("Error while loading Data.", error);
         });
 
-        jsonCall(ezApi.security.getAuthWithDummyPassword({courtier: "BourseDirect"}))
+        jsonCall(ezApi.security.getAuthWithoutPassword({courtier: "BourseDirect"}))
         .then(resp => {            
             setBourseDirectAuthInfo(resp);
         })

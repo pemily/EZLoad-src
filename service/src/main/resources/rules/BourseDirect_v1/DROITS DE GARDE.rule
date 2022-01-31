@@ -4,9 +4,9 @@
   "brokerFileVersion" : 1,
   "name" : "DROITS DE GARDE",
   "enabled" : true,
-  "description" : "",
+  "description" : [ "" ],
   "ezLoadVersion" : 1,
-  "condition" : "ezOperation_INFO1 == \"DROITS DE GARDE\"",
+  "condition" : "ezOperation_INFO1 == 'DROITS DE GARDE'",
   "shareId" : "",
   "operationRules" : [ {
     "field2ErrorMsg" : { },
@@ -14,12 +14,12 @@
     "operationDateExpr" : "ezOperation_DATE",
     "operationCompteTypeExpr" : "computeEzAccountTypeName()",
     "operationBrokerExpr" : "ezBrokerName",
-    "operationQuantityExpr" : "\"\"",
-    "operationTypeExpr" : "\"Droits de garde/Frais divers\"",
-    "operationActionNameExpr" : "\"\"",
-    "operationCountryExpr" : "\"\"",
+    "operationQuantityExpr" : "''",
+    "operationTypeExpr" : "'Droits de garde/Frais divers'",
+    "operationActionNameExpr" : "''",
+    "operationCountryExpr" : "''",
     "operationAmountExpr" : "-ezOperation_DEBIT",
-    "operationDescriptionExpr" : "\"Droits de Garde\""
+    "operationDescriptionExpr" : "'Droits de Garde'"
   } ],
   "portefeuilleRules" : [ {
     "field2ErrorMsg" : { },
@@ -27,7 +27,7 @@
     "portefeuilleValeurExpr" : "ezLiquidityName",
     "portefeuilleCompteExpr" : "computeEzAccountTypeName()",
     "portefeuilleCourtierExpr" : "ezBrokerName",
-    "portefeuilleTickerGoogleFinanceExpr" : "\"LIQUIDITE\"",
+    "portefeuilleTickerGoogleFinanceExpr" : "'LIQUIDITE'",
     "portefeuillePaysExpr" : "ezMonPortefeuillePays",
     "portefeuilleSecteurExpr" : "ezMonPortefeuilleSecteur",
     "portefeuilleIndustrieExpr" : "ezMonPortefeuilleIndustrie",

@@ -2,8 +2,11 @@ package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.util.StringValue;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class RuleDefinition extends RuleDefinitionSummary {
 
@@ -76,4 +79,13 @@ public class RuleDefinition extends RuleDefinitionSummary {
         portefeuilleRules.forEach(PortefeuilleRule::validate);
         return this;
     }
+
+    public void beforeSave(Function<String, String> normalizer){
+        super.beforeSave(normalizer);
+        this.condition = normalizer.apply(this.condition);
+        this.shareId = normalizer.apply(this.shareId);
+        this.operationRules.stream().forEach(op -> op.beforeSave(normalizer));
+        this.portefeuilleRules.stream().forEach(po -> po.beforeSave(normalizer));
+    }
 }
+

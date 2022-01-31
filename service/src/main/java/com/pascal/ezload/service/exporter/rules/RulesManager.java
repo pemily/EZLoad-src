@@ -2,6 +2,8 @@ package com.pascal.ezload.service.exporter.rules;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -13,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RulesManager {
 
@@ -70,11 +74,16 @@ public class RulesManager {
 
         new File(newFilePath).getParentFile().mkdirs();
         ruleDef.clearErrors();
+        ruleDef.beforeSave(RulesManager::normalize);
 
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
         ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
-        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
+
+        DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+        prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+
+        mapper.writer(prettyPrinter).writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
 
         if (isRenaming){
             // it is a rename, remove the old file
@@ -129,21 +138,38 @@ public class RulesManager {
             CommonFunctions commonFunctions = new CommonFunctions();
             commonFunctions.setBrokerFileVersion(brokerFileVersion);
             commonFunctions.setBroker(broker);
-            commonFunctions.setScript("// Liste de fonctions utilisables dans toutes les expressions de "+broker+" v"+brokerFileVersion
-                    +"\n\n\n");
+            commonFunctions.setScript(("// Liste de fonctions utilisables dans toutes les expressions de "+broker+" v"+brokerFileVersion
+                    +"\n\n\n").split("\n"));
             return commonFunctions;
         }
     }
 
     public synchronized CommonFunctions saveCommonScript(CommonFunctions function) throws IOException {
         String commonFile = getCommonFilePath(function.getBroker(), function.getBrokerFileVersion());
+
+        // to ease the comparison in github
+        function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalize).collect(Collectors.toList()).toArray(new String[]{}));
+
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
-        ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
-        mapper.writerWithDefaultPrettyPrinter().writeValue(new FileWriter(commonFile), function);
+
+        ObjectMapper mapper = new ObjectMapper(jsonFactory)
+                .enable(SerializationFeature.INDENT_OUTPUT);
+
+        DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+        prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+
+        mapper.writer(prettyPrinter).writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
 
         borkerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
         return function;
+    }
+
+    public static String normalize(String line) {
+        line = line.replace("\t", "    "); // replace tabulation by 4 spaces
+        line = line.replace("\"", "'"); // replace " by '
+        line = line.trim();
+        return line;
     }
 
 }
