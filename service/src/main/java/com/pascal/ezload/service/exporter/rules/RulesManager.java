@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class RulesManager {
 
     private final static String RULE_FILE_EXTENSION = ".rule";
-    private final static String COMMON_FUNCTIONS_EXTENSION = ".script";
+    private final static String COMMON_FUNCTIONS_FILENAME = "common.script";
 
     private final MainSettings mainSettings;
     private final Map<String, CommonFunctions> borkerAndFileVersion2CommonFunctionsCache = new HashMap<>();
@@ -111,7 +111,7 @@ public class RulesManager {
     }
 
     private String getCommonFilePath(EnumEZBroker broker, int borkerFileVersion){
-        return mainSettings.getEzLoad().getRulesDir()+File.separator+SettingsManager.RULE_SHARED_DIR+File.separator+broker.getDirName()+"_v"+borkerFileVersion+COMMON_FUNCTIONS_EXTENSION;
+        return mainSettings.getEzLoad().getRulesDir()+File.separator+SettingsManager.RULE_SHARED_DIR+File.separator+broker.getDirName()+"_v"+borkerFileVersion+File.separator+COMMON_FUNCTIONS_FILENAME;
     }
 
     public synchronized CommonFunctions getCommonScript(RuleDefinition ruleDef){
