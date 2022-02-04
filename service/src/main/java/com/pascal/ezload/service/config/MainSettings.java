@@ -6,6 +6,9 @@ import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.StringValue;
 
 public class MainSettings {
+    public enum EnumAlgoYearSelector { FROM_LAST_YEAR, FROM_CURRENT_YEAR}
+    public enum EnumAlgoDateSelector { PAY_DATE, EX_DATE } // EX_DATE == DATE DE DETACHEMENT
+    public enum EnumPercentSelector { ADAPTATIF, STABLE }
 
     private ChromeSettings chrome;
     private EZLoad ezLoad;
@@ -95,7 +98,10 @@ public class MainSettings {
         private String rulesDir;
         private String logsDir;
         private String passPhrase;
-        public Admin admin;
+        private Admin admin;
+        private AnnualDividendConfig annualDividend;
+        private DividendCalendarConfig dividendCalendar;
+
 
         public String getLogsDir() {
             return logsDir;
@@ -137,12 +143,79 @@ public class MainSettings {
             this.port = port;
         }
 
+        public AnnualDividendConfig getAnnualDividend() {
+            return annualDividend;
+        }
+
+        public void setAnnualDividend(AnnualDividendConfig annualDividend) {
+            this.annualDividend = annualDividend;
+        }
+
+        public DividendCalendarConfig getDividendCalendar() {
+            return dividendCalendar;
+        }
+
+        public void setDividendCalendar(DividendCalendarConfig dividendCalendar) {
+            this.dividendCalendar = dividendCalendar;
+        }
+
         @Override
         public EZLoad validate() {
             new DirValue(true).validate(this, Field.logsDir.name(), logsDir);
             new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
             new DirValue(true).validate(this, Field.rulesDir.name(), rulesDir);
             return this;
+        }
+    }
+
+    public static class AnnualDividendConfig {
+        private EnumAlgoYearSelector yearSelector;
+        private EnumAlgoDateSelector dateSelector;
+
+        public EnumAlgoYearSelector getYearSelector() {
+            return yearSelector;
+        }
+
+        public void setYearSelector(EnumAlgoYearSelector yearSelector) {
+            this.yearSelector = yearSelector;
+        }
+
+        public EnumAlgoDateSelector getDateSelector() {
+            return dateSelector;
+        }
+
+        public void setDateSelector(EnumAlgoDateSelector dateSelector) {
+            this.dateSelector = dateSelector;
+        }
+    }
+
+    public static class DividendCalendarConfig {
+        private EnumAlgoYearSelector yearSelector;
+        private EnumAlgoDateSelector dateSelector;
+        private EnumPercentSelector percentSelector;
+
+        public EnumAlgoYearSelector getYearSelector() {
+            return yearSelector;
+        }
+
+        public void setYearSelector(EnumAlgoYearSelector yearSelector) {
+            this.yearSelector = yearSelector;
+        }
+
+        public EnumAlgoDateSelector getDateSelector() {
+            return dateSelector;
+        }
+
+        public void setDateSelector(EnumAlgoDateSelector dateSelector) {
+            this.dateSelector = dateSelector;
+        }
+
+        public EnumPercentSelector getPercentSelector() {
+            return percentSelector;
+        }
+
+        public void setPercentSelector(EnumPercentSelector percentSelector) {
+            this.percentSelector = percentSelector;
         }
     }
 

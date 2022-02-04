@@ -44,18 +44,19 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int RENDEMENT_VERSE_NOT_USED = 24;
     public static final int RENDEMENT_NET_NOT_USED = 25;
     public static final int IMPOT_REVENUE_NOT_USED = 26;
-    public static final int CALENDRIER_DIVIDEND_JANVIER = 27;
-    public static final int CALENDRIER_DIVIDEND_FEVRIER = 28;
-    public static final int CALENDRIER_DIVIDEND_MARS = 29;
-    public static final int CALENDRIER_DIVIDEND_AVRIL = 30;
-    public static final int CALENDRIER_DIVIDEND_MAI = 31;
-    public static final int CALENDRIER_DIVIDEND_JUIN = 32;
-    public static final int CALENDRIER_DIVIDEND_JUILLET = 33;
-    public static final int CALENDRIER_DIVIDEND_AOUT = 34;
-    public static final int CALENDRIER_DIVIDEND_SEPTEMBRE = 35;
-    public static final int CALENDRIER_DIVIDEND_OCTOBRE = 36;
-    public static final int CALENDRIER_DIVIDEND_NOVEMBRE = 37;
-    public static final int CALENDRIER_DIVIDEND_DECEMBRE = 38;
+    public static final int EMPTY_DO_NOT_USE2 = 27;
+    public static final int CALENDRIER_DIVIDEND_JANVIER = 28;
+    public static final int CALENDRIER_DIVIDEND_FEVRIER = 29;
+    public static final int CALENDRIER_DIVIDEND_MARS = 30;
+    public static final int CALENDRIER_DIVIDEND_AVRIL = 31;
+    public static final int CALENDRIER_DIVIDEND_MAI = 32;
+    public static final int CALENDRIER_DIVIDEND_JUIN = 33;
+    public static final int CALENDRIER_DIVIDEND_JUILLET = 34;
+    public static final int CALENDRIER_DIVIDEND_AOUT = 35;
+    public static final int CALENDRIER_DIVIDEND_SEPTEMBRE = 36;
+    public static final int CALENDRIER_DIVIDEND_OCTOBRE = 37;
+    public static final int CALENDRIER_DIVIDEND_NOVEMBRE = 38;
+    public static final int CALENDRIER_DIVIDEND_DECEMBRE = 39;
 
     private final SheetValues portefeuille;
 

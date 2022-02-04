@@ -6,15 +6,21 @@ import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
+import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.CountryUtil;
 import com.pascal.ezload.service.util.FinanceTools;
 import com.pascal.ezload.service.util.ShareUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData.broker_version;
@@ -237,36 +243,14 @@ public class RulesEngine {
 
         try {
             if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
-                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(ezPortefeuilleEdition.getCountry(), ezPortefeuilleEdition.getTickerGoogleFinance());
-                List<String> yearsReversedOrder = dividends.stream().map(FinanceTools.Dividend::getYear).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-                Map<String, List<FinanceTools.Dividend>> dividendPerYear = dividends.stream()
-                        .collect(Collectors.groupingBy(FinanceTools.Dividend::getYear));
+                // recherche les dividendes sur seekingalpha
+                EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
+                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
 
-                // Calcul du dividend annuelle
-                // recheche la 1ere année avec les dividendes completes
-                Optional<String> yearWithAllDivivdends = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getEx_date().getMonth() == 12)).findFirst();
-
-                StringBuilder yearlyDividendsAddition = new StringBuilder();
-                if (yearWithAllDivivdends.isPresent()) {
-                    dividendPerYear.get(yearWithAllDivivdends).stream().map(FinanceTools.Dividend::getAmount).collect(Collectors.joining("+"));
-
-
-// TODO            ezPortefeuilleEdition.setAnnualDividend(eval(ezPortefeuilleEdition, "", data, functions));
-
-                    // Calcul du calendrier de dividendes
-                    Optional<String> yearForCalendar = yearsReversedOrder.stream().filter(y -> dividendPerYear.get(y).stream().anyMatch(d -> d.getPayDate().getMonth() == 12)).findFirst();
-                    Map<Integer, List<FinanceTools.Dividend>> dividendPerMonth = dividendPerYear.get(yearForCalendar)
-                            .stream().collect(Collectors.groupingBy(d -> d.getPayDate().getMonth()));
-                    for (int month = 1; month <= 12; month++) {
-                        String amountAddition = dividendPerMonth.get(month).stream().map(d -> d.getAmount()).collect(Collectors.joining("+"));
-                        ezPortefeuilleEdition.setMonthlyDividend(month, eval(ezPortefeuilleEdition, amountAddition, data, functions));
-                    }
-
-
-                    //ezPortefeuilleEdition.setMonthlyDividend();
-                }
+                new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, mainSettings.getEzLoad().getAnnualDividend(), dividends);
+                new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, mainSettings.getEzLoad().getDividendCalendar(), dividends);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes. ("+e.getMessage()+")");
         }
 
@@ -287,7 +271,7 @@ public class RulesEngine {
                 return "";
             }
             else {
-                String script = functions.getScript() + ";\n"+ expression;
+                String script = String.join("\n", functions.getScript()) + ";\n"+ expression;
                 String result = ExpressionEvaluator.getSingleton().evaluateAsString(reporting, script, data);
                 return format(result);
             }
@@ -298,7 +282,7 @@ public class RulesEngine {
         }
     }
 
-    private static String format(String value){
+    public static String format(String value){
         return value == null ? "" : value.replace('\n', ' ').trim();
     }
 

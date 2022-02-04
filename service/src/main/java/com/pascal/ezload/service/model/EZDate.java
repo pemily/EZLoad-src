@@ -31,6 +31,10 @@ public class EZDate {
         return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
     }
 
+    public String toYYMMDD(){
+        return year+"/"+leadingZero(month)+"/"+leadingZero(day);
+    }
+
     public String toDate(char separator){
         return year+""+separator+leadingZero(month)+separator+leadingZero(day);
     }

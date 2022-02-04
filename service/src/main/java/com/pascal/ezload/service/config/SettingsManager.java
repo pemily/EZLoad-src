@@ -236,6 +236,16 @@ public class SettingsManager {
         ezLoad.setRulesDir(ezHome+File.separator+"rules");
         ezLoad.setPassPhrase(genString(42));
 
+        MainSettings.AnnualDividendConfig annualConfig = new MainSettings.AnnualDividendConfig();
+        annualConfig.setDateSelector(MainSettings.EnumAlgoDateSelector.EX_DATE);
+        annualConfig.setYearSelector(MainSettings.EnumAlgoYearSelector.FROM_LAST_YEAR);
+        ezLoad.setAnnualDividend(annualConfig);
+
+        MainSettings.DividendCalendarConfig calendar = new MainSettings.DividendCalendarConfig();
+        calendar.setDateSelector(MainSettings.EnumAlgoDateSelector.PAY_DATE);
+        calendar.setYearSelector(MainSettings.EnumAlgoYearSelector.FROM_CURRENT_YEAR);
+        ezLoad.setDividendCalendar(calendar);
+
         new File(ezLoad.getRulesDir()).mkdirs();
         new File(ezHome+File.separator+"rules"+File.separator+RULE_SHARED_DIR).mkdirs();
         new File(ezHome+File.separator+"rules"+File.separator+RULE_LOCAL_DIR).mkdirs();

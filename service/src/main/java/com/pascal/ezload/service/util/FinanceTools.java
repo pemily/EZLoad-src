@@ -9,10 +9,14 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 // https://rapidapi.com/category/Finance
 public class FinanceTools {
+    private static final Logger logger = Logger.getLogger("FinanceTools");
+
     private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     private static final FinanceTools instance = new FinanceTools();
@@ -144,7 +148,10 @@ public class FinanceTools {
 
     public List<Dividend> searchDividends(String country, String actionTicker) throws IOException {
         if ("US".equals(country)){
-            URL url = new URL("https://seekingalpha.com/api/v3/symbols/"+actionTicker+"/dividend_history?&years=1");
+            String[] code = StringUtils.divide(actionTicker, ':');
+            if (code != null && code.length > 1) actionTicker = code[1];
+
+            URL url = new URL("https://seekingalpha.com/api/v3/symbols/"+actionTicker+"/dividend_history?&years=2");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             try {
                 con.setUseCaches(false);
@@ -152,19 +159,36 @@ public class FinanceTools {
                 con.setRequestMethod("GET");
                 InputStream input = new BufferedInputStream(con.getInputStream());
                 Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
+
+                if (top.containsKey("errors")) return new LinkedList<>();
                 List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
                 if (history.size() == 0) return new LinkedList<>();
                 return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
-                        .map(attributes ->
-                            new Dividend(attributes.get("year").toString(),
+                        .filter(attributes -> attributes.get("amount") != null
+                        && attributes.get("year") != null)
+                        .map(attributes -> {
+
+                            String freq = attributes.get("freq") != null ? attributes.get("freq").toString() : null;
+
+                            Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL; // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
+                            if ("MONTHLY".equals(freq)) frequency = Dividend.EnumFrequency.MENSUEL;
+                            else if ("QUARTERLY".equals(freq)) frequency = Dividend.EnumFrequency.TRIMESTRIEL;
+                            else if ("SEMIANNUAL".equals(freq)) frequency = Dividend.EnumFrequency.SEMESTRIEL;
+                            else if ("YEARLY".equals(freq)) frequency = Dividend.EnumFrequency.ANNUEL;
+
+                            return new Dividend(
                                     attributes.get("amount").toString(),
-                                    seekingAlphaDate(attributes.get("ex_date").toString()),
-                                    seekingAlphaDate(attributes.get("declare_date").toString()),
-                                    seekingAlphaDate(attributes.get("pay_date").toString()),
-                                    seekingAlphaDate(attributes.get("record_date").toString()),
-                                    seekingAlphaDate(attributes.get("date").toString()),
-                                    attributes.get("adjusted_amount").toString()))
+                                    seekingAlphaDate(attributes.get("ex_date")),
+                                    seekingAlphaDate(attributes.get("declare_date")),
+                                    seekingAlphaDate(attributes.get("pay_date")),
+                                    seekingAlphaDate(attributes.get("record_date")),
+                                    seekingAlphaDate(attributes.get("date")),
+                                   frequency);
+                        })
                         .collect(Collectors.toList());
+            }
+            catch(Exception e){
+                logger.log(Level.SEVERE, "When searching dividend on "+url.toString(), e);
             }
             finally {
                 con.disconnect();
@@ -173,42 +197,39 @@ public class FinanceTools {
         return new LinkedList<>();
     }
 
-    private EZDate seekingAlphaDate(String date){
-        String d[] = StringUtils.divide(date, '/');
-        return new EZDate(Integer.parseInt(d[2]), Integer.parseInt(d[0]), Integer.parseInt(d[1]));
+    private EZDate seekingAlphaDate(Object date){
+        if (date == null) return null;
+        String d[] = date.toString().split("-");
+        return new EZDate(Integer.parseInt(d[0]), Integer.parseInt(d[1]), Integer.parseInt(d[2]));
     }
 
     public static class Dividend {
-        String year;
+
+        public enum EnumFrequency { MENSUEL, TRIMESTRIEL, SEMESTRIEL, ANNUEL, EXCEPTIONEL }
         String amount;
-        EZDate ex_date;
+        EZDate detachementDate;
         EZDate declareDate;
         EZDate payDate;
         EZDate recordDate;
         EZDate date;
-        String adjustedAmount;
+        EnumFrequency frequency;
 
-        public Dividend(String year, String amount, EZDate ex_date, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, String adjustedAmount) {
-            this.year = year;
+        public Dividend(String amount, EZDate detachementDate, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, EnumFrequency frequency) {
             this.amount = amount;
-            this.ex_date = ex_date;
+            this.detachementDate = detachementDate;
             this.declareDate = declareDate;
             this.payDate = payDate;
             this.recordDate = recordDate;
             this.date = date;
-            this.adjustedAmount = adjustedAmount;
-        }
-
-        public String getYear() {
-            return year;
+            this.frequency = frequency;
         }
 
         public String getAmount() {
             return amount;
         }
 
-        public EZDate getEx_date() {
-            return ex_date;
+        public EZDate getDetachementDate() {
+            return detachementDate;
         }
 
         public EZDate getDeclareDate() {
@@ -227,9 +248,11 @@ public class FinanceTools {
             return date;
         }
 
-        public String getAdjustedAmount() {
-            return adjustedAmount;
+        public EnumFrequency getFrequency() {
+            return frequency;
         }
+
+
     }
 }
 

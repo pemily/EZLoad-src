@@ -36,6 +36,9 @@ public class CountryUtil {
         return optDevise.orElseThrow(() -> new BRException("Country with code: "+code+" not found"));
     }
 
-
+    public static EZCountry foundByName(String name) throws BRException {
+        Optional<EZCountry> optDevise = countries.stream().filter(d -> d.getName().equals(name)).findFirst();
+        return optDevise.orElseThrow(() -> new BRException("Country with code: "+name+" not found"));
+    }
 }
 
