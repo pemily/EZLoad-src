@@ -9,8 +9,10 @@ import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.util.ModelUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,7 +100,7 @@ public class MesOperations  {
         if (latestRow.getValueStr(SOURCE_FILE_COL).equals("")){
             return Optional.of(latestRow.getValueDate(DATE_COL));
         }
-        return Optional.of(latestRow.getValueStr(SOURCE_FILE_COL)).map(ModelUtils::getDateFromFile);
+        return Optional.of(latestRow.getValueStr(SOURCE_FILE_COL)).map(BourseDirectDownloader::getDateFromPdfFilePath);
     }
 
     public void saveDone() {

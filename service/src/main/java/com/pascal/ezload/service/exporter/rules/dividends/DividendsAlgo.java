@@ -138,7 +138,7 @@ public abstract class DividendsAlgo {
     }
 
     protected Function<FinanceTools.Dividend, EZDate> getDividendYear(MainSettings.EnumAlgoDateSelector dateSelector) {
-        if (dateSelector == MainSettings.EnumAlgoDateSelector.EX_DATE)
+        if (dateSelector == MainSettings.EnumAlgoDateSelector.DATE_DE_DETACHEMENT)
             return FinanceTools.Dividend::getDetachementDate;
 
         return FinanceTools.Dividend::getPayDate;

@@ -1,7 +1,10 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
+import com.pascal.ezload.service.config.EzProfil;
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
@@ -11,6 +14,7 @@ import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.util.ModelUtils;
 import com.pascal.ezload.service.util.Sleep;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +68,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
     @Override
     // return the list of EzEdition operation not saved
-    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId) throws Exception {
+    public List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId) throws Exception {
         reporting.info("Saving EZPortfolio...");
         MesOperations operations = ezPortfolio.getMesOperations();
 
@@ -83,9 +87,10 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                 EzOperationEdition ignoredOperation = new EzOperationEdition();
                                 ignoredOperation.setDescription("Operation Ignorée");
                                 String sourceFile = ezEdition.getData().get(ReportData.report_source);
-                                Optional<EnumEZBroker> broker = ModelUtils.fromSourceFile(sourceFile);
+                                String accountNumber = ezEdition.getData().get(AccountData.account_number);
+                                Optional<EnumEZBroker> broker = profil.getBourseDirect().getAccounts().stream().anyMatch(a -> a.getNumber() != null && a.getNumber().equals(accountNumber)) ? Optional.of(EnumEZBroker.BourseDirect) : Optional.empty();
                                 ignoredOperation.setBroker(broker.map(EnumEZBroker::getEzPortfolioName).orElse(null));
-                                ignoredOperation.setDate(ModelUtils.getDateFromFile(sourceFile).toEzPortoflioDate());
+                                ignoredOperation.setDate(BourseDirectDownloader.getDateFromPdfFilePath(sourceFile).toEzPortoflioDate());
                                 RuleDefinitionSummary ruleDefinitionSummary = new RuleDefinitionSummary();
                                 ruleDefinitionSummary.setBroker(broker.orElse(null));
                                 ruleDefinitionSummary.setName("IGNOREE");

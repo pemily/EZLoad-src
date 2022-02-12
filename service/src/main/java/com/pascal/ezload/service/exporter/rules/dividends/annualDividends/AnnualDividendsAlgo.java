@@ -16,7 +16,7 @@ public class AnnualDividendsAlgo extends DividendsAlgo {
         Function<FinanceTools.Dividend, EZDate> dateSelector = getDividendYear(algoConfig.getDateSelector());
 
         List<FinanceTools.Dividend> oneYearDividends = null;
-        if (algoConfig.getYearSelector() == MainSettings.EnumAlgoYearSelector.FROM_CURRENT_YEAR)
+        if (algoConfig.getYearSelector() == MainSettings.EnumAlgoYearSelector.ANNEE_EN_COURS)
             oneYearDividends = getCurrentYearDividends(allDividends, dateSelector);
         else
             oneYearDividends = getLastYearDividends(allDividends, getDividendYear(algoConfig.getDateSelector()));

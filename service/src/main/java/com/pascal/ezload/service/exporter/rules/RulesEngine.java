@@ -1,6 +1,8 @@
 package com.pascal.ezload.service.exporter.rules;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
@@ -247,8 +249,9 @@ public class RulesEngine {
                 EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
                 List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
 
-                new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, mainSettings.getEzLoad().getAnnualDividend(), dividends);
-                new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, mainSettings.getEzLoad().getDividendCalendar(), dividends);
+                EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
+                new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
+                new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
             }
         } catch (Exception e) {
             ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes. ("+e.getMessage()+")");

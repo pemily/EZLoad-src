@@ -30,6 +30,8 @@ public class SettingsManager {
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
     public final static String RULE_SHARED_DIR =  "shared";
     public final static String RULE_LOCAL_DIR =  "local";
+    private final static String CREDS_DIR = "creds";
+
 
 
     private SettingsManager(String configFile){
@@ -45,18 +47,16 @@ public class SettingsManager {
 
     public MainSettings loadProps() throws Exception {
         MainSettings settings = readMainSettingsFile();
-        String passphrase = settings.getEzLoad().getPassPhrase();
-        if (passphrase == null){
-            settings.getEzLoad().setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase());
-            saveMainSettingsFile(settings);
-        }
         return settings;
     }
 
-    private MainSettings readMainSettingsFile() throws IOException {
-        try(Reader reader = new FileReader(configFile)) {
-            return yamlMapper.readValue(reader, MainSettings.class);
+    private MainSettings readMainSettingsFile() throws Exception {
+        if (new File(configFile).exists()) {
+            try (Reader reader = new FileReader(configFile)) {
+                return defaultValuesIfNotSet(yamlMapper.readValue(reader, MainSettings.class));
+            }
         }
+        else return defaultValuesIfNotSet(new MainSettings());
     }
 
     public void saveMainSettingsFile(MainSettings mainSettings) throws IOException {
@@ -66,17 +66,17 @@ public class SettingsManager {
         }
     }
 
-    private EzProfil readEzProfilFile(String ezProfilName) throws IOException {
+    private EzProfil readEzProfilFile(String ezProfilName) throws Exception {
         try(Reader reader = new FileReader(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilName+"."+ezProfilFileExtension)) {
-            return yamlMapper.readValue(reader, EzProfil.class);
+            return defaultValuesIfNotSet(ezProfilName, yamlMapper.readValue(reader, EzProfil.class), null);
         }
     }
 
-    public void newEzProfil(String ezProfilName) throws IOException {
+    public void newEzProfil(String ezProfilName) throws Exception {
         MainSettings settings = readMainSettingsFile();
         EzProfil defaultProfil = readEzProfilFile(settings.getActiveEzProfilName());
         // comme le fichier de gdrive est pénible a faire, je le recupere du profil par defaut.
-        createEzProfil(ezProfilName, defaultProfil.getEzPortfolio().getGdriveCredsFile());
+        createEzProfilIfNotExists(ezProfilName, defaultProfil.getEzPortfolio().getGdriveCredsFile());
     }
 
     public void saveEzProfilFile(String ezProfilName, EzProfil ezProfil) throws IOException {
@@ -86,7 +86,7 @@ public class SettingsManager {
             yamlMapper.writeValue(writer, ezProfil);
         }
     }
-    public void renameEzProfile(String oldProfilName, String newProfilName) throws IOException {
+    public void renameEzProfile(String oldProfilName, String newProfilName) throws Exception {
         String oldProfileDir = getEzProfileDirectory(oldProfilName);
         String newProfileDir = getEzProfileDirectory(newProfilName);
 
@@ -121,7 +121,7 @@ public class SettingsManager {
         new File(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilName+"."+ezProfilFileExtension).delete();
     }
 
-    public EzProfil getActiveEzProfil(MainSettings mainSettings) throws IOException {
+    public EzProfil getActiveEzProfil(MainSettings mainSettings) throws Exception {
         String ezProfilName = StringUtils.isBlank(mainSettings.getActiveEzProfilName()) ? defaultEzProfilName : mainSettings.getActiveEzProfilName();
         return readEzProfilFile(ezProfilName);
     }
@@ -157,13 +157,7 @@ public class SettingsManager {
     }
 
     public static SettingsManager getInstance() throws IOException {
-        String configFilePath = searchConfigFilePath();
-        if (new File(configFilePath).exists()){
-            return new SettingsManager(configFilePath);
-        }
-        SettingsManager settingsManager = new SettingsManager(configFilePath);
-        settingsManager.createInitialSettings();
-        return settingsManager;
+        return new SettingsManager(searchConfigFilePath());
     }
 
     public Consumer<String> saveNewChromeDriver(){
@@ -179,95 +173,164 @@ public class SettingsManager {
         };
     }
 
-    public EzProfil createEzProfil(String ezProfilName, String initGDriveCredsFile) throws IOException {
+    public EzProfil createEzProfilIfNotExists(String ezProfilName, String initGDriveCredsFile) throws Exception {
         String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
 
         if (StringUtils.isBlank(ezProfilName) || new File(ezProfilDirectory).exists()) return null;
+        EzProfil ezProfil = null;
+        return defaultValuesIfNotSet(ezProfilName, ezProfil, initGDriveCredsFile);
+    }
 
-        EzProfil ezProfil = new EzProfil();
-        String credsDir = "creds";
+    private String getEzProfileDirectory(String ezProfilName) {
+        String ezHome = getEzHome();
+        return ezHome+File.separator+profilesDirectory+File.separator+ ezProfilName +File.separator;
+    }
 
-        ezProfil.setCourtierCredsFile(ezProfilDirectory+credsDir+File.separator+"ezCreds.json");
+    private EzProfil defaultValuesIfNotSet(String ezProfilName, EzProfil ezProfil, String initGDriveCredsFile) throws Exception {
+        if (ezProfil == null) {
+            ezProfil = new EzProfil();
+        }
+        String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
+
+        if (ezProfil.getCourtierCredsFile() == null) {
+            ezProfil.setCourtierCredsFile(ezProfilDirectory + CREDS_DIR + File.separator + "ezCreds.json");
+            try (FileOutputStream output = new FileOutputStream(ezProfil.getCourtierCredsFile())) {
+                output.write("{}".getBytes(StandardCharsets.UTF_8));
+            }
+        }
         new File(ezProfil.getCourtierCredsFile()).getParentFile().mkdirs();
 
-        try (FileOutputStream output = new FileOutputStream(ezProfil.getCourtierCredsFile())) {
-            output.write("{}".getBytes(StandardCharsets.UTF_8));
+        if (ezProfil.getDownloadDir() == null){
+            ezProfil.setDownloadDir(ezProfilDirectory+"courtiers");
         }
-
-        EZPortfolioSettings ezPortfolioSettings = new EZPortfolioSettings();
-        ezProfil.setEzPortfolio(ezPortfolioSettings);
-        ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
-        ezPortfolioSettings.setGdriveCredsFile(ezProfilDirectory+credsDir+File.separator+"gdrive-access.json");
-        new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
-        if (initGDriveCredsFile == null) {
-            FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), "{}");
-        }
-        else{
-            String content = FileUtil.file2String(initGDriveCredsFile);
-            if (content != null) FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), content);
-        }
-
-        BourseDirectSettings bourseDirectSettings = new BourseDirectSettings();
-        bourseDirectSettings.setAccounts(new LinkedList<>());
-        ezProfil.setBourseDirect(bourseDirectSettings);
-
-        ezProfil.setDownloadDir(ezProfilDirectory+"courtiers");
         new File(ezProfil.getDownloadDir()).mkdirs();
+
+        ezProfil.setAnnualDividend(defaultValuesIfNotSet(ezProfil.getAnnualDividend()));
+        ezProfil.setDividendCalendar(defaultValuesIfNotSet(ezProfil.getDividendCalendar()));
+
+        ezProfil.setEzPortfolio(defaultValuesIfNotSet(ezProfilName, ezProfil.getEzPortfolio(), initGDriveCredsFile));
+        ezProfil.setBourseDirect(defaultValuesIfNotSet(ezProfil.getBourseDirect()));
 
         saveEzProfilFile(ezProfilName, ezProfil);
         return ezProfil;
     }
 
-    private String getEzProfileDirectory(String ezProfilName) {
-        String ezHome = getEzHome();
-        String ezProfilDirectory = ezHome+File.separator+profilesDirectory+File.separator+ ezProfilName +File.separator;
-        return ezProfilDirectory;
+    private BourseDirectSettings defaultValuesIfNotSet(BourseDirectSettings bourseDirectSettings) throws Exception {
+        if (bourseDirectSettings == null){
+            bourseDirectSettings = new BourseDirectSettings();
+        }
+
+        if (bourseDirectSettings.getAccounts() == null) {
+            bourseDirectSettings.setAccounts(new LinkedList<>());
+        }
+        return bourseDirectSettings;
     }
 
-    private MainSettings createInitialSettings() throws IOException {
-        MainSettings mainSettings = new MainSettings();
-        MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
+    private EZPortfolioSettings defaultValuesIfNotSet(String ezProfilName, EZPortfolioSettings ezPortfolioSettings, String initGDriveCredsFile) throws Exception {
+        if (ezPortfolioSettings == null){
+            ezPortfolioSettings = new EZPortfolioSettings();
+        }
+        String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
+        if (ezPortfolioSettings.getEzPortfolioUrl() == null) ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
+        if (ezPortfolioSettings.getGdriveCredsFile() == null){
+            ezPortfolioSettings.setGdriveCredsFile(ezProfilDirectory+ CREDS_DIR +File.separator+"gdrive-access.json");
+            new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
+            if (initGDriveCredsFile == null) {
+                FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), "{}");
+            }
+            else{
+                String content = FileUtil.file2String(initGDriveCredsFile);
+                FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), content == null ? "{}" : content);
+            }
+
+        }
+        return ezPortfolioSettings;
+    }
+
+    private MainSettings defaultValuesIfNotSet(MainSettings mainSettings) throws Exception {
+        mainSettings.setEzLoad(defaultValuesIfNotSet(mainSettings.getEzLoad()));
+        mainSettings.setChrome(defaultValuesIfNotSet(mainSettings.getChrome()));
+        if (StringUtils.isBlank(mainSettings.getActiveEzProfilName())) {
+            mainSettings.setActiveEzProfilName(defaultEzProfilName);
+        }
+
+        createEzProfilIfNotExists(defaultEzProfilName, null);
+
+        saveMainSettingsFile(mainSettings);
+        return mainSettings;
+    }
+
+    private MainSettings.EZLoad defaultValuesIfNotSet(MainSettings.EZLoad ezLoad) throws Exception {
+        if (ezLoad == null){
+            ezLoad = new MainSettings.EZLoad();
+        }
         String ezHome = getEzHome();
-        MainSettings.Admin admin = new MainSettings.Admin();
-        admin.setShowRules(false);
-        ezLoad.setPort(2180);
-        ezLoad.setAdmin(admin);
-        ezLoad.setLogsDir(ezHome+File.separator+"logs");
-        ezLoad.setRulesDir(ezHome+File.separator+"rules");
-        ezLoad.setPassPhrase(genString(42));
-
-        MainSettings.AnnualDividendConfig annualConfig = new MainSettings.AnnualDividendConfig();
-        annualConfig.setDateSelector(MainSettings.EnumAlgoDateSelector.EX_DATE);
-        annualConfig.setYearSelector(MainSettings.EnumAlgoYearSelector.FROM_LAST_YEAR);
-        ezLoad.setAnnualDividend(annualConfig);
-
-        MainSettings.DividendCalendarConfig calendar = new MainSettings.DividendCalendarConfig();
-        calendar.setDateSelector(MainSettings.EnumAlgoDateSelector.PAY_DATE);
-        calendar.setYearSelector(MainSettings.EnumAlgoYearSelector.FROM_CURRENT_YEAR);
-        ezLoad.setDividendCalendar(calendar);
+        if (ezLoad.getPort() == 0) ezLoad.setPort(2180);
+        if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(ezHome+File.separator+"logs");
+        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(ezHome+File.separator+"rules");
+        if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
 
         new File(ezLoad.getRulesDir()).mkdirs();
-        new File(ezHome+File.separator+"rules"+File.separator+RULE_SHARED_DIR).mkdirs();
-        new File(ezHome+File.separator+"rules"+File.separator+RULE_LOCAL_DIR).mkdirs();
+        new File(ezLoad.getRulesDir()+File.separator+RULE_SHARED_DIR).mkdirs();
+        new File(ezLoad.getRulesDir()+File.separator+RULE_LOCAL_DIR).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
-        mainSettings.setEzLoad(ezLoad);
-
-        MainSettings.ChromeSettings chromeSettings = new MainSettings.ChromeSettings();
-        chromeSettings.setUserDataDir(ezHome+File.separator+"chrome"+File.separator+"data");
-        // chromeDriver is a file that does not exists, so next time it will be downloaded
-        chromeSettings.setDriverPath(ezHome+File.separator+"chrome"+File.separator+"driver"+File.separator+"chromedriver");
-        chromeSettings.setDefaultTimeout(10);
-        new File(chromeSettings.getUserDataDir()).mkdirs();
-        new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
-        mainSettings.setChrome(chromeSettings);
 
         copyRulesTo(ezLoad.getRulesDir());
 
-        mainSettings.setActiveEzProfilName(defaultEzProfilName);
-        createEzProfil(defaultEzProfilName, null);
-        saveMainSettingsFile(mainSettings);
+        ezLoad.setAdmin(defaultValuesIfNotSet(ezLoad.getAdmin()));
 
-        return mainSettings;
+        return ezLoad;
+    }
+
+    private MainSettings.Admin defaultValuesIfNotSet(MainSettings.Admin admin) throws Exception {
+        if (admin == null) {
+            admin = new MainSettings.Admin();
+            admin.setShowRules(false);
+        }
+        return admin;
+    }
+
+    private MainSettings.AnnualDividendConfig defaultValuesIfNotSet(MainSettings.AnnualDividendConfig annualDividendConfig) {
+        if (annualDividendConfig == null) {
+            annualDividendConfig = new MainSettings.AnnualDividendConfig();
+        }
+        if (annualDividendConfig.getDateSelector() == null)
+            annualDividendConfig.setDateSelector(MainSettings.EnumAlgoDateSelector.DATE_DE_DETACHEMENT);
+        if (annualDividendConfig.getYearSelector() == null)
+            annualDividendConfig.setYearSelector(MainSettings.EnumAlgoYearSelector.ANNEE_PRECEDENTE);
+
+        return annualDividendConfig;
+    }
+
+    private MainSettings.DividendCalendarConfig defaultValuesIfNotSet(MainSettings.DividendCalendarConfig dividendCalendarConfig) {
+        if (dividendCalendarConfig == null) {
+            dividendCalendarConfig = new MainSettings.DividendCalendarConfig();
+        }
+
+        if (dividendCalendarConfig.getDateSelector() == null)
+            dividendCalendarConfig.setDateSelector(MainSettings.EnumAlgoDateSelector.DATE_DE_PAIEMENT);
+        if (dividendCalendarConfig.getYearSelector() == null)
+            dividendCalendarConfig.setYearSelector(MainSettings.EnumAlgoYearSelector.ANNEE_EN_COURS);
+        if (dividendCalendarConfig.getPercentSelector() == null)
+            dividendCalendarConfig.setPercentSelector(MainSettings.EnumPercentSelector.ADAPTATIF);
+        return dividendCalendarConfig;
+    }
+
+    private MainSettings.ChromeSettings defaultValuesIfNotSet(MainSettings.ChromeSettings chromeSettings) throws Exception {
+        if (chromeSettings == null) {
+            chromeSettings = new MainSettings.ChromeSettings();
+        }
+        String ezHome = getEzHome();
+        if (chromeSettings.getUserDataDir() == null)
+            chromeSettings.setUserDataDir(ezHome + File.separator + "chrome" + File.separator + "data");
+        // chromeDriver is a file that does not exists, so next time it will be downloaded
+        if (chromeSettings.getDriverPath() == null)
+            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver");
+        if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(13);
+
+        new File(chromeSettings.getUserDataDir()).mkdirs();
+        new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
+        return chromeSettings;
     }
 
 

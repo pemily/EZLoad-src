@@ -158,7 +158,7 @@ public class EngineHandler {
                         // transfert all the new PRU row created in the previous analysis in this new just loaded PRU
                         serverState.getNewPRUs().forEach(pru -> ezPortfolioProxyFinal.getPRU().newPRU(pru));
 
-                        List<EzReport> result = ezPortfolioProxy.save(reporting, serverState.getEzReports(), ignoreEzEditionId);
+                        List<EzReport> result = ezPortfolioProxy.save(ezProfil, reporting, serverState.getEzReports(), ignoreEzEditionId);
 
                         updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
 
@@ -262,7 +262,7 @@ public class EngineHandler {
                     ezReport.setEzEditions(Collections.singletonList(ezEdition));
                     clearCache();
 
-                    ezPortfolioProxy.save(reporting, Collections.singletonList(ezReport), new ArrayList<>());
+                    ezPortfolioProxy.save(ezProfil, reporting, Collections.singletonList(ezReport), new ArrayList<>());
 
                     reporting.info("Date sauvegardé dans l'onglet 'MesOpérations'");
                 });

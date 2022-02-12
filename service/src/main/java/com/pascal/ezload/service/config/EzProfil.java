@@ -14,6 +14,8 @@ public class EzProfil extends Checkable<EzProfil> {
     private EZPortfolioSettings ezPortfolio;
     private String courtierCredsFile;
     private String downloadDir;
+    private MainSettings.AnnualDividendConfig annualDividend;
+    private MainSettings.DividendCalendarConfig dividendCalendar;
 
     public BourseDirectSettings getBourseDirect() {
         return bourseDirect;
@@ -45,6 +47,22 @@ public class EzProfil extends Checkable<EzProfil> {
 
     public void setDownloadDir(String downloadDir) {
         this.downloadDir = downloadDir == null ? null : downloadDir.trim();
+    }
+
+    public MainSettings.AnnualDividendConfig getAnnualDividend() {
+        return annualDividend;
+    }
+
+    public void setAnnualDividend(MainSettings.AnnualDividendConfig annualDividend) {
+        this.annualDividend = annualDividend;
+    }
+
+    public MainSettings.DividendCalendarConfig getDividendCalendar() {
+        return dividendCalendar;
+    }
+
+    public void setDividendCalendar(MainSettings.DividendCalendarConfig dividendCalendar) {
+        this.dividendCalendar = dividendCalendar;
     }
 
     public EzProfil validate(){

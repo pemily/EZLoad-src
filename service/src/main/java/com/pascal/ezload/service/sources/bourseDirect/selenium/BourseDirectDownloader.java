@@ -239,6 +239,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX; // if this change, review the method getDateFromPdfFilePath
     }
 
+    // @TODO cette fonction devrait etre revu et deplacer dans une fonction plus générale, non lié au Profider.
     public static EZDate getDateFromPdfFilePath(String pdfFilePath) {
         try {
             String s = new File(pdfFilePath).getName().substring(BOURSE_DIRECT_PDF_PREFIX.length());

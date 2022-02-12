@@ -78,17 +78,5 @@ public class ModelUtils {
         return normalizeAmount(String.format("%s", v)); // 5 digit apres la virgule
     }
 
-
-    public static EZDate getDateFromFile(String sourceFile){
-        Optional<EnumEZBroker> optBroker = fromSourceFile(sourceFile);
-        if (optBroker.isEmpty()) throw new IllegalStateException("Impossible to determine broker from source file: "+sourceFile);
-        switch(optBroker.get()) {
-            case BourseDirect: return BourseDirectDownloader.getDateFromPdfFilePath(sourceFile);
-            default: throw new IllegalStateException("Unkown broker");
-        }
-    }
-
-    public static Optional<EnumEZBroker> fromSourceFile(String reportSource){
-        return Arrays.stream(EnumEZBroker.values()).filter(e -> reportSource.startsWith(e.getDirName())).findFirst();
-    }
+ 
 }

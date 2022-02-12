@@ -6,8 +6,8 @@ import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.StringValue;
 
 public class MainSettings {
-    public enum EnumAlgoYearSelector { FROM_LAST_YEAR, FROM_CURRENT_YEAR}
-    public enum EnumAlgoDateSelector { PAY_DATE, EX_DATE } // EX_DATE == DATE DE DETACHEMENT
+    public enum EnumAlgoYearSelector { ANNEE_PRECEDENTE, ANNEE_EN_COURS}
+    public enum EnumAlgoDateSelector {DATE_DE_PAIEMENT, DATE_DE_DETACHEMENT }
     public enum EnumPercentSelector { ADAPTATIF, STABLE }
 
     private ChromeSettings chrome;
@@ -99,9 +99,6 @@ public class MainSettings {
         private String logsDir;
         private String passPhrase;
         private Admin admin;
-        private AnnualDividendConfig annualDividend;
-        private DividendCalendarConfig dividendCalendar;
-
 
         public String getLogsDir() {
             return logsDir;
@@ -143,21 +140,6 @@ public class MainSettings {
             this.port = port;
         }
 
-        public AnnualDividendConfig getAnnualDividend() {
-            return annualDividend;
-        }
-
-        public void setAnnualDividend(AnnualDividendConfig annualDividend) {
-            this.annualDividend = annualDividend;
-        }
-
-        public DividendCalendarConfig getDividendCalendar() {
-            return dividendCalendar;
-        }
-
-        public void setDividendCalendar(DividendCalendarConfig dividendCalendar) {
-            this.dividendCalendar = dividendCalendar;
-        }
 
         @Override
         public EZLoad validate() {
@@ -187,6 +169,7 @@ public class MainSettings {
         public void setDateSelector(EnumAlgoDateSelector dateSelector) {
             this.dateSelector = dateSelector;
         }
+
     }
 
     public static class DividendCalendarConfig {

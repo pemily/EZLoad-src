@@ -4,6 +4,7 @@ import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued 
 import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
+import { ComboField } from '../Tools/ComboField';
 import { ConfigStartDate } from '../ConfigStartDate';
 import { Help } from '../Tools/Help';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -22,6 +23,25 @@ export interface ConfigProps {
   followProcess: (process: EzProcess|undefined) => void;
   saveStartDate: (date: string, account: BourseDirectEZAccountDeclaration) => void;
 }        
+
+const calculAnnualDividendsInfo = `Pour calculer la Colonne ***L*** dans MonPortefeuille
+
+#### **Année précédente**
+- Le calcul est la somme des dividendes perçu l'année derniere sans les dividendes exceptionnels
+
+#### **Année en cours**
+- Le calcul se fait en s'appuyant sur la fréquences des dividendes de l'année dernière et les dividendes déjà perçu cette année.
+ Si il n'y à pas encore eu de dividendes cette année alors le calcul de l'**année précédente** sera appliqué`
+
+const calendrierDuDividendeInfo = `Pour calculer les Colonnes de ***AC -> AN*** dans MonPortefeuille
+
+#### **Année précédente**
+- Le calcul est la somme des dividendes perçu l'année derniere sans les dividendes exceptionnels
+
+#### **Année en cours**
+- Le calcul se fait en s'appuyant sur la fréquences des dividendes de l'année dernière et les dividendes déjà perçu cette année.
+ Si il n'y à pas encore eu de dividendes cette année alors le calcul de l'**année précédente** sera appliqué`
+
 
 const loginPasswordInfo = `L'identifiant & le mot de passe de votre compte BourseDirect **sont optionels**.  
 
@@ -139,6 +159,107 @@ export function Config(props: ConfigProps) {
                            </Help>
                        </Box>                        
                     </Box>
+
+                    <Box direction="row" justify="start">
+                        <Heading level="5">Calcul du Dividende Annuel</Heading>
+                        <Help isInfo={true} title="info">
+                            <Box border={{ color: 'brand', size: 'large' }} pad="medium">
+                                <Markdown>{ calculAnnualDividendsInfo }</Markdown>
+                            </Box>
+                        </Help>
+                    </Box>
+                    
+                    <Box direction="column" margin="small">
+                        <ComboField id="ezAnnualDividendYearSelector"
+                            value={props.ezProfil.annualDividend?.yearSelector === 'ANNEE_PRECEDENTE' ? 'Année précédente (défaut)' : 'Année en cours'}
+                            errorMsg={undefined}
+                            values={['Année précédente (défaut)', 'Année en cours']}                            
+                            description=""
+                            readOnly={props.readOnly}
+                            onChange={newValue  => saveEzProfile(
+                                { ...props.ezProfil,
+                                    annualDividend: {
+                                        ...props.ezProfil.annualDividend,
+                                        yearSelector: newValue === 'Année précédente (défaut)' ? 'ANNEE_PRECEDENTE' : 'ANNEE_EN_COURS'
+                                    } 
+                               }, props.ezProfilStateSetter)}/>
+                    </Box>
+
+                    <Box direction="column" margin="small">
+                        <ComboField id="ezAnnualDividendDateSelector"
+                            value={props.ezProfil.annualDividend?.dateSelector === 'DATE_DE_DETACHEMENT' ? 'Date de détachement (défaut)' : 'Date de paiement' }
+                            errorMsg={undefined}
+                            values={['Date de détachement (défaut)', 'Date de paiement']}                            
+                            description=""                            
+                            readOnly={props.readOnly}
+                            onChange={newValue  => saveEzProfile(
+                                { ...props.ezProfil,
+                                    annualDividend: {
+                                        ...props.ezProfil.annualDividend,
+                                        dateSelector: newValue === 'Date de détachement (défaut)' ? 'DATE_DE_DETACHEMENT' : 'DATE_DE_PAIEMENT'
+                                    }
+                               }, props.ezProfilStateSetter)}/>
+                    </Box>
+
+
+                    <Box direction="row" justify="start">
+                        <Heading level="5">Calendrier du Dividende</Heading>
+                        <Help isInfo={true} title="info">
+                            <Box border={{ color: 'brand', size: 'large' }} pad="medium">
+                                <Markdown>{ calendrierDuDividendeInfo }</Markdown>
+                            </Box>
+                        </Help>
+                    </Box>
+                    
+                    <Box direction="column" margin="small">
+                        <ComboField id="ezDividendCalendarYearSelector"
+                            value={props.ezProfil.dividendCalendar?.yearSelector === 'ANNEE_PRECEDENTE' ? 'Année précédente' : 'Année en cours (Défaut)'}
+                            errorMsg={undefined}
+                            values={['Année précédente', 'Année en cours (Défaut)']}                            
+                            description=""
+                            readOnly={props.readOnly}
+                            onChange={newValue  => saveEzProfile(
+                                { ...props.ezProfil,
+                                    dividendCalendar: {
+                                        ...props.ezProfil.dividendCalendar,
+                                        yearSelector: newValue === 'Année précédente' ? 'ANNEE_PRECEDENTE' : 'ANNEE_EN_COURS'
+                                    } 
+                               }, props.ezProfilStateSetter)}/>
+                    </Box>
+
+                    <Box direction="column" margin="small">
+                        <ComboField id="ezDividendCalendarDateSelector"
+                            value={props.ezProfil.dividendCalendar?.dateSelector === 'DATE_DE_DETACHEMENT' ? 'Date de détachement' : 'Date de paiement (Défaut)' }
+                            errorMsg={undefined}
+                            values={['Date de détachement', 'Date de paiement (Défaut)']}                            
+                            description=""                            
+                            readOnly={props.readOnly}
+                            onChange={newValue  => saveEzProfile(
+                                { ...props.ezProfil,
+                                    dividendCalendar: {
+                                        ...props.ezProfil.dividendCalendar,
+                                        dateSelector: newValue === 'Date de détachement' ? 'DATE_DE_DETACHEMENT' : 'DATE_DE_PAIEMENT'
+                                    }
+                               }, props.ezProfilStateSetter)}/>
+                    </Box>
+
+                    <Box direction="column" margin="small">
+                        <ComboField id="ezDividendCalendarPercentSelector"
+                            value={props.ezProfil.dividendCalendar?.percentSelector === 'ADAPTATIF' ? 'Adaptatif (Défaut)' : 'Stable' }
+                            errorMsg={undefined}
+                            values={['Adaptatif (Défaut)', 'Stable']}                            
+                            description=""                            
+                            readOnly={props.readOnly}
+                            onChange={newValue  => saveEzProfile(
+                                { ...props.ezProfil,
+                                    dividendCalendar: {
+                                        ...props.ezProfil.dividendCalendar,
+                                        percentSelector: newValue === 'Adaptatif (Défaut)' ? 'ADAPTATIF' : 'STABLE'
+                                    }
+                               }, props.ezProfilStateSetter)}/>
+                    </Box>
+
+
 {/*
                     <Heading level="5">Téléchargements</Heading>
                     <Box direction="column" margin="small">

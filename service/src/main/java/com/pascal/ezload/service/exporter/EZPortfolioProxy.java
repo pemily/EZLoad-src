@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.exporter;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
@@ -22,7 +23,7 @@ public interface EZPortfolioProxy {
     void load(Reporting reporting) throws Exception;
 
     // return the list of EzEdition operation not saved
-    List<EzReport> save(Reporting reporting, List<EzReport> operations, List<String> ignoreOperations) throws Exception;
+    List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operations, List<String> ignoreOperations) throws Exception;
 
     Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account);
 

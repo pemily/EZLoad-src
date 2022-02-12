@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 
+import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
@@ -35,7 +36,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public List<EzReport> save(Reporting reporting, List<EzReport> operationsToAdd,  List<String> ignoreEzEditionId){
+    public List<EzReport> save(EzProfil ezProfil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId){
         throw new NotImplementedException();
     }
 
