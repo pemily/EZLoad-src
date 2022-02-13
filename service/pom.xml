@@ -102,29 +102,6 @@
             </plugin>
         -->
 
-            <!-- Zip all rules  -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>rules</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>rules</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <formats>
-                                <format>zip</format>
-                            </formats>
-                            <descriptors>
-                                <descriptor>rules-assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -133,11 +110,14 @@
                     <target>11</target>
                 </configuration>
             </plugin>
-            <!-- End Zip all rules  -->
         </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.pascal.ezload</groupId>
+            <artifactId>ezGithub-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>

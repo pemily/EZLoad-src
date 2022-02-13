@@ -22,8 +22,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.model.EnumEZBroker;
-
-import org.apache.commons.lang3.StringUtils;
+import com.pascal.ezload.service.util.StringUtils;
 
 public class AuthManager {
 
@@ -87,7 +86,7 @@ public class AuthManager {
         if (clearPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(passPhrase));
-        return byteArrayToHexStr(cipher.doFinal(clearPassword.getBytes(StandardCharsets.UTF_8)));
+        return StringUtils.byteArrayToHexStr(cipher.doFinal(clearPassword.getBytes(StandardCharsets.UTF_8)));
     }
 
     // Get a decrypted password
@@ -95,7 +94,7 @@ public class AuthManager {
         if (encryptedPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(passPhrase));
-        return new String(cipher.doFinal(hexStrToByteArray(encryptedPassword)));
+        return new String(cipher.doFinal(StringUtils.hexStrToByteArray(encryptedPassword)));
     }
 
     private static SecretKeySpec getSecretKey(String passPhrase) throws NoSuchAlgorithmException {
@@ -114,15 +113,7 @@ public class AuthManager {
         byte[] salt = new byte[32];
         random.nextBytes(salt);
 
-        return byteArrayToHexStr(salt);
-    }
-
-    private static byte[] hexStrToByteArray(String s){
-        return Base64.getDecoder().decode(s);
-    }
-
-    private static String byteArrayToHexStr(byte[] b){
-        return Base64.getEncoder().encodeToString(b);
+        return StringUtils.byteArrayToHexStr(salt);
     }
 
     private static class Data {

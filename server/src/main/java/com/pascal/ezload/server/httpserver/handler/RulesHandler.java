@@ -11,7 +11,6 @@ import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.LoggerReporting;
 import com.pascal.ezload.service.util.TextReporting;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
@@ -97,7 +96,7 @@ public class RulesHandler {
     public CommonFunctions getCommonFunction(@NotNull @PathParam("broker") EnumEZBroker broker,
                                              @NotNull @PathParam("brokerFileVersion") int brokerFileVersion) throws Exception {
         return new RulesManager(SettingsManager.getInstance().loadProps())
-                .readCommonScript(broker, brokerFileVersion);
+                .getCommonScript(broker, brokerFileVersion);
     }
 
     @POST

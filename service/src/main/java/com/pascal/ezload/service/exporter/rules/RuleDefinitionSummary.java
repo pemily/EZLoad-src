@@ -12,6 +12,8 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
     private EnumEZBroker broker; // part of the unique key
     private int brokerFileVersion;  // part of the unique key
     private String name;  // part of the unique key
+    private transient boolean userRule;
+    private transient boolean sharedVersionExists;
 
     private boolean enabled;
     private String[] description;
@@ -56,6 +58,22 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
         this.description = description;
     }
 
+    public boolean isUserRule() {
+        return userRule;
+    }
+
+    public void setUserRule(boolean userRule) {
+        this.userRule = userRule;
+    }
+
+    public boolean isSharedVersionExists() {
+        return sharedVersionExists;
+    }
+
+    public void setSharedVersionExists(boolean sharedVersionExists) {
+        this.sharedVersionExists = sharedVersionExists;
+    }
+
     @Override
     public RuleDefinitionSummary validate() {
         return this;
@@ -65,4 +83,5 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
         this.description = Arrays.stream(this.description).map(normalizer::apply).collect(Collectors.toList()).toArray(new String[]{});
         this.name = normalizer.apply(this.name);
     }
+
 }

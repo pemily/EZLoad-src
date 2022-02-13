@@ -286,8 +286,9 @@ public class SettingsManager {
         if (admin == null) {
             admin = new MainSettings.Admin();
             admin.setShowRules(false);
-            admin.setAccountId(genString(20));
         }
+        if (admin.getAccountId() == null)
+            admin.setAccountId(genString(20));
         return admin;
     }
 

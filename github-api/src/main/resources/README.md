@@ -1,7 +1,7 @@
+Pour le code, la reference resapi est ici: https://docs.github.com/en/rest/reference/repos#get-repository-content
+
 
 Source:
-
-
 https://github.com/github/rest-api-description/blob/main/descriptions-next/api.github.com/api.github.com.yaml
 
 J'ai enlevé le -- et le openapi: 3.0.0 a ete remplacé par 3.0.0

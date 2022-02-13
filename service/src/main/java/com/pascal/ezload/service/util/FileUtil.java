@@ -1,11 +1,14 @@
 package com.pascal.ezload.service.util;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -54,4 +57,9 @@ public class FileUtil {
     public static void rmdir(File profilDir) throws IOException {
         FileUtils.deleteDirectory(profilDir);
     }
+
+    public static String hashCode(File file) throws IOException {
+        return DigestUtils.md5Hex(FileUtils.readFileToByteArray(file));
+    }
+
 }

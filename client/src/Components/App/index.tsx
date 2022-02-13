@@ -57,8 +57,8 @@ export function App(){
         .catch(e => console.error(e) )
     }
 
-    function reloadAllData(){        
-        jsonCall(ezApi.home.getMainData())
+    function reloadAllData() :  Promise<any> {        
+        return jsonCall(ezApi.home.getMainData())
         .then(r =>  {                  
             console.log("ReloadData: ",r);         
              setConfigFile(r.configFile);
@@ -80,15 +80,12 @@ export function App(){
         })
         .catch((error) => {
             console.error("Error while loading Data.", error);
-        });
-
-        jsonCall(ezApi.security.getAuthWithoutPassword({courtier: "BourseDirect"}))
-        .then(resp => {            
-            setBourseDirectAuthInfo(resp);
         })
-        .catch((error) => {
-            console.error("Error while loading BourseDirect Username", error);
-        });
+        .then(e => jsonCall(ezApi.security.getAuthWithoutPassword({courtier: "BourseDirect"}))
+                    .then(setBourseDirectAuthInfo)
+                    .catch((error) => {
+                        console.error("Error while loading BourseDirect Username", error);
+                    }));
     }
         
     function isOperationIgnored(op: EzEdition | undefined) : boolean {
@@ -180,7 +177,14 @@ export function App(){
         setInterval(() => ezApi.home.ping(), 20000);    // every 20 seconds call the ping
 
         // will be executed on the load
-        reloadAllData();
+        reloadAllData()
+        .then(e => jsonCall(ezApi.home.checkUpdate())
+                    .then(followProcess)
+                    .catch(e => console.error(e))
+        )
+        .catch((error) => {
+            console.error("Error while checking update...", error);
+        });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ ]);
 

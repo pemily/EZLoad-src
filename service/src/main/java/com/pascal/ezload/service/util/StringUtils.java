@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.util;
 
+import java.util.Base64;
+
 public class StringUtils {
 
     public static String clean(String text) {
@@ -49,4 +51,14 @@ public class StringUtils {
 
         return text.trim();
     }
+
+
+    public static byte[] hexStrToByteArray(String s){
+        return Base64.getDecoder().decode(s);
+    }
+
+    public static String byteArrayToHexStr(byte[] b){
+        return Base64.getEncoder().encodeToString(b);
+    }
+
 }

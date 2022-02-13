@@ -12,6 +12,7 @@ import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
@@ -201,6 +202,22 @@ public class HomeHandler {
         try(Writer writer = response.getWriter()) {
             processManager.viewLogProcess(writer);
         }
+    }
+
+    @POST
+    @Path("/checkUpdate")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess checkUpdate() throws Exception {
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+                "Recherche de Mise à jour",
+                ProcessManager.getLog(mainSettings, "update", "-check.html"),
+                (processLogger) -> {
+                    RulesVersionManager rulesVersionManager = new RulesVersionManager(mainSettings);
+                    rulesVersionManager.synchSharedRulesFolder(processLogger.getReporting());
+                });
     }
 
 }

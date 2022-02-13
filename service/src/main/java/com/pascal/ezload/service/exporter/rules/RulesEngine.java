@@ -19,7 +19,6 @@ import com.pascal.ezload.service.util.ShareUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,7 +126,7 @@ public class RulesEngine {
     }
 
     private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data, ShareUtil shareUtil) {
-        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition);
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
 
         data.put(OperationData.operation_ezLiquidityName, shareUtil.getEzLiquidityName());
 
@@ -194,7 +193,7 @@ public class RulesEngine {
 
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
         List<EzPortefeuilleEdition> result = new LinkedList<>();
-        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition);
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
         ruleDefinition.getPortefeuilleRules().forEach(portRule -> {
             EzData data2 = new EzData(data);
             EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();

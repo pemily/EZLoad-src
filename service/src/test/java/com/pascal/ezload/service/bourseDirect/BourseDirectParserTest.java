@@ -27,110 +27,12 @@ public class BourseDirectParserTest {
 
     // to regenerate the benchmark, just remove them and relaunch the test
 
+/* Il n'y a plus les regles dans src test resources, elles sont dans un autre repo maintenant
     @Test
     public void test1() throws IOException {
-        test("boursedirect-2021-02-24");
+      test("boursedirect-2021-02-24");
     }
-
-    @Test
-    public void test2() throws IOException {
-        test("boursedirect-2021-02-26");
-    }
-
-    @Test
-    public void test3() throws IOException {
-        test("boursedirect-2021-03-01");
-    }
-
-    @Test
-    public void test4() throws IOException {
-        test("boursedirect-2021-03-02");
-    }
-
-    @Test
-    public void test5() throws IOException {
-        test("boursedirect-2021-03-03");
-    }
-
-    @Test
-    public void test6() throws IOException {
-        test("boursedirect-2021-03-08");
-    }
-
-    @Test
-    public void test7() throws IOException {
-        test("boursedirect-2021-03-09");
-    }
-
-    @Test
-    public void test8() throws IOException {
-        test("boursedirect-2021-03-16");
-    }
-
-    @Test
-    public void test9() throws IOException {
-        test("boursedirect-2021-03-18");
-    }
-
-    @Test
-    public void test10() throws IOException {
-        test("boursedirect-2021-03-19");
-    }
-
-    @Test
-    public void test11() throws IOException {
-        test("boursedirect-2021-03-30");
-    }
-
-    @Test
-    public void test12() throws IOException {
-        test("boursedirect-2021-04-07");
-    }
-
-    @Test
-    public void test13() throws IOException {
-        test("boursedirect-2021-04-19");
-    }
-
-    @Test
-    public void test14() throws IOException {
-        test("boursedirect-2021-04-30");
-    }
-
-    @Test
-    public void test15() throws IOException {
-        test("boursedirect-2021-05-11");
-    }
-
-    @Test
-    public void test16() throws IOException {
-        test("boursedirect-2021-05-18");
-    }
-
-    @Test
-    public void test17() throws IOException {
-        test("boursedirect-2021-07-06");
-    }
-
-    @Test
-    public void test18() throws IOException {
-        test("boursedirect-2021-07-08");
-    }
-
-    @Test
-    public void test19() throws IOException {
-        test("boursedirect-2021-07-12");
-    }
-
-    @Test
-    public void test20() throws IOException {
-        test("boursedirect-2021-07-15");
-    }
-
-    @Test
-    public void test21() throws IOException {
-        test("boursedirect-2021-07-19");
-    }
+*/
 
     private URL getFilePath(String fileName){
         return BourseDirectParserTest.class.getResource(fileName);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trash, HelpOption, Add, Duplicate } from 'grommet-icons';
+import { Trash, HelpOption, Add, Duplicate, Revert } from 'grommet-icons';
 import { Box, Heading, Text, Button, Anchor, List } from "grommet";
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { TextField } from '../../Tools/TextField';
@@ -106,24 +106,43 @@ export function Rule(props: RuleProps){
                         })
                 }}/>     
 
+                { props.ruleDefinition.userRule && (
                 <Button key={"delBD"} size="small" alignSelf="end"
                     disabled={props.readOnly}
-                    icon={<Trash color='status-critical' size='medium'/>} onClick={() =>{
-                    confirmAlert({
-                        title: 'Etes vous sûr de vouloir supprimer cette règle?',
-                        message: 'Elles ne pourra plus être utilisée pour créer des opérations.',
-                        buttons: [
-                            {
-                                label: 'Oui',
-                                onClick: () => props.deleteRule()
-                            },
-                            {
-                            label: 'Non',
-                                onClick: () => {}
-                            }
-                        ]
-                        });
-                }}/>     
+                    icon={props.ruleDefinition.sharedVersionExists ? 
+                                            (<Revert color='status-critical' size='medium'/>)
+                                             : (<Trash color='status-critical' size='medium'/>)} onClick={() =>{
+                    props.ruleDefinition.sharedVersionExists ? (
+                        confirmAlert({
+                            title: 'Etes vous sûr de vouloir revenir à la version d\'origine?',
+                            message: 'Vous allez restaurer la version originale de cette règle, et vous allez perdre vos modifications.',
+                            buttons: [
+                                {
+                                    label: 'Restaurer',
+                                    onClick: () => props.deleteRule()
+                                },
+                                {
+                                label: 'Annuler',
+                                    onClick: () => {}
+                                }
+                            ]
+                            })) :
+                            confirmAlert({
+                                title: 'Etes vous sûr de vouloir supprimer cette règle?',
+                                message: 'Elles ne pourra plus être utilisée pour créer des opérations.',
+                                buttons: [
+                                    {
+                                        label: 'Oui',
+                                        onClick: () => props.deleteRule()
+                                    },
+                                    {
+                                    label: 'Non',
+                                        onClick: () => {}
+                                    }
+                                ]
+                                })
+                            ;
+                }}/> ) }
             </Box>
         </Box>
         <Box align="Center" margin="small">
