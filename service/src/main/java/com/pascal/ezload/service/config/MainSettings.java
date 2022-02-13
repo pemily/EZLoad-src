@@ -1,7 +1,6 @@
 package com.pascal.ezload.service.config;
 
 import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.DirValue;
 import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.StringValue;
 
@@ -83,8 +82,8 @@ public class MainSettings {
 
         @Override
         public ChromeSettings validate() {
-            new FileValue(true).validate(this, Field.driverPath.name(), driverPath);
-            new DirValue(true).validate(this, Field.userDataDir.name(), userDataDir);
+            new FileValue(this, Field.driverPath.name(), driverPath).checkRequired().checkFile();
+            new FileValue(this, Field.userDataDir.name(), userDataDir).checkRequired().checkDirectory();
             return this;
         }
 
@@ -143,9 +142,10 @@ public class MainSettings {
 
         @Override
         public EZLoad validate() {
-            new DirValue(true).validate(this, Field.logsDir.name(), logsDir);
-            new StringValue(true).validate(this, Field.passPhrase.name(), passPhrase);
-            new DirValue(true).validate(this, Field.rulesDir.name(), rulesDir);
+            new FileValue(this, Field.logsDir.name(), logsDir).checkRequired().checkDirectory();
+            new StringValue(this, Field.passPhrase.name(), passPhrase).checkRequired();
+            new FileValue(this, Field.rulesDir.name(), rulesDir).checkRequired().checkDirectory();;
+            admin.validate();
             return this;
         }
     }
@@ -202,8 +202,11 @@ public class MainSettings {
         }
     }
 
-    public static class Admin {
+    public static class Admin extends Checkable<Admin>{
+        enum Field {accountId}
+
         private boolean showRules;
+        private String accountId;
 
         public boolean isShowRules() {
             return showRules;
@@ -211,6 +214,22 @@ public class MainSettings {
 
         public void setShowRules(boolean showRules) {
             this.showRules = showRules;
+        }
+
+        public String getAccountId() {
+            return accountId;
+        }
+
+        public void setAccountId(String accountId) {
+            this.accountId = accountId;
+        }
+
+        @Override
+        public Admin validate() {
+            new StringValue(this, Admin.Field.accountId.name(), accountId)
+                    .checkRequired()
+                    .validateWithForbidenValues("admin", "release", "alpha", "beta", "git", ".git");
+            return this;
         }
     }
 

@@ -104,16 +104,16 @@ public class OperationRule extends Checkable<OperationRule> {
 
     @Override
     public OperationRule validate() {
-        new StringValue(false).validate(this, Field.condition.name(), condition);
-        new StringValue(true).validate(this, Field.operationDateExpr.name(), operationDateExpr);
-        new StringValue(true).validate(this, Field.operationCompteTypeExpr.name(), operationCompteTypeExpr);
-        new StringValue(true).validate(this, Field.operationBrokerExpr.name(), operationBrokerExpr);
-        new StringValue(true).validate(this, Field.operationQuantityExpr.name(), operationQuantityExpr);
-        new StringValue(true).validate(this, Field.operationTypeExpr.name(), operationTypeExpr);
-        new StringValue(true).validate(this, Field.operationActionNameExpr.name(), operationActionNameExpr);
-        new StringValue(true).validate(this, Field.operationCountryExpr.name(), operationCountryExpr);
-        new StringValue(true).validate(this, Field.operationAmountExpr.name(), operationAmountExpr);
-        new StringValue(true).validate(this, Field.operationDescriptionExpr.name(), operationDescriptionExpr);
+        new StringValue(this, Field.condition.name(), condition); // no check
+        new StringValue(this, Field.operationDateExpr.name(), operationDateExpr).checkRequired();
+        new StringValue(this, Field.operationCompteTypeExpr.name(), operationCompteTypeExpr).checkRequired();
+        new StringValue(this, Field.operationBrokerExpr.name(), operationBrokerExpr).checkRequired();
+        new StringValue(this, Field.operationQuantityExpr.name(), operationQuantityExpr).checkRequired();
+        new StringValue(this, Field.operationTypeExpr.name(), operationTypeExpr).checkRequired();
+        new StringValue(this, Field.operationActionNameExpr.name(), operationActionNameExpr).checkRequired();
+        new StringValue(this, Field.operationCountryExpr.name(), operationCountryExpr).checkRequired();
+        new StringValue(this, Field.operationAmountExpr.name(), operationAmountExpr).checkRequired();
+        new StringValue(this, Field.operationDescriptionExpr.name(), operationDescriptionExpr).checkRequired();
         return this;
     }
 

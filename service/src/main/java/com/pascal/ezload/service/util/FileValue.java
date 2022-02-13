@@ -4,24 +4,37 @@ import java.io.File;
 
 public class FileValue {
 
-    private final boolean required;
+    private final Checkable<?> checkable;
+    private final String field;
+    private final String value;
 
-    public FileValue(boolean required){        
-        this.required = required;
+    public FileValue(Checkable<?> checkable, String field, String value){
+        this.checkable = checkable;
+        this.field = field;
+        this.value = value;
     }
 
+    public FileValue checkRequired(){
+        if (value == null || !new File(value).exists()){
+            checkable.setErrorMsg(field, "Le repertoire n'existe pas");
+        }
+        return this;
+    }
 
-    public void validate(Checkable checkable, String field, String value){
+    public FileValue checkDirectory(){
+        if (value != null && new File(value).exists()){
+            if (!new File(value).isDirectory())
+                checkable.setErrorMsg(field, "Cette valeur ne représente pas un repertoire");
+        }
+        return this;
+    }
+
+    public FileValue checkFile(){
         if (value != null && new File(value).exists()){
             if (!new File(value).isFile())
                 checkable.setErrorMsg(field, "Cette valeur ne représente pas un fichier");
-            else checkable.setErrorMsg(field, null);
         }
-        else{
-            if (required)
-                checkable.setErrorMsg(field, "Le fichier n'existe pas");
-            else checkable.setErrorMsg(field, null);
-        }
+        return this;
     }
 
 }

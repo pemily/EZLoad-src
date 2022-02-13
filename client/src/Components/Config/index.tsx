@@ -1,6 +1,6 @@
 import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
 import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
-import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued } from '../../ez-api/tools';
+import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued, saveMainSettings } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
 import { TextField } from '../Tools/TextField';
@@ -23,6 +23,10 @@ export interface ConfigProps {
   followProcess: (process: EzProcess|undefined) => void;
   saveStartDate: (date: string, account: BourseDirectEZAccountDeclaration) => void;
 }        
+
+const accountIdInfo = `Le Compte Id doit être unique sur https://github.com/pemily/EZLoad-Rules, il est utile si vous souhaitez sauvegarder vos ajouts et modifications des règles.
+
+Il n'y a aucune données personnelle dans les rêgles, mais vous pouvez aider les autres qui en aurait besoin`
 
 const calculAnnualDividendsInfo = `Pour calculer la Colonne ***L*** dans MonPortefeuille
 
@@ -418,6 +422,32 @@ export function Config(props: ConfigProps) {
                         </Box>
                     </Box>
 
+                    { props.mainSettings.ezLoad?.admin?.showRules && (
+                        <>
+                            <Box direction="row" justify="start">
+                                    <Heading level="5" self-align="start">Compte</Heading>
+                                    <Help isInfo={true} title="info">
+                                        <Box border={{ color: 'brand', size: 'large' }} pad="medium">
+                                            <Markdown>{ accountIdInfo }</Markdown>
+                                        </Box>
+                                    </Help>
+                                </Box>                    
+                            <Box direction="column" margin="small">
+                                <TextField id="ezAccountId" label="Id" value={props.mainSettings.ezLoad?.admin?.accountId}
+                                    isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.accountId}
+                                    readOnly={props.readOnly}
+                                    onChange={newValue  => saveMainSettings(
+                                        { ...props.mainSettings,
+                                            ezLoad: {
+                                                ...props.mainSettings.ezLoad,
+                                                admin: {
+                                                    ...props.mainSettings.ezLoad?.admin,
+                                                    accountId: newValue
+                                                }
+                                            }
+                                    }, props.mainSettingsStateSetter)}/>
+                            </Box>
+                        </> ) }
                 </Form>
             </Box>
           );

@@ -3,7 +3,6 @@ package com.pascal.ezload.service.config;
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.DirValue;
 import com.pascal.ezload.service.util.FileValue;
 
 
@@ -66,8 +65,8 @@ public class EzProfil extends Checkable<EzProfil> {
     }
 
     public EzProfil validate(){
-        new FileValue(true).validate(this, Field.courtierCredFile.name(), courtierCredsFile);
-        new DirValue(true).validate(this, Field.downloadDir.name(), downloadDir);
+        new FileValue(this, Field.courtierCredFile.name(), courtierCredsFile).checkRequired().checkFile();
+        new FileValue(this, Field.downloadDir.name(), downloadDir).checkRequired().checkDirectory();
         bourseDirect.validate();
         ezPortfolio.validate();
         return this;

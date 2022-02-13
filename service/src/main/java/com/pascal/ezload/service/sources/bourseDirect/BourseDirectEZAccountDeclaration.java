@@ -53,8 +53,8 @@ public class BourseDirectEZAccountDeclaration extends Checkable<BourseDirectEZAc
     }
 
     public BourseDirectEZAccountDeclaration validate(){
-        new StringValue(true).validate(this, Field.name.name(), name);
-        new StringValue(true).validate(this, Field.number.name(), number);
+        new StringValue(this, Field.name.name(), name).checkRequired();
+        new StringValue(this, Field.number.name(), number).checkRequired();
         return this;
     }
 

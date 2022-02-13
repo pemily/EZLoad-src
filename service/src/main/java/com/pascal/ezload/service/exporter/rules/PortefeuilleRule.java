@@ -125,18 +125,18 @@ public class PortefeuilleRule extends Checkable<PortefeuilleRule> {
 
     @Override
     public PortefeuilleRule validate() {
-        new StringValue(false).validate(this, Field.condition.name(), condition);
-        new StringValue(true).validate(this, Field.portefeuilleValeurExpr.name(), portefeuilleValeurExpr);
-        new StringValue(true).validate(this, Field.portefeuilleCompteExpr.name(), portefeuilleCompteExpr);
-        new StringValue(true).validate(this, Field.portefeuilleCourtierExpr.name(), portefeuilleCourtierExpr);
-        new StringValue(true).validate(this, Field.portefeuilleTickerGoogleFinanceExpr.name(), portefeuilleTickerGoogleFinanceExpr);
-        new StringValue(true).validate(this, Field.portefeuillePaysExpr.name(), portefeuillePaysExpr);
-        new StringValue(true).validate(this, Field.portefeuilleSecteurExpr.name(), portefeuilleSecteurExpr);
-        new StringValue(true).validate(this, Field.portefeuilleIndustrieExpr.name(), portefeuilleIndustrieExpr);
-        new StringValue(true).validate(this, Field.portefeuilleEligibiliteAbbattement40Expr.name(), portefeuilleEligibiliteAbbattement40Expr);
-        new StringValue(true).validate(this, Field.portefeuilleTypeExpr.name(), portefeuilleTypeExpr);
-        new StringValue(true).validate(this, Field.portefeuillePrixDeRevientExpr.name(), portefeuillePrixDeRevientExpr);
-        new StringValue(true).validate(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr);
+        new StringValue(this, Field.condition.name(), condition); // no check
+        new StringValue(this, Field.portefeuilleValeurExpr.name(), portefeuilleValeurExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleCompteExpr.name(), portefeuilleCompteExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleCourtierExpr.name(), portefeuilleCourtierExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleTickerGoogleFinanceExpr.name(), portefeuilleTickerGoogleFinanceExpr).checkRequired();
+        new StringValue(this, Field.portefeuillePaysExpr.name(), portefeuillePaysExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleSecteurExpr.name(), portefeuilleSecteurExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleIndustrieExpr.name(), portefeuilleIndustrieExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleEligibiliteAbbattement40Expr.name(), portefeuilleEligibiliteAbbattement40Expr).checkRequired();
+        new StringValue(this, Field.portefeuilleTypeExpr.name(), portefeuilleTypeExpr).checkRequired();
+        new StringValue(this, Field.portefeuillePrixDeRevientExpr.name(), portefeuillePrixDeRevientExpr).checkRequired();
+        new StringValue(this, Field.portefeuilleQuantiteExpr.name(), portefeuilleQuantiteExpr).checkRequired();
         return this;
     }
 

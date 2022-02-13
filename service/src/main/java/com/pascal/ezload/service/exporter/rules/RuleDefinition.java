@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.service.util.StringValues;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -70,10 +71,10 @@ public class RuleDefinition extends RuleDefinitionSummary {
     public RuleDefinition validate(){
         // TODO ici vérifiez que chaque expression n'utilise pas une variable qui n'existe pas et que l'expression est correcte
 
-        new StringValue(true).validate(this, Field.name.name(), getName());
-        new StringValue(false).validate(this, Field.description.name(), getDescription());
-        new StringValue(true).validate(this, Field.condition.name(), condition);
-        new StringValue(false).validate(this, Field.shareId.name(), shareId);
+        new StringValue(this, Field.name.name(), getName()).checkRequired();
+        new StringValues(this, Field.description.name(), getDescription()); // no check
+        new StringValue(this, Field.condition.name(), condition).checkRequired();
+        new StringValue(this, Field.shareId.name(), shareId); // no check
 
         operationRules.forEach(OperationRule::validate);
         portefeuilleRules.forEach(PortefeuilleRule::validate);
@@ -84,8 +85,8 @@ public class RuleDefinition extends RuleDefinitionSummary {
         super.beforeSave(normalizer);
         this.condition = normalizer.apply(this.condition);
         this.shareId = normalizer.apply(this.shareId);
-        this.operationRules.stream().forEach(op -> op.beforeSave(normalizer));
-        this.portefeuilleRules.stream().forEach(po -> po.beforeSave(normalizer));
+        this.operationRules.forEach(op -> op.beforeSave(normalizer));
+        this.portefeuilleRules.forEach(po -> po.beforeSave(normalizer));
     }
 }
 

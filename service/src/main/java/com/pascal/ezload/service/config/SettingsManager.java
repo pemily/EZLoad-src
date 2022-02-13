@@ -282,10 +282,11 @@ public class SettingsManager {
         return ezLoad;
     }
 
-    private MainSettings.Admin defaultValuesIfNotSet(MainSettings.Admin admin) throws Exception {
+    private MainSettings.Admin defaultValuesIfNotSet(MainSettings.Admin admin) {
         if (admin == null) {
             admin = new MainSettings.Admin();
             admin.setShowRules(false);
+            admin.setAccountId(genString(20));
         }
         return admin;
     }
