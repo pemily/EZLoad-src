@@ -92,7 +92,7 @@ public class RulesVersionManager {
             Git.cloneRepository()
                     .setURI("https://github.com/" + owner + "/" + repo + ".git")
                     .setDirectory(new File(ezRepoDir))
-                    .setBranchesToClone(Arrays.asList("refs/heads/" + originBranch))
+                    .setBranchesToClone(List.of("refs/heads/" + originBranch))
                     .setBranch("refs/heads/" + originBranch)
                     .call()
                     .branchCreate()
