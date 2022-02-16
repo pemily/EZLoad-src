@@ -24,7 +24,7 @@ public class RulesVersionManager {
 
     // Ces Info viennent du compte Github
     private static String owner = "pemily";
-    private static String repo = "EZLoad-Rules";
+    private static String repo = "EZLoad";
     private static String originBranch = "EZLoad-1.0";
     private static String accessToken = "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";  // extracted from https://github.com/settings/tokens/801639196
                                                                                     // Le token ne doit avoir que l'access: public_repo
@@ -33,11 +33,13 @@ public class RulesVersionManager {
     // la doc officiel openapi de github: https://github.com/github/rest-api-description
     // https://github.com/github/rest-api-description/tree/main/descriptions-next/api.github.com
 
+    private final String ezRepoDir;
     private final MainSettings mainSettings;
     private Git git;
 
-    public RulesVersionManager(MainSettings mainSettings){
+    public RulesVersionManager(String ezRepoDir, MainSettings mainSettings){
         this.mainSettings = mainSettings;
+        this.ezRepoDir = ezRepoDir;
     }
 
     public void synchSharedRulesFolder(Reporting reporting) throws Exception {
@@ -84,12 +86,12 @@ public class RulesVersionManager {
             throw new IllegalArgumentException("Le nom "+localBranch+" n'est pas un nom valide");
         }
 
-        if (! new File(getRepoDir().getAbsolutePath()+File.separator+".git").exists()) {
-            getRepoDir().mkdirs();
+        if (! new File(ezRepoDir+File.separator+".git").exists()) {
+            new File(ezRepoDir).mkdirs();
 
             Git.cloneRepository()
                     .setURI("https://github.com/" + owner + "/" + repo + ".git")
-                    .setDirectory(getRepoDir())
+                    .setDirectory(new File(ezRepoDir))
                     .setBranchesToClone(Arrays.asList("refs/heads/" + originBranch))
                     .setBranch("refs/heads/" + originBranch)
                     .call()
@@ -114,12 +116,12 @@ public class RulesVersionManager {
     }
 
     private void initIfNeeded() throws IOException {
-        if (new File(getRepoDir().getAbsolutePath()+File.separator+".git").exists()) {
+        if (new File(ezRepoDir+File.separator+".git").exists()) {
             if (this.git == null)
-                this.git = Git.open(getRepoDir());
+                this.git = Git.open(new File(ezRepoDir));
         }
         else
-            throw new IOException("Git directory not created: "+getRepoDir().getAbsolutePath()+File.separator+".git");
+            throw new IOException("Git directory not created: "+ezRepoDir+File.separator+".git");
     }
 
     // if success true, false if nothing to commit
@@ -146,11 +148,6 @@ public class RulesVersionManager {
             return false;
         }
         return true;
-    }
-
-    @NotNull
-    private File getRepoDir() {
-        return new File(mainSettings.getEzLoad().getRulesDir());
     }
 
     public void revert(String absoluteFilePath) throws GitAPIException, IOException {
@@ -184,10 +181,10 @@ public class RulesVersionManager {
 
     @NotNull
     private String getGitFilePath(String abosluteFilePath) throws IOException {
-        if (! abosluteFilePath.startsWith(getRepoDir().getAbsolutePath()))
-            throw new IOException("Bad file path: "+ abosluteFilePath +" not in "+getRepoDir());
+        if (! abosluteFilePath.startsWith(ezRepoDir))
+            throw new IOException("Bad file path: "+ abosluteFilePath +" not in "+ezRepoDir);
 
-        String filePath = abosluteFilePath.substring(getRepoDir().getAbsolutePath().length()+1).replace('\\', '/');
+        String filePath = abosluteFilePath.substring(ezRepoDir.length()+1).replace('\\', '/');
         return filePath;
     }
 }

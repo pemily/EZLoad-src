@@ -142,6 +142,10 @@ public class SettingsManager {
         return new File(configFile).getParentFile().getAbsolutePath();
     }
 
+    public String getEzLoadRepoDir() {
+        return getEzHome()+File.separator+"repo";
+    }
+
     public static String searchConfigFilePath(){
         String configFile = System.getProperty("ezloadConfig");
         if (configFile == null) configFile = System.getenv("ezloadConfig");
@@ -265,7 +269,7 @@ public class SettingsManager {
         String ezHome = getEzHome();
         if (ezLoad.getPort() == 0) ezLoad.setPort(2180);
         if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(ezHome+File.separator+"logs");
-        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(ezHome+File.separator+"rules");
+        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(getEzLoadRepoDir()+File.separator+"rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
 
         new File(ezLoad.getRulesDir()).mkdirs();

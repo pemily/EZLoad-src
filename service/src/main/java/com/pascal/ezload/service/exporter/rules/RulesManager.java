@@ -28,9 +28,9 @@ public class RulesManager {
     private final MainSettings mainSettings;
     private final Map<String, CommonFunctions> brokerAndFileVersion2CommonFunctionsCache = new HashMap<>();
 
-    public RulesManager(MainSettings mainSettings) {
+    public RulesManager(String ezRepoDir, MainSettings mainSettings) {
         this.mainSettings = mainSettings;
-        this.rulesVersionManager = new RulesVersionManager(mainSettings);
+        this.rulesVersionManager = new RulesVersionManager(ezRepoDir, mainSettings);
     }
 
     public synchronized List<RuleDefinition> getAllRules() throws IOException {

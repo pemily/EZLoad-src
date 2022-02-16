@@ -66,7 +66,7 @@ public class HomeHandler {
                             ezServerState.getEzReports(),
                             ezServerState.getNewShares(),
                             ezServerState.getFilesNotYetLoaded(),
-                            new RulesManager(mainSettings).getAllRules()
+                            new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)
                                     .collect(Collectors.toList()),
@@ -215,7 +215,7 @@ public class HomeHandler {
                 "Recherche de Mise à jour",
                 ProcessManager.getLog(mainSettings, "update", "-check.html"),
                 (processLogger) -> {
-                    RulesVersionManager rulesVersionManager = new RulesVersionManager(mainSettings);
+                    RulesVersionManager rulesVersionManager = new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings);
                     rulesVersionManager.synchSharedRulesFolder(processLogger.getReporting());
                 });
     }

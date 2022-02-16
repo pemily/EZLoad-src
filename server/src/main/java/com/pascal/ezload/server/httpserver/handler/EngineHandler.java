@@ -115,7 +115,7 @@ public class EngineHandler {
                     shareValues.addAll(serverState.getNewShares().stream().filter(f -> !StringUtils.isBlank(f.getUserShareName())).collect(Collectors.toList()));
                     ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
 
-                    List<EzReport> allEzReports = new EzEditionExporter(mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy, shareUtil);
+                    List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy, shareUtil);
                     updateShareValuesAndEzReports(ezPortfolioProxy.getNewPRUValues(), knownValues, allEzReports);
                 });
 
