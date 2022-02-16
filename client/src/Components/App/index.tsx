@@ -114,8 +114,14 @@ export function App(){
             if (rule.field2ErrorMsg?.['name'] === undefined || rule.field2ErrorMsg?.['name'] === null){
                 // sauvegarde ok
                 // si il n'y a pas d'erreur sur le nom, alors je mets a jours le old Name car la sauvegarde a réussis, 
-                setSelectedRule({oldName: rule.name, ruleDefinition: rule});
-                // updates the rules list
+                reloadAllData()
+                .then(r => {
+                    console.log("AAA", rule.name, " ruledef: ", rule);
+                    setSelectedRule({oldName: rule.name, ruleDefinition: rule})
+                })
+                .catch(e => console.error("Reloading all data failed: ", e))
+
+                /*  // updates the rules list
                 if (newRuleDef.oldName === undefined){
                     // new rule
                     rules.push({
@@ -132,7 +138,7 @@ export function App(){
                         }
                         else return r;
                     }));
-                } 
+                } */
             }
             else{                
                 // sauvegarde ko, je garde l'ancien nom

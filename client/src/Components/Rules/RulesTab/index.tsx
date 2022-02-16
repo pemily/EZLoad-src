@@ -22,7 +22,7 @@ export function RulesTab(props: RulesTabProps){
                 disabled={props.readOnly}
                 labelKey="title"
                 valueKey={{ key: "rule", reduce: true }}
-                options={props.rules.map(r => { return { title: ruleTitle(r), rule: r }})}
+                options={props.rules.map(r => { return { title: ruleTitle(r)+(r.newUserRule ? " (Nouveau)" : r.dirtyFile ? " (Modifé)" : ""), rule: r }})}
                 onChange={ ({ value: nextValue }) => props.changeSelection(nextValue) } />
         </Box>            
 

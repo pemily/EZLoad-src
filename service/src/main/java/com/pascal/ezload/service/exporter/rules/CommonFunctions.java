@@ -6,8 +6,7 @@ public class CommonFunctions {
     private EnumEZBroker broker;
     private int brokerFileVersion;
     private String script[];
-    private transient boolean userRule;
-    private transient boolean sharedVersionExists;
+    private transient boolean dirtyFile;
 
     public EnumEZBroker getBroker() {
         return broker;
@@ -33,19 +32,11 @@ public class CommonFunctions {
         this.script = script;
     }
 
-    public boolean isUserRule() {
-        return userRule;
+    public boolean isDirtyFile() {
+        return dirtyFile;
     }
 
-    public void setUserRule(boolean userRule) {
-        this.userRule = userRule;
-    }
-
-    public boolean isSharedVersionExists() {
-        return sharedVersionExists;
-    }
-
-    public void setSharedVersionExists(boolean sharedVersionExists) {
-        this.sharedVersionExists = sharedVersionExists;
+    public void setDirtyFile(boolean dirtyFile) {
+        this.dirtyFile = dirtyFile;
     }
 }

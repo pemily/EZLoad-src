@@ -9,6 +9,7 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ShareUtil;
 

@@ -106,13 +106,13 @@ export function Rule(props: RuleProps){
                         })
                 }}/>     
 
-                { props.ruleDefinition.userRule && (
+                { (props.ruleDefinition.newUserRule || props.ruleDefinition.dirtyFile) && (
                 <Button key={"delBD"} size="small" alignSelf="end"
                     disabled={props.readOnly}
-                    icon={props.ruleDefinition.sharedVersionExists ? 
+                    icon={props.ruleDefinition.dirtyFile ?
                                             (<Revert color='status-critical' size='medium'/>)
                                              : (<Trash color='status-critical' size='medium'/>)} onClick={() =>{
-                    props.ruleDefinition.sharedVersionExists ? (
+                    props.ruleDefinition.dirtyFile ? (
                         confirmAlert({
                             title: 'Etes vous sûr de vouloir revenir à la version d\'origine?',
                             message: 'Vous allez restaurer la version originale de cette règle, et vous allez perdre vos modifications.',

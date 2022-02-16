@@ -28,8 +28,6 @@ public class SettingsManager {
     private static final String defaultEzProfilName = getDefaultProfileName();
     private static final String profilesDirectory = "profiles";
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
-    public final static String RULE_SHARED_DIR =  "shared";
-    public final static String RULE_LOCAL_DIR =  "local";
     private final static String CREDS_DIR = "creds";
 
 
@@ -271,11 +269,7 @@ public class SettingsManager {
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
 
         new File(ezLoad.getRulesDir()).mkdirs();
-        new File(ezLoad.getRulesDir()+File.separator+RULE_SHARED_DIR).mkdirs();
-        new File(ezLoad.getRulesDir()+File.separator+RULE_LOCAL_DIR).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
-
-        copyRulesTo(ezLoad.getRulesDir());
 
         ezLoad.setAdmin(defaultValuesIfNotSet(ezLoad.getAdmin()));
 
@@ -343,14 +337,6 @@ public class SettingsManager {
                 .limit(length)
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
-    }
-
-    private static void copyRulesTo(String rulesDir) throws IOException {
-        InputStream stream = SettingsManager.class.getClassLoader().getResourceAsStream("rules.zip");
-        if (stream == null){
-            stream = new FileInputStream("service/target/rules.zip");
-        }
-        FileUtil.unzip(stream, rulesDir, false);
     }
 
     public static String getVersion() throws IOException {
