@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.exporter.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.Checkable;
 
@@ -12,8 +13,8 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
     private EnumEZBroker broker; // part of the unique key
     private int brokerFileVersion;  // part of the unique key
     private String name;  // part of the unique key
-    private transient boolean newUserRule;
-    private transient boolean dirtyFile;
+    private Boolean newUserRule;
+    private Boolean dirtyFile;
 
     private boolean enabled;
     private String[] description;
@@ -58,19 +59,19 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
         this.description = description;
     }
 
-    public boolean isNewUserRule() {
+    public Boolean isNewUserRule() {
         return newUserRule;
     }
 
-    public void setNewUserRule(boolean newUserRule) {
+    public void setNewUserRule(Boolean newUserRule) {
         this.newUserRule = newUserRule;
     }
 
-    public boolean isDirtyFile() {
+    public Boolean isDirtyFile() {
         return dirtyFile;
     }
 
-    public void setDirtyFile(boolean dirtyFile) {
+    public void setDirtyFile(Boolean dirtyFile) {
         this.dirtyFile = dirtyFile;
     }
 
@@ -82,6 +83,8 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
     public void beforeSave(Function<String, String> normalizer){
         this.description = Arrays.stream(this.description).map(normalizer::apply).collect(Collectors.toList()).toArray(new String[]{});
         this.name = normalizer.apply(this.name);
+        this.dirtyFile = null; // serialized to the client via json => ok but in the file => no so set null before save
+        this.newUserRule = null; // serialized to the client via json => ok but in the file => no so set null before save
     }
 
 }

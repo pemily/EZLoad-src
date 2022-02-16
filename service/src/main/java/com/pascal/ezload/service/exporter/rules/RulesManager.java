@@ -1,28 +1,25 @@
 package com.pascal.ezload.service.exporter.rules;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.util.FileProcessor;
+import com.pascal.ezload.service.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RulesManager {
 
     private final static String RULE_FILE_EXTENSION = ".rule";
     private final static String COMMON_FUNCTIONS_FILENAME = "common.script";
-    private final static DefaultIndenter defaultIndenter = new DefaultIndenter("  ", "\n"); // tab with 2 spaces and \n instead of \n\r
 
     private final RulesVersionManager rulesVersionManager;
     private final MainSettings mainSettings;
@@ -41,16 +38,15 @@ public class RulesManager {
                         return readRule(f, state == RulesVersionManager.FileState.NEW,
                                     state != RulesVersionManager.FileState.NEW && state != RulesVersionManager.FileState.NO_CHANGE);
                     } catch (IOException | GitAPIException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException("Error while reading file: "+f, e);
                     }
                 });
     }
 
 
     public synchronized RuleDefinition readRule(String filepath, boolean newUserRule, boolean dirtyFile) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         try(Reader reader = new FileReader(filepath, StandardCharsets.UTF_8)) {
-            RuleDefinition ruleDefinition = mapper.readValue(reader, RuleDefinition.class);
+            RuleDefinition ruleDefinition = JsonUtil.getDefaultMapper().readValue(reader, RuleDefinition.class);
             ruleDefinition.validate();
             ruleDefinition.setNewUserRule(newUserRule);
             ruleDefinition.setDirtyFile(dirtyFile);
@@ -80,21 +76,12 @@ public class RulesManager {
 
         new File(newFilePath).getParentFile().mkdirs();
         ruleDef.clearErrors();
-        ruleDef.beforeSave(RulesManager::normalize);
+        boolean isNewUserRule = ruleDef.isNewUserRule();
+        ruleDef.beforeSave(RulesManager::normalize); // the before save set to null the newUserRule
 
-        JsonFactory jsonFactory = new JsonFactory();
-        jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
-        ObjectMapper mapper = new ObjectMapper(jsonFactory).enable(SerializationFeature.INDENT_OUTPUT);;
+        JsonUtil.getDefaultWriter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
 
-        DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
-        prettyPrinter.indentArraysWith(defaultIndenter);
-        prettyPrinter.indentObjectsWith(defaultIndenter);
-        prettyPrinter.withArrayIndenter(defaultIndenter);
-        prettyPrinter.withObjectIndenter(defaultIndenter);
-
-        mapper.writer(prettyPrinter).writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
-
-        if (isRenaming){
+        if (isRenaming && isNewUserRule){
             // it is a rename, remove the old file
             boolean ignored = new File(oldFilePath).delete();
         }
@@ -156,36 +143,27 @@ public class RulesManager {
 
     private synchronized CommonFunctions readCommonScript(EnumEZBroker broker, int brokerFileVersion, boolean dirtyFile) throws IOException {
         String commonFile = getCommonFilePath(broker, brokerFileVersion);
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         try (Reader reader = new FileReader(commonFile)) {
-            CommonFunctions content = mapper.readValue(reader, CommonFunctions.class);
+            CommonFunctions content = JsonUtil.getDefaultMapper().readValue(reader, CommonFunctions.class);
             content.setDirtyFile(dirtyFile);
             return content;
         }
     }
 
-    public synchronized CommonFunctions saveCommonScript(CommonFunctions function) throws IOException {
+    public synchronized void saveCommonScript(CommonFunctions function) throws IOException {
         String commonFile = getCommonFilePath(function.getBroker(), function.getBrokerFileVersion());
 
         // to ease the comparison in github
         function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalize).collect(Collectors.toList()).toArray(new String[]{}));
 
-        JsonFactory jsonFactory = new JsonFactory();
-        jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
-
-        ObjectMapper mapper = new ObjectMapper(jsonFactory)
-                .enable(SerializationFeature.INDENT_OUTPUT);
-
-        DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
-        prettyPrinter.indentArraysWith(defaultIndenter);
-
-        mapper.writer(prettyPrinter).writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
+        function.beforeSave();
+        JsonUtil.getDefaultWriter().writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
 
         brokerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
-        return function;
     }
 
     public static String normalize(String line) {
+        if (line == null) return null;
         line = line.replace("\t", "    "); // replace tabulation by 4 spaces
         line = line.replace("\"", "'"); // replace " by '
         line = line.trim();

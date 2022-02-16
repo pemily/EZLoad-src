@@ -1,12 +1,13 @@
 package com.pascal.ezload.service.exporter.rules;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.model.EnumEZBroker;
 
 public class CommonFunctions {
     private EnumEZBroker broker;
     private int brokerFileVersion;
     private String script[];
-    private transient boolean dirtyFile;
+    private Boolean dirtyFile;
 
     public EnumEZBroker getBroker() {
         return broker;
@@ -32,11 +33,15 @@ public class CommonFunctions {
         this.script = script;
     }
 
-    public boolean isDirtyFile() {
+    public Boolean isDirtyFile() {
         return dirtyFile;
     }
 
-    public void setDirtyFile(boolean dirtyFile) {
+    public void setDirtyFile(Boolean dirtyFile) {
         this.dirtyFile = dirtyFile;
+    }
+
+    public void beforeSave() {
+        dirtyFile = null; // serialized to the client via json => ok but in the file => no so set null before save
     }
 }
