@@ -272,7 +272,6 @@ public class SettingsManager {
         if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(getEzLoadRepoDir()+File.separator+"rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
 
-        new File(ezLoad.getRulesDir()).mkdirs();
         new File(ezLoad.getLogsDir()).mkdirs();
 
         ezLoad.setAdmin(defaultValuesIfNotSet(ezLoad.getAdmin()));

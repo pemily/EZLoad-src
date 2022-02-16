@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Box, Layer, Anchor, Spinner, Button, Text, TextArea } from "grommet";
-import { Catalog } from 'grommet-icons';
+import { Catalog, Revert } from 'grommet-icons';
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { CommonFunctions} from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, textCall } from '../../../ez-api/tools';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 
 export interface CommonFunctionsEditorProps {    
     readOnly: boolean;    
@@ -12,7 +15,7 @@ export interface CommonFunctionsEditorProps {
 }      
 
 export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){          
-    const [visible, setVisible] = useState<boolean>(false);
+    const [editorVisible, setEditorVisible] = useState<boolean>(false);
     const [busy, setBusy] = useState<boolean>(false);
     const [commonFunctions, setCommonFunctions] = useState<CommonFunctions|undefined>(undefined);
     const [report, setReport] = useState<string>("");
@@ -21,7 +24,10 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
         if (props.broker === undefined || props.brokerFileVersion === undefined){
             setCommonFunctions(undefined);
         }
-        else setVisible(false);
+        else {
+            setEditorVisible(false);
+            loadCommonFunctions(props.broker!, props.brokerFileVersion!);
+        }
     }, [props.broker, props.brokerFileVersion]);
 
     const saveCommonFunctions = (commonFunctions: CommonFunctions) => {
@@ -35,8 +41,7 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
         });
     };
 
-    const loadCommonFunctions = (broker: "BourseDirect", brokerFileVersion: number) : Promise<any> => {
-        setVisible(true);
+    const loadCommonFunctions = (broker: "BourseDirect", brokerFileVersion: number) : Promise<any> => {        
         setBusy(true);
         return jsonCall(ezApi.rule.getCommonFunction(broker, brokerFileVersion))
         .then(c => {
@@ -66,9 +71,9 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
     return (
     <>
     { props.broker && props.brokerFileVersion && 
-        (<Anchor margin={{right: "medium"}} alignSelf="end" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion} icon={<Catalog size="medium"/>} 
-            onClick={() => loadCommonFunctions(props.broker!, props.brokerFileVersion!)}/>)}
-    { props.broker && props.brokerFileVersion && visible && (
+        (<Anchor margin={{right: "medium"}} alignSelf="end" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion+(commonFunctions?.dirtyFile ? " (Modifié)" : "")} icon={<Catalog size="medium"/>} 
+            onClick={() => { setEditorVisible(true); loadCommonFunctions(props.broker!, props.brokerFileVersion!);}}/>)}
+    { props.broker && props.brokerFileVersion && editorVisible && (
             <Layer full position="center" margin="large">
                 <Box margin="medium" height="large" align="center" >
                     { busy && (<Box align="center" alignSelf="center" alignContent="center"><Text size="large">Tâche en cours, patientez...</Text><Spinner/></Box>) }
@@ -80,6 +85,36 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
                                 readOnly={props.readOnly || busy}
                                 isFormField={false}
                                 onChange={newValue => saveCommonFunctions({ ...commonFunctions, script: newValue.split("\n")})}/>                 
+                        {commonFunctions?.dirtyFile && (
+                        <Button key={"delBD"} size="small" alignSelf="end"
+                            title="Revenir à la version d'origine" 
+                            disabled={props.readOnly}
+                            icon={<Revert color='status-critical' size='medium'/>}
+                            onClick={() =>{
+                                confirmAlert({
+                                    title: 'Etes vous sûr de vouloir revenir à la version d\'origine?',
+                                    message: 'Vous allez restaurer la version originale de cette règle, et vous allez perdre vos modifications.',
+                                    buttons: [
+                                        {
+                                            label: 'Restaurer',
+                                            onClick: () =>  jsonCall(ezApi.rule.revertCommonsFunctions(commonFunctions))
+                                            .then(c => {
+                                                loadCommonFunctions(props.broker!, props.brokerFileVersion!)
+                                            })
+                                            .catch(e => {
+                                                setCommonFunctions(undefined);
+                                                setBusy(false);
+                                                console.error(e);
+                                            })
+                                        },
+                                        {
+                                        label: 'Annuler',
+                                            onClick: () => {}
+                                        }
+                                    ]
+                                    });
+                        }}/> ) }                        
+                            
                             <Box height="xsmall" width="100%">
                                 <Text size="small">Résultat Validation:</Text>
                                 <TextArea fill contentEditable={false} value={report} />
@@ -88,7 +123,7 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
                         )}       
                     <Box direction="row" margin="small">
                         <Button alignSelf="center" size="small" margin="small" label="Validate" disabled={busy} onClick={() => validate(commonFunctions)} />
-                        <Button alignSelf="center" size="small" margin="small" label="Fermer" disabled={busy} onClick={() => setVisible(false)}/>
+                        <Button alignSelf="center" size="small" margin="small" label="Fermer" disabled={busy} onClick={() => setEditorVisible(false)}/>
                     </Box>
                 </Box>                 
             </Layer>

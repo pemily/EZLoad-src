@@ -116,8 +116,15 @@ public class RulesManager {
         }
     }
 
+    public void revertCommonFunction(CommonFunctions commonFunctions) throws GitAPIException, IOException {
+        String filePath = getCommonFilePath(commonFunctions.getBroker(), commonFunctions.getBrokerFileVersion());
+        if (commonFunctions.isDirtyFile()) {
+            rulesVersionManager.revert(filePath);
+        }
+    }
+
     public String getRulesDirectory(EnumEZBroker broker, int brokerFileVersion){
-        return mainSettings.getEzLoad().getRulesDir()+File.separator+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
+        return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
     }
 
     public String getFile(String filename, EnumEZBroker broker, int brokerFileVersion){
@@ -150,21 +157,10 @@ public class RulesManager {
     private synchronized CommonFunctions readCommonScript(EnumEZBroker broker, int brokerFileVersion, boolean dirtyFile) throws IOException {
         String commonFile = getCommonFilePath(broker, brokerFileVersion);
         ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-        if (new File(commonFile).exists()) {
-            try (Reader reader = new FileReader(commonFile)) {
-                CommonFunctions content = mapper.readValue(reader, CommonFunctions.class);
-                content.setDirtyFile(dirtyFile);
-                return content;
-            }
-        }
-        else{
-            CommonFunctions commonFunctions = new CommonFunctions();
-            commonFunctions.setBrokerFileVersion(brokerFileVersion);
-            commonFunctions.setDirtyFile(dirtyFile);
-            commonFunctions.setBroker(broker);
-            commonFunctions.setScript(("// Liste de fonctions utilisables dans toutes les expressions de "+broker+" v"+brokerFileVersion
-                    +"\n\n\n").split("\n"));
-            return commonFunctions;
+        try (Reader reader = new FileReader(commonFile)) {
+            CommonFunctions content = mapper.readValue(reader, CommonFunctions.class);
+            content.setDirtyFile(dirtyFile);
+            return content;
         }
     }
 

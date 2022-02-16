@@ -108,6 +108,7 @@ export function Rule(props: RuleProps){
 
                 { (props.ruleDefinition.newUserRule || props.ruleDefinition.dirtyFile) && (
                 <Button key={"delBD"} size="small" alignSelf="end"
+                    title="Revenir à la version d'origine" 
                     disabled={props.readOnly}
                     icon={props.ruleDefinition.dirtyFile ?
                                             (<Revert color='status-critical' size='medium'/>)
