@@ -1,6 +1,5 @@
 package com.pascal.ezload.service.exporter.rules;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.Checkable;
 

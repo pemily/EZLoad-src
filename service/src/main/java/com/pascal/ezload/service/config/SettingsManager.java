@@ -259,6 +259,7 @@ public class SettingsManager {
         createEzProfilIfNotExists(defaultEzProfilName, null);
 
         saveMainSettingsFile(mainSettings);
+        
         return mainSettings;
     }
 
@@ -284,8 +285,8 @@ public class SettingsManager {
             admin = new MainSettings.Admin();
             admin.setShowRules(false);
         }
-        if (admin.getAccountId() == null)
-            admin.setAccountId(genString(20));
+        if (admin.getBranchName() == null)
+            admin.setBranchName(getDefaultProfileName().replaceAll(" ", ""));
         return admin;
     }
 

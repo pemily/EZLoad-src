@@ -203,10 +203,11 @@ public class MainSettings {
     }
 
     public static class Admin extends Checkable<Admin>{
-        enum Field {accountId}
+        enum Field {branchName, email}
 
         private boolean showRules;
-        private String accountId;
+        private String branchName;
+        private String email;
 
         public boolean isShowRules() {
             return showRules;
@@ -216,19 +217,30 @@ public class MainSettings {
             this.showRules = showRules;
         }
 
-        public String getAccountId() {
-            return accountId;
+        public String getBranchName() {
+            return branchName;
         }
 
-        public void setAccountId(String accountId) {
-            this.accountId = accountId;
+        public void setBranchName(String branchName) {
+            this.branchName = branchName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
 
         @Override
         public Admin validate() {
-            new StringValue(this, Admin.Field.accountId.name(), accountId)
+            new StringValue(this, Admin.Field.branchName.name(), branchName)
                     .checkRequired()
                     .validateWithForbidenValues("admin", "release", "alpha", "beta", "git", ".git");
+            new StringValue(this, Field.email.name(), email)
+                    .checkRequired()
+                    .validateEmail();
             return this;
         }
     }

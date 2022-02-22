@@ -2,6 +2,7 @@ package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.rules.update.FileState;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.util.FileProcessor;
 import com.pascal.ezload.service.util.JsonUtil;
@@ -34,9 +35,9 @@ public class RulesManager {
         return new FileProcessor(mainSettings.getEzLoad().getRulesDir(), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
                 .mapFile(f -> {
                     try {
-                        RulesVersionManager.FileState state = rulesVersionManager.getState(f);
-                        return readRule(f, state == RulesVersionManager.FileState.NEW,
-                                    state != RulesVersionManager.FileState.NEW && state != RulesVersionManager.FileState.NO_CHANGE);
+                        FileState state = rulesVersionManager.getState(f);
+                        return readRule(f, state == FileState.NEW,
+                                    state != FileState.NEW && state != FileState.NO_CHANGE);
                     } catch (IOException | GitAPIException e) {
                         throw new RuntimeException("Error while reading file: "+f, e);
                     }
@@ -103,13 +104,6 @@ public class RulesManager {
         }
     }
 
-    public void revertCommonFunction(CommonFunctions commonFunctions) throws GitAPIException, IOException {
-        String filePath = getCommonFilePath(commonFunctions.getBroker(), commonFunctions.getBrokerFileVersion());
-        if (commonFunctions.isDirtyFile()) {
-            rulesVersionManager.revert(filePath);
-        }
-    }
-
     public String getRulesDirectory(EnumEZBroker broker, int brokerFileVersion){
         return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
     }
@@ -134,7 +128,7 @@ public class RulesManager {
         return brokerAndFileVersion2CommonFunctionsCache.computeIfAbsent(broker.getDirName()+brokerFileVersion,
                 (key) -> {
                     try {
-                        return readCommonScript(broker, brokerFileVersion, rulesVersionManager.getState(getCommonFilePath(broker, brokerFileVersion)) != RulesVersionManager.FileState.NO_CHANGE);
+                        return readCommonScript(broker, brokerFileVersion, rulesVersionManager.getState(getCommonFilePath(broker, brokerFileVersion)) != FileState.NO_CHANGE);
                     } catch (IOException | GitAPIException e) {
                         throw new RuntimeException(e);
                     }

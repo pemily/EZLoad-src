@@ -100,3 +100,7 @@ export function strToBroker(brokerName: string | undefined) : 'BourseDirect'|und
   if (brokerName === 'Bourse Direct') return 'BourseDirect';
   return undefined;
 }
+
+export function ruleToFilePath(filename: string, broker: "BourseDirect", /** @format int32 */ brokerFileVersion: number){
+  return broker+"_v"+brokerFileVersion+"/"+filename;
+}

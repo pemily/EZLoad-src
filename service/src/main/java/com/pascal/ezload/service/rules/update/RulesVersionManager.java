@@ -2,25 +2,32 @@ package com.pascal.ezload.service.rules.update;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.FileProcessor;
+import com.pascal.ezload.service.util.StringUtils;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.dircache.DirCacheIterator;
+import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.merge.ContentMergeStrategy;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.AbstractTreeIterator;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RulesVersionManager {
-    public enum FileState {
-        NO_CHANGE, NEW, UPDATED, DELETED, CONFLICT
-    }
 
     // Ces Info viennent du compte Github
     private static String owner = "pemily";
@@ -42,34 +49,47 @@ public class RulesVersionManager {
         this.ezRepoDir = ezRepoDir;
     }
 
+    public void initRepoIfNeeded() throws GitAPIException, IOException {
+        createLocalRepoIfNotExists(getAccountId());
+    }
+
     public void synchSharedRulesFolder(Reporting reporting) throws Exception {
         try(Reporting rep = reporting.pushSection("Vérification des mises à jour")) {
-            createLocalRepoIfNotExists(getAccountId());
-            mergeOrigin();
-
-            reporting.info("Vous êtes à jour");
+            if (mergeOrigin())
+                reporting.info("Vous êtes à jour");
+            else
+                reporting.error("Vous avez un conflit dans les règles");
         }
     }
 
     private String getAccountId() {
-        return mainSettings.getEzLoad().getAdmin().getAccountId();
+        return mainSettings.getEzLoad().getAdmin().getBranchName();
     }
 
 
-    public void mergeOrigin() throws IOException, GitAPIException {
+    public boolean mergeOrigin() throws IOException, GitAPIException {
         initIfNeeded();
         // fetch the updates of the server
         git.fetch()
                 .setForceUpdate(true)
                 .call();
 
-        git.merge()
-                .setContentMergeStrategy(ContentMergeStrategy.CONFLICT)
-                .setStrategy(MergeStrategy.SIMPLE_TWO_WAY_IN_CORE)
-                .setFastForward(MergeCommand.FastForwardMode.FF)
-                .include(git.getRepository().findRef("refs/remotes/origin/"+originBranch))
-                .call();
-        // en cas de conflit, le getStatus de chaque fichier
+        try {
+            MergeResult mergeResult = git.merge()
+                    .setContentMergeStrategy(ContentMergeStrategy.CONFLICT)
+                    .setStrategy(MergeStrategy.SIMPLE_TWO_WAY_IN_CORE)
+                    .setFastForward(MergeCommand.FastForwardMode.FF)
+                    .include(git.getRepository().findRef("refs/remotes/origin/" + originBranch))
+                    .call();
+
+            return mergeResult.getMergeStatus() != MergeResult.MergeStatus.ABORTED
+                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.FAILED
+                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.CHECKOUT_CONFLICT
+                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.NOT_SUPPORTED;
+        }
+        catch(NullPointerException | JGitInternalException e){
+            return false;
+        }
     }
 
     public List<RemoteBranch> getAllRemoteBranches() throws IOException, GitAPIException {
@@ -81,7 +101,7 @@ public class RulesVersionManager {
                 .collect(Collectors.toList());
     }
 
-    public void createLocalRepoIfNotExists(String localBranch) throws GitAPIException, IOException {
+    private void createLocalRepoIfNotExists(String localBranch) throws GitAPIException, IOException {
         if (!CreateBranchCommand.isValidBranchName(localBranch)){
             throw new IllegalArgumentException("Le nom "+localBranch+" n'est pas un nom valide");
         }
@@ -125,7 +145,7 @@ public class RulesVersionManager {
     }
 
     // if success true, false if nothing to commit
-    public boolean commitAndPush(String authorName, String authorEmail, String commitMessage) throws IOException, GitAPIException {
+    public boolean commitAndPush(String authorEmail, String commitMessage) throws IOException, GitAPIException {
         initIfNeeded();
         git.add()
                 .addFilepattern(".")
@@ -133,14 +153,14 @@ public class RulesVersionManager {
                 .call();
         try {
             git.commit()
-                    .setAuthor(authorName, authorEmail)
+                    .setAuthor(authorEmail, authorEmail)
                     .setAllowEmpty(false)
                     .setMessage(commitMessage)
                     .call();
 
             git.push()
                     // ici dans authorName, on peut mettre n'importe quoi, sauf "", ce n'est pas pris en compte, c'est le token qui compte
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorName, accessToken))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorEmail, accessToken))
                     .setForce(true)
                     .call();
         }
@@ -184,7 +204,56 @@ public class RulesVersionManager {
         if (! abosluteFilePath.startsWith(ezRepoDir))
             throw new IOException("Bad file path: "+ abosluteFilePath +" not in "+ezRepoDir);
 
-        String filePath = abosluteFilePath.substring(ezRepoDir.length()+1).replace('\\', '/');
-        return filePath;
+        return abosluteFilePath.substring(ezRepoDir.length()+1).replace('\\', '/');
+    }
+
+    public List<FileStatus> getAllChanges(String fromDirectory) throws IOException {
+        initIfNeeded();
+        return new FileProcessor(fromDirectory, f -> true, f -> true)
+                .mapFile(filePath ->
+                        {
+                            try {
+                                return new FileStatus(getGitFilePath(filePath), getState(filePath));
+                            } catch (IOException | GitAPIException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                )
+                .stream()
+                .filter(f -> f.getFileState() != FileState.NO_CHANGE)
+                .collect(Collectors.toList());
+    }
+
+    public String getChange(String absolutePath) throws Exception {
+        initIfNeeded();
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        DiffFormatter df = new DiffFormatter(result);
+        df.setRepository(git.getRepository());
+        DirCacheIterator oldTree = new DirCacheIterator(git.getRepository().readDirCache()); // the base user branch
+        FileTreeIterator newTree = new FileTreeIterator(git.getRepository());
+        df.setPathFilter(PathFilter.create(getGitFilePath(absolutePath)));
+        df.format(oldTree, newTree);
+        df.flush();
+        df.close();
+
+        String[] div = StringUtils.divide(result.toString(),"@@"); // remove the header
+        if (div == null) return "";
+        return "@@"+div[1];
+    }
+
+    private static AbstractTreeIterator prepareTreeParser(Repository repository, String ref) throws Exception {
+        Ref head = repository.getRefDatabase().findRef(ref);
+        RevWalk walk = new RevWalk(repository);
+        RevCommit commit = walk.parseCommit(head.getObjectId());
+        RevTree tree = walk.parseTree(commit.getTree().getId());
+
+        CanonicalTreeParser oldTreeParser = new CanonicalTreeParser();
+        ObjectReader oldReader = repository.newObjectReader();
+        try {
+            oldTreeParser.reset(oldReader, tree.getId());
+        } finally {
+            oldReader.close();
+        }
+        return oldTreeParser;
     }
 }

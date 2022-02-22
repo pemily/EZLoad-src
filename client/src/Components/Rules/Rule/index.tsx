@@ -77,7 +77,7 @@ export function Rule(props: RuleProps){
             <Box direction="row" align="end" alignSelf="end" margin="small">
                 <SourceFileLink sourceFile={props.data?.data?.['ezReportSource']}/>      
                 <Box margin={{top:"none", bottom:"none", right:"xlarge", left:"xlarge"}}></Box>
-                <CommonFunctionsEditor readOnly={props.readOnly} broker={ruleDef.broker} brokerFileVersion={ruleDef.brokerFileVersion}/>
+                {ruleDef.broker && ruleDef.brokerFileVersion && ( <CommonFunctionsEditor readOnly={props.readOnly} broker={ruleDef.broker} brokerFileVersion={ruleDef.brokerFileVersion}/>)}
                 <Anchor margin={{right: "medium"}} alignSelf="end" label="Syntaxe" target="jexl" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html" icon={<HelpOption size="medium"/>}/>                    
             </Box>
             <Box direction="row" align="center" margin="small">

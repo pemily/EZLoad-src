@@ -57,6 +57,8 @@ public class HomeHandler {
     public WebData getMainData() throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
+        new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
+                .initRepoIfNeeded();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         return new WebData(SettingsManager.searchConfigFilePath(),
                             mainSettings,

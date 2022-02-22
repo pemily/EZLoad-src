@@ -24,7 +24,7 @@ export interface ConfigProps {
   saveStartDate: (date: string, account: BourseDirectEZAccountDeclaration) => void;
 }        
 
-const accountIdInfo = `Le Compte Id doit être unique sur https://github.com/pemily/EZLoad-Rules, il est utile si vous souhaitez sauvegarder vos ajouts et modifications des règles.
+const branchName = `Le nom de la branche doit être unique sur https://github.com/pemily/EZLoad. Ce nom est utile si vous souhaitez sauvegarder vos ajouts et modifications des règles.
 
 Il n'y a aucune données personnelle dans les rêgles, mais vous pouvez aider les autres qui en aurait besoin`
 
@@ -428,13 +428,13 @@ export function Config(props: ConfigProps) {
                                     <Heading level="5" self-align="start">Compte</Heading>
                                     <Help isInfo={true} title="info">
                                         <Box border={{ color: 'brand', size: 'large' }} pad="medium">
-                                            <Markdown>{ accountIdInfo }</Markdown>
+                                            <Markdown>{ branchName }</Markdown>
                                         </Box>
                                     </Help>
                                 </Box>                    
                             <Box direction="column" margin="small">
-                                <TextField id="ezAccountId" label="Id" value={props.mainSettings.ezLoad?.admin?.accountId}
-                                    isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.accountId}
+                                <TextField id="ezBranchName" label="Nom de branche" value={props.mainSettings.ezLoad?.admin?.branchName}
+                                    isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.brancheName}
                                     readOnly={props.readOnly}
                                     onChange={newValue  => saveMainSettings(
                                         { ...props.mainSettings,
@@ -442,10 +442,24 @@ export function Config(props: ConfigProps) {
                                                 ...props.mainSettings.ezLoad,
                                                 admin: {
                                                     ...props.mainSettings.ezLoad?.admin,
-                                                    accountId: newValue
+                                                    branchName: newValue
                                                 }
                                             }
                                     }, props.mainSettingsStateSetter)}/>
+                                <TextField id="ezEmailId" label="Email" value={props.mainSettings.ezLoad?.admin?.email}
+                                    isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.email}
+                                    readOnly={props.readOnly}
+                                    onChange={newValue  => saveMainSettings(
+                                        { ...props.mainSettings,
+                                            ezLoad: {
+                                                ...props.mainSettings.ezLoad,
+                                                admin: {
+                                                    ...props.mainSettings.ezLoad?.admin,
+                                                    email: newValue
+                                                }
+                                            }
+                                    }, props.mainSettingsStateSetter)}/>
+
                             </Box>
                         </> ) }
                 </Form>

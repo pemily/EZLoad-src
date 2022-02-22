@@ -28,10 +28,10 @@ export function ConfigApp(props: ConfigAppProps){
                     if (str.length === 2){                   
                         jsonCall(ezApi.config.setValue({key: str[0], value: str[1]}))
                         .then(e => setCurrentSettings(e))
-                        .catch(e => alert(e));
+                        .catch(e => console.error(e));
                     }
                     else{
-                        alert('Key=Value Invalide!')
+                        console.log('Key=Value Invalide!')
                     }
                 }}/>
             <Anchor alignSelf="start" color="brand" href="/" label="Retour"/>

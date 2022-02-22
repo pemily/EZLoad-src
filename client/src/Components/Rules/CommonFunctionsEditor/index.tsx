@@ -3,15 +3,15 @@ import { Box, Layer, Anchor, Spinner, Button, Text, TextArea } from "grommet";
 import { Catalog, Revert } from 'grommet-icons';
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { CommonFunctions} from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, textCall } from '../../../ez-api/tools';
+import { ezApi, jsonCall, textCall, ruleToFilePath } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface CommonFunctionsEditorProps {    
     readOnly: boolean;    
-    broker?: "BourseDirect";
-    brokerFileVersion?: number;  
+    broker: "BourseDirect";
+    brokerFileVersion: number;  
 }      
 
 export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){          
@@ -71,10 +71,11 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
     return (
     <>
     { props.broker && props.brokerFileVersion && 
-        (<Anchor margin={{right: "medium"}} alignSelf="end" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion+(commonFunctions?.dirtyFile ? " (Modifié)" : "")} icon={<Catalog size="medium"/>} 
+        (<Anchor margin={{right: "medium"}} alignSelf="end" label={"Fonctions "+props.broker+" v"+props.brokerFileVersion} icon={<Catalog size="medium"/>} 
             onClick={() => { setEditorVisible(true); loadCommonFunctions(props.broker!, props.brokerFileVersion!);}}/>)}
+
     { props.broker && props.brokerFileVersion && editorVisible && (
-            <Layer full position="center" margin="large">
+            <Layer full position="center" margin="large"  onClickOutside={() => setEditorVisible(false)}  onEsc={() => setEditorVisible(false)} >
                 <Box margin="medium" height="large" align="center" >
                     { busy && (<Box align="center" alignSelf="center" alignContent="center"><Text size="large">Tâche en cours, patientez...</Text><Spinner/></Box>) }
                     { commonFunctions && (
@@ -84,37 +85,7 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
                                 allowTab={true}
                                 readOnly={props.readOnly || busy}
                                 isFormField={false}
-                                onChange={newValue => saveCommonFunctions({ ...commonFunctions, script: newValue.split("\n")})}/>                 
-                        {commonFunctions?.dirtyFile && (
-                        <Button key={"delBD"} size="small" alignSelf="end"
-                            title="Revenir à la version d'origine" 
-                            disabled={props.readOnly}
-                            icon={<Revert color='status-critical' size='medium'/>}
-                            onClick={() =>{
-                                confirmAlert({
-                                    title: 'Etes vous sûr de vouloir revenir à la version d\'origine?',
-                                    message: 'Vous allez restaurer la version originale de cette règle, et vous allez perdre vos modifications.',
-                                    buttons: [
-                                        {
-                                            label: 'Restaurer',
-                                            onClick: () =>  jsonCall(ezApi.rule.revertCommonsFunctions(commonFunctions))
-                                            .then(c => {
-                                                loadCommonFunctions(props.broker!, props.brokerFileVersion!)
-                                            })
-                                            .catch(e => {
-                                                setCommonFunctions(undefined);
-                                                setBusy(false);
-                                                console.error(e);
-                                            })
-                                        },
-                                        {
-                                        label: 'Annuler',
-                                            onClick: () => {}
-                                        }
-                                    ]
-                                    });
-                        }}/> ) }                        
-                            
+                                onChange={newValue => saveCommonFunctions({ ...commonFunctions, script: newValue.split("\n")})}/>
                             <Box height="xsmall" width="100%">
                                 <Text size="small">Résultat Validation:</Text>
                                 <TextArea fill contentEditable={false} value={report} />

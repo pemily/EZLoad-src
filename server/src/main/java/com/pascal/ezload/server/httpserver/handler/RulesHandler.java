@@ -94,16 +94,6 @@ public class RulesHandler {
                         .delete(ruleDefinition);
     }
 
-    @DELETE
-    @Path("common")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public void revertCommonsFunctions(@NotNull CommonFunctions commonFunctions) throws Exception {
-        SettingsManager settingsManager = SettingsManager.getInstance();
-        new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
-                .revertCommonFunction(commonFunctions);
-    }
-
     @GET
     @Path("common/{broker}/{brokerFileVersion}")
     @Produces(MediaType.APPLICATION_JSON)

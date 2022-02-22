@@ -1,7 +1,10 @@
-import { Box, Select } from "grommet";
+import { Box, Anchor, Select } from "grommet";
+import { History } from 'grommet-icons';
 import { ruleTitle, SelectedRule } from '../../../ez-api/tools';
 import { EzData, RuleDefinitionSummary, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
 import { Rule } from '../../Rules/Rule';
+import { GitStatus } from "../../Git/GitStatus";
+
 
 export interface RulesTabProps {
     readOnly : boolean;
@@ -17,13 +20,17 @@ export interface RulesTabProps {
 export function RulesTab(props: RulesTabProps){
     return (
         <>
-        <Box margin="small" >    
-            <Select placeholder="Sélectionnez une règle"                                                    
-                disabled={props.readOnly}
-                labelKey="title"
-                valueKey={{ key: "rule", reduce: true }}
-                options={props.rules.map(r => { return { title: ruleTitle(r)+(r.newUserRule ? " (Nouveau)" : r.dirtyFile ? " (Modifé)" : ""), rule: r }})}
-                onChange={ ({ value: nextValue }) => props.changeSelection(nextValue) } />
+        <Box margin="small" direction="row">    
+            <Box flex="grow">
+                <Select                 
+                    placeholder="Sélectionnez une règle"                                                    
+                    disabled={props.readOnly}
+                    labelKey="title"
+                    valueKey={{ key: "rule", reduce: true }}
+                    options={props.rules.map(r => { return { title: ruleTitle(r), rule: r }})}
+                    onChange={ ({ value: nextValue }) => props.changeSelection(nextValue) } />
+            </Box>
+            <GitStatus readOnly={props.readOnly}/>
         </Box>            
 
         { props.ruleDefinitionSelected && (
@@ -32,7 +39,7 @@ export function RulesTab(props: RulesTabProps){
                 duplicateRule={props.duplicateRule}
                 deleteRule={props.deleteSelectedRule}
                 data={props.data}
-                ruleDefinition={props.ruleDefinitionSelected?.ruleDefinition}/>
+                ruleDefinition={props.ruleDefinitionSelected.ruleDefinition}/>
         )}
         </>
     );

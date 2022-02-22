@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.Arrays;
 
@@ -50,4 +51,9 @@ public class StringValue {
         }
     }
 
+    public void validateEmail() {
+        if (!EmailValidator.getInstance().isValid(value)){
+            checkable.setErrorMsg(field, "Email invalide");
+        }
+    }
 }
