@@ -148,6 +148,11 @@ public class MainSettings {
             admin.validate();
             return this;
         }
+
+        public void clearErrors(){
+            super.clearErrors();
+            admin.clearErrors();
+        }
     }
 
     public static class AnnualDividendConfig {
