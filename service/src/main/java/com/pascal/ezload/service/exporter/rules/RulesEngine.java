@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData.broker_version;
 
 public class RulesEngine {
     public static final String NO_RULE_FOUND = "NO_RULE_FOUND";
+    private static final Logger logger = Logger.getLogger("RulesEngine");
 
     private Reporting reporting;
     private MainSettings mainSettings;
@@ -253,7 +256,8 @@ public class RulesEngine {
                 new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
             }
         } catch (Exception e) {
-            ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes. ("+e.getMessage()+")");
+            ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes de "+ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
+            logger.log(Level.SEVERE, "Probleme lors de la recherche des dividendes de "+ezPortefeuilleEdition.getTickerGoogleFinance(), e);
         }
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)

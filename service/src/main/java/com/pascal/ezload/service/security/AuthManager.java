@@ -64,15 +64,19 @@ public class AuthManager {
     }
 
     private Data loadFile(String authFilePath) {
+        Data map = null;
         try {
             Reader reader = new BufferedReader(new FileReader(authFilePath));
-            Data map = new Gson().fromJson(reader, Data.class);
+            map = new Gson().fromJson(reader, Data.class);
             reader.close();
-            return map;
         }
         catch(IOException e){
-            return new Data();
         }
+        if (map == null){
+            map = new Data();
+            map.setInfo(new HashMap<>());
+        }
+        return map;
     }
 
     private void saveFile(String authFilePath, Data data) throws IOException {
@@ -82,7 +86,7 @@ public class AuthManager {
     }
 
     // Get a encrypted password using PBKDF2 hash algorithm
-    private static String encryptPassword(String clearPassword, String passPhrase) throws Exception {
+    public static String encryptPassword(String clearPassword, String passPhrase) throws Exception {
         if (clearPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(passPhrase));
@@ -90,7 +94,7 @@ public class AuthManager {
     }
 
     // Get a decrypted password
-    private static String decryptPassword(String encryptedPassword, String passPhrase) throws Exception {
+    public static String decryptPassword(String encryptedPassword, String passPhrase) throws Exception {
         if (encryptedPassword == null) return null;
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(passPhrase));

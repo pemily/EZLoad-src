@@ -159,7 +159,6 @@ public class RulesManager {
     public static String normalize(String line) {
         if (line == null) return null;
         line = line.replace("\t", "    "); // replace tabulation by 4 spaces
-        line = line.replace("\"", "'"); // replace " by '
         line = line.trim();
         return line;
     }

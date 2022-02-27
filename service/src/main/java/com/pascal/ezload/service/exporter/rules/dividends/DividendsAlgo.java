@@ -149,6 +149,8 @@ public abstract class DividendsAlgo {
                 .stream()
                 .map(FinanceTools.Dividend::getAmount).collect(Collectors.joining(" + "));
 
-        return ModelUtils.normalizeAmount(eval(reporting, addition));
+        String result = eval(reporting, addition);
+        if (result == null) return "0";
+        return ModelUtils.normalizeAmount(result);
     }
 }

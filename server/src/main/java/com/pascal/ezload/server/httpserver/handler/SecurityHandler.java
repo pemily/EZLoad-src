@@ -57,7 +57,7 @@ public class SecurityHandler {
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
         AuthInfo result = authManager.getAuthWithoutPassword(courtier);
-            result.setPassword(BAD_PASSWORD);
+        result.setPassword(BAD_PASSWORD);
         return result;
     }
 

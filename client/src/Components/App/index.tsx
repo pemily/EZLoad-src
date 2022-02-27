@@ -331,6 +331,8 @@ export function App(){
                                                         brokerFileVersion: parseInt(op.data?.data?.['ezBrokerVersion']),
                                                         condition: "ezOperation_INFO1 == \"" + op.data?.data?.['ezOperation_INFO1']+"\"",
                                                         shareId: "ezOperation_INFO2",
+                                                        newUserRule: true,
+                                                        dirtyFile: true,
                                                         enabled: true
                                                 }};
                                             saveRuleDefinition(newSelectedRule)

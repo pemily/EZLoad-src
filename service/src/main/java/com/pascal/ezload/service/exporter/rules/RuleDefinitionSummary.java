@@ -80,7 +80,7 @@ public class RuleDefinitionSummary extends Checkable<RuleDefinitionSummary> {
     }
 
     public void beforeSave(Function<String, String> normalizer){
-        this.description = Arrays.stream(this.description).map(normalizer::apply).collect(Collectors.toList()).toArray(new String[]{});
+        this.description = this.description == null ? new String[]{""} : Arrays.stream(this.description).map(normalizer::apply).collect(Collectors.toList()).toArray(new String[]{});
         this.name = normalizer.apply(this.name);
         this.dirtyFile = null; // serialized to the client via json => ok but in the file => no so set null before save
         this.newUserRule = null; // serialized to the client via json => ok but in the file => no so set null before save
