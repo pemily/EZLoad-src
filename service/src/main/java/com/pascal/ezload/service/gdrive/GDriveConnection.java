@@ -66,7 +66,9 @@ public class GDriveConnection {
         reporting.info("Si cela fait longtemps que vous ne vous êtes pas connecté avec EZLoad");
         reporting.info("Google va vous re-demander de choisir le compte de connection et de valider l'application EZLoad");
         reporting.info("Vous devrez selectionner votre compte Google et cliquer sur 'Continuer'");
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        LocalServerReceiver localServerReceiver = new LocalServerReceiver();
+        AuthorizationCodeInstalledApp authCode = new AuthorizationCodeInstalledApp(flow, localServerReceiver);
+        return authCode.authorize("user"); // this call is blocked until the user gives the google permissions
     }
 
 

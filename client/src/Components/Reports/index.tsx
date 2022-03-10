@@ -63,10 +63,11 @@ export function Reports(props: ReportsProps){
     return (
         <Box margin="small" >
             <Accordion animate={true} multiple>            
-             { props.reports.map((report, index) => {                 
+             { props.reports.map((report, index) => {       
                      return (
                         <AccordionPanel key={index} label={(<Box direction="row" border={getAccordionBorder(report.status)} >
-                                                    <SourceFileLink sourceFile={report.sourceFile!}/>
+                                                    { report.reportType === "IS_SHARE_UPDATE" && (<SourceFileLink sourceFile={report.sourceFile!}/>) }
+                                                    { report.reportType === "IS_DIVIDEND_UPDATE" && (<Text margin="xxsmall">Mise à jour des dividendes</Text>) }                                                    
                                                 </Box>)}>
                             {report.errors!.length > 0 && (                                    
                                 <List data={report.errors} margin="none" pad="none" 
@@ -82,7 +83,8 @@ export function Reports(props: ReportsProps){
                                 viewRule={props.viewRule}
                                 operations={report.ezEditions}
                                 isIgnored={props.isOperationIgnored}
-                                setIgnored={props.ignoreOperation}/>)}
+                                setIgnored={props.ignoreOperation}
+                                isDividendUpdate={report.reportType === "IS_SHARE_UPDATE"}/>)}
                         </AccordionPanel>
                      );
                  })}          

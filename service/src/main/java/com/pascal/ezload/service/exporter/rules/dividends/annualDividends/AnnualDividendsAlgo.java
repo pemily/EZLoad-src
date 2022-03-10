@@ -12,7 +12,8 @@ import java.util.function.Function;
 
 public class AnnualDividendsAlgo extends DividendsAlgo {
 
-    public void compute(Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition, MainSettings.AnnualDividendConfig algoConfig, List<FinanceTools.Dividend> allDividends){
+    // return true if update, false else
+    public boolean compute(Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition, MainSettings.AnnualDividendConfig algoConfig, List<FinanceTools.Dividend> allDividends){
         Function<FinanceTools.Dividend, EZDate> dateSelector = getDividendYear(algoConfig.getDateSelector());
 
         List<FinanceTools.Dividend> oneYearDividends;
@@ -22,12 +23,18 @@ public class AnnualDividendsAlgo extends DividendsAlgo {
             oneYearDividends = getLastYearDividends(allDividends, getDividendYear(algoConfig.getDateSelector()));
 
 
-        computeAnnualDividends(reporting, oneYearDividends, ezPortefeuilleEdition);
+        return computeAnnualDividends(reporting, oneYearDividends, ezPortefeuilleEdition);
     }
 
 
-    private void computeAnnualDividends(Reporting reporting, List<FinanceTools.Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition) {
-        ezPortefeuilleEdition.setAnnualDividend(sumOfAllDividends(reporting, dividends));
+    // return true if update, false else
+    private boolean computeAnnualDividends(Reporting reporting, List<FinanceTools.Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition) {
+        String sum = sumOfAllDividends(reporting, dividends);
+        if (evalNumberOrPercent(sum) != evalNumberOrPercent(ezPortefeuilleEdition.getAnnualDividend())) {
+            ezPortefeuilleEdition.setAnnualDividend(sum);
+            return true;
+        }
+        return false;
     }
 
 }

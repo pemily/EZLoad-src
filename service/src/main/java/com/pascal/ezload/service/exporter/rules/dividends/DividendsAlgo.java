@@ -22,6 +22,17 @@ public abstract class DividendsAlgo {
         return RulesEngine.format(result);
     }
 
+    protected float evalNumberOrPercent(String numberOrPercent){
+        String val = numberOrPercent;
+        if (numberOrPercent.endsWith("%")){
+            val = numberOrPercent.substring(0, numberOrPercent.length()-1);
+        }
+        if (numberOrPercent.isBlank()){
+            val = "0";
+        }
+        return ModelUtils.str2Float(val);
+    }
+
     protected List<FinanceTools.Dividend> getLastYearDividends(List<FinanceTools.Dividend> allHistoricalDividends, Function<FinanceTools.Dividend, EZDate> dvd2Date){
         List<FinanceTools.Dividend> divs = allHistoricalDividends.stream()
                                             .filter(d -> d.getFrequency() != FinanceTools.Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle

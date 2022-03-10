@@ -62,6 +62,10 @@ public class MonPortefeuille implements MonPortefeuilleData {
 
     public MonPortefeuille(SheetValues portefeuille) {
         this.portefeuille = portefeuille;
+        if (portefeuille.getValues() != null && StringUtils.isBlank(portefeuille.getValues().get(0).getValueStr(TICKER_COL))){
+            // if there is no row in the sheet, add the liquidity row immediately  to have it at first row
+            createRow(ShareValue.LIQUIDITY_CODE);
+        }
     }
 
     public SheetValues getSheetValues(){
@@ -179,5 +183,39 @@ public class MonPortefeuille implements MonPortefeuilleData {
 
     public MonPortefeuille createDeepCopy() {
         return new MonPortefeuille(portefeuille.createDeepCopy());
+    }
+
+    public Optional<EzPortefeuilleEdition> createFrom(String ticker) {
+        return searchRow(ticker)
+                .map(row -> {
+                    EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
+
+                    ezPortefeuilleEdition.setTickerGoogleFinance(ticker);
+                    ezPortefeuilleEdition.setValeur(row.getValueStr(VALEUR_COL));
+                    ezPortefeuilleEdition.setAccountType(row.getValueStr(ACCOUNT_TYPE_COL));
+                    ezPortefeuilleEdition.setBroker(row.getValueStr(BROKER_COL));
+                    ezPortefeuilleEdition.setCountry(row.getValueStr(COUNTRY_COL));
+                    ezPortefeuilleEdition.setSector(row.getValueStr(SECTOR_COL));
+                    ezPortefeuilleEdition.setIndustry(row.getValueStr(INDUSTRY_COL));
+                    ezPortefeuilleEdition.setEligibilityDeduction40(row.getValueStr(DEDUCTION_40_COL));
+                    ezPortefeuilleEdition.setType(row.getValueStr(TYPE_COL));
+                    ezPortefeuilleEdition.setCostPrice(row.getValueStr(COST_PRICE_UNITARY_COL));
+                    ezPortefeuilleEdition.setQuantity(row.getValueStr(QUANTITY_COL));
+                    ezPortefeuilleEdition.setAnnualDividend(row.getValueStr(ANNUAL_DIVIDEND_COL));
+                    ezPortefeuilleEdition.setMonthlyDividend(1, row.getValueStr(CALENDRIER_DIVIDEND_JANVIER));
+                    ezPortefeuilleEdition.setMonthlyDividend(2, row.getValueStr(CALENDRIER_DIVIDEND_FEVRIER));
+                    ezPortefeuilleEdition.setMonthlyDividend(3, row.getValueStr(CALENDRIER_DIVIDEND_MARS));
+                    ezPortefeuilleEdition.setMonthlyDividend(4, row.getValueStr(CALENDRIER_DIVIDEND_AVRIL));
+                    ezPortefeuilleEdition.setMonthlyDividend(5, row.getValueStr(CALENDRIER_DIVIDEND_MAI));
+                    ezPortefeuilleEdition.setMonthlyDividend(6, row.getValueStr(CALENDRIER_DIVIDEND_JUIN));
+                    ezPortefeuilleEdition.setMonthlyDividend(7, row.getValueStr(CALENDRIER_DIVIDEND_JUILLET));
+                    ezPortefeuilleEdition.setMonthlyDividend(8, row.getValueStr(CALENDRIER_DIVIDEND_AOUT));
+                    ezPortefeuilleEdition.setMonthlyDividend(9, row.getValueStr(CALENDRIER_DIVIDEND_SEPTEMBRE));
+                    ezPortefeuilleEdition.setMonthlyDividend(10, row.getValueStr(CALENDRIER_DIVIDEND_OCTOBRE));
+                    ezPortefeuilleEdition.setMonthlyDividend(11, row.getValueStr(CALENDRIER_DIVIDEND_NOVEMBRE));
+                    ezPortefeuilleEdition.setMonthlyDividend(12, row.getValueStr(CALENDRIER_DIVIDEND_DECEMBRE));
+
+                    return ezPortefeuilleEdition;
+                });
     }
 }

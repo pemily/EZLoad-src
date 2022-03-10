@@ -116,7 +116,6 @@ export function App(){
                 // si il n'y a pas d'erreur sur le nom, alors je mets a jours le old Name car la sauvegarde a réussis, 
                 reloadAllData()
                 .then(r => {
-                    console.log("AAA", rule.name, " ruledef: ", rule);
                     setSelectedRule({oldName: rule.name, ruleDefinition: rule})
                 })
                 .catch(e => console.error("Reloading all data failed: ", e))

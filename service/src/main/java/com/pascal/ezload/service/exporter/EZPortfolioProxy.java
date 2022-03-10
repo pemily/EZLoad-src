@@ -42,4 +42,6 @@ public interface EZPortfolioProxy {
     List<String> getNewPRUValues();
 
     EZPortfolioProxy createDeepCopy();
+
+    Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker);
 }

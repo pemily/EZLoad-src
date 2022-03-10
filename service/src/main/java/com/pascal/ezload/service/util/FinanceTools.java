@@ -48,6 +48,9 @@ public class FinanceTools {
     }
 
     public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
+        if (StringUtils.isBlank(actionCode) || actionCode.contains(" ") || actionCode.length() > 16)
+            throw new BRException("Erreur, cette information ne semble par être une action: "+actionCode);
+
         URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
@@ -60,7 +63,7 @@ public class FinanceTools {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
                 if (data.size() == 0) return null;
                 if (data.size() > 1) {
-                    reporting.info("More than 1 data found for " + actionCode + ". First one is selected. check: "+url);
+                    reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1èere est sélectionné. Vérifié: "+url);
                 }
                 EZAction action = new EZAction();
                 Map<String, Object> actionData = data.get(0);
@@ -76,11 +79,11 @@ public class FinanceTools {
                 action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());
 
                 if (!currency.get("code").equals(action.getMarketPlace().getCurrency().getCode()))
-                    throw new BRException("The currency declared for this action: "+actionCode+" is "+currency+ " and is not the expected currency: "+action.getMarketPlace().getCurrency().getCode()+" info from "+ url);
+                    throw new BRException("La monnaie déclaré pour cette action: "+actionCode+" est "+currency+ " et n'est pas celle attendue: "+action.getMarketPlace().getCurrency().getCode()+" info venant de: "+ url);
                 return action;
             }
             catch(Throwable e){
-                throw new BRException("Error when retrieving information for actionCode: "+actionCode+" info from: "+ url, e);
+                throw new BRException("Erreur pendant la récupération d'information sur l'action: "+actionCode+" Info venant de: "+ url, e);
             }
         }
         finally {
@@ -100,7 +103,7 @@ public class FinanceTools {
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("quotes");
             if (quotes.size() == 0) return null;
             if (quotes.size() > 1) {
-                reporting.info("More than 1 data found for " + actionCode + " First one is selected. check: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1èere est sélectionné. Vérifié: "+url);
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
@@ -128,7 +131,7 @@ public class FinanceTools {
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("data");
             if (quotes.size() == 0) return null;
             if (quotes.size() > 1) {
-                reporting.info("More than 1 data found for " + actionTicker + " First one is selected. check: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionTicker + ". La 1èere est sélectionné. Vérifié: "+url);
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
@@ -188,7 +191,7 @@ public class FinanceTools {
                         .collect(Collectors.toList());
             }
             catch(Exception e){
-                logger.log(Level.SEVERE, "When searching dividend on "+url.toString(), e);
+                logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: "+url.toString(), e);
             }
             finally {
                 con.disconnect();

@@ -1,7 +1,6 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
 import com.pascal.ezload.service.config.EzProfil;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
@@ -15,9 +14,7 @@ import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
-import com.pascal.ezload.service.util.ModelUtils;
 import com.pascal.ezload.service.util.Sleep;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,6 +72,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         List<EzReport> notSaved = new LinkedList<>();
         boolean errorFound = false;
         AtomicInteger nbOperationSaved = new AtomicInteger();
+        AtomicInteger nbPortefeuilleRowSaved = new AtomicInteger();
         for (EzReport ezReportToAdd : operationsToAdd){
             if (ezReportToAdd.getErrors().size() > 0) errorFound = true;
             if (errorFound){
@@ -109,8 +107,10 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                 nbOperationSaved.incrementAndGet();
                                             });
 
-                                    ezEdition.getEzPortefeuilleEditions().forEach(ezPortefeuilleEdition ->
-                                            ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition));
+                                    ezEdition.getEzPortefeuilleEditions().forEach(ezPortefeuilleEdition -> {
+                                        ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition);
+                                        nbPortefeuilleRowSaved.incrementAndGet();
+                                    });
                                 } else if (!ezEdition.getEzPortefeuilleEditions().isEmpty()) {
                                     throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
                                             + ezEdition.getRuleDefinitionSummary().getBroker() + "_v" + ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
@@ -121,14 +121,14 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             }
         }
 
-        if (operations.getNewOperations().size() > 0) {
-            reporting.info("Saving "+nbOperationSaved.get()+" operations");
+        if (nbOperationSaved.get() > 0 || nbPortefeuilleRowSaved.get() > 0) {
+            reporting.info("Export de "+nbOperationSaved.get()+" operations et "+nbPortefeuilleRowSaved.get()+" lignes du portefeuille");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
 
             // Force la mise a jours des methods GoogleFinance dans les cellulles N&O de MonPortefeuille avant la mise a jour de toutes les autres opérations. (sinon ca bug)
             fixGoogleFinanceBug(sheets, reporting, monPortefeuille);
             // attend un peu pour etre sur que ce soit fait
-            Sleep.waitSeconds(2);
+            Sleep.waitSeconds(5);
             sheets.batchUpdate(reporting,
                     SheetValues.createFromRowLists("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
@@ -139,7 +139,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             ezPortfolio.getPru().saveDone();
         }
 
-        reporting.info("Save done!");
+        reporting.info("Export terminé!");
         return notSaved;
     }
 
@@ -200,6 +200,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         EZPorfolioProxyV5 copy = new EZPorfolioProxyV5(sheets);
         copy.ezPortfolio = this.ezPortfolio.createDeepCopy();
         return copy;
+    }
+
+    @Override
+    public Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker) {
+        return ezPortfolio.getMonPortefeuille().createFrom(ticker);
     }
 
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {

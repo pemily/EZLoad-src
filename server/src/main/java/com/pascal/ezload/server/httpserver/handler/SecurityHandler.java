@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 
 
 @Path("security")
@@ -57,7 +58,12 @@ public class SecurityHandler {
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
         AuthInfo result = authManager.getAuthWithoutPassword(courtier);
-        result.setPassword(BAD_PASSWORD);
+        if (result == null){
+            result = new AuthInfo();
+            result.setPassword("");
+            result.setPassword("");
+        }
+        else result.setPassword(BAD_PASSWORD);
         return result;
     }
 

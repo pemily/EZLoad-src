@@ -61,4 +61,7 @@ public class StringUtils {
         return Base64.getEncoder().encodeToString(b);
     }
 
+    public static boolean isBlank(String s){
+        return org.apache.commons.lang3.StringUtils.isBlank(s);
+    }
 }

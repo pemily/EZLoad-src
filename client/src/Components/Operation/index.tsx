@@ -11,6 +11,11 @@ function show(str: string|undefined){
     return str === undefined ? "" : str;
 }
 
+function showMonthlyDividend(month: string, div: string){
+    if (div === "") return "";
+    return month + ": "+div+" ";
+}
+
 function getBorder(errors: string[]) : BorderType {
     // if there is an error or not
     if (errors.length === 0) return { size: "none" };
@@ -35,8 +40,8 @@ export function Operation(props: OperationProps){
                      {(error: string, index: number) => getOperationError(props.id, index, error, props.operation)}      
                 </List>
             )}
-            { props.operation.errors!.length === 0 && (props.operation.ezOperationEditions?.length === 0) &&
-                (<Text key={"operationNoImpact"+props.id}>Cette opération n'a pas d'impact dans EzPortfolio</Text>)}
+            {/* props.operation.errors!.length === 0 && (props.operation.ezOperationEditions?.length === 0) &&
+                (<Text key={"operationNoImpact"+props.id}>Cette opération n'a pas d'impact dans EzPortfolio</Text>) */}
 
             { props.operation.errors!.length === 0 && (
                 <>
@@ -108,6 +113,23 @@ export function Operation(props: OperationProps){
                                 <TableCell><Text>{datanum.quantity}</Text></TableCell>
                                 <TableCell><Text>{datanum.annualDividend}</Text></TableCell>
                             </TableRow>
+                            { datanum.annualDividend !== "" && datanum.annualDividend !== "0" && (
+                            <TableRow >
+                                <TableCell colSpan={12}><Text>{"Calendrier de dividendes: "
+                                +showMonthlyDividend("Jan ",datanum.monthlyDividends![0])
+                                +showMonthlyDividend("Fev ",datanum.monthlyDividends![1])
+                                +showMonthlyDividend("Mar ",datanum.monthlyDividends![2])
+                                +showMonthlyDividend("Avr ",datanum.monthlyDividends![3])
+                                +showMonthlyDividend("Mai ",datanum.monthlyDividends![4])
+                                +showMonthlyDividend("Juin ",datanum.monthlyDividends![5])
+                                +showMonthlyDividend("Juil ",datanum.monthlyDividends![6])
+                                +showMonthlyDividend("Aout ",datanum.monthlyDividends![7])
+                                +showMonthlyDividend("Sept ",datanum.monthlyDividends![8])
+                                +showMonthlyDividend("Oct ",datanum.monthlyDividends![9])
+                                +showMonthlyDividend("Nov ",datanum.monthlyDividends![10])
+                                +showMonthlyDividend("Dec ",datanum.monthlyDividends![11])                                
+                                }</Text></TableCell>
+                            </TableRow> ) }
                         </TableBody>
                     </Table>     
                     )}

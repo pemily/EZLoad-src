@@ -85,4 +85,9 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
         return null;
     }
 
+    @Override
+    public Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker) {
+        return Optional.empty();
+    }
+
 }

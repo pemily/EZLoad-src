@@ -87,20 +87,23 @@ public class SettingsManager {
     public void renameEzProfile(String oldProfilName, String newProfilName) throws Exception {
         String oldProfileDir = getEzProfileDirectory(oldProfilName);
         String newProfileDir = getEzProfileDirectory(newProfilName);
+        // read the settings before the rename
+        MainSettings settings = readMainSettingsFile();
+        EzProfil newEzProfil = readEzProfilFile(oldProfilName);
 
         if (StringUtils.isBlank(newProfilName) || new File(newProfileDir).exists()) return;
 
+        // move the directory & files
         FileUtils.moveDirectory(new File(oldProfileDir), new File(newProfileDir));
         FileUtils.moveFile(new File(getEzHome()+File.separator+profilesDirectory+File.separator+oldProfilName+"."+ezProfilFileExtension),
                 new File(getEzHome()+File.separator+profilesDirectory+File.separator+newProfilName+"."+ezProfilFileExtension));
 
-        MainSettings settings = readMainSettingsFile();
+        // update the settings
         if (settings.getActiveEzProfilName().equals(oldProfilName)){
             settings.setActiveEzProfilName(newProfilName);
             saveMainSettingsFile(settings);
         }
 
-        EzProfil newEzProfil = readEzProfilFile(newProfilName);
         if (newEzProfil.getDownloadDir().startsWith(oldProfileDir)){
             newEzProfil.setDownloadDir(newEzProfil.getDownloadDir().replace(oldProfileDir, newProfileDir));
         }
@@ -193,9 +196,11 @@ public class SettingsManager {
             ezProfil = new EzProfil();
         }
         String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
+        new File(ezProfilDirectory).mkdirs();
 
-        if (ezProfil.getCourtierCredsFile() == null) {
+        if (ezProfil.getCourtierCredsFile() == null || !new File(ezProfil.getCourtierCredsFile()).exists()) {
             ezProfil.setCourtierCredsFile(ezProfilDirectory + CREDS_DIR + File.separator + "ezCreds.json");
+            new File(ezProfil.getCourtierCredsFile()).getParentFile().mkdirs();
             try (FileOutputStream output = new FileOutputStream(ezProfil.getCourtierCredsFile())) {
                 output.write("{}".getBytes(StandardCharsets.UTF_8));
             }
@@ -252,11 +257,15 @@ public class SettingsManager {
     private MainSettings defaultValuesIfNotSet(MainSettings mainSettings) throws Exception {
         mainSettings.setEzLoad(defaultValuesIfNotSet(mainSettings.getEzLoad()));
         mainSettings.setChrome(defaultValuesIfNotSet(mainSettings.getChrome()));
+        String ezProfilName = defaultEzProfilName;
         if (StringUtils.isBlank(mainSettings.getActiveEzProfilName())) {
-            mainSettings.setActiveEzProfilName(defaultEzProfilName);
+            mainSettings.setActiveEzProfilName(ezProfilName);
+        }
+        else{
+            ezProfilName = mainSettings.getActiveEzProfilName();
         }
 
-        createEzProfilIfNotExists(defaultEzProfilName, null);
+        createEzProfilIfNotExists(ezProfilName, null);
 
         saveMainSettingsFile(mainSettings);
         

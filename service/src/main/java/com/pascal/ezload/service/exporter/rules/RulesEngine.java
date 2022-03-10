@@ -246,18 +246,11 @@ public class RulesEngine {
         ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
 
         try {
-            if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
-                // recherche les dividendes sur seekingalpha
-                EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
-                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
-
-                EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
-                new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
-                new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
-            }
+            EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
+            computeDividendCalendarAndAnnual(ezProfil, reporting, ezPortefeuilleEdition);
         } catch (Exception e) {
-            ezPortefeuilleEdition.addError("Probleme lors de la recherche des dividendes de "+ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
-            logger.log(Level.SEVERE, "Probleme lors de la recherche des dividendes de "+ezPortefeuilleEdition.getTickerGoogleFinance(), e);
+            ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
+            logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
         }
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)
@@ -265,6 +258,25 @@ public class RulesEngine {
         // ezPortefeuilleEdition.fill(data);
 
         return true;
+    }
+
+    // return true if update, false else
+    public static boolean computeDividendCalendarAndAnnual(EzProfil ezProfil, Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition) {
+        boolean result = false;
+        if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
+            try{
+                // recherche les dividendes sur seekingalpha
+                EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
+                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
+
+                result |= new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
+                result |= new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
+            } catch (Exception e) {
+                ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
+                logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
+            }
+        }
+        return result;
     }
 
     private String eval(WithErrors entity, String expression, EzData data, CommonFunctions functions) {

@@ -16,6 +16,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
+import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
@@ -115,8 +116,48 @@ public class EngineHandler {
                     shareValues.addAll(serverState.getNewShares().stream().filter(f -> !StringUtils.isBlank(f.getUserShareName())).collect(Collectors.toList()));
                     ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
 
-                    List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting).exportModels(allEZModels, ezPortfolioProxy, shareUtil);
+                    List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting)
+                            .exportModels(allEZModels, ezPortfolioProxy, shareUtil);
+
+                    // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présentent dans des fichiers
+                    // first allTickerCodes received all the ticker codes present in the ezPorfolio
+                    Set<String> allTickerCodes = ezPortfolioProxy.getShareValues().stream()
+                            .map(ShareValue::getTickerCode)
+                            .filter(ticker -> !ticker.equals(ShareValue.LIQUIDITY_CODE))
+                            .filter(ticker -> !ticker.isEmpty())
+                            .collect(Collectors.toSet());
+                    Set<String> allTickerCodesAnalyzed = allEzReports.stream()
+                            .flatMap(report -> report.getEzEditions().stream())
+                            .flatMap(ezEdition -> ezEdition.getEzPortefeuilleEditions().stream())
+                            .map(EzPortefeuilleEdition::getTickerGoogleFinance)
+                            .filter(ticker -> !ticker.equals(ShareValue.LIQUIDITY_CODE))
+                            .collect(Collectors.toSet());
+                    allTickerCodes.removeAll(allTickerCodesAnalyzed);
+
+                    List<EzPortefeuilleEdition> dividendsEdition = allTickerCodes.stream()
+                                    .map(ezPortfolioProxy::createNoOpEdition)
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .map(ezPortefeuilleEdition  ->
+                                            Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .collect(Collectors.toList());
+
+                    if (dividendsEdition.size() > 0) {
+                        EzReport dividendsReport = new EzReport();
+                        dividendsReport.setReportType(EzReport.ReportType.IS_DIVIDEND_UPDATE);
+                        List<EzEdition> dividendsEditions = new LinkedList<>();
+                        dividendsReport.setEzEditions(dividendsEditions);
+                        EzEdition ez = new EzEdition();
+                        ez.setId("DividendsUpdate");
+                        ez.setEzPortefeuilleEditions(dividendsEdition);
+                        dividendsEditions.add(ez);
+                        allEzReports.add(dividendsReport);
+                    }
+
                     updateShareValuesAndEzReports(ezPortfolioProxy.getNewPRUValues(), knownValues, allEzReports);
+
                 });
 
     }

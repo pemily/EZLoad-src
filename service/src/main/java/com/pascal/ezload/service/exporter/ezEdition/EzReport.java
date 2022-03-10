@@ -3,26 +3,29 @@ package com.pascal.ezload.service.exporter.ezEdition;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.model.EZModel;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class EzReport {
 
     public enum EnumStatus { OK, WARNING, ERROR }
+    public enum ReportType { IS_DIVIDEND_UPDATE, IS_SHARE_UPDATE }
+
     private List<EzEdition> ezEditions = new LinkedList<>();
     private List<String> errors = new LinkedList<>();
     private String sourceFile;
     private EnumStatus status;
+    private ReportType reportType;
 
     public EzReport(){
+        reportType = ReportType.IS_SHARE_UPDATE;
     }
 
     public EzReport(EZModel fromEzModel){
         errors = fromEzModel.getErrors();
         status = errors.size() > 0 ? EnumStatus.ERROR : EnumStatus.OK;
         sourceFile = fromEzModel.getSourceFile();
+        reportType = ReportType.IS_SHARE_UPDATE;
     }
 
     public List<EzEdition> getEzEditions() {
@@ -62,4 +65,13 @@ public class EzReport {
     public void setStatus(EnumStatus status) {
         this.status = status;
     }
+
+    public ReportType getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(ReportType reportType) {
+        this.reportType = reportType;
+    }
+
 }

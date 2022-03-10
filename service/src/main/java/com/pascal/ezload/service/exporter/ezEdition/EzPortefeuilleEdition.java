@@ -125,6 +125,14 @@ public class EzPortefeuilleEdition implements WithErrors {
         this.errors = errors;
     }
 
+    public String[] getMonthlyDividends(){
+        return monthlyDividend;
+    }
+
+    public void setMonthlyDividends(String[] monthlyDividend){
+        this.monthlyDividend = monthlyDividend;
+    }
+
     // month between 1 & 12
     public String getMonthlyDividend(int month) {
         return monthlyDividend[month-1];
