@@ -24,10 +24,13 @@ public abstract class DividendsAlgo {
 
     protected float evalNumberOrPercent(String numberOrPercent){
         String val = numberOrPercent;
-        if (numberOrPercent.endsWith("%")){
+        if (numberOrPercent == null) {
+            val = "";
+        }
+        if (val.endsWith("%")){
             val = numberOrPercent.substring(0, numberOrPercent.length()-1);
         }
-        if (numberOrPercent.isBlank()){
+        if (val.isBlank()){
             val = "0";
         }
         return ModelUtils.str2Float(val);

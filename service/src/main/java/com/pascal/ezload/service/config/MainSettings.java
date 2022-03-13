@@ -5,7 +5,7 @@ import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.StringValue;
 
 public class MainSettings {
-    public enum EnumAlgoYearSelector { ANNEE_PRECEDENTE, ANNEE_EN_COURS}
+    public enum EnumAlgoYearSelector { DISABLED, ANNEE_PRECEDENTE, ANNEE_EN_COURS}
     public enum EnumAlgoDateSelector {DATE_DE_PAIEMENT, DATE_DE_DETACHEMENT }
     public enum EnumPercentSelector { ADAPTATIF, STABLE }
 

@@ -19,6 +19,11 @@ public class EzPortefeuilleEdition implements WithErrors {
 
     private String monthlyDividend[] = new String[12];
 
+    public EzPortefeuilleEdition(){
+        for (int i = 0; i < 12; i++)
+            monthlyDividend[i] = "";
+    }
+
     public String getValeur() {
         return valeur;
     }

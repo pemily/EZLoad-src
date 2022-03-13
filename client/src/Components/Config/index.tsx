@@ -104,6 +104,29 @@ const gdriveAccessStep6 = () : String =>  `
 `;
 
 
+function dividendAlgo2str(sel: 'ANNEE_PRECEDENTE'|'DISABLED'|'ANNEE_EN_COURS'|undefined, defaut:'ANNEE_PRECEDENTE'|'ANNEE_EN_COURS'){
+    if (sel === 'DISABLED') return 'Désactivé';
+    var v = ''
+    if (sel === 'ANNEE_PRECEDENTE'){
+        v = 'Année précédente';
+        if (defaut === 'ANNEE_PRECEDENTE') v = v + ' (Défaut)'
+        return v;
+    }
+    else{
+        v = 'Année en cours';
+        if (defaut === 'ANNEE_EN_COURS') v = v + ' (Défaut)'
+        return v;
+    }
+}
+
+function str2dividendAlgo(str: string, defaut:'ANNEE_PRECEDENTE'|'ANNEE_EN_COURS') : 'ANNEE_PRECEDENTE'|'DISABLED'|'ANNEE_EN_COURS' {
+    if (str === 'Désactivé') return 'DISABLED';    
+    if (str.startsWith('Année précédente')) {
+        return 'ANNEE_PRECEDENTE';        
+    } 
+    return 'ANNEE_EN_COURS';
+}
+
 export function Config(props: ConfigProps) {   
     const [showConfigStartDate, setShowConfigStartDate] = useState<boolean>(false);
     const [showStartDateForAccount, setShowStartDateForAccount] = useState<BourseDirectEZAccountDeclaration|undefined>(undefined);
@@ -175,32 +198,32 @@ export function Config(props: ConfigProps) {
                     
                     <Box direction="column" margin="small">
                         <ComboField id="ezAnnualDividendYearSelector"
-                            value={props.ezProfil.annualDividend?.yearSelector === 'ANNEE_PRECEDENTE' ? 'Année précédente (défaut)' : 'Année en cours'}
+                            value={dividendAlgo2str(props.ezProfil.annualDividend?.yearSelector, 'ANNEE_PRECEDENTE')}
                             errorMsg={undefined}
-                            values={['Année précédente (défaut)', 'Année en cours']}                            
+                            values={['Désactivé', 'Année précédente (Défaut)', 'Année en cours']}                            
                             description=""
                             readOnly={props.readOnly}
                             onChange={newValue  => saveEzProfile(
                                 { ...props.ezProfil,
                                     annualDividend: {
                                         ...props.ezProfil.annualDividend,
-                                        yearSelector: newValue === 'Année précédente (défaut)' ? 'ANNEE_PRECEDENTE' : 'ANNEE_EN_COURS'
+                                        yearSelector: str2dividendAlgo(newValue, 'ANNEE_PRECEDENTE')
                                     } 
                                }, props.ezProfilStateSetter)}/>
                     </Box>
 
                     <Box direction="column" margin="small">
                         <ComboField id="ezAnnualDividendDateSelector"
-                            value={props.ezProfil.annualDividend?.dateSelector === 'DATE_DE_DETACHEMENT' ? 'Date de détachement (défaut)' : 'Date de paiement' }
+                            value={props.ezProfil.annualDividend?.dateSelector === 'DATE_DE_DETACHEMENT' ? 'Date de détachement (Défaut)' : 'Date de paiement' }
                             errorMsg={undefined}
-                            values={['Date de détachement (défaut)', 'Date de paiement']}                            
+                            values={['Date de détachement (Défaut)', 'Date de paiement']}                            
                             description=""                            
                             readOnly={props.readOnly}
                             onChange={newValue  => saveEzProfile(
                                 { ...props.ezProfil,
                                     annualDividend: {
                                         ...props.ezProfil.annualDividend,
-                                        dateSelector: newValue === 'Date de détachement (défaut)' ? 'DATE_DE_DETACHEMENT' : 'DATE_DE_PAIEMENT'
+                                        dateSelector: newValue === 'Date de détachement (Défaut)' ? 'DATE_DE_DETACHEMENT' : 'DATE_DE_PAIEMENT'
                                     }
                                }, props.ezProfilStateSetter)}/>
                     </Box>
@@ -217,16 +240,16 @@ export function Config(props: ConfigProps) {
                     
                     <Box direction="column" margin="small">
                         <ComboField id="ezDividendCalendarYearSelector"
-                            value={props.ezProfil.dividendCalendar?.yearSelector === 'ANNEE_PRECEDENTE' ? 'Année précédente' : 'Année en cours (Défaut)'}
+                            value={dividendAlgo2str(props.ezProfil.dividendCalendar?.yearSelector, 'ANNEE_EN_COURS')}
                             errorMsg={undefined}
-                            values={['Année précédente', 'Année en cours (Défaut)']}                            
+                            values={['Désactivé', 'Année précédente', 'Année en cours (Défaut)']}                            
                             description=""
                             readOnly={props.readOnly}
                             onChange={newValue  => saveEzProfile(
                                 { ...props.ezProfil,
                                     dividendCalendar: {
                                         ...props.ezProfil.dividendCalendar,
-                                        yearSelector: newValue === 'Année précédente' ? 'ANNEE_PRECEDENTE' : 'ANNEE_EN_COURS'
+                                        yearSelector: str2dividendAlgo(newValue, 'ANNEE_EN_COURS')
                                     } 
                                }, props.ezProfilStateSetter)}/>
                     </Box>
@@ -246,7 +269,7 @@ export function Config(props: ConfigProps) {
                                     }
                                }, props.ezProfilStateSetter)}/>
                     </Box>
-
+{/*
                     <Box direction="column" margin="small">
                         <ComboField id="ezDividendCalendarPercentSelector"
                             value={props.ezProfil.dividendCalendar?.percentSelector === 'ADAPTATIF' ? 'Adaptatif (Défaut)' : 'Stable' }
@@ -262,7 +285,7 @@ export function Config(props: ConfigProps) {
                                     }
                                }, props.ezProfilStateSetter)}/>
                     </Box>
-
+*/}
 
 {/*
                     <Heading level="5">Téléchargements</Heading>

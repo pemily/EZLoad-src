@@ -203,7 +203,12 @@ public class FinanceTools {
     private EZDate seekingAlphaDate(Object date){
         if (date == null) return null;
         String d[] = date.toString().split("-");
-        return new EZDate(Integer.parseInt(d[0]), Integer.parseInt(d[1]), Integer.parseInt(d[2]));
+        try{
+            return new EZDate(Integer.parseInt(d[0]), Integer.parseInt(d[1]), Integer.parseInt(d[2]));
+        }
+        catch(NumberFormatException e){
+            return null;
+        }
     }
 
     public static class Dividend {

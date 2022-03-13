@@ -269,8 +269,12 @@ public class RulesEngine {
                 EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
                 List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
 
-                result |= new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
-                result |= new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
+                if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)
+                    result |= new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
+
+                if (ezProfil.getDividendCalendar().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)
+                    result |= new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
+
             } catch (Exception e) {
                 ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
                 logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
