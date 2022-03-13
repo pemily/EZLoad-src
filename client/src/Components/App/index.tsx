@@ -238,7 +238,16 @@ export function App(){
                 } 
                 </span>       
                 <Text size="large" >{"EZLoad v"+version}</Text>
-                <Anchor margin="small" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
+                <Box>
+                    <Anchor margin="xxsmall" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
+                    <html>
+                        <form action="https://www.paypal.com/donate" method="post" target="_top">
+                            <input type="hidden" name="hosted_button_id" value="JK6H9Y7V9XDFW" />
+                            <input type="image" src="https://www.paypalobjects.com/fr_FR/FR/i/btn/btn_donate_SM.gif" name="submit" title="Pour me soutenir, merci" alt="Bouton Faites un don avec PayPal" />
+                            <img alt="" src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
+                        </form>
+                    </html>
+                </Box>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
             {(mainSettings === undefined || mainSettings == null) && ( 

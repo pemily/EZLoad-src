@@ -134,7 +134,7 @@ public class RulesEngine {
         data.put(OperationData.operation_ezLiquidityName, shareUtil.getEzLiquidityName());
 
         // compute the share Id
-        String shareId = eval(new GetFinancialDataError(), ruleDefinition.getShareId(), data, functions);
+        String shareId = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
         if (!StringUtils.isBlank(shareId)){
             EZAction action = FinanceTools.getInstance().get(reporting, shareId, shareUtil);
             action.fill(data);
@@ -149,20 +149,21 @@ public class RulesEngine {
 
         List<EzOperationEdition> result = new LinkedList<>();
 
+        String ruleName = ruleDefinition.getName();
         ruleDefinition.getOperationRules().forEach(opRule -> {
             EzOperationEdition ezOperationEdition = new EzOperationEdition();
             String condition = opRule.getCondition();
             condition = StringUtils.isBlank(condition) ? "true" : condition;
-            if (Boolean.parseBoolean(eval(ezOperationEdition, condition, data, functions))) {
-                ezOperationEdition.setDate(eval(ezOperationEdition, opRule.getOperationDateExpr(), data, functions));
-                ezOperationEdition.setAccountType(eval(ezOperationEdition, opRule.getOperationCompteTypeExpr(), data, functions));
-                ezOperationEdition.setBroker(eval(ezOperationEdition, opRule.getOperationBrokerExpr(), data, functions));
-                ezOperationEdition.setQuantity(eval(ezOperationEdition, opRule.getOperationQuantityExpr(), data, functions));
-                ezOperationEdition.setOperationType(eval(ezOperationEdition, opRule.getOperationTypeExpr(), data, functions));
-                ezOperationEdition.setShareName(eval(ezOperationEdition, opRule.getOperationActionNameExpr(), data, functions));
-                ezOperationEdition.setCountry(eval(ezOperationEdition, opRule.getOperationCountryExpr(), data, functions));
-                ezOperationEdition.setAmount(eval(ezOperationEdition, opRule.getOperationAmountExpr(), data, functions));
-                ezOperationEdition.setDescription(eval(ezOperationEdition, opRule.getOperationDescriptionExpr(), data, functions));
+            if (Boolean.parseBoolean(eval(ezOperationEdition, ruleName+".conditionExpr", condition, data, functions))) {
+                ezOperationEdition.setDate(eval(ezOperationEdition, ruleName+".operationDateExpr", opRule.getOperationDateExpr(), data, functions));
+                ezOperationEdition.setAccountType(eval(ezOperationEdition, ruleName+".operationCompteTypeExpr", opRule.getOperationCompteTypeExpr(), data, functions));
+                ezOperationEdition.setBroker(eval(ezOperationEdition, ruleName+".operationBrokerExpr", opRule.getOperationBrokerExpr(), data, functions));
+                ezOperationEdition.setQuantity(eval(ezOperationEdition, ruleName+".operationQuantityExpr", opRule.getOperationQuantityExpr(), data, functions));
+                ezOperationEdition.setOperationType(eval(ezOperationEdition, ruleName+".operationTypeExpr", opRule.getOperationTypeExpr(), data, functions));
+                ezOperationEdition.setShareName(eval(ezOperationEdition, ruleName+".operationActionNameExpr", opRule.getOperationActionNameExpr(), data, functions));
+                ezOperationEdition.setCountry(eval(ezOperationEdition, ruleName+".operationCountryExpr", opRule.getOperationCountryExpr(), data, functions));
+                ezOperationEdition.setAmount(eval(ezOperationEdition, ruleName+".operationAmountExpr", opRule.getOperationAmountExpr(), data, functions));
+                ezOperationEdition.setDescription(eval(ezOperationEdition, ruleName+".operationDescriptionExpr", opRule.getOperationDescriptionExpr(), data, functions));
                 result.add(ezOperationEdition);
             }
         });
@@ -201,7 +202,7 @@ public class RulesEngine {
             EzData data2 = new EzData(data);
             EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
-            String tickerCode = eval(ezPortefeuilleEdition, portRule.getPortefeuilleTickerGoogleFinanceExpr(), data2, functions);
+            String tickerCode = eval(ezPortefeuilleEdition, ruleDefinition.getName()+".portefeuilleTickerGoogleFinance", portRule.getPortefeuilleTickerGoogleFinanceExpr(), data2, functions);
             portfolioProxy.fillFromMonPortefeuille(data2, tickerCode);
 
             if (StringUtils.isBlank(tickerCode)) {
@@ -209,7 +210,7 @@ public class RulesEngine {
             } else {
 
                 if (!ezPortefeuilleEdition.hasErrors()) {
-                    if (applyRuleForPortefeuille(ezPortefeuilleEdition, portRule, data2, functions)) {
+                    if (applyRuleForPortefeuille(ezPortefeuilleEdition, ruleDefinition.getName(), portRule, data2, functions)) {
                         portfolioProxy.applyOnPortefeuille(ezPortefeuilleEdition);
                         result.add(ezPortefeuilleEdition);
                     }
@@ -225,25 +226,25 @@ public class RulesEngine {
     }
 
     // return false if no effect
-    private boolean applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition , PortefeuilleRule portefeuilleRule, EzData data, CommonFunctions functions) {
+    private boolean applyRuleForPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition, String ruleName, PortefeuilleRule portefeuilleRule, EzData data, CommonFunctions functions) {
 
         String condition = portefeuilleRule.getCondition();
         condition = StringUtils.isBlank(condition) ? "true" : condition;
-        if (!Boolean.parseBoolean(eval(ezPortefeuilleEdition, condition, data, functions))) {
+        if (!Boolean.parseBoolean(eval(ezPortefeuilleEdition, ruleName+".condition", condition, data, functions))) {
             return false;
         }
 
-        ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleValeurExpr(), data, functions));
-        ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCompteExpr(), data, functions));
-        ezPortefeuilleEdition.setBroker(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleCourtierExpr(), data, functions));
-        ezPortefeuilleEdition.setTickerGoogleFinance(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTickerGoogleFinanceExpr(), data, functions));
-        ezPortefeuilleEdition.setCountry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePaysExpr(), data, functions));
-        ezPortefeuilleEdition.setSector(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleSecteurExpr(), data, functions));
-        ezPortefeuilleEdition.setIndustry(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleIndustrieExpr(), data, functions));
-        ezPortefeuilleEdition.setEligibilityDeduction40(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleEligibiliteAbbattement40Expr(), data, functions));
-        ezPortefeuilleEdition.setType(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleTypeExpr(), data, functions));
-        ezPortefeuilleEdition.setCostPrice(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuillePrixDeRevientExpr(), data, functions));
-        ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
+        ezPortefeuilleEdition.setValeur(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleValeurExpr", portefeuilleRule.getPortefeuilleValeurExpr(), data, functions));
+        ezPortefeuilleEdition.setAccountType(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleCompteExpr", portefeuilleRule.getPortefeuilleCompteExpr(), data, functions));
+        ezPortefeuilleEdition.setBroker(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleCourtierExpr", portefeuilleRule.getPortefeuilleCourtierExpr(), data, functions));
+        ezPortefeuilleEdition.setTickerGoogleFinance(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleTickerGoogleFinanceExpr", portefeuilleRule.getPortefeuilleTickerGoogleFinanceExpr(), data, functions));
+        ezPortefeuilleEdition.setCountry(eval(ezPortefeuilleEdition, ruleName+".PortefeuillePaysExpr", portefeuilleRule.getPortefeuillePaysExpr(), data, functions));
+        ezPortefeuilleEdition.setSector(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleSecteurExpr", portefeuilleRule.getPortefeuilleSecteurExpr(), data, functions));
+        ezPortefeuilleEdition.setIndustry(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleIndustrieExpr", portefeuilleRule.getPortefeuilleIndustrieExpr(), data, functions));
+        ezPortefeuilleEdition.setEligibilityDeduction40(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleEligibiliteAbbattement40Expr", portefeuilleRule.getPortefeuilleEligibiliteAbbattement40Expr(), data, functions));
+        ezPortefeuilleEdition.setType(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleTypeExpr", portefeuilleRule.getPortefeuilleTypeExpr(), data, functions));
+        ezPortefeuilleEdition.setCostPrice(eval(ezPortefeuilleEdition, ruleName+".PortefeuillePrixDeRevientExpr", portefeuilleRule.getPortefeuillePrixDeRevientExpr(), data, functions));
+        ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleQuantiteExpr", portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
 
         try {
             EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
@@ -283,10 +284,10 @@ public class RulesEngine {
         return result;
     }
 
-    private String eval(WithErrors entity, String expression, EzData data, CommonFunctions functions) {
+    private String eval(WithErrors entity, String expressionErrorHelp, String expression, EzData data, CommonFunctions functions) {
         try {
             if (expression == null){
-                entity.addError("Une expression n'est pas renseignée, vous devez la corriger dans l'éditeur de règles");
+                entity.addError("L'expression: "+expressionErrorHelp+" n'est pas renseignée, vous devez la corriger dans l'éditeur de règles");
                 return "";
             }
             else if (StringUtils.isBlank(expression)){
@@ -299,7 +300,7 @@ public class RulesEngine {
             }
         }
         catch(Exception e){
-            entity.addError("L'expression '"+expression+"' provoque l'erreur: " +e.getMessage());
+            entity.addError("L'expression de "+expressionErrorHelp+": '"+expression+"' provoque l'erreur: " +e.getMessage());
             return "<Error "+e.getMessage()+">";
         }
     }

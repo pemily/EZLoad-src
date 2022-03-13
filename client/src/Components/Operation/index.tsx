@@ -113,7 +113,10 @@ export function Operation(props: OperationProps){
                                 <TableCell><Text>{datanum.quantity}</Text></TableCell>
                                 <TableCell><Text>{datanum.annualDividend}</Text></TableCell>
                             </TableRow>
-                            { datanum.annualDividend !== "" && datanum.annualDividend !== "0" && (
+                            { datanum.annualDividend !== "" 
+                                 && datanum.annualDividend !== "0"
+                                 &&  datanum.annualDividend !== undefined 
+                                 && datanum.annualDividend !== null && (
                             <TableRow >
                                 <TableCell colSpan={12}><Text>{"Calendrier de dividendes: "
                                 +showMonthlyDividend("Jan ",datanum.monthlyDividends![0])

@@ -23,10 +23,9 @@ export function Operations(props: OperationsProps){
     const [checked, setChecked] = useState<boolean[]>( props.operations.map(op => op.id === undefined ? false : props.isIgnored(op)) );
 
     function showActions(index: number, operation: EzEdition){
-        return 
-            ( <Box key={"actions"+index} >
+        return ( <Box key={"actions"+index} >
                 {ignoreRule(index, operation)}
-                { props.showRules && 
+                { !props.isDividendUpdate && props.showRules && 
                     (<Box direction="row" align="center" key={"operationAction"+index}>
                         <EzDataField key={"OperationData"+index} value={operation!.data!} iconInfo={true}/>
                         {createOrViewRule(index, operation)}
@@ -60,7 +59,7 @@ export function Operations(props: OperationsProps){
         <Box margin="small" key={"Operations"+props.id}>            
             <List data={props.operations} margin="none" pad="xsmall"
                  background={['light-2', 'light-4']}             
-                 action={(item, index) => props.isDividendUpdate ? showActions(index, item) : (<span key={index}></span>) }>
+                 action={(item, index) => showActions(index, item) }>
                     {(op: EzEdition, index: number) =>(<Operation id={index} operation={op}/>)}
             </List>            
         </Box>
