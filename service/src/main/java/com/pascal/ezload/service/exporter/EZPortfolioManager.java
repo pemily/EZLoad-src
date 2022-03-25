@@ -32,7 +32,7 @@ public class EZPortfolioManager {
                 throw e;
             }
             reporting.error("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème de connection", e);
-            throw new IllegalStateException("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème de connection");
+            throw new IllegalStateException("Il ne s'agit pas de EZPortfolio V5 ou il y a eu un problème de connection", e);
         }
     }
 

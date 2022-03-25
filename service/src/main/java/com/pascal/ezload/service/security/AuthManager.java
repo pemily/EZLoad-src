@@ -49,9 +49,14 @@ public class AuthManager {
         AuthInfo info = data.getInfo().get(courtier);
         if (info == null) return null;
         AuthInfo result = new AuthInfo();
-        result.setPassword(decryptPassword(info.getPassword(), passPhrase));
-        result.setUsername(info.getUsername());
-        return result;
+        try {
+            result.setPassword(decryptPassword(info.getPassword(), passPhrase));
+            result.setUsername(info.getUsername());
+            return result;
+        }
+        catch(Exception e){
+            throw new Exception("Essayez de supprimer le fichier "+authFilePath+" redonnez votre mot de passe et recommencez", e);
+        }
     }
 
     public void saveAuthInfo(EnumEZBroker courtier, AuthInfo authInfo) throws Exception {

@@ -71,6 +71,7 @@ public class GDriveSheets {
             BatchGetValuesResponse resp = service.spreadsheets()
                     .values()
                     .batchGet(spreadsheetId)
+                    .setValueRenderOption("FORMULA") // https://developers.google.com/sheets/api/reference/rest/v4/ValueRenderOption
                     .setRanges(ranges)
                     .execute();
             return resp.getValueRanges().stream().map(vr -> SheetValues.createFromObjectLists(vr.getRange(), vr.getValues())).collect(Collectors.toList());
@@ -85,7 +86,7 @@ public class GDriveSheets {
         reporting.info("Mise à jour de Google Drive: "+sheetValues.stream().map(SheetValues::getRange).collect(Collectors.joining(" & ")));
         return retryOnTimeout(reporting, RETRY_NB, () -> {
             BatchUpdateValuesRequest buvr = new BatchUpdateValuesRequest();
-            buvr.setValueInputOption("USER_ENTERED");
+            buvr.setValueInputOption("USER_ENTERED"); // https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
 
             buvr.setData(sheetValues.stream().map(sv -> {
                 ValueRange vr = new ValueRange();

@@ -1,4 +1,4 @@
-import { Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
+import { Anchor, Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
 import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
 import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued, saveMainSettings } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
@@ -136,19 +136,12 @@ export function Config(props: ConfigProps) {
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Box direction="row"><Heading level="5" >EZPortfolio</Heading><Text margin={{start:"small"}} size="xxsmall" alignSelf="center">({props.configFile + " - " +props.mainSettings.activeEzProfilName})</Text></Box>
-                    <Box direction="column" margin="small">
-                        <Box margin="none" pad="none" direction="row">
-                            <TextField id="ezPortfolioUrl" label="URL vers ezPortfolio" value={props.ezProfil?.ezPortfolio?.ezPortfolioUrl}
-                                errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
-                                readOnly={props.readOnly}
-                                onChange={newValue  => 
-                                    saveEzProfile({ ...props.ezProfil,
-                                      ezPortfolio: { ...props.ezProfil.ezPortfolio, ezPortfolioUrl: newValue }
-                               }, props.ezProfilStateSetter)
-                               }/>
-
-                           <Help title="Créer le fichier d'accès Google Drive?">
+                    <Box direction="row" margin="small">
+                        <Text margin={{start:"small"}} size="xxsmall" alignSelf="center">{props.configFile + " - " +props.mainSettings.activeEzProfilName}</Text>
+                    </Box>
+                    <Box direction="row" justify="start">
+                        <Heading level="5">Url de EZPortfolio</Heading>
+                        <Help title="Créer le fichier d'accès Google Drive" isInfo={true}>
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
                                 <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>
                                 <FileInput  name="gdriveSec" id="gdriveSec" messages={{dropPrompt: "Glisser le fichier téléchargé içi", browse: "Parcourir" }} 
@@ -184,6 +177,19 @@ export function Config(props: ConfigProps) {
                                             size="small" icon={<Validate size="small"/>} label="Valider la connection"/>
                                </Box>
                            </Help>
+                    </Box> 
+                    <Box direction="column" margin="small">                       
+                        <Box margin="none" pad="none" direction="row">
+                            <TextField id="ezPortfolioUrl" value={props.ezProfil?.ezPortfolio?.ezPortfolioUrl}
+                                errorMsg={props.ezProfil?.ezPortfolio?.field2ErrorMsg?.ezPortfolioUrl}
+                                readOnly={props.readOnly}
+                                onChange={newValue  => 
+                                    saveEzProfile({ ...props.ezProfil,
+                                      ezPortfolio: { ...props.ezProfil.ezPortfolio, ezPortfolioUrl: newValue }
+                               }, props.ezProfilStateSetter)
+                               }/>
+
+                            <Anchor alignSelf="center" target="_blank" href="https://docs.google.com/spreadsheets/d/1ibgKcrkwnqZNHXNKr9Fv8vqACsbFfjvNAO3qOqe3TiE/edit#gid=227754599">Nouveau</Anchor>
                        </Box>                        
                     </Box>
 

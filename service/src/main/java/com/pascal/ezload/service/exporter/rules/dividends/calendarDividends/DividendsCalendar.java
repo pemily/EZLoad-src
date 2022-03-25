@@ -52,7 +52,7 @@ public class DividendsCalendar extends DividendsAlgo {
 
             if (evalNumberOrPercent(newValue) != evalNumberOrPercent(ezPortefeuilleEdition.getMonthlyDividend(month))) {
                 result = true;
-                ezPortefeuilleEdition.setMonthlyDividend(month, newValue);
+                ezPortefeuilleEdition.setMonthlyDividend(month, newValue.equals("") ? newValue : newValue+"%");
             }
         }
         return result;

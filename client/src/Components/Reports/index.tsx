@@ -84,7 +84,7 @@ export function Reports(props: ReportsProps){
                                 operations={report.ezEditions}
                                 isIgnored={props.isOperationIgnored}
                                 setIgnored={props.ignoreOperation}
-                                isDividendUpdate={report.reportType === "IS_SHARE_UPDATE"}/>)}
+                                isDividendUpdate={report.reportType === "IS_DIVIDEND_UPDATE"}/>)}
                         </AccordionPanel>
                      );
                  })}          
