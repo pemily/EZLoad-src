@@ -34,7 +34,8 @@ public class MarketPlaceUtil {
             new EZMarketPlace("Shenzhen Stock Exchange", "Shenzhen", "XSHE", null, "SHE", CountryUtil.foundByCode("CN"), DeviseUtil.foundByCode("CNY")),
             new EZMarketPlace("London Stock Exchange", "London", "XLON", "LSE", "LON", CountryUtil.foundByCode("GB"), DeviseUtil.foundByCode("GBX")),
             new EZMarketPlace("Toronto Stock Exchange", "Toronto", "XTSE", "TSX", "TSE", CountryUtil.foundByCode("CA"), DeviseUtil.foundByCode("CAD")),
-            new EZMarketPlace("Deutsche Börse", "Frankfurt", "XFRA", null, "FRA", CountryUtil.foundByCode("DE"), DeviseUtil.foundByCode("EUR"))
+            new EZMarketPlace("Deutsche Börse", "Frankfurt", "XFRA", null, "FRA", CountryUtil.foundByCode("DE"), DeviseUtil.foundByCode("EUR")),
+            new EZMarketPlace("Bolsa de Madrid", "Madrid", "XMAD", null, "BME", CountryUtil.foundByCode("ES"), DeviseUtil.foundByCode("EUR"))
 /*
             new EZMarketPlace("Euronext", "Dublin", "XMSM", "ISE MSM", null, "IE", DeviseUtil.foundByCode("EUR")),
             new EZMarketPlace("Euronext", "Oslo", "XOSL", null, null, "NO", DeviseUtil.foundByCode("EUR")),
