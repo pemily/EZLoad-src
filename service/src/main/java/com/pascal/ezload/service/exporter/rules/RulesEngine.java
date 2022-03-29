@@ -269,6 +269,7 @@ public class RulesEngine {
                 // recherche les dividendes sur seekingalpha
                 EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
                 List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
+                if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)
                     result |= new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);

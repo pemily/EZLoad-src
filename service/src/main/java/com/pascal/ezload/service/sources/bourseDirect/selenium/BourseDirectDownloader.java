@@ -79,12 +79,10 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                         reporting.info("Aucune opération chargé par EZLoad dans le compte " + courtier.getEzPortfolioName() + ":" + account.getName());
                     }
 
+                    LocalDate currentdate = LocalDate.now();
                     EZDate fromDate;
-                    if (!fromDateOpt.isPresent()) {
-                        // BourseDirect fournit le relevé jusqu'a un an en arriere
-                        LocalDate currentdate = LocalDate.now();
-                        fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
-                    } else fromDate = fromDateOpt.get();
+                    // BourseDirect fournit le relevé jusqu'a un an en arriere
+                    fromDate = fromDateOpt.orElse(new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1));
 
                     String cptIndex = selectAccount(account);
 
@@ -93,16 +91,12 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                     Month dateFromPage = extractDateFromPage();
                     // just a check to be sure we are on the correct page
                     if (dateFromPage.getYear() != fromDate.getYear() || dateFromPage.getMonth() != fromDate.getMonth()) {
-                        throw new BRException("The date of the download page: " + dateFromPage + " is not the expected one: " + fromDate);
+                        reporting.info("The date of the download page: " + dateFromPage + " is not the expected one: " + fromDate+" => restart from the beginning");
+                        // BourseDirect fournit le relevé jusqu'a un an en arriere
+                        fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
+                        goToMonth(cptIndex, new Month(fromDate));
+                        dateFromPage = extractDateFromPage();
                     }
-                /*
-                // go to the oldest page for this account
-                Month dateFromPage = extractDateFromPage();
-                while(dateFromPage.getYear() != fromDate.getYear() || dateFromPage.getMonth() != fromDate.getMonth()) {
-                    dateFromPage = clickMoisPrecedent();
-                    if (dateFromPage == null) throw new BRException("Impossible to find the first page to start dowload from date: "+fromDate);
-                }
-                */
 
                     Month monthToDownload = dateFromPage;
                     do {

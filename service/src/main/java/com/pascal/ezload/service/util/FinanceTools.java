@@ -148,7 +148,7 @@ public class FinanceTools {
         }
     }
 
-
+    // return null if the dividend cannot be downloaded for this action
     public List<Dividend> searchDividends(String country, String actionTicker) throws IOException {
         if ("US".equals(country)){
             String[] code = StringUtils.divide(actionTicker, ':');
@@ -197,7 +197,7 @@ public class FinanceTools {
                 con.disconnect();
             }
         }
-        return new LinkedList<>();
+        return null;
     }
 
     private EZDate seekingAlphaDate(Object date){

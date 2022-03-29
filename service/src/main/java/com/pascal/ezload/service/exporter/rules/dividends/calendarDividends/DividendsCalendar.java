@@ -42,17 +42,15 @@ public class DividendsCalendar extends DividendsAlgo {
 
         float percentForMonth = 100f / monthWithDividends.size();
         String value = ModelUtils.float2Str(percentForMonth);
+        String percentValueForYear = ModelUtils.float2Str(percentForMonth / 100f);
 
         boolean result = false;
         for (int month = 1; month <= 12; month++) {
-            String newValue;
-            if (monthWithDividends.contains(month))
-                newValue = value;
-            else newValue = "";
+            String testValue = monthWithDividends.contains(month) ? percentValueForYear : "";
 
-            if (evalNumberOrPercent(newValue) != evalNumberOrPercent(ezPortefeuilleEdition.getMonthlyDividend(month))) {
+            if (evalNumberOrPercent(testValue) != evalNumberOrPercent(ezPortefeuilleEdition.getMonthlyDividend(month))) {
                 result = true;
-                ezPortefeuilleEdition.setMonthlyDividend(month, newValue.equals("") ? newValue : newValue+"%");
+                ezPortefeuilleEdition.setMonthlyDividend(month, testValue.equals("") ? "" : value+"%");
             }
         }
         return result;
