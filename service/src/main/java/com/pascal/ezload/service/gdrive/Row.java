@@ -1,12 +1,19 @@
 package com.pascal.ezload.service.gdrive;
 
 import static com.pascal.ezload.service.util.ModelUtils.str2Float;
+import static com.pascal.ezload.service.util.ModelUtils.str2Int;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.api.services.sheets.v4.model.CellData;
+import com.google.api.services.sheets.v4.model.CellFormat;
+import com.google.api.services.sheets.v4.model.ExtendedValue;
+import com.google.api.services.sheets.v4.model.NumberFormat;
 import com.pascal.ezload.service.model.EZDate;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +35,17 @@ public class Row {
     public EZDate getValueDate(int colIndex) {
         String date = getValueStr(colIndex);
         if (StringUtils.isBlank(date)) return null;
-        return EZDate.parseFrenchDate(date, '/');
+        EZDate r = EZDate.parseFrenchDate(date, '/');
+        if (r == null){
+            try {
+                LocalDate localDate = LocalDate.of(1899, Month.DECEMBER, 30).plusDays(str2Int(date));
+                return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+            }
+            catch(Exception e){
+                r = null;
+            }
+        }
+        return r;
     }
 
     public List<Object> getValues() {

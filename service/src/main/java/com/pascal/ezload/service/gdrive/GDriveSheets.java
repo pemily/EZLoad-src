@@ -9,8 +9,11 @@ import com.pascal.ezload.service.util.Sleep;
 import com.pascal.ezload.service.util.StringUtils;
 import com.pascal.ezload.service.util.SupplierWithException;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GDriveSheets {
@@ -19,6 +22,7 @@ public class GDriveSheets {
     private final String ezPortfolioUrl;
     private final String spreadsheetId;
     private final Sheets service;
+    private final Map<String, Integer> sheetName2sheetId = new HashMap<>();
 
     public GDriveSheets(Sheets service, String ezPortfolioUrl){
         this.ezPortfolioUrl = ezPortfolioUrl;
@@ -101,6 +105,12 @@ public class GDriveSheets {
         });
     }
 
+    public void applyRequest(List<Request> requests) throws IOException {
+        BatchUpdateSpreadsheetRequest rq = new BatchUpdateSpreadsheetRequest();
+        rq.setRequests(requests);
+        service.spreadsheets().batchUpdate(spreadsheetId, rq).execute();
+    }
+
     private <T> T retryOnTimeout(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
         try {
             return fct.get();
@@ -120,4 +130,15 @@ public class GDriveSheets {
         }
     }
 
+    public void init(Reporting reporting) throws Exception {
+        retryOnTimeout(reporting, RETRY_NB, () -> {
+            Spreadsheet o = service.spreadsheets().get(spreadsheetId).execute();
+            o.getSheets().forEach(s ->  sheetName2sheetId.put(s.getProperties().getTitle(), s.getProperties().getSheetId()));
+            return null;
+        });
+    }
+
+    public Integer getSheetId(String sheetName){
+        return sheetName2sheetId.get(sheetName);
+    }
 }

@@ -1,5 +1,8 @@
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
+import com.google.api.services.sheets.v4.model.GridRange;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.UnmergeCellsRequest;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
@@ -16,6 +19,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.util.Sleep;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -125,6 +129,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             reporting.info("Export de "+nbOperationSaved.get()+" operations et "+nbPortefeuilleRowSaved.get()+" lignes du portefeuille");
             SheetValues monPortefeuille = ezPortfolio.getMonPortefeuille().getSheetValues();
 
+            fixBugUnmergedMesOperationCells();
+
             // Force la mise a jours des methods GoogleFinance dans les cellulles N&O de MonPortefeuille avant la mise a jour de toutes les autres opérations. (sinon ca bug)
             fixGoogleFinanceBug(sheets, reporting, monPortefeuille);
             // attend un peu pour etre sur que ce soit fait
@@ -143,6 +149,41 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         return notSaved;
     }
 
+    private void fixBugUnmergedMesOperationCells() throws IOException {
+        UnmergeCellsRequest unmerge = new UnmergeCellsRequest();
+        GridRange gridRange = new GridRange();
+            /* https://docs.rs/google-sheets4/1.0.14+20200630/google_sheets4/struct.GridRange.html
+            https://googlesheets4.tidyverse.org/articles/range-specification.html
+            For example, if "Sheet1" is sheet ID 0, (le 1er onglet est toujours egale a 0, les suivant sont de vrai id)
+             then:
+            Sheet1!A1:A1 == sheet_id: 0, start_row_index: 0, end_row_index: 1, start_column_index: 0, end_column_index: 1
+            Sheet1!A3:B4 == sheet_id: 0, start_row_index: 2, end_row_index: 4, start_column_index: 0, end_column_index: 2
+            Sheet1!A:B == sheet_id: 0, start_column_index: 0, end_column_index: 2
+            Sheet1!A5:B == sheet_id: 0, start_row_index: 4, start_column_index: 0, end_column_index: 2
+            Sheet1 == sheet_id:0
+             */
+
+        // MesOperations:I66:L66
+        gridRange.setSheetId(sheets.getSheetId("MesOperations")); https://stackoverflow.com/questions/52934537/how-to-use-sheet-id-in-google-sheets-api/66575843#66575843
+            /* cellule a unmergé
+                MesOpérations:I66:L66
+                MesOpérations:I108:L108
+                MesOpérations:I169:L169
+                MesOpérations:I182:L182
+                MesOpérations:I194:L194
+                MesOpérations:I201:L201
+            */
+
+        gridRange.setStartColumnIndex(8);
+        gridRange.setEndColumnIndex(13);
+        gridRange.setStartRowIndex(65);
+        gridRange.setEndRowIndex(202);
+        unmerge.setRange(gridRange);
+        Request r = new Request();
+        r.setUnmergeCells(unmerge);
+        sheets.applyRequest(Arrays.asList(r));
+    }
+
     private void fixGoogleFinanceBug(GDriveSheets sheets, Reporting reporting, SheetValues monPortefeuille) throws Exception {
         SheetValues.CellXY[] range = monPortefeuille.getCellsRange();
         List<Row> googleFinanceFcts = monPortefeuille.getValues().stream()
@@ -153,6 +194,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                         return newRow;
                                                     }).collect(Collectors.toList());
         sheets.update(reporting, "MonPortefeuille!N"+range[0].getRowNumber()+":O"+range[1].getRowNumber(), googleFinanceFcts);
+
+        UnmergeCellsRequest unmerge = new UnmergeCellsRequest();
+
     }
 
     @Override

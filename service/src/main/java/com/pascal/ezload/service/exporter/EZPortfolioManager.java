@@ -2,6 +2,7 @@ package com.pascal.ezload.service.exporter;
 
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
@@ -10,6 +11,8 @@ import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EZPortfolioManager {
 
@@ -63,13 +66,14 @@ public class EZPortfolioManager {
         }
     }
 
-    private void connect(Reporting reporting, EzProfil ezProfil) throws IOException, GeneralSecurityException {
+    private void connect(Reporting reporting, EzProfil ezProfil) throws Exception {
         Sheets service;
         try {
             EZPortfolioSettings ezPortfolioSettings = ezProfil.getEzPortfolio();
             reporting.info("Connection à votre EZPortfolio: "+ ezPortfolioSettings.getEzPortfolioUrl());
             service = GDriveConnection.getService(reporting, ezPortfolioSettings.getGdriveCredsFile());
             sheets = new GDriveSheets(service, ezPortfolioSettings.getEzPortfolioUrl());
+            sheets.init(reporting);
         }
         catch(Exception e){
             reporting.error("Impossible de se connecter à Google Drive. Vérifiez votre fichier de sécurité Google Drive");

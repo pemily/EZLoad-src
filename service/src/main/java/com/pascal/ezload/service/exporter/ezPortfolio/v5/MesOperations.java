@@ -98,7 +98,7 @@ public class MesOperations  {
         // donc je ne prends pas la colonne date, mais je déduis la date a partir du fichier stocké dans ezPortfolio
         // mais si je n'ai pas de fichier, (pour une initialisation de Date de Départ par exemple) dans ce cas je prends la colonne date
         if (latestRow.getValueStr(SOURCE_FILE_COL).equals("")){
-            return Optional.of(latestRow.getValueDate(DATE_COL));
+            return Optional.ofNullable(latestRow.getValueDate(DATE_COL));
         }
         return Optional.of(latestRow.getValueStr(SOURCE_FILE_COL)).map(BourseDirectDownloader::getDateFromPdfFilePath);
     }

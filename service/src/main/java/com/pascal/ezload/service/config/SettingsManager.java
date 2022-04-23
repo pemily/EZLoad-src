@@ -359,7 +359,10 @@ public class SettingsManager {
     }
 
     public static String getDownloadDir(EzProfil ezProfil, EnumEZBroker brCourtier) {
-        return ezProfil.getDownloadDir()+ File.separator+brCourtier.getDirName();
+        String dirStr = ezProfil.getDownloadDir()+ File.separator+brCourtier.getDirName();
+        File dir = new File(dirStr);
+        if (!dir.exists()) dir.mkdirs();
+        return dirStr;
     }
 
 }
