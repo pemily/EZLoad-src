@@ -4,3 +4,9 @@
 
 
 
+# Nécéssite Java pour fonctionner
+
+* [Pour windows](https://www.oracle.com/java/technologies/downloads/#jdk18-windows)
+* [Pour Mac](https://www.oracle.com/java/technologies/downloads/#jdk18-mac)
+* [Pour Linux](https://www.oracle.com/java/technologies/downloads/#jdk18-linux)
+
