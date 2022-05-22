@@ -25,31 +25,48 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <!-- Create the main jar -->
                     <execution>
+                        <id>main-jar</id>
+                        <!-- Create the main jar -->
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.pascal.ezload.server.EZLoad</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <descriptors>
+                                <descriptor>single-jar-assembly.xml</descriptor>
+                            </descriptors>
+                            <finalName>EZLoad-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>final-zip</id>
+                        <!-- Create the main jar -->
+                        <phase>install</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>final-zip-assembly.xml</descriptor>
+                            </descriptors>
+                            <finalName>EZLoad-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.pascal.ezload.server.EZLoad</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <descriptors>
-                        <descriptor>main-assembly.xml</descriptor>
-                    </descriptors>
-                    <finalName>EZLoad-${project.version}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
             </plugin>
-            <!-- end of Create the main jar -->
+
 
             <!-- Generate checksum -->
             <plugin>
@@ -57,6 +74,7 @@
                 <artifactId>checksum-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <phase>install</phase>
                         <goals>
                             <goal>artifacts</goal>
                         </goals>
@@ -74,10 +92,10 @@
                             <target>
                                 <mkdir dir="${basedir}/../release/${project.version}" />
                                 <copy todir="${basedir}/../release/${project.version}">
-                                    <fileset dir="${project.build.directory}" includes="EZLoad*" />
+                                    <fileset dir="${project.build.directory}" includes="EZLoad*.zip*" />
                                 </copy>
                                 <copy todir="${basedir}/../release/${project.version}">
-                                    <fileset dir="${project.build.directory}/classes" includes="*" />
+                                    <fileset dir="${project.build.directory}/classes" includes="ReadMe.md" />
                                 </copy>
                             </target>
                         </configuration>
