@@ -12,6 +12,7 @@ Merge develop on main branch
 * git add . 
 * git commit -m "Set version X.Y"
 * git push
+* create a release on github 
 
 Create new version in develop
 * git checkout develop
