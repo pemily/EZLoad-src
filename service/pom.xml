@@ -133,10 +133,10 @@
     </build>
 
     <dependencies>
-        <dependency>
+        <!--<dependency>
             <groupId>com.pascal.ezload</groupId>
             <artifactId>ezGithub-api</artifactId>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
