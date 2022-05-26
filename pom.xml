@@ -1,3 +1,22 @@
+<!--
+
+    EZLoadRoot - ${project.description}
+    Copyright © ${year} EMILY Pascal (pascal.emily@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -5,13 +24,14 @@
     <groupId>com.pascal.ezload</groupId>
     <artifactId>EZLoadRoot</artifactId>
     <version>1.1-SNAPSHOT</version>
-        <!--
-            Pour changer la version et le faire dans tous les sous modules:
-                mvn versions:set -DnewVersion=2.0-SNAPSHOT
-                mvn versions:commit # pour supprimer les fichiers backup du pom.xml
-        -->
-    <packaging>pom</packaging>
+    <description>EZLoad an automatic loader for EZPortfolio</description>
 
+    <!--
+        Pour changer la version et le faire dans tous les sous modules:
+            mvn versions:set -DnewVersion=2.0-SNAPSHOT
+            mvn versions:commit # pour supprimer les fichiers backup du pom.xml
+    -->
+    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,7 +41,7 @@
     </properties>
 
     <modules>
-        <module>github-api</module>
+        <!-- <module>github-api</module> -->
         <module>service</module>
         <module>server</module>
         <module>client</module>
@@ -34,6 +54,50 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.1</version>
+                <executions>
+                    <execution>
+                        <id>check-copyright-headers</id>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <properties>
+                        <owner>EMILY Pascal</owner>
+                        <email>pascal.emily@gmail.com</email>
+                    </properties>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header>
+                            <excludes>
+                                <exclude>**/README</exclude>
+                                <exclude>**/src/test/resources/**</exclude>
+                                <exclude>**/src/main/resources/**</exclude>
+                                <exclude>**/src/main/javacc21/**</exclude>
+                                <exclude>**/client/src/main/javacc21/**</exclude>
+                                <exclude>**/client/build/**</exclude>
+                                <exclude>**/client/node_modules/**</exclude>
+                                <exclude>**/target/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
+                    <failIfMissing>true</failIfMissing>
+                    <failIfUnknown>true</failIfUnknown>
+                    <quiet>false</quiet>
+                    <mapping>
+                        <java>JAVADOC_STYLE</java>
+                        <tsx>SLASHSTAR_STYLE</tsx>
+                        <ts>SLASHSTAR_STYLE</ts>
+                        <scss>SCSS_STYLE</scss>
+                    </mapping>
+                </configuration>
             </plugin>
         </plugins>
 

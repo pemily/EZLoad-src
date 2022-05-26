@@ -90,6 +90,7 @@
                         <phase>install</phase>
                         <configuration>
                             <target>
+                                <delete dir="${basedir}/../release/${project.version}"/>
                                 <mkdir dir="${basedir}/../release/${project.version}" />
                                 <copy todir="${basedir}/../release/${project.version}">
                                     <fileset dir="${project.build.directory}" includes="EZLoad*.zip*" />
