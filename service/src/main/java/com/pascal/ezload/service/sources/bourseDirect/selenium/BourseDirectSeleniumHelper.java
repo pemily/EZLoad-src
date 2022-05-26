@@ -32,7 +32,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
     public void login(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
         super.init(currentChromeVersion, newDriverPathSaver, mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
         try(Reporting rep = reporting.pushSection("Login")) {
-            get("https://www.boursedirect.fr/fr/login");
+            goTo("https://www.boursedirect.fr/fr/login");
 
             try {
                 // reject cookies
@@ -69,12 +69,14 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
                     Sleep.waitSeconds(1);
                 }
             } while (!connected);
+
+            waitPageLoaded();
         }
     }
 
 
-    protected void goToAvisOperes() {
-        get("https://www.boursedirect.fr/priv/avis-operes.php");
+    protected void goToAvisOperes() throws Exception {
+        goTo("https://www.boursedirect.fr/priv/avis-operes.php");
     }
 
 }

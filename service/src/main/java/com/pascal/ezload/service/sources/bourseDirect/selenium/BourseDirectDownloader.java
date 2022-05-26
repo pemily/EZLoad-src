@@ -129,8 +129,8 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         }
     }
 
-    private void goToMonth(String cptIndex, Month month){
-        get("https://www.boursedirect.fr/priv/avis-operes.php?tr=RO&nc="+cptIndex+"&month="+ month.getMonth()+"&year="+ month.getYear());
+    private void goToMonth(String cptIndex, Month month) throws Exception {
+        goTo("https://www.boursedirect.fr/priv/avis-operes.php?tr=RO&nc="+cptIndex+"&month="+ month.getMonth()+"&year="+ month.getYear());
     }
 
     private String selectAccount(BourseDirectEZAccountDeclaration account) {

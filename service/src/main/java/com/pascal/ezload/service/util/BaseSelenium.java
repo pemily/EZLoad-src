@@ -109,11 +109,13 @@ public class BaseSelenium {
         return driver;
     }
 
-    public void get(String url) {
+    public void goTo(String url) throws Exception {
         reporting.info("Get Page "+url);
 
         //launching the specified URL
         driver.get(url);
+
+        waitUrlIs(url);
     }
 
     public List<WebElement> getAllElements(String element, String className){
@@ -141,12 +143,17 @@ public class BaseSelenium {
         return driver.findElement(By.xpath("//a[contains(@href, '"+hrefSubstring+"')]"));
     }
 
-    public void waitUrlIsNot(String url){
+    public void waitUrlIsNot(String url) throws TimeoutException {
         reporting.info("Waiting that url is no more: "+url);
         new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
-    public void waitPageLoaded(){
+    public void waitUrlIs(String url) throws TimeoutException {
+        reporting.info("Waiting that url is: "+url);
+        new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.urlToBe(url));
+    }
+
+    public void waitPageLoaded() throws TimeoutException {
         reporting.info("Waiting page is loaded");
         new WebDriverWait(driver, defaultTimeoutInSec).until(
                 webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
@@ -162,6 +169,23 @@ public class BaseSelenium {
         if (!element.isEnabled())
             throw new SeleniumError("The element is not clickable");
         element.click();
+    }
+
+
+    public <T> T retryOnError(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
+        try {
+            return fct.get();
+        }
+        catch(Exception e){
+            if (n == 0){
+                reporting.info("Relance maximum atteinte");
+                throw e;
+            }
+            reporting.info("Delai dépassé. attendre 10 secondes... puis relance");
+            Sleep.waitSeconds(10);
+            reporting.info("Relance n°: "+n);
+            return retryOnError(reporting, n - 1, fct);
+        }
     }
 
 

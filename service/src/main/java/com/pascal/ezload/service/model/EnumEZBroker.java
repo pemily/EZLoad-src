@@ -2,10 +2,6 @@ package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
-import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 public enum EnumEZBroker implements BrokerData {
     BourseDirect("Bourse Direct", "BourseDirect");
