@@ -38,7 +38,6 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.List;
@@ -216,7 +215,6 @@ public class RulesVersionManager {
         return FileState.NO_CHANGE;
     }
 
-    @NotNull
     private String getGitFilePath(String abosluteFilePath) throws IOException {
         if (! abosluteFilePath.startsWith(ezRepoDir))
             throw new IOException("Bad file path: "+ abosluteFilePath +" not in "+ezRepoDir);
