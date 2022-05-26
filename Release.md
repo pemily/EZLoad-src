@@ -6,7 +6,7 @@ To create a new version:
 
 Merge develop on main branch
 * mvn versions:set `fill the new version (without -SNAPSHOT)`
-* mvn install
+* mvn clean install
 * git add . 
 * git commit -m "New version X.Y"
 * git push
