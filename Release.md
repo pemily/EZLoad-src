@@ -1,4 +1,4 @@
-#How to create a new vresion
+#How to create a new version
 
 develop branch has a -SNAPSHOT version
 
