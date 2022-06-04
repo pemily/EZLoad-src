@@ -19,9 +19,18 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 public class SystemFunction {
 
+    private final VariableResolver variableResolver;
+
+    public SystemFunction(VariableResolver variableResolver) {
+        this.variableResolver = variableResolver;
+    }
+
     // Pour faire planter une rule si on detecte un probleme dedans
     public void error(String errorMsg){
         throw new RuntimeException(errorMsg);
     }
 
+    public boolean isDefined(String variableName){
+        return variableResolver.has(variableName);
+    }
 }

@@ -25,27 +25,38 @@ import java.util.Optional;
 
 public class CountryUtil {
 
+    // https://documentation.abes.fr/sudoc/formats/CodesPays.htm
     private static List<EZCountry> countries = Arrays.asList(
-            new EZCountry("DE", "Allemagne"),
-            new EZCountry("GB", "Angleterre"),
-            new EZCountry("AU", "Australie"),
             new EZCountry("AT", "Autriche"),
+            new EZCountry("AU", "Australie"),
             new EZCountry("BE", "Belgique"),
             new EZCountry("CA", "Canada"),
-            new EZCountry("ES", "Espagne"),
-            new EZCountry("US", "Etats-Unis"),
-            new EZCountry("FI", "Finlande"),
-            new EZCountry("FR", "France"),
-            new EZCountry("HK", "Hong-Kong"),
-            new EZCountry("IE", "Irlande"),
-            new EZCountry("IT", "Italie"),
-            new EZCountry("LU", "Luxembourg"),
-            new EZCountry("NO", "Norvège"),
-            new EZCountry("NL", "Pays-Bas"),
-            new EZCountry("PT", "Portugal"),
             new EZCountry("CH", "Suisse"),
             new EZCountry("CN", "Chine"),
-            new EZCountry("JP", "Japon")
+            new EZCountry("DE", "Allemagne"),
+            new EZCountry("DK", "Danemark"),
+            new EZCountry("EE", "Estonie"),
+            new EZCountry("ES", "Espagne"),
+            new EZCountry("FI", "Finlande"),
+            new EZCountry("FR", "France"),
+            new EZCountry("GB", "Angleterre"),
+            new EZCountry("HK", "Hong-Kong"),
+            new EZCountry("IE", "Irlande"),
+            new EZCountry("IN", "Inde"),
+            new EZCountry("IS", "Islande"),
+            new EZCountry("IT", "Italie"),
+            new EZCountry("JP", "Japon"),
+            new EZCountry("KR", "Corée"),
+            new EZCountry("LT", "Lituanie"),
+            new EZCountry("LU", "Luxembourg"),
+            new EZCountry("LV", "Lettonie"),
+            new EZCountry("NL", "Pays-Bas"),
+            new EZCountry("NO", "Norvège"),
+            new EZCountry("PT", "Portugal"),
+            new EZCountry("SE", "Suède"),
+            new EZCountry("TW", "Taiwan"),
+            new EZCountry("US", "Etats-Unis"),
+            new EZCountry("ZA", "Afrique du Sud")
     );
 
     public static EZCountry foundByCode(String code) throws BRException {
@@ -58,4 +69,3 @@ public class CountryUtil {
         return optDevise.orElseThrow(() -> new BRException("Country with code: "+name+" not found"));
     }
 }
-

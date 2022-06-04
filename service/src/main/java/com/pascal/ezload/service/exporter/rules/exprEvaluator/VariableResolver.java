@@ -17,9 +17,7 @@
  */
 package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.jexl3.JexlContext;
 
@@ -42,7 +40,7 @@ public class VariableResolver  implements JexlContext {
     @Override
     public Object get(String name) {
         if (name.equals(VARIABLE_SYSTEM_NAME)){
-            return new SystemFunction();
+            return new SystemFunction(this);
         }
         // search if the variable is a in the allVariables map
         String v = allVariables.get(name);

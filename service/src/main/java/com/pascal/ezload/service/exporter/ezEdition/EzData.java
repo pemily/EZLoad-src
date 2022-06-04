@@ -53,9 +53,9 @@ public class EzData {
     @JsonIgnore
     public void put(EzDataKey key, String value){
         String val = value == null ? "" : value;
-        if (containsKey(key.getName()) && !Objects.equals(val, get(key)))
-            throw new RuntimeException("There is already a variable with this key: "+key+" current Value:"
-                    +get(key)+" new Value: "+val);
+        if (containsKey(key.getName()) && !Objects.equals(val, get(key))) {
+            throw new RuntimeException("There is already a variable with this key: " + key + " new Value: " + val+ "  EZData is: "+data.toString());
+        }
         this.data.put(key.getName(), val);
     }
 
