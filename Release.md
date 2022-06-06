@@ -4,6 +4,9 @@ develop branch has a -SNAPSHOT version
 
 To create a new version:
 
+* Complete the history in file exec/src/main/resources/ReadMe.md
+* Commit and Push on develop
+
 Merge develop on main branch
 * git checkout main
 * git merge origin/develop

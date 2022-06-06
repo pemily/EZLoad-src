@@ -41,9 +41,14 @@ export interface ConfigProps {
   saveStartDate: (date: string, account: BourseDirectEZAccountDeclaration) => void;
 }        
 
-const branchName = `Le nom de la branche doit être unique sur https://github.com/pemily/EZLoad. Ce nom est utile si vous souhaitez sauvegarder vos ajouts et modifications des règles.
+const githubHelp = `Le nom de la branche doit être unique sur https://github.com/pemily/EZLoad. 
+Ce nom est utile si vous souhaitez sauvegarder vos ajouts et modifications des règles.
 
-Il n'y a aucune données personnelle dans les rêgles, mais vous pouvez aider les autres qui en aurait besoin`
+
+#### Pour obtenir votre accessToken, creer un compte sur github et allez sur: https://github.com/settings/tokens
+- Cliquez sur Generate new token.
+- Dans note, mettre EZLoad
+- Ne cocher que **public_repo**, Generate token`
 
 const calculAnnualDividendsInfo = `Pour calculer la Colonne ***L*** dans MonPortefeuille
 
@@ -334,7 +339,7 @@ export function Config(props: ConfigProps) {
                         <Box direction="row" margin={{left:'medium', top:'none', bottom: 'none'}}>
                             <TextField id="bourseDirectLogin" label="Identifiant de votre compte BourseDirect" value={props?.bourseDirectAuthInfo?.username}                                
                                 readOnly={props.readOnly}
-                                onChange={newValue => savePassword('BourseDirect', newValue, "***", props.bourseDirectAuthInfoSetter)}/> {/* Ici le *** doit etre la meme valeur que la classe: SecurityHandler.BAD_PASSWORD */}
+                                onChange={newValue => savePassword('BourseDirect', newValue, props?.bourseDirectAuthInfo?.password, props.bourseDirectAuthInfoSetter)}/>
                             <TextField id="bourseDirectPasswd" label="Mot de passe " isPassword={true} value={props?.bourseDirectAuthInfo?.password}
                                 readOnly={props.readOnly}
                                 onChange={newValue => newValue && savePassword('BourseDirect', props?.bourseDirectAuthInfo?.username, newValue, props.bourseDirectAuthInfoSetter)}/>
@@ -471,13 +476,13 @@ export function Config(props: ConfigProps) {
                     { props.mainSettings.ezLoad?.admin?.showRules && (
                         <>
                             <Box direction="row" justify="start">
-                                    <Heading level="5" self-align="start">Compte</Heading>
-                                    <Help isInfo={true} title="info">
-                                        <Box border={{ color: 'brand', size: 'large' }} pad="medium">
-                                            <Markdown>{ branchName }</Markdown>
-                                        </Box>
-                                    </Help>
-                                </Box>                    
+                                <Heading level="5" self-align="start">Compte</Heading>
+                                <Help isInfo={true} title="info">
+                                    <Box border={{ color: 'brand', size: 'large' }} pad="medium">
+                                        <Markdown>{ githubHelp }</Markdown>
+                                    </Box>
+                                </Help>
+                            </Box>                    
                             <Box direction="column" margin="small">
                                 <TextField id="ezBranchName" label="Nom de branche" value={props.mainSettings.ezLoad?.admin?.branchName}
                                     isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.brancheName}
@@ -506,6 +511,19 @@ export function Config(props: ConfigProps) {
                                             }
                                     }, props.mainSettingsStateSetter)}/>
 
+                                <TextField id="ezAccessTokenId" label="Github AccessToken" value={props.mainSettings.ezLoad?.admin?.accessToken}
+                                    isRequired={true} errorMsg={props.mainSettings.ezLoad?.admin?.field2ErrorMsg?.accessToken}
+                                    readOnly={props.readOnly}
+                                    onChange={newValue  => saveMainSettings(
+                                        { ...props.mainSettings,
+                                            ezLoad: {
+                                                ...props.mainSettings.ezLoad,
+                                                admin: {
+                                                    ...props.mainSettings.ezLoad?.admin,
+                                                    accessToken: newValue
+                                                }
+                                            }
+                                    }, props.mainSettingsStateSetter)}/>
                             </Box>
                         </> ) }
                 </Form>

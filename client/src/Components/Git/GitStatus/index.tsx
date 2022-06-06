@@ -58,7 +58,13 @@ export function GitStatus(props: GitStatusProps){
                 { gitVisible &&
                     (
                     <Layer full position="center" margin="large" animation="slide" onEsc={onClose} onClickOutside={onClose} >                        
-                        { changes.length == 0 && ( <Heading alignSelf="center" level="5">Aucun changement dans les rêgles</Heading> ) }
+                        { changes.length == 0 && ( 
+                                <Box direction="column" fill > 
+                                    <Heading alignSelf="center" level="5">Aucun changement dans les rêgles</Heading> 
+                                    <Anchor alignSelf='center' margin="small" label='Fermer' onClick={() => onClose()}/>
+                                </Box>
+                            )
+                        }
 
                         { changes.length > 0 && ( <Heading alignSelf="center" level="5">Vos changements</Heading> ) }
 
@@ -73,7 +79,10 @@ export function GitStatus(props: GitStatusProps){
                                                 onClick={() =>                                                                     
                                                                 jsonCall(ezApi.git.push({message: "Message"}))
                                                                 .then(r => onOpen)
-                                                                .then(r => alert("Merci d'avoir partagé vos modifications. Elles seront analysé et intégré dans une prochaine version"))                                                                
+                                                                .then(r => {
+                                                                    setChanges([]);
+                                                                    alert("Merci d'avoir partagé vos modifications. Elles seront analysé et intégré dans une prochaine version");
+                                                                })
                                                                 .catch(e => console.error(e))
                                                             }
                                             />
@@ -93,7 +102,7 @@ export function GitStatus(props: GitStatusProps){
                                         )
                                     }
                                 </Box>
-                                <Box fill>
+                                <Box fill margin="small">
                                     <TextArea resize={false} fill readOnly={true} value={selectedChange?.replaceAll('\t', '    ')}/>       
 
                                     <Box alignSelf='end' direction="row">
@@ -141,9 +150,8 @@ export function GitStatus(props: GitStatusProps){
                                                     }
                                         }}/> 
                                         )}
-                                        <Anchor margin="small" label='Close' onClick={() => onClose()}/>
-                                        
-                                    </Box>                                
+                                        <Anchor alignSelf='center' margin="small" label='Fermer' onClick={() => onClose()}/>
+                                    </Box>                                                                    
                                 </Box>
                             </Box> ) }
                     </Layer>

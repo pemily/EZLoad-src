@@ -51,16 +51,6 @@ public class AuthManager {
         this.authFilePath = authFilePath;
     }
 
-    public AuthInfo getAuthWithoutPassword(EnumEZBroker courtier) throws Exception {
-        Data data = loadFile(authFilePath);
-        AuthInfo info = data.getInfo().get(courtier);
-        if (info == null) return null;
-        AuthInfo result = new AuthInfo();
-        result.setUsername(info.getUsername());
-        result.setPassword(""); // to not send the password to the browser
-        return result;
-    }
-
     public AuthInfo getAuthInfo(EnumEZBroker courtier) throws Exception {
         Data data = loadFile(authFilePath);
         AuthInfo info = data.getInfo().get(courtier);

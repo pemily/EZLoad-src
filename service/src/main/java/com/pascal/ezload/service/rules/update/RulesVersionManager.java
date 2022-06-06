@@ -49,8 +49,6 @@ public class RulesVersionManager {
     private static String owner = "pemily";
     private static String repo = "EZLoad";
     private static String originBranch = "EZLoad-1.0";
-    private static String accessToken = "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";  // extracted from https://github.com/settings/tokens/801639196
-                                                                                    // Le token ne doit avoir que l'access: public_repo
 
 
     // la doc officiel openapi de github: https://github.com/github/rest-api-description
@@ -151,6 +149,11 @@ public class RulesVersionManager {
         }
     }
 
+    private void renameLocalGitBranch(String localBranch) throws GitAPIException {
+        // renomme la branche courrante si elle a changer dans la configuration
+        git.branchRename().setNewName(localBranch).call();
+    }
+
     private void initIfNeeded() throws IOException {
         if (new File(ezRepoDir+File.separator+".git").exists()) {
             if (this.git == null)
@@ -161,8 +164,10 @@ public class RulesVersionManager {
     }
 
     // if success true, false if nothing to commit
-    public boolean commitAndPush(String authorEmail, String commitMessage) throws IOException, GitAPIException {
+    public boolean commitAndPush(String authorEmail, String localBranch, String commitMessage) throws IOException, GitAPIException {
         initIfNeeded();
+        renameLocalGitBranch(localBranch);
+
         git.add()
                 .addFilepattern(".")
                 .setUpdate(false) // take also the new files
@@ -174,9 +179,11 @@ public class RulesVersionManager {
                     .setMessage(commitMessage)
                     .call();
 
+            // extracted from https://github.com/settings/tokens
+            // Le token ne doit avoir que l'access: public_repo
             git.push()
                     // ici dans authorName, on peut mettre n'importe quoi, sauf "", ce n'est pas pris en compte, c'est le token qui compte
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorEmail, accessToken))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorEmail, mainSettings.getEzLoad().getAdmin().getAccessToken()))
                     .setForce(true)
                     .call();
         }

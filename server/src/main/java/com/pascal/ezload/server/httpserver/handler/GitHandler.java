@@ -75,6 +75,6 @@ public class GitHandler {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
         new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
-                .commitAndPush(mainSettings.getEzLoad().getAdmin().getEmail(), message);
+                .commitAndPush(mainSettings.getEzLoad().getAdmin().getEmail(), mainSettings.getEzLoad().getAdmin().getBranchName(), message);
     }
 }
