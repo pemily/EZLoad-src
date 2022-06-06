@@ -28,22 +28,26 @@ public class DeviseUtil {
     // https://en.wikipedia.org/wiki/Currency
 
     private static List<EZDevise> devises = Arrays.asList(
-            new EZDevise("USD", "$"),
-            new EZDevise("EUR", "€"),
-            new EZDevise("JPY", "¥"),
-            new EZDevise("GBP", "£"),
-            new EZDevise("GBX", "£"), // non present sur le site, mais ezportfolio utilse gbx
             new EZDevise("AUD", "A$"),
             new EZDevise("CAD", "C$"),
             new EZDevise("CHF", "CHF"),
             new EZDevise("CNY", "元"),
+            new EZDevise("DKK", "Kr"),
+            new EZDevise("EUR", "€"),
+            new EZDevise("GBP", "£"),
+            new EZDevise("GBX", "£"), // non present sur le site, mais ezportfolio utilse gbx
             new EZDevise("HKD", "HK$"),
+            new EZDevise("INR", "₹"),
+            new EZDevise("ISK", "krona"), // cette monaie n'a pas de symbol court
+            new EZDevise("JPY", "¥"),
+            new EZDevise("KRW", "₩"),
+            new EZDevise("NOK", "Kr"),
             new EZDevise("NZD", "NZ$"),
             new EZDevise("SEK", "kr"),
-            new EZDevise("KRW", "₩"),
             new EZDevise("SGD", "S$"),
-            new EZDevise("NOK", "Kr"),
-            new EZDevise("DKK", "Kr")
+            new EZDevise("TWD", "NT$"),
+            new EZDevise("USD", "$"),
+            new EZDevise("ZAR", "R")
             );
 
 
@@ -51,6 +55,5 @@ public class DeviseUtil {
         Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getCode().equals(code)).findFirst();
         return optDevise.orElseThrow(() -> new BRException("Devise with code: "+code+" not found"));
     }
-
 
 }

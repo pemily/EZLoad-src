@@ -37,7 +37,6 @@ import org.checkerframework.checker.units.qual.A;
 
 @Path("security")
 public class SecurityHandler {
-    private static String BAD_PASSWORD = "***";
 
     @Inject
     private ProcessManager processManager;
@@ -59,7 +58,7 @@ public class SecurityHandler {
         else {
             authInfo.setUsername(authParam.getUsername());
 
-            if (!StringUtils.isBlank(authParam.getPassword()) && !BAD_PASSWORD.equals(authParam.getPassword())){
+            if (!StringUtils.isBlank(authParam.getPassword()) && !isBadPassword(authParam.getPassword())){
                 authInfo.setPassword(authParam.getPassword());
             }
             authManager.saveAuthInfo(courtier, authInfo);
@@ -74,13 +73,13 @@ public class SecurityHandler {
         MainSettings mainSettings = settingsManager.loadProps().validate();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
-        AuthInfo result = authManager.getAuthWithoutPassword(courtier);
+        AuthInfo result = authManager.getAuthInfo(courtier);
         if (result == null){
             result = new AuthInfo();
-            result.setPassword("");
+            result.setUsername("");
             result.setPassword("");
         }
-        else result.setPassword(BAD_PASSWORD);
+        else result.setPassword(genBadPassword(result.getPassword().length()));
         return result;
     }
 
@@ -106,5 +105,18 @@ public class SecurityHandler {
                         reporting.error("Il y a une erreur soit avec votre fichier de sécurité, soit avec votre url EZPortfolio");
                     }
                 });
+    }
+
+    // is bad if it contains only * characters
+    private boolean isBadPassword(String pwd){
+        return pwd.chars().allMatch(c -> c == '*');
+    }
+
+    private String genBadPassword(int length){
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i <length; i++){
+            s.append("*");
+        }
+        return s.toString();
     }
 }

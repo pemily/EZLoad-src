@@ -1,16 +1,21 @@
-#How to create a new vresion
+#How to create a new version
 
 develop branch has a -SNAPSHOT version
 
 To create a new version:
 
+* Complete the history in file exec/src/main/resources/ReadMe.md
+* Commit and Push on develop
+
 Merge develop on main branch
 * git checkout main
-* git merge origin/develop* mvn versions:set `fill the new version (without -SNAPSHOT)`
+* git merge origin/develop
+* mvn versions:set `fill the new version (without -SNAPSHOT)`
 * mvn clean install
 * git add . 
 * git commit -m "Set version X.Y"
 * git push
+* create a release on github 
 
 Create new version in develop
 * git checkout develop

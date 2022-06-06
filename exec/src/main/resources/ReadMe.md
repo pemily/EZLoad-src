@@ -5,6 +5,13 @@
 
 ## Historique 
 
+### Version 1.2
+* Ajout de plusieurs MarketPlaces, pays & devises manquants
+* Correction pour avoir une fonction qui teste l'existence d'une variable: isDefined
+* Dans configuration, ajout de l'access Token pour github
+* Dans configuration, correction du nom de branche qui n'etait pas renommé
+
+
 ### Version 1.1
 * Correction pour améliorer la stabilité du téléchargement des rélévés d'informations de BourseDirect 
 

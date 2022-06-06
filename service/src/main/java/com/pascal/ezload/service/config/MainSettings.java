@@ -225,11 +225,12 @@ public class MainSettings {
     }
 
     public static class Admin extends Checkable<Admin>{
-        enum Field {branchName, email}
+        enum Field {branchName, email, accessToken}
 
         private boolean showRules;
         private String branchName;
         private String email;
+        private String accessToken;
 
         public boolean isShowRules() {
             return showRules;
@@ -254,15 +255,25 @@ public class MainSettings {
         public void setEmail(String email) {
             this.email = email;
         }
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
 
         @Override
         public Admin validate() {
             new StringValue(this, Admin.Field.branchName.name(), branchName)
                     .checkRequired()
-                    .validateWithForbidenValues("admin", "release", "alpha", "beta", "git", ".git");
+                    .validateWithForbidenValues("admin", "release", "alpha", "beta", "git", ".git", "main", "develop", "master");
             new StringValue(this, Field.email.name(), email)
                     .checkRequired()
                     .validateEmail();
+            new StringValue(this, Field.accessToken.name(), accessToken)
+                    .checkRequired();
             return this;
         }
     }

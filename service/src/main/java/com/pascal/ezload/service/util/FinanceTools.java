@@ -80,7 +80,7 @@ public class FinanceTools {
                 List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
                 if (data.size() == 0) return null;
                 if (data.size() > 1) {
-                    reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1èere est sélectionné. Vérifié: "+url);
+                    reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
                 }
                 EZAction action = new EZAction();
                 Map<String, Object> actionData = data.get(0);
@@ -120,7 +120,7 @@ public class FinanceTools {
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("quotes");
             if (quotes.size() == 0) return null;
             if (quotes.size() > 1) {
-                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1èere est sélectionné. Vérifié: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
@@ -148,7 +148,7 @@ public class FinanceTools {
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("data");
             if (quotes.size() == 0) return null;
             if (quotes.size() > 1) {
-                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionTicker + ". La 1èere est sélectionné. Vérifié: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionTicker + ". La 1ère est sélectionné. Vérifié: "+url);
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
