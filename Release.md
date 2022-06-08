@@ -9,7 +9,8 @@ To create a new version:
 
 Merge develop on main branch
 * git checkout main
-* git merge origin/develop
+* git fetch
+* git merge origin/develop `Sur les conflits prendre tous les theirs (develop)`
 * mvn versions:set `fill the new version (without -SNAPSHOT)`
 * mvn clean install
 * git add . 
