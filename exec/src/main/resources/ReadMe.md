@@ -5,6 +5,9 @@
 
 ## Historique 
 
+### Version 1.3
+* Corrige un bug sur les devises
+
 ### Version 1.2
 * Ajout de plusieurs MarketPlaces, pays & devises manquants
 * Correction pour avoir une fonction qui teste l'existence d'une variable: isDefined
