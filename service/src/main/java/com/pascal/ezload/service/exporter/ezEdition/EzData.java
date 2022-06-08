@@ -94,4 +94,8 @@ public class EzData {
     public String generateId(){
         return this.data.hashCode()+"";
     }
+
+    public String toString(){
+        return this.data.toString();
+    }
 }

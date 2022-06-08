@@ -115,7 +115,7 @@ public class RulesEngine {
                 }
             }
             catch(Exception e){
-                reporting.error(e);
+                reporting.error("Opération en erreur: "+operation+ " avec les data: "+ezData, e);
                 ezEdition.setEzOperationEditions(new LinkedList<>());
                 ezEdition.setEzPortefeuilleEditions(new LinkedList<>());
                 ezEdition.getErrors().add("Il y a eu une erreur de transformation pour cette opération");
@@ -158,7 +158,7 @@ public class RulesEngine {
         }
         else{
             // a stupid action just to have the variables list when creating a new rule
-            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("", ""), new EZDevise("", ""));
+            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("", ""));
             EZAction action = new EZAction();
             action.setMarketPlace(marketPlace);
             action.fill(data);

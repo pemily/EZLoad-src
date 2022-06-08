@@ -28,16 +28,14 @@ public class EZMarketPlace implements MarketPlaceData {
     private String acronym;
     private EZCountry country;
     private String googleFinanceCode;
-    private EZDevise currency;
 
-    public EZMarketPlace(String stockExchange, String city, String mic, String acronym, String googleFinanceCode, EZCountry country, EZDevise currency) {
+    public EZMarketPlace(String stockExchange, String city, String mic, String acronym, String googleFinanceCode, EZCountry country) {
         this.stockExchange = stockExchange;
         this.city = city;
         this.mic = mic;
         this.acronym = acronym;
         this.googleFinanceCode = googleFinanceCode;
         this.country = country;
-        this.currency = currency;
     }
 
     public String getStockExchange() {
@@ -60,10 +58,6 @@ public class EZMarketPlace implements MarketPlaceData {
         return country;
     }
 
-    public EZDevise getCurrency() {
-        return currency;
-    }
-
     public String getGoogleFinanceCode() {
         return googleFinanceCode;
     }
@@ -76,7 +70,5 @@ public class EZMarketPlace implements MarketPlaceData {
         data.put(market_countryCode, country.getCode());
         data.put(market_country, country.getName());
         data.put(market_googleCode, googleFinanceCode);
-        data.put(market_currencyCode, currency.getCode());
-        data.put(market_currencySymbol, currency.getSymbol());
     }
 }
