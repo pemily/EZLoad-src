@@ -28,11 +28,12 @@ public class MarketPlaceUtil {
     // and http://www.iotafinance.com/en/ISO-10383-Market-Identification-Codes-MIC.html
     // and https://www.google.com/googlefinance/disclaimer/
     // http://factiva.com/CP_Developer/ProductHelp/FDK/FDK33/shared_elements/table_exchange.htm
-    // Pour la devise, je l'ai remplis moi meme
-    // https://www.sport-histoire.fr/Geographie/Monnaies.php
 
     // https://www.iotafinance.com/en/Detail-view-MIC-code-XNGS.html
     private static List<EZMarketPlace> markets = Arrays.asList(
+
+            // Le stockExchange, La City, et l'acronym ne sont pas utilisé
+            // Je les garde pour information
             new EZMarketPlace("New York Stock Exchange", "New York City", "XNYS",  "NYSE", "NYSE", CountryUtil.foundByCode("US")),
             new EZMarketPlace("Nasdaq", "New York City", "XNAS", "NASDAQ", "NASDAQ", CountryUtil.foundByCode("US")),
             new EZMarketPlace("Nasdaq/Ngs", "New York City", "XNGS", "NGS", "NASDAQ", CountryUtil.foundByCode("US")),
@@ -53,6 +54,7 @@ public class MarketPlaceUtil {
             new EZMarketPlace("London Stock Exchange", "London", "XLON", "LSE", "LON", CountryUtil.foundByCode("GB")),
             new EZMarketPlace("Toronto Stock Exchange", "Toronto", "XTSE", "TSX", "TSE", CountryUtil.foundByCode("CA")),
             new EZMarketPlace("Deutsche Börse", "Frankfurt", "XFRA", null, "FRA", CountryUtil.foundByCode("DE")),
+            new EZMarketPlace("Deutsche Börse", "Frankfurt", "XETR", null, "ETR", CountryUtil.foundByCode("DE")),
             new EZMarketPlace("Bolsa de Madrid", "Madrid", "XMAD", null, "BME", CountryUtil.foundByCode("ES")),
 
             // new EZMarketPlace("Euronext", "Dublin", "XMSM", "ISE MSM", null, CountryUtil.foundByCode("IE")),
@@ -76,8 +78,8 @@ public class MarketPlaceUtil {
 
 
     public static EZMarketPlace foundByMic(String mic) throws BRException {
-        Optional<EZMarketPlace> optDevise = markets.stream().filter(d -> d.getMic().equals(mic)).findFirst();
-        return optDevise.orElseThrow(() -> new BRException("Market Place with mic: "+mic+" not found"));
+        Optional<EZMarketPlace> optMarketPlace = markets.stream().filter(d -> d.getMic().equals(mic)).findFirst();
+        return optMarketPlace.orElseThrow(() -> new BRException("Market Place with mic: "+mic+" not found"));
     }
 
 
