@@ -5,6 +5,9 @@
 
 ## Historique 
 
+### Version 1.4
+* Ajout de la bourse de Francfort, code XETR
+
 ### Version 1.3
 * Corrige un bug sur les devises
 
