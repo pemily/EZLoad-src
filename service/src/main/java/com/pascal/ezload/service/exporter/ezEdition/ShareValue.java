@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.exporter.ezEdition;
 
+import com.pascal.ezload.service.model.EnumEZBroker;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -26,15 +27,19 @@ public class ShareValue {
 
     private String tickerCode; // Correspond a la colonne Ticker Google Finance dans MonPortefeuille
     private String userShareName; // can be null if it is not yet filled
+    private String ezAccountType; // PEA, CTO, etc.
+    private EnumEZBroker broker; // bourseDirect
     private boolean isDirty; // vrai si depuis la derniere analyse, le user a changé le nom
 
     public ShareValue(){}
-    public ShareValue(String tickerCode, String userShareName, boolean isDirty){
+    public ShareValue(String tickerCode, String ezAccountType, EnumEZBroker broker, String userShareName, boolean isDirty){
         this.tickerCode = tickerCode;
         this.userShareName = userShareName;
         this.isDirty = isDirty;
+        this.broker = broker;
+        this.ezAccountType = ezAccountType;
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
-            this.userShareName = "Liquidité";
+            this.userShareName = "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
         }
         else if (StringUtils.isBlank(userShareName)){
             this.isDirty = true; // on n'accepte pas de valeur vide
@@ -45,16 +50,20 @@ public class ShareValue {
         return tickerCode;
     }
 
-    public void setTickerCode(String tickerCode) {
-        this.tickerCode = tickerCode;
-    }
-
     public String getUserShareName() {
         return userShareName;
     }
 
     public void setUserShareName(String userShareName) {
         this.userShareName = userShareName;
+    }
+
+    public EnumEZBroker getBroker() {
+        return broker;
+    }
+
+    public String getEzAccountType() {
+        return ezAccountType;
     }
 
     public boolean isDirty() {
@@ -70,12 +79,11 @@ public class ShareValue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ShareValue that = (ShareValue) o;
-        return tickerCode.equals(that.tickerCode);
+        return tickerCode.equals(that.tickerCode) && ezAccountType.equals(that.ezAccountType) && broker.equals(that.broker);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tickerCode);
+        return Objects.hash(tickerCode, ezAccountType, broker);
     }
-
 }

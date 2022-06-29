@@ -43,7 +43,7 @@ public class BourseDirect2EZModel {
     
     public EZModel create(String sourceFile, EZAccountDeclaration EZAccountDeclaration, BourseDirectModel model) throws IOException {
         reporting.info("Creating Standard Model...");
-        EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, model.getBrokerFileVersion(), BourseDirectAnalyser.getSourceRef(ezProfil, sourceFile));
+        EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, model.getBrokerFileVersion(), ezProfil.getSourceRef(sourceFile));
         ezModel.setReportDate(model.getDateAvisOperation());
 
         EZAccount EZAccount = new EZAccount();

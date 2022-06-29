@@ -17,12 +17,22 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 public class EZDate {
-    private int day;
-    private int month;
-    private int year;
+    private final int day;
+    private final int month;
+    private final int year;
+
+    public EZDate(String dateValue){
+        // for json deserialization
+        EZDate d = parseFrenchDate(dateValue, '/');
+        day = d.getDay();
+        month = d.getMonth();
+        year = d.getYear();
+    }
 
     // month => between 1 - 12
     // day => between 1 - 31
@@ -69,6 +79,7 @@ public class EZDate {
         }
     }
 
+    @JsonIgnore
     public boolean isValid(){
         // here => check that the dd is between 1 and 31
         // here => check that the mm is between 1 and 12

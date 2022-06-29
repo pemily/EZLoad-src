@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -31,10 +33,15 @@ import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2EZM
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
+import com.pascal.ezload.service.sources.jsonSource.JsonSource;
 import com.pascal.ezload.service.util.FileProcessor;
+import com.pascal.ezload.service.util.JsonUtil;
 import com.pascal.ezload.service.util.PdfTextExtractor;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,7 +61,7 @@ public class BourseDirectAnalyser {
     }
 
     public List<String> getFilesNotYetLoaded(Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
-        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> getSourceRef(ezProfil, pdfFilePath)));
+        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> ezProfil.getSourceRef(pdfFilePath)));
     }
 
     public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
@@ -69,18 +76,18 @@ public class BourseDirectAnalyser {
             reporting.info("Répertoire des fichiers à analyser: "+downloadDir);
               return new FileProcessor(downloadDir,
                                         BourseDirectDownloader.dirFilter(ezProfil), BourseDirectDownloader.fileFilter())
-                    .mapFile(pdfFilePath -> {
-                        EZAccountDeclaration account = bourseDirectDownloader.getAccountFromPdfFilePath(pdfFilePath);
-                        EZDate pdfDate = BourseDirectDownloader.getDateFromPdfFilePath(pdfFilePath);
+                    .mapFile(filePath -> {
+                        EZAccountDeclaration account = bourseDirectDownloader.getAccountFromFilePath(filePath);
+                        EZDate fileDate = BourseDirectDownloader.getDateFromFilePath(filePath);
 
                         if (account != null
-                                && pdfDate != null
-                                && !ezPortfolioProxy.isFileAlreadyLoaded(EnumEZBroker.BourseDirect, account, pdfDate)
+                                && fileDate != null
+                                && !ezPortfolioProxy.isFileAlreadyLoaded(EnumEZBroker.BourseDirect, account, fileDate)
                                 && account.isActive()) {
-                            // if the pdf file is valid, and is not yet processed
+                            // if the file is valid, and is not yet processed
                             // start its analysis
                             try {
-                                return process.execute(account, pdfFilePath);
+                                return process.execute(account, filePath);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -90,35 +97,37 @@ public class BourseDirectAnalyser {
         }
     }
 
-    public EZModel start(Reporting reporting, EZAccountDeclaration EZAccountDeclaration, String pdfFilePath) throws IOException {
-        try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, pdfFilePath))){
+    public EZModel start(Reporting reporting, EZAccountDeclaration ezAccountDeclaration, String filePath) throws IOException {
+        try(Reporting ignored = reporting.pushSection((rep1, fileLinkCreator) -> rep1.escape("Fichier en cours d'analyse: ") + fileLinkCreator.createSourceLink(rep1, filePath))){
 
-            List<String> errors = new LinkedList<>();
-            try {
-                PdfTextExtractor extractor = new PdfTextExtractor(reporting, pdfFilePath);
-                PdfTextExtractor.Result pdfText = extractor.process();
+            if (filePath.endsWith(".pdf")){
+                List<String> errors = new LinkedList<>();
+                try {
+                    BourseDirectModel model = genModelFromPdf(reporting, filePath);
+                    errors = new BourseDirectModelChecker(reporting, model).searchErrors();
 
-                BourseDirectModel model = new BourseDirectText2Model(reporting).toModel(pdfText);
-
-                errors = new BourseDirectModelChecker(reporting, model).searchErrors();
-
-                if (errors.size() == 0) {
-                    return new BourseDirect2EZModel(ezProfil, reporting).create(pdfFilePath, EZAccountDeclaration, model);
+                    if (errors.size() == 0) {
+                        return new BourseDirect2EZModel(ezProfil, reporting).create(filePath, ezAccountDeclaration, model);
+                    }
+                } catch (Exception e) {
+                    reporting.error("Erreur pendant l'analyze", e);
+                    errors.add("Erreur pendant l'analyze: " + e.getMessage());
                 }
+                EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, ezProfil.getSourceRef(filePath));
+                ezModel.setErrors(errors);
+                return ezModel;
+
             }
-            catch(Exception e){
-                reporting.error("Erreur pendant l'analyze", e);
-                errors.add("Erreur pendant l'analyze: "+e.getMessage());
+            else {
+                return JsonSource.genModelFromJson(reporting, ezProfil, ezAccountDeclaration, filePath);
             }
-            EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, getSourceRef(ezProfil, pdfFilePath));
-            ezModel.setErrors(errors);
-            return ezModel;
         }
     }
 
-    public static String getSourceRef(EzProfil ezProfil, String pdfFilePath) {
-        String file = pdfFilePath.substring(ezProfil.getDownloadDir().length()).replace('\\', '/');
-        if (file.startsWith("/")) file = file.substring(1);
-        return file;
+    private BourseDirectModel genModelFromPdf(Reporting reporting, String filePath) throws IOException {
+        PdfTextExtractor extractor = new PdfTextExtractor(reporting, filePath);
+        PdfTextExtractor.Result pdfText = extractor.process();
+        return new BourseDirectText2Model(reporting).toModel(pdfText);
     }
+
 }

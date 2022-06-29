@@ -19,6 +19,7 @@ package com.pascal.ezload.service.exporter.ezEdition.data.common;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
+import com.pascal.ezload.service.model.EnumEZBroker;
 
 public interface MonPortefeuilleData {
 
@@ -36,5 +37,5 @@ public interface MonPortefeuilleData {
     EzDataKey ezPortfolio_portefeuille_annualDividend = new EzDataKey("ezMonPortefeuilleDividendeAnnuel", "Le dividende annuel présent dans ezPortfolio.MonPortefeuille pour la valeur en cours d'édition");
 
 
-    void fill(EzData data, String share);
+    void fill(EzData data, String share, String accountType, EnumEZBroker broker);
 }

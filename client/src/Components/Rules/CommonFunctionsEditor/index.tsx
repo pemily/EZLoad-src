@@ -27,7 +27,30 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 export interface CommonFunctionsEditorProps {    
     readOnly: boolean;    
-    broker: "BourseDirect";
+    broker: | "Autre"
+    | "Axa"
+    | "Binck"
+    | "BNP"
+    | "BourseDirect"
+    | "Boursorama"
+    | "CreditAgricole"
+    | "CreditDuNord"
+    | "CreditMutuel"
+    | "DeGiro"
+    | "eToro"
+    | "Fortuneo"
+    | "Freetrade"
+    | "GFX"
+    | "INGDirect"
+    | "InteractiveBroker"
+    | "LCL"
+    | "LynxBroker"
+    | "NominatifPur"
+    | "SaxoBanque"
+    | "SocieteGenerale"
+    | "TradeRepublic"
+    | "Trading212"
+    | "Revolut";
     brokerFileVersion: number;  
 }      
 
@@ -58,7 +81,30 @@ export function CommonFunctionsEditor(props: CommonFunctionsEditorProps){
         });
     };
 
-    const loadCommonFunctions = (broker: "BourseDirect", brokerFileVersion: number) : Promise<any> => {        
+    const loadCommonFunctions = (broker: | "Autre"
+    | "Axa"
+    | "Binck"
+    | "BNP"
+    | "BourseDirect"
+    | "Boursorama"
+    | "CreditAgricole"
+    | "CreditDuNord"
+    | "CreditMutuel"
+    | "DeGiro"
+    | "eToro"
+    | "Fortuneo"
+    | "Freetrade"
+    | "GFX"
+    | "INGDirect"
+    | "InteractiveBroker"
+    | "LCL"
+    | "LynxBroker"
+    | "NominatifPur"
+    | "SaxoBanque"
+    | "SocieteGenerale"
+    | "TradeRepublic"
+    | "Trading212"
+    | "Revolut", brokerFileVersion: number) : Promise<any> => {        
         setBusy(true);
         return jsonCall(ezApi.rule.getCommonFunction(broker, brokerFileVersion))
         .then(c => {

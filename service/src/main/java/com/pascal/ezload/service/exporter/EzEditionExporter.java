@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.exporter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;

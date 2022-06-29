@@ -20,11 +20,11 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.util.StringUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -38,7 +38,6 @@ public class ExplorerHandler {
 
     @GET
     @Path("/file")
-    @Produces("application/pdf")
     public Response SourceFile(@NotNull @QueryParam("source") String sourceFile) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
@@ -55,7 +54,9 @@ public class ExplorerHandler {
             input.close();
         };
         Response.ResponseBuilder responseBuilder = Response.ok(output);
-        responseBuilder.type("application/pdf");
+        String[] fileWithExtension = StringUtils.divide(sourceFile, '.');
+        if (fileWithExtension.length == 2) responseBuilder.type("application/"+fileWithExtension[1]);
+        else responseBuilder.type("application/stream");
         responseBuilder.header("Content-Disposition", "filename=\"" + sourceFile + "\"");
         return responseBuilder.build();
     }

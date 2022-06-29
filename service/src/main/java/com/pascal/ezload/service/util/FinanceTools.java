@@ -18,8 +18,10 @@
 package com.pascal.ezload.service.util;
 
 import com.google.api.client.json.gson.GsonFactory;
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.*;
@@ -45,10 +47,10 @@ public class FinanceTools {
     private final Map<String, EZAction> actionCode2BRAction = new HashMap<>();
 
 
-    public EZAction get(Reporting reporting, String actionCode, ShareUtil shareUtil){
+    public EZAction get(Reporting reporting, String actionCode, String accountType, EnumEZBroker broker, ShareUtil shareUtil, EzData ezData){
         EZAction result = actionCode2BRAction.computeIfAbsent(actionCode, code -> {
             try {
-                return searchActionFromBourseDirect(reporting, code);
+                return searchActionFromBourseDirect(reporting, code, broker, ezData);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -59,12 +61,12 @@ public class FinanceTools {
         // re-apply the name outside of the cache, because the user can have changed the name
         String name = shareUtil.getEzName(result.getEzTicker());
         result.setEzName(name == null ? result.getRawName() : name);
-        shareUtil.createIfNeeded(result.getEzTicker(), result.getEzName());
+        shareUtil.createIfNeeded(result.getEzTicker(), accountType, broker, result.getEzName());
         result.setPruCellReference(shareUtil.getPRUReference(result.getEzTicker()));
         return result;
     }
 
-    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode) throws IOException {
+    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode, EnumEZBroker broker, EzData ezData) throws IOException {
         if (StringUtils.isBlank(actionCode) || actionCode.contains(" ") || actionCode.length() > 16)
             throw new BRException("Erreur, cette information ne semble par être une action: "+actionCode);
 
@@ -79,11 +81,16 @@ public class FinanceTools {
                 Map<String, Object> instruments = (Map<String, Object>) top.get("instruments");
                 List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
                 if (data.size() == 0) return null;
+                Map<String, Object> actionData = null;
+                if (data.size() == 1) actionData = data.get(0);
                 if (data.size() > 1) {
-                    reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
+                    actionData = broker.getImpl().searchActionInDifferentMarket(data, ezData)
+                            .orElseGet(() -> {
+                                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
+                                return data.get(0);
+                            });
                 }
                 EZAction action = new EZAction();
-                Map<String, Object> actionData = data.get(0);
                 action.setRawName((String) actionData.get("name")); // WP CAREY INC
                 action.setTicker((String) actionData.get("ticker")); // WPC
                 action.setIsin((String) actionData.get("isin")); // US92936U1097

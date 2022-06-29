@@ -81,6 +81,13 @@ public class EzProfil extends Checkable<EzProfil> {
         this.dividendCalendar = dividendCalendar;
     }
 
+    public String getSourceRef(String filePath) {
+        String file = filePath.substring(this.getDownloadDir().length()).replace('\\', '/');
+        if (file.startsWith("/")) file = file.substring(1);
+        return file;
+    }
+
+
     public EzProfil validate(){
         new FileValue(this, Field.courtierCredFile.name(), courtierCredsFile).checkRequired().checkFile();
         new FileValue(this, Field.downloadDir.name(), downloadDir).checkRequired().checkDirectory();

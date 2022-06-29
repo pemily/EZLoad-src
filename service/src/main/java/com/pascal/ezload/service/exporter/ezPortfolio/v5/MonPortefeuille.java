@@ -23,6 +23,7 @@ import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.MonPortefeuilleData;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -79,47 +80,47 @@ public class MonPortefeuille implements MonPortefeuilleData {
 
     public MonPortefeuille(SheetValues portefeuille) {
         this.portefeuille = portefeuille;
-        if (portefeuille.getValues() != null && StringUtils.isBlank(portefeuille.getValues().get(0).getValueStr(TICKER_COL))){
-            // if there is no row in the sheet, add the liquidity row immediately  to have it at first row
-            createRow(ShareValue.LIQUIDITY_CODE);
-        }
     }
 
     public SheetValues getSheetValues(){
         return portefeuille;
     }
 
-    public Optional<Row> searchRow(String tickerCode){
-        return this.portefeuille.getValues().stream().filter(r -> Objects.equals(r.getValueStr(TICKER_COL), tickerCode)).findFirst();
+    public Optional<Row> searchRow(String tickerCode, String accountType, EnumEZBroker broker){
+        return this.portefeuille.getValues().stream()
+                .filter(r -> Objects.equals(r.getValueStr(TICKER_COL), tickerCode)
+                            && Objects.equals(r.getValueStr(ACCOUNT_TYPE_COL), accountType)
+                            && Objects.equals(r.getValueStr(BROKER_COL), broker.getEzPortfolioName())
+                )
+                .findFirst();
     }
 
     public Set<ShareValue> getShareValues(){
-        Set<ShareValue> result = this.portefeuille.getValues().stream()
-                .filter(r -> r.getValueStr(TICKER_COL) != null)
-                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(VALEUR_COL), false))
+        return this.portefeuille.getValues().stream()
+                .filter(r -> StringUtils.isNotBlank(r.getValueStr(TICKER_COL)))
+                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL), false))
                 .collect(Collectors.toSet());
-        return result;
     }
 
-    private Row createRow(String tickerCode){
+    private Row createRow(String tickerCode, String accountType, EnumEZBroker broker){
         // je cherche la 1ere ligne blanche avant celle qui a la valeur TOTAL
         Optional<Row> row = this.portefeuille.getValues().stream()
                 .filter(r -> StringUtils.isBlank(r.getValueStr(TICKER_COL))
                             || Objects.equals(r.getValueStr(VALEUR_COL), TOTAL_MARKER)).findFirst();
-        if (!row.isPresent()) throw new IllegalStateException("Impossible de trouver une nouvelle ligne dans 'MonPortefeuille'");
+        if (row.isEmpty()) throw new IllegalStateException("Impossible de trouver une nouvelle ligne dans 'MonPortefeuille'");
         if (Objects.equals(row.get().getValueStr(VALEUR_COL), TOTAL_MARKER)) throw new IllegalStateException("Il n'y a plus de ligne disponible dans MonPortefeuille pour la nouvelle valeur: "+tickerCode);
         row.get().setValue(TICKER_COL, tickerCode);
+        row.get().setValue(ACCOUNT_TYPE_COL, accountType);
+        row.get().setValue(BROKER_COL, broker.getEzPortfolioName());
         return row.get();
     }
 
     public void apply(EzPortefeuilleEdition ezPortefeuilleEdition) {
-        Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getTickerGoogleFinance());
-        Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getTickerGoogleFinance()));
+        Optional<Row> rowOpt = searchRow(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getAccountType(), ezPortefeuilleEdition.getBroker());
+        Row row = rowOpt.orElseGet(() -> createRow(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getAccountType(), ezPortefeuilleEdition.getBroker()));
         int rowNumber = row.getRowNumber();
 
         row.setValue(VALEUR_COL, ezPortefeuilleEdition.getValeur());
-        row.setValue(ACCOUNT_TYPE_COL, ezPortefeuilleEdition.getAccountType());
-        row.setValue(BROKER_COL, ezPortefeuilleEdition.getBroker());
         row.setValue(COUNTRY_COL, ezPortefeuilleEdition.getCountry());
         row.setValue(SECTOR_COL, ezPortefeuilleEdition.getSector());
         row.setValue(INDUSTRY_COL, ezPortefeuilleEdition.getIndustry());
@@ -165,8 +166,8 @@ public class MonPortefeuille implements MonPortefeuilleData {
         return retryIfError(n-1,"IFERROR("+function+";"+function+")");
     }
 
-    public void fill(EzData data, String tickerCode){
-        Optional<Row> rowOpt = searchRow(tickerCode);
+    public void fill(EzData data, String tickerCode, String accountType, EnumEZBroker broker){
+        Optional<Row> rowOpt = searchRow(tickerCode, accountType, broker);
         if (rowOpt.isPresent()) {
             Row row = rowOpt.get();
             data.put(ezPortfolio_portefeuille_share, row.getValueStr(VALEUR_COL));
@@ -193,7 +194,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
             data.put(ezPortfolio_portefeuille_deduction40, "");
             data.put(ezPortfolio_portefeuille_type, "");
             data.put(ezPortfolio_portefeuille_costPriceUnit, "");
-            data.put(ezPortfolio_portefeuille_quantity, "");
+            data.put(ezPortfolio_portefeuille_quantity, "0"); // init a 0 car on fait des operations quantity - debit
             data.put(ezPortfolio_portefeuille_annualDividend, "");
         }
     }
@@ -202,15 +203,15 @@ public class MonPortefeuille implements MonPortefeuilleData {
         return new MonPortefeuille(portefeuille.createDeepCopy());
     }
 
-    public Optional<EzPortefeuilleEdition> createFrom(String ticker) {
-        return searchRow(ticker)
+    public Optional<EzPortefeuilleEdition> createFrom(ShareValue shareValue) {
+        return searchRow(shareValue.getTickerCode(), shareValue.getEzAccountType(), shareValue.getBroker())
                 .map(row -> {
                     EzPortefeuilleEdition ezPortefeuilleEdition = new EzPortefeuilleEdition();
 
-                    ezPortefeuilleEdition.setTickerGoogleFinance(ticker);
+                    ezPortefeuilleEdition.setTickerGoogleFinance(shareValue.getTickerCode());
                     ezPortefeuilleEdition.setValeur(row.getValueStr(VALEUR_COL));
                     ezPortefeuilleEdition.setAccountType(row.getValueStr(ACCOUNT_TYPE_COL));
-                    ezPortefeuilleEdition.setBroker(row.getValueStr(BROKER_COL));
+                    ezPortefeuilleEdition.setBroker(EnumEZBroker.getFomEzName(row.getValueStr(BROKER_COL)));
                     ezPortefeuilleEdition.setCountry(row.getValueStr(COUNTRY_COL));
                     ezPortefeuilleEdition.setSector(row.getValueStr(SECTOR_COL));
                     ezPortefeuilleEdition.setIndustry(row.getValueStr(INDUSTRY_COL));

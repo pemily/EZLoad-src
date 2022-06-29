@@ -23,8 +23,7 @@ import com.pascal.ezload.service.util.LoggerReporting;
 import com.pascal.ezload.service.util.ModelUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExpressionEvaluatorTest {
 
@@ -171,5 +170,29 @@ public class ExpressionEvaluatorTest {
         ezdata.put(new EzDataKey("varOne"), "2988,36");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "-varOne", ezdata);
         assertEquals("-2988,36", result);
+    }
+
+
+    @Test
+    public void testVariableIsNotDefined(){
+        EzData ezdata = new EzData();
+        boolean result = ExpressionEvaluator.getSingleton().evaluateAsBoolean(new LoggerReporting(), "ez.isDefined('varOne') && varOne != 0", ezdata);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testVariableIsDefined(){
+        EzData ezdata = new EzData();
+        ezdata.put(new EzDataKey("varOne"), "0");
+        boolean result = ExpressionEvaluator.getSingleton().evaluateAsBoolean(new LoggerReporting(), "ez.isDefined('varOne') && varOne != 0", ezdata);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testVariableIsDefinedAndNotZero(){
+        EzData ezdata = new EzData();
+        ezdata.put(new EzDataKey("varOne"), "1000");
+        boolean result = ExpressionEvaluator.getSingleton().evaluateAsBoolean(new LoggerReporting(), "ez.isDefined('varOne') && varOne != 0", ezdata);
+        assertTrue(result);
     }
 }

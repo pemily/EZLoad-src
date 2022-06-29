@@ -38,7 +38,6 @@ public class ModelUtils {
         // example:
         //    +1 248.43 => 1248,43
         // maximum 6 number after the comma
-
         if (result.startsWith("+")){
             result = result.substring(1);
         }

@@ -17,11 +17,9 @@
  */
 package com.pascal.ezload.service.util;
 
-import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPortfolio;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
-
+import com.pascal.ezload.service.model.EnumEZBroker;
 
 import java.util.Optional;
 import java.util.Set;
@@ -29,45 +27,49 @@ import java.util.Set;
 public class ShareUtil {
 
     private final Set<ShareValue> shareValues;
-    private final PRU pru;
 
-    public ShareUtil(PRU pru, Set<ShareValue> shareValues) {
+    public ShareUtil(Set<ShareValue> shareValues) {
         this.shareValues = shareValues;
-        this.pru = pru;
     }
 
     public String getEzName(String ezTicker) {
-        return getShareValue(ezTicker).map(ShareValue::getUserShareName).orElse(null);
-    }
-
-    public String getEzLiquidityName() {
-        return shareValues.stream()
-                .filter(s -> s.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
-                .findFirst()
-                .map(ShareValue::getUserShareName)
-                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", false).getUserShareName());
-    }
-
-    private Optional<ShareValue> getShareValue(String ezTicker){
         return shareValues.stream()
                 .filter(s -> s.getTickerCode().equals(ezTicker))
+                .findFirst()
+                .map(ShareValue::getUserShareName).orElse(null);
+    }
+
+    public String getEzLiquidityName(String ezAccountType, EnumEZBroker broker) {
+        return shareValues.stream()
+                .filter(s -> s.getTickerCode().equals(ShareValue.LIQUIDITY_CODE)
+                        && s.getBroker().equals(broker)
+                        && s.getEzAccountType().equals(ezAccountType))
+                .findFirst()
+                .map(ShareValue::getUserShareName)
+                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, ezAccountType, broker, "", false).getUserShareName());
+    }
+
+    public Optional<ShareValue> getShareValue(String ezTicker, String ezAccountType, EnumEZBroker broker){
+        return shareValues.stream()
+                .filter(s -> s.getTickerCode().equals(ezTicker)
+                    && s.getEzAccountType().equals(ezAccountType)
+                    && s.getBroker().equals(broker)
+                )
                 .findFirst();
     }
 
     public String getPRUReference(String ezTicker){
-        Optional<ShareValue> shareVal = getShareValue(ezTicker);
+        String userShareName = getEzName(ezTicker);
         // normally always present as we add it if not found (see createIfNeeded)
-        return shareVal.map(shareValue -> "=" + pru.getPRUCellReference(shareValue.getUserShareName()))
-                .orElse("");
+        return "=query(PRU!A$5:B; \"select B where A = '"+userShareName+"' limit 1\")";
     }
 
-    public void createIfNeeded(String ezTicker, String ezName) {
-        if (!getShareValue(ezTicker).isPresent()){
-            shareValues.add(new ShareValue(ezTicker, ezName, false));
-        }
-        String cellRef = pru.getPRUCellReference(ezName);
-        if (cellRef == null){
-            pru.newPRU(ezName);
+    public void createIfNeeded(String ezTicker, String ezAccountType, EnumEZBroker broker, String ezName) {
+        if (!getShareValue(ezTicker, ezAccountType, broker).isPresent()){
+            shareValues.add(new ShareValue(ezTicker, ezAccountType, broker, ezName, false));
         }
     }
 }
+
+
+

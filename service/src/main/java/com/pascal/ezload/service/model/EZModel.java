@@ -41,10 +41,18 @@ public class EZModel implements ReportData {
 
     private List<String> errors = new LinkedList<>();
 
+    public EZModel(){
+        // for json deserializer
+    }
+
     public EZModel(EnumEZBroker broker, int brokerFileVersion, String sourceFile){
         this.broker = broker;
         this.sourceFile = sourceFile;
         this.brokerFileVersion = brokerFileVersion;
+    }
+
+    public int getBrokerFileVersion() {
+        return brokerFileVersion;
     }
 
     public List<String> getErrors(){
@@ -57,10 +65,6 @@ public class EZModel implements ReportData {
 
     public EnumEZBroker getBroker() {
         return broker;
-    }
-
-    public void setBroker(EnumEZBroker broker) {
-        this.broker = broker;
     }
 
     public String getSourceFile() {

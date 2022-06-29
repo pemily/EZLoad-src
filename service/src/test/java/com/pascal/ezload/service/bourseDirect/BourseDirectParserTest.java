@@ -79,7 +79,7 @@ public class BourseDirectParserTest {
         TextReporting reporting = new TextReporting();
         BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-        ShareUtil shareUtil = new ShareUtil(new PRU(SheetValues.createFromRowLists("a1:a", new LinkedList<>())), new HashSet<>());
+        ShareUtil shareUtil = new ShareUtil(new HashSet<>());
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         mainSettings.setEzLoad(ezLoad);

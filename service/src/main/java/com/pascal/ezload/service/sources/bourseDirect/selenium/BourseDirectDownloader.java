@@ -42,17 +42,21 @@ import java.util.stream.Collectors;
 
 public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
-    public static final String BOURSE_DIRECT_PDF_PREFIX = "boursedirect-";
+    public static final String BOURSE_DIRECT_FILE_PREFIX = "boursedirect-";
     public static final String BOURSE_DIRECT_PDF_SUFFIX = ".pdf";
+    public static final String BOURSE_DIRECT_JSON_SUFFIX = ".json";
 
     public BourseDirectDownloader(Reporting reporting, MainSettings mainSettings, EzProfil ezProfil) {
         super(reporting, mainSettings, ezProfil);
     }
 
     public static Predicate<File> fileFilter(){
-        return file -> file.getName().startsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_PREFIX)
-                && file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_SUFFIX)
-                && getDateFromPdfFilePath(file.getName()) != null;
+        return file -> file.getName().startsWith(BourseDirectDownloader.BOURSE_DIRECT_FILE_PREFIX)
+                && (
+                        file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_PDF_SUFFIX)
+                    ||  file.getName().endsWith(BourseDirectDownloader.BOURSE_DIRECT_JSON_SUFFIX)
+                   )
+                && getDateFromFilePath(file.getName()) != null;
     }
 
     public static Predicate<File> dirFilter(EzProfil ezProfil){
@@ -86,7 +90,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
         for (BourseDirectEZAccountDeclaration account : bourseDirectSettings.getAccounts()) {
-            if (account.isActive()) {
+            if (account.isActive() && !account.getNumber().equalsIgnoreCase("N/A")) {
                 try (Reporting ignored = reporting.pushSection("PDF Extraction for account: " + account.getName())) {
 
                     Optional<EZDate> fromDateOpt = ezPortfolioProxy.getLastOperationDate(EnumEZBroker.BourseDirect, account);
@@ -247,14 +251,16 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                 + File.separator + account.getName() // if this change, review the method  getAccountNameFromPdfFilePath
                 + File.separator + d.getYear()
                 + File.separator +
-                BOURSE_DIRECT_PDF_PREFIX+d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX; // if this change, review the method getDateFromPdfFilePath
+                BOURSE_DIRECT_FILE_PREFIX +d.getYear()+"-"+month+"-"+day+BOURSE_DIRECT_PDF_SUFFIX; // if this change, review the method getDateFromPdfFilePath
     }
 
     // @TODO cette fonction devrait etre revu et deplacer dans une fonction plus générale, non lié au Profider.
-    public static EZDate getDateFromPdfFilePath(String pdfFilePath) {
+    public static EZDate getDateFromFilePath(String filePath) {
         try {
-            String s = new File(pdfFilePath).getName().substring(BOURSE_DIRECT_PDF_PREFIX.length());
-            String s2 = s.substring(0, s.length() - BOURSE_DIRECT_PDF_SUFFIX.length());
+            String s = new File(filePath).getName().substring(BOURSE_DIRECT_FILE_PREFIX.length());
+
+            int suffixLength = filePath.endsWith(BOURSE_DIRECT_PDF_SUFFIX) ? BOURSE_DIRECT_PDF_SUFFIX.length() : BOURSE_DIRECT_JSON_SUFFIX.length();
+            String s2 = s.substring(0, s.length() - suffixLength);
             String[] elem = s2.split("-");
             EZDate date = new EZDate(Integer.parseInt(elem[0]), Integer.parseInt(elem[1]), Integer.parseInt(elem[2]));
             if (date.isValid()) {
@@ -267,7 +273,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         return null;
     }
 
-    public BourseDirectEZAccountDeclaration getAccountFromPdfFilePath(String pdfFile){
+    public BourseDirectEZAccountDeclaration getAccountFromFilePath(String pdfFile){
         String[] section = pdfFile.replace('\\', '/') // for windows
                                     .split("/");
         String account = section.length >=3 ? section[section.length-3] : null; // the pdfFile is: /path/AccountDeclarationName/Year/file.pdf => extract the AccountDeclarationName

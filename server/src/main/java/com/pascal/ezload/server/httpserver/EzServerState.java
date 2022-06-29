@@ -32,7 +32,6 @@ public class EzServerState {
     private List<EzReport> ezReports = new LinkedList<>();
     private List<String> filesNotYetLoaded = new LinkedList<>();
     private Set<ShareValue> newShares = new HashSet<>(); // liste des nouvelles actions detecté dans les operations
-    private List<String> newPRUs = new LinkedList<>(); // liste des nouveaux PRUs detecté
 
     private EZPortfolioProxy ezPortfolioProxy; // cached, if null will be loaded from google drive, else clone it and use it
 
@@ -68,14 +67,6 @@ public class EzServerState {
         this.newShares = newShares;
     }
 
-    public List<String> getNewPRUs() {
-        return newPRUs;
-    }
-
-    public void setNewPRUs(List<String> newPRUs) {
-        this.newPRUs = newPRUs;
-    }
-
     public EZPortfolioProxy getEzPortfolioProxy() {
         return ezPortfolioProxy;
     }
@@ -90,6 +81,5 @@ public class EzServerState {
         ezReports = new LinkedList<>();
         filesNotYetLoaded = new LinkedList<>();
         newShares = new HashSet<>();
-        newPRUs = new LinkedList<>();
     }
 }

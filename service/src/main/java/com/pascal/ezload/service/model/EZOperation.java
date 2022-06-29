@@ -18,6 +18,7 @@
 package com.pascal.ezload.service.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
@@ -33,8 +34,12 @@ public final class EZOperation implements OperationData {
     private EZDate date;
     private ArrayList<String> designation;
     private Map<String, String> fields;
+
+    @JsonIgnore
     private EnumEZBroker broker;
+    @JsonIgnore
     private EZAccount account;
+    @JsonIgnore
     private EZAccountDeclaration ezAccountDeclaration;
 
     public EZDate getDate() {
@@ -113,5 +118,9 @@ public final class EZOperation implements OperationData {
 
     public void setFields(Map<String, String> fields) {
         this.fields = fields;
+    }
+
+    public Map<String, String> getFields(){
+        return fields; // this method is used to display the json format
     }
 }

@@ -19,15 +19,49 @@ package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
+import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectCustomCode;
+
+import java.util.Arrays;
 
 public enum EnumEZBroker implements BrokerData {
-    BourseDirect("Bourse Direct", "BourseDirect");
+    Autre("Autre", null, null),
+    Axa("Axa Banque", null, null),
+    Binck("Binck", null, null),
+    BNP("BNP Paribas", null, null),
+    BourseDirect("Bourse Direct", "BourseDirect", new BourseDirectCustomCode()),
+    Boursorama("Boursorama", null, null),
+    CreditAgricole("Crédit Agricole", null, null),
+    CreditDuNord("Crédit du Nord", null, null),
+    CreditMutuel("Crédit Mutuel", null, null),
+    DeGiro("De Giro", null, null),
+    eToro("eToro", null, null),
+    Fortuneo("Fortuneo", null, null),
+    Freetrade("Freetrade", null, null),
+    GFX("GFX", null, null),
+    INGDirect("ING Direct", null, null),
+    InteractiveBroker("Interactive Broker", null, null),
+    LCL("LCL", null, null),
+    LynxBroker("Lynx Broker", null, null),
+    NominatifPur("Nominatif pur", null, null),
+    SaxoBanque("Saxo Banque", null, null),
+    SocieteGenerale("Société Générale", null, null),
+    TradeRepublic("Trade Republic", null, null),
+    Trading212("Trading 212", null, null),
+    Revolut("Revolut", null, null);
 
-    private String ezPortfolioName, dirName;
+    private final BrokerCustomCode brokerCustomCode;
+    private final String ezPortfolioName, dirName;
 
-    EnumEZBroker(String ezPortfolioName, String dirName){
+    EnumEZBroker(String ezPortfolioName, String dirName, BrokerCustomCode brokerCustomCode){
         this.ezPortfolioName = ezPortfolioName;
         this.dirName = dirName;
+        this.brokerCustomCode = brokerCustomCode;
+    }
+
+    public static EnumEZBroker getFomEzName(String brokerEzName) {
+        return Arrays.stream(values()).filter(b -> b.getEzPortfolioName().equals(brokerEzName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(brokerEzName+" not found in the broker list"));
     }
 
     public String getEzPortfolioName(){
@@ -43,4 +77,7 @@ public enum EnumEZBroker implements BrokerData {
         // data.put(broker_dir, getDirName());
     }
 
+    public BrokerCustomCode getImpl() {
+        return brokerCustomCode;
+    }
 }

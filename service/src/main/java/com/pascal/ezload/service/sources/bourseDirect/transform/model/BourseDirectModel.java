@@ -21,9 +21,10 @@ package com.pascal.ezload.service.sources.bourseDirect.transform.model;
 import com.pascal.ezload.service.model.EZDate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BourseDirectModel {
-    private int version;
+    private int brokerFileVersion;
     private String accountNumber;
     private String accountType;
     private String accountOwnerName;
@@ -31,14 +32,18 @@ public class BourseDirectModel {
     private EZDate dateAvisOperation;
     private String deviseCredit;
     private String deviseDebit;
-    private ArrayList<BourseDirectOperation> operations;
+    private List<BourseDirectOperation> operations;
 
-    public BourseDirectModel(int version){
-        this.version = version;
+    public BourseDirectModel(){
+        // for json deserialisation
+    }
+
+    public BourseDirectModel(int brokerFileVersion){
+        this.brokerFileVersion = brokerFileVersion;
     }
 
     public int getBrokerFileVersion(){
-        return version;
+        return brokerFileVersion;
     }
 
     public String getAccountNumber() {
@@ -97,11 +102,11 @@ public class BourseDirectModel {
         this.deviseDebit = deviseDebit;
     }
 
-    public ArrayList<BourseDirectOperation> getOperations() {
+    public List<BourseDirectOperation> getOperations() {
         return operations;
     }
 
-    public void setOperations(ArrayList<BourseDirectOperation> operations) {
+    public void setOperations(List<BourseDirectOperation> operations) {
         this.operations = operations;
     }
 

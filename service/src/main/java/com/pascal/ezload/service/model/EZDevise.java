@@ -21,6 +21,10 @@ public class EZDevise {
     private String symbol; // $
     private String code; // USD
 
+    public EZDevise(){
+        // for json deserializer
+    }
+
     public EZDevise(String code, String symbol){
         this.code = code;
         this.symbol = symbol;
