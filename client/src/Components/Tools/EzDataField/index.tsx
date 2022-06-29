@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { useState } from "react";
-import { Box, Heading, Text, Button, Layer, DataTable, ColumnConfig } from "grommet";
+import { Accordion, AccordionPanel, Box, Heading, Text, Button, Layer, DataTable, ColumnConfig } from "grommet";
 import { CircleInformation, Tty } from 'grommet-icons';
 import { EzData } from '../../../ez-api/gen-api/EZLoadApi';
 
@@ -29,6 +29,7 @@ export interface EzSingleData {
 export interface EzDataProps {
   value: EzData | undefined;
   iconInfo: boolean;
+  jsonText?: string;
   onSelect?: (d: EzSingleData) => void
 } 
 
@@ -62,17 +63,29 @@ export function EzDataField(props: EzDataProps) {
               <Heading margin="small" level="4" color="brand">Données extraites</Heading>
               <Box overflow="auto">
                 { !props.value && (<Text alignSelf="center">Aucune données</Text>)}
-                { props.value && (<DataTable
-                  columns={columns}
-                  data={data}
-                  onClickRow={(event) => {                
-                    if (props.onSelect){ 
-                      props.onSelect(event.datum);
-                      setOpen(false);
-                    }
-                  }}/> )}
+                { props.value && 
+                    (
+                      <>
+                        <DataTable
+                          columns={columns}
+                          data={data}
+                          onClickRow={(event) => {                
+                            if (props.onSelect){ 
+                              props.onSelect(event.datum);
+                              setOpen(false);
+                            }}}
+                        />
+                        <Accordion margin="medium">
+                          <AccordionPanel label="Json Operation">
+                            <pre>
+                              {props.jsonText}
+                            </pre>
+                          </AccordionPanel>
+                        </Accordion>
+                      </> 
+                    )}
                 </Box>   
-                <Button margin="xsmall" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            
+                <Button margin="medium" alignSelf="center" size="small" label="Fermer" onClick={() => setOpen(false)} />            
             </Layer> 
           }
         </>)

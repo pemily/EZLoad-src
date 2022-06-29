@@ -78,7 +78,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public void fillFromMonPortefeuille(EzData data, String valeur) {
+    public void fillFromMonPortefeuille(EzData data, String valeur, String accountType, EnumEZBroker broker) {
         throw new NotImplementedException();
     }
 
@@ -88,22 +88,12 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public PRU getPRU() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<String> getNewPRUValues() {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public EZPortfolioProxy createDeepCopy() {
         return null;
     }
 
     @Override
-    public Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker) {
+    public Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue ticker) {
         return Optional.empty();
     }
 

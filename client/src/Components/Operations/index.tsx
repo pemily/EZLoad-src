@@ -44,7 +44,7 @@ export function Operations(props: OperationsProps){
                 {ignoreRule(index, operation)}
                 { !props.isDividendUpdate && props.showRules && 
                     (<Box direction="row" align="center" key={"operationAction"+index}>
-                        <EzDataField key={"OperationData"+index} value={operation!.data!} iconInfo={true}/>
+                        <EzDataField key={"OperationData"+index} value={operation!.data!} jsonText={operation!.operationInJsonFormat} iconInfo={true}/>
                         {createOrViewRule(index, operation)}
                         </Box>)}
             </Box> );

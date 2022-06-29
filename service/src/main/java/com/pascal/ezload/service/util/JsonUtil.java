@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class JsonUtil {
     private final static DefaultIndenter defaultIndenter = new DefaultIndenter("  ", "\n"); // tab with 2 spaces and \n instead of \n\r
 
-    public static ObjectWriter getDefaultWriter() {
+    public static ObjectWriter createDefaultWriter() {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
 
@@ -46,11 +47,19 @@ public class JsonUtil {
         return mapper.writer(prettyPrinter);
     }
 
-    public static ObjectMapper getDefaultMapper() {
+    public static ObjectMapper createDefaultMapper() {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
-
         ObjectMapper mapper = new ObjectMapper(jsonFactory);
+        return mapper;
+    }
+
+    public static ObjectMapper createLazyMapper(){
+        JsonFactory jsonFactory = new JsonFactory();
+        jsonFactory.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
+        ObjectMapper mapper = new ObjectMapper(jsonFactory);
+        mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
 }

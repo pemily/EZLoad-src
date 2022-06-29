@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { ezApi, jsonCall, textCall, ruleTitle, SelectedRule } from '../../../ez-api/tools';
-import { EzData, RuleDefinitionSummary, RuleDefinition, FileStatus } from '../../../ez-api/gen-api/EZLoadApi';
-import { Trash, Revert, Configure, Clipboard, DocumentStore, Command, Services, ClearOption, History } from 'grommet-icons';
+import { ezApi, jsonCall, textCall } from '../../../ez-api/tools';
+import { FileStatus } from '../../../ez-api/gen-api/EZLoadApi';
+import { Trash, Revert, History } from 'grommet-icons';
 
 import { useState } from "react";
 
@@ -33,7 +33,7 @@ export function GitStatus(props: GitStatusProps){
     const [gitVisible, setGitVisible] = useState(false);
     const [changes, setChanges] = useState<FileStatus[]>([]);      
     const [selectedFile, selectFile] = useState<FileStatus|undefined>(undefined);      
-    const [selectedChange, selectChange] = useState<string|undefined>(undefined);      
+    const [selectedChange, selectChange] = useState<string|undefined>(undefined);          
 
     const getState = (st: undefined | "NO_CHANGE" | "NEW" | "UPDATED" | "DELETED" | "CONFLICT") => {
         if (st === "NEW") return "(Nouveau)";
@@ -58,7 +58,7 @@ export function GitStatus(props: GitStatusProps){
                 { gitVisible &&
                     (
                     <Layer full position="center" margin="large" animation="slide" onEsc={onClose} onClickOutside={onClose} >                        
-                        { changes.length == 0 && ( 
+                        { changes.length === 0 && ( 
                                 <Box direction="column" fill > 
                                     <Heading alignSelf="center" level="5">Aucun changement dans les rêgles</Heading> 
                                     <Anchor alignSelf='center' margin="small" label='Fermer' onClick={() => onClose()}/>
@@ -78,11 +78,8 @@ export function GitStatus(props: GitStatusProps){
                                                 disabled={props.readOnly}
                                                 onClick={() =>                                                                     
                                                                 jsonCall(ezApi.git.push({message: "Message"}))
-                                                                .then(r => onOpen)
-                                                                .then(r => {
-                                                                    setChanges([]);
-                                                                    alert("Merci d'avoir partagé vos modifications. Elles seront analysé et intégré dans une prochaine version");
-                                                                })
+                                                                .then(pushResult => alert(pushResult.msg))
+                                                                .then(r => onOpen) // to reload the git data                                                                
                                                                 .catch(e => console.error(e))
                                                             }
                                             />

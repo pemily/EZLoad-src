@@ -118,6 +118,29 @@ export function strToBroker(brokerName: string | undefined) : 'BourseDirect'|und
   return undefined;
 }
 
-export function ruleToFilePath(filename: string, broker: "BourseDirect", /** @format int32 */ brokerFileVersion: number){
+export function ruleToFilePath(filename: string, broker: | "Autre"
+| "Axa"
+| "Binck"
+| "BNP"
+| "BourseDirect"
+| "Boursorama"
+| "CreditAgricole"
+| "CreditDuNord"
+| "CreditMutuel"
+| "DeGiro"
+| "eToro"
+| "Fortuneo"
+| "Freetrade"
+| "GFX"
+| "INGDirect"
+| "InteractiveBroker"
+| "LCL"
+| "LynxBroker"
+| "NominatifPur"
+| "SaxoBanque"
+| "SocieteGenerale"
+| "TradeRepublic"
+| "Trading212"
+| "Revolut", /** @format int32 */ brokerFileVersion: number){
   return broker+"_v"+brokerFileVersion+"/"+filename;
 }

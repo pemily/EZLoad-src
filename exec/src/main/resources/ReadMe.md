@@ -5,6 +5,13 @@
 
 ## Historique 
 
+### Version 1.5
+* Gestion de fichiers json pour créer des opérations manuellement
+* Affichage du json des opérations 
+* Gestion de plusieurs lignes de LIQUIDITE
+* Amélioration de la recherche du Ticker Google
+* Correction de bugs
+
 ### Version 1.4
 * Ajout de la bourse de Francfort, code XETR
 

@@ -17,13 +17,15 @@
  */
 package com.pascal.ezload.service.exporter.ezEdition;
 
+import com.pascal.ezload.service.model.EnumEZBroker;
+
 public class EzPortefeuilleEdition implements WithErrors {
 
     private String errors;
 
     private String valeur;
     private String accountType;
-    private String broker;
+    private EnumEZBroker broker;
     private String tickerGoogleFinance;
     private String country;
     private String sector;
@@ -57,11 +59,11 @@ public class EzPortefeuilleEdition implements WithErrors {
         this.accountType = accountType;
     }
 
-    public String getBroker() {
+    public EnumEZBroker getBroker() {
         return broker;
     }
 
-    public void setBroker(String broker) {
+    public void setBroker(EnumEZBroker broker) {
         this.broker = broker;
     }
 

@@ -21,7 +21,6 @@ public class EZPortfolio {
     private final String ezPortfolioVersion;
     private MesOperations mesOperations;
     private MonPortefeuille monPortefeuille;
-    private PRU pru;
 
     public EZPortfolio(String ezPortfolioVersion){
         this.ezPortfolioVersion = ezPortfolioVersion;
@@ -47,17 +46,8 @@ public class EZPortfolio {
         return ezPortfolioVersion;
     }
 
-    public PRU getPru() {
-        return pru;
-    }
-
-    public void setPru(PRU pru) {
-        this.pru = pru;
-    }
-
     public EZPortfolio createDeepCopy(){
         EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
-        copy.setPru(pru.createDeepCopy());
         copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
         copy.setMesOperations(mesOperations.createDeepCopy());
         return copy;

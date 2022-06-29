@@ -20,10 +20,12 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.rules.update.FileStatus;
+import com.pascal.ezload.service.rules.update.PushResult;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 import java.util.List;
@@ -71,10 +73,16 @@ public class GitHandler {
     @Path("/push")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void push(@NotNull @QueryParam("message")  String message) throws Exception {
-        SettingsManager settingsManager = SettingsManager.getInstance();
-        MainSettings mainSettings = settingsManager.loadProps().validate();
-        new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
-                .commitAndPush(mainSettings.getEzLoad().getAdmin().getEmail(), mainSettings.getEzLoad().getAdmin().getBranchName(), message);
+    public PushResult push(@NotNull @QueryParam("message")  String message) throws Exception {
+        try {
+            SettingsManager settingsManager = SettingsManager.getInstance();
+            MainSettings mainSettings = settingsManager.loadProps().validate();
+            new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
+                    .commitAndPush(mainSettings.getEzLoad().getAdmin().getEmail(), mainSettings.getEzLoad().getAdmin().getBranchName(), message);
+            return new PushResult(true, "Merci d'avoir partagé vos modifications. Elles seront analysé et intégré dans une prochaine version");
+        }
+        catch(Exception e){
+            return new PushResult(false, ExceptionUtils.getStackTrace(e));
+        }
     }
 }

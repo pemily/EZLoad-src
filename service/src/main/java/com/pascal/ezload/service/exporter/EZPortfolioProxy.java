@@ -50,15 +50,11 @@ public interface EZPortfolioProxy {
 
     void applyOnPortefeuille(EzPortefeuilleEdition ezPortefeuilleEdition);
 
-    void fillFromMonPortefeuille(EzData data, String valeur);
+    void fillFromMonPortefeuille(EzData data, String valeur, String accountType, EnumEZBroker broker);
 
     Set<ShareValue> getShareValues();
 
-    PRU getPRU();
-
-    List<String> getNewPRUValues();
-
     EZPortfolioProxy createDeepCopy();
 
-    Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker);
+    Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue share);
 }

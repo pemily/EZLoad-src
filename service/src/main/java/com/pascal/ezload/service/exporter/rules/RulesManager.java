@@ -64,7 +64,7 @@ public class RulesManager {
 
     public synchronized RuleDefinition readRule(String filepath, boolean newUserRule, boolean dirtyFile) throws IOException {
         try(Reader reader = new FileReader(filepath, StandardCharsets.UTF_8)) {
-            RuleDefinition ruleDefinition = JsonUtil.getDefaultMapper().readValue(reader, RuleDefinition.class);
+            RuleDefinition ruleDefinition = JsonUtil.createDefaultMapper().readValue(reader, RuleDefinition.class);
             ruleDefinition.validate();
             ruleDefinition.setNewUserRule(newUserRule);
             ruleDefinition.setDirtyFile(dirtyFile);
@@ -97,7 +97,7 @@ public class RulesManager {
         boolean isNewUserRule = ruleDef.isNewUserRule();
         ruleDef.beforeSave(RulesManager::normalize); // the before save set to null the newUserRule
 
-        JsonUtil.getDefaultWriter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
+        JsonUtil.createDefaultWriter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
 
         if (isRenaming && isNewUserRule){
             // it is a rename, remove the old file
@@ -155,7 +155,7 @@ public class RulesManager {
     private synchronized CommonFunctions readCommonScript(EnumEZBroker broker, int brokerFileVersion, boolean dirtyFile) throws IOException {
         String commonFile = getCommonFilePath(broker, brokerFileVersion);
         try (Reader reader = new FileReader(commonFile)) {
-            CommonFunctions content = JsonUtil.getDefaultMapper().readValue(reader, CommonFunctions.class);
+            CommonFunctions content = JsonUtil.createDefaultMapper().readValue(reader, CommonFunctions.class);
             content.setDirtyFile(dirtyFile);
             return content;
         }
@@ -168,7 +168,7 @@ public class RulesManager {
         function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalize).collect(Collectors.toList()).toArray(new String[]{}));
 
         function.beforeSave();
-        JsonUtil.getDefaultWriter().writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
+        JsonUtil.createDefaultWriter().writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
 
         brokerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
     }

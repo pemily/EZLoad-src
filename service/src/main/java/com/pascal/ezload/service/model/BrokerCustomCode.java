@@ -17,26 +17,14 @@
  */
 package com.pascal.ezload.service.model;
 
-public class EZDevise {
-    private String symbol; // $
-    private String code; // USD
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
 
-    public EZDevise(){
-        // for json deserializer
-    }
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-    public EZDevise(String code, String symbol){
-        this.code = code;
-        this.symbol = symbol;
-    }
+public interface BrokerCustomCode {
 
-    public String getSymbol() {
-        return symbol;
-    }
-
-
-    public String getCode() {
-        return code;
-    }
+    Optional<Map<String, Object>> searchActionInDifferentMarket(List<Map<String, Object>> data, EzData ezData);
 
 }

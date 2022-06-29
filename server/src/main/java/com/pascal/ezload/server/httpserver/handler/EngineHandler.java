@@ -131,24 +131,24 @@ public class EngineHandler {
                     Set<ShareValue> shareValues = new HashSet<>();
                     shareValues.addAll(ezPortfolioProxy.getShareValues());
                     shareValues.addAll(serverState.getNewShares().stream().filter(f -> !StringUtils.isBlank(f.getUserShareName())).collect(Collectors.toList()));
-                    ShareUtil shareUtil = new ShareUtil(ezPortfolioProxy.getPRU(), shareValues);
+                    ShareUtil shareUtil = new ShareUtil(shareValues);
 
                     List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting)
                             .exportModels(allEZModels, ezPortfolioProxy, shareUtil);
 
-                    // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présentent dans des fichiers
+                    // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présente dans des fichiers
                     // first allTickerCodes received all the ticker codes present in the ezPorfolio
-                    Set<String> allTickerCodes = ezPortfolioProxy.getShareValues().stream()
-                            .map(ShareValue::getTickerCode)
-                            .filter(ticker -> !ticker.equals(ShareValue.LIQUIDITY_CODE))
-                            .filter(ticker -> !ticker.isEmpty())
-                            .collect(Collectors.toSet());
-                    Set<String> allTickerCodesAnalyzed = allEzReports.stream()
+                    List<ShareValue> allTickerCodes = ezPortfolioProxy.getShareValues().stream()
+                            .filter(sv -> !sv.getTickerCode().isEmpty() && !sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
+                            .collect(Collectors.toList());
+                    List<ShareValue> allTickerCodesAnalyzed = allEzReports.stream()
                             .flatMap(report -> report.getEzEditions().stream())
                             .flatMap(ezEdition -> ezEdition.getEzPortefeuilleEditions().stream())
-                            .map(EzPortefeuilleEdition::getTickerGoogleFinance)
-                            .filter(ticker -> !ticker.equals(ShareValue.LIQUIDITY_CODE))
-                            .collect(Collectors.toSet());
+                            .filter(ezPortefeuilleEdition -> !ezPortefeuilleEdition.getTickerGoogleFinance().equals(ShareValue.LIQUIDITY_CODE))
+                            .map(ezPortefeuilleEdition -> shareUtil.getShareValue(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getAccountType(), ezPortefeuilleEdition.getBroker()))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList());
                     allTickerCodes.removeAll(allTickerCodesAnalyzed);
 
                     List<EzPortefeuilleEdition> dividendsEdition = allTickerCodes.stream()
@@ -173,7 +173,7 @@ public class EngineHandler {
                         allEzReports.add(dividendsReport);
                     }
 
-                    updateShareValuesAndEzReports(ezPortfolioProxy.getNewPRUValues(), knownValues, allEzReports);
+                    updateShareValuesAndEzReports(knownValues, allEzReports);
 
                 });
 
@@ -212,13 +212,9 @@ public class EngineHandler {
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
                         EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
 
-                        final EZPortfolioProxy ezPortfolioProxyFinal = ezPortfolioProxy;  // because of the lambda just below
-                        // transfert all the new PRU row created in the previous analysis in this new just loaded PRU
-                        serverState.getNewPRUs().forEach(pru -> ezPortfolioProxyFinal.getPRU().newPRU(pru));
-
                         List<EzReport> result = ezPortfolioProxy.save(ezProfil, reporting, serverState.getEzReports(), ignoreEzEditionId);
 
-                        updateShareValuesAndEzReports(new LinkedList<>(), ezPortfolioProxy.getShareValues(), result);
+                        updateShareValuesAndEzReports(ezPortfolioProxy.getShareValues(), result);
 
                         // get the new version, and update the list of file not yet loaded
                         updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
@@ -252,14 +248,13 @@ public class EngineHandler {
         serverState.setFilesNotYetLoaded(notYetLoaded);
     }
 
-    private void updateShareValuesAndEzReports(List<String> newPRUs, Set<ShareValue> knownShareValues, List<EzReport> newReports){
+    private void updateShareValuesAndEzReports(Set<ShareValue> knownShareValues, List<EzReport> newReports){
         serverState.setEzReports(newReports);
-        serverState.setNewPRUs(newPRUs);
         // recupere les valeurs analysé
         Set<ShareValue> newShareValues = newReports.stream()
                                                     .flatMap(r -> r.getEzEditions().stream())
                 .flatMap(ezEdition -> ezEdition.getEzPortefeuilleEditions().stream())
-                .map(ezPortefeuilleEdition -> new ShareValue(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getValeur(), false))
+                .map(ezPortefeuilleEdition -> new ShareValue(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getAccountType(), ezPortefeuilleEdition.getBroker(), ezPortefeuilleEdition.getValeur(), false))
                 .collect(Collectors.toSet());
         // fait la soustraction des 2 listes
         newShareValues.removeAll(knownShareValues);

@@ -34,8 +34,8 @@ public class BourseDirectDownloaderTest {
 
     @Test
     public void testDateFromPdf(){
-        Assertions.assertEquals("2021/01/23", BourseDirectDownloader.getDateFromPdfFilePath("/un/path/boursedirect-2021-01-23.pdf").toDate('/'));
-        assertNull(BourseDirectDownloader.getDateFromPdfFilePath("/un/path/file.pdf"));
+        Assertions.assertEquals("2021/01/23", BourseDirectDownloader.getDateFromFilePath("/un/path/boursedirect-2021-01-23.pdf").toDate('/'));
+        assertNull(BourseDirectDownloader.getDateFromFilePath("/un/path/file.pdf"));
     }
 
     @Test
@@ -52,9 +52,9 @@ public class BourseDirectDownloaderTest {
         EzProfil ezProfil = new EzProfil();
         ezProfil.setBourseDirect(bourseDircectSettings);
         BourseDirectDownloader bdd = new BourseDirectDownloader(new LoggerReporting(), mainSettings, ezProfil);
-        Assertions.assertEquals("AAAA", bdd.getAccountFromPdfFilePath("/AAAA/2021/boursedirect-2021-01-23.pdf").getName());
-        Assertions.assertEquals("AAA", bdd.getAccountFromPdfFilePath("/AAA/2021/boursedirect-2021-01-23.pdf").getName());
-        Assertions.assertEquals("AAAAA", bdd.getAccountFromPdfFilePath("/AAAAA/2021/boursedirect-2021-01-23.pdf").getName());
-        assertNull(bdd.getAccountFromPdfFilePath("/AAAAAAA/2021/boursedirect-2021-01-23.pdf"));
+        Assertions.assertEquals("AAAA", bdd.getAccountFromFilePath("/AAAA/2021/boursedirect-2021-01-23.pdf").getName());
+        Assertions.assertEquals("AAA", bdd.getAccountFromFilePath("/AAA/2021/boursedirect-2021-01-23.pdf").getName());
+        Assertions.assertEquals("AAAAA", bdd.getAccountFromFilePath("/AAAAA/2021/boursedirect-2021-01-23.pdf").getName());
+        assertNull(bdd.getAccountFromFilePath("/AAAAAAA/2021/boursedirect-2021-01-23.pdf"));
     }
 }

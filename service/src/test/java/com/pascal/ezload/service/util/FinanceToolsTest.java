@@ -17,7 +17,10 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,12 +32,14 @@ public class FinanceToolsTest {
 
     @Test
     public void testSearchBourseDirect() throws IOException {
-        EZAction action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "US92936U1097");
+        EzData data = new EzData();
+        data.put(new EzDataKey("ezOperation_Lieu"), "NASDAQ/NGS (GLOBAL SELECT MARKET)");
+        EZAction action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "US88160R1014", EnumEZBroker.BourseDirect, data);
         assertNotNull(action);
-        Assertions.assertEquals("US92936U1097", action.getIsin());
-        Assertions.assertEquals("XNYS", action.getMarketPlace().getMic());
-        Assertions.assertEquals("WP CAREY INC", action.getRawName());
-        Assertions.assertEquals("WPC", action.getTicker());
+        Assertions.assertEquals("US88160R1014", action.getIsin());
+        Assertions.assertEquals("XNGS", action.getMarketPlace().getMic());
+        Assertions.assertEquals("Tesla, Inc.", action.getRawName());
+        Assertions.assertEquals("TSLA", action.getTicker());
     }
 
 

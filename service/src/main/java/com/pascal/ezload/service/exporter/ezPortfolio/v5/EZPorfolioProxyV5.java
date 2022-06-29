@@ -80,7 +80,6 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
         SheetValues allPRUs = ezSheets.get(2);
         PRU pru = new PRU(allPRUs);
-        ezPortfolio.setPru(pru);
         reporting.info(allPRUs.getValues().size() + " rows from PRU loaded.");
     }
 
@@ -109,7 +108,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                 String accountNumber = ezEdition.getData().get(AccountData.account_number);
                                 Optional<EnumEZBroker> broker = profil.getBourseDirect().getAccounts().stream().anyMatch(a -> a.getNumber() != null && a.getNumber().equals(accountNumber)) ? Optional.of(EnumEZBroker.BourseDirect) : Optional.empty();
                                 ignoredOperation.setBroker(broker.map(EnumEZBroker::getEzPortfolioName).orElse(null));
-                                ignoredOperation.setDate(BourseDirectDownloader.getDateFromPdfFilePath(sourceFile).toEzPortoflioDate());
+                                ignoredOperation.setDate(BourseDirectDownloader.getDateFromFilePath(sourceFile).toEzPortoflioDate());
                                 RuleDefinitionSummary ruleDefinitionSummary = new RuleDefinitionSummary();
                                 ruleDefinitionSummary.setBroker(broker.orElse(null));
                                 ruleDefinitionSummary.setName("IGNOREE");
@@ -155,11 +154,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             sheets.batchUpdate(reporting,
                     SheetValues.createFromRowLists("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
-                    monPortefeuille,
-                    SheetValues.createFromRowLists("PRU!A"+(ezPortfolio.getPru().getNumberOfExistingPRUs()+FIRST_ROW_PRU) + ":A",
-                                ezPortfolio.getPru().getNewPRUs()));
+                    monPortefeuille
+            );
             ezPortfolio.getMesOperations().saveDone();
-            ezPortfolio.getPru().saveDone();
         }
 
         reporting.info("Export terminé!");
@@ -181,8 +178,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
              */
 
         // MesOperations:I66:L66
-        gridRange.setSheetId(sheets.getSheetId("MesOperations")); https://stackoverflow.com/questions/52934537/how-to-use-sheet-id-in-google-sheets-api/66575843#66575843
-            /* cellule a unmergé
+        gridRange.setSheetId(sheets.getSheetId("MesOperations"));
+            /* https://stackoverflow.com/questions/52934537/how-to-use-sheet-id-in-google-sheets-api/66575843#66575843
+               cellule a unmergé
                 MesOpérations:I66:L66
                 MesOpérations:I108:L108
                 MesOpérations:I169:L169
@@ -198,7 +196,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         unmerge.setRange(gridRange);
         Request r = new Request();
         r.setUnmergeCells(unmerge);
-        sheets.applyRequest(Arrays.asList(r));
+        sheets.applyRequest(List.of(r));
     }
 
     private void fixGoogleFinanceBug(GDriveSheets sheets, Reporting reporting, SheetValues monPortefeuille) throws Exception {
@@ -211,9 +209,6 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                         return newRow;
                                                     }).collect(Collectors.toList());
         sheets.update(reporting, "MonPortefeuille!N"+range[0].getRowNumber()+":O"+range[1].getRowNumber(), googleFinanceFcts);
-
-        UnmergeCellsRequest unmerge = new UnmergeCellsRequest();
-
     }
 
     @Override
@@ -237,23 +232,13 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public void fillFromMonPortefeuille(EzData data, String tickerCode) {
-        ezPortfolio.getMonPortefeuille().fill(data, tickerCode);
+    public void fillFromMonPortefeuille(EzData data, String tickerCode, String accountType, EnumEZBroker broker) {
+        ezPortfolio.getMonPortefeuille().fill(data, tickerCode, accountType, broker);
     }
 
     @Override
     public Set<ShareValue> getShareValues() {
         return ezPortfolio.getMonPortefeuille().getShareValues();
-    }
-
-    @Override
-    public PRU getPRU() {
-        return ezPortfolio.getPru();
-    }
-
-    @Override
-    public List<String> getNewPRUValues() {
-        return ezPortfolio.getPru().getNewPRUValues();
     }
 
     @Override
@@ -264,7 +249,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<EzPortefeuilleEdition> createNoOpEdition(String ticker) {
+    public Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue ticker) {
         return ezPortfolio.getMonPortefeuille().createFrom(ticker);
     }
 

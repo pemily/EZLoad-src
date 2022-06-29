@@ -34,6 +34,7 @@ public class EzEdition {
     private List<EzPortefeuilleEdition> ezPortefeuilleEditions = new LinkedList<>();
     private List<String> errors = new LinkedList<>();
 
+    private String operationInJsonFormat;
     private EzData data = new EzData();
 
     public EzEdition(){
@@ -85,5 +86,13 @@ public class EzEdition {
 
     public void setRuleDefinitionSummary(RuleDefinitionSummary ruleDefinitionSummary) {
         this.ruleDefinitionSummary = ruleDefinitionSummary;
+    }
+
+    public String getOperationInJsonFormat() {
+        return operationInJsonFormat;
+    }
+
+    public void setOperationInJsonFormat(String operationInJsonFormat) {
+        this.operationInJsonFormat = operationInJsonFormat;
     }
 }

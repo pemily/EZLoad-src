@@ -15,28 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.rules.update;
 
-public class EZDevise {
-    private String symbol; // $
-    private String code; // USD
+public class PushResult {
 
-    public EZDevise(){
-        // for json deserializer
+    private String msg;
+    private boolean success;
+
+    public PushResult(){
     }
 
-    public EZDevise(String code, String symbol){
-        this.code = code;
-        this.symbol = symbol;
+    public PushResult(boolean success, String msg){
+        this.msg = msg;
+        this.success = success;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getMsg() {
+        return msg;
     }
 
-
-    public String getCode() {
-        return code;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
 }

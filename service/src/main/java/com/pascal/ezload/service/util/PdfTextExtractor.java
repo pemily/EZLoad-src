@@ -44,23 +44,24 @@ public class PdfTextExtractor {
 
     public Result process() throws IOException {
         reporting.info("Reading pdf...");
-        InputStream input = new BufferedInputStream(new FileInputStream(pdfFilePath));
+        try(InputStream input = new BufferedInputStream(new FileInputStream(pdfFilePath))) {
 
-        PDDocument document = PDDocument.load(input);
+            PDDocument document = PDDocument.load(input);
 
-        PDFTextStripper stripper = new PDFTextStripper(){
-            @Override
-            protected void processTextPosition(TextPosition text) {
-                process(text.getX(), text.getY(), text.getUnicode());
-                super.processTextPosition(text);
-            }
-        };
+            PDFTextStripper stripper = new PDFTextStripper() {
+                @Override
+                protected void processTextPosition(TextPosition text) {
+                    process(text.getX(), text.getY(), text.getUnicode());
+                    super.processTextPosition(text);
+                }
+            };
 
-        String pdfText = stripper.getText(document);
-        document.close();
+            String pdfText = stripper.getText(document);
+            document.close();
 
-        reporting.info("pdf read => ok");
-        return new Result(pdfText, allTexts);
+            reporting.info("pdf read => ok");
+            return new Result(pdfText, allTexts);
+        }
     }
 
 
