@@ -84,7 +84,7 @@ public class FinanceTools {
                 Map<String, Object> actionData = null;
                 if (data.size() == 1) actionData = data.get(0);
                 if (data.size() > 1) {
-                    actionData = broker.getImpl().searchActionInDifferentMarket(data, ezData)
+                    actionData = broker.getImpl().searchActionInDifferentMarket(actionCode, data, ezData)
                             .orElseGet(() -> {
                                 reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
                                 return data.get(0);

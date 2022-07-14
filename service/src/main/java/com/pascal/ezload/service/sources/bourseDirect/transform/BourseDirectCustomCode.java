@@ -19,25 +19,140 @@ package com.pascal.ezload.service.sources.bourseDirect.transform;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.model.BrokerCustomCode;
+import com.pascal.ezload.service.util.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BourseDirectCustomCode implements BrokerCustomCode {
+    private LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
+
     @Override
-    public Optional<Map<String, Object>> searchActionInDifferentMarket(List<Map<String, Object>> data, EzData ezData) {
+    public Optional<Map<String, Object>> searchActionInDifferentMarket(String actionCode, List<Map<String, Object>> data, EzData ezData) {
+        List<Map<String, Object>> dataReduced = reduce(actionCode, ezData, data,
+                this::sortByISIN,
+                this::sortByStock,
+                this::sortByLieu,
+                this::sortByCountryCode,
+                this::sortByBestName
+                 );
+        return dataReduced.size() > 0 ? Optional.of(dataReduced.get(0)) : Optional.empty();
+    }
+
+    public interface IReducer {
+        int  reduce(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2);
+    }
+
+    private List<Map<String, Object>> reduce(String actionCode, EzData ezData, List<Map<String, Object>> data, IReducer... reducers){
+        if (data.size() == 1) return data;
+
+        return data.stream().sorted(
+                (d1 , d2) -> {
+                    for (IReducer reducer : reducers){
+                        int r = reducer.reduce(actionCode, ezData, d1, d2);
+                        if (r != 0) return r;
+                    }
+                    return 0;
+                }
+        )
+        .collect(Collectors.toList());
+    }
+
+
+    private int sortByStock(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {
+        boolean isStock1 = isStock(d1);
+        boolean isStock2 = isStock(d2);
+        if (isStock1 && isStock2) return 0;
+        if (isStock1) return -1;
+        if (isStock2) return 1;
+        return 0;
+    }
+
+    private boolean isStock(Map<String, Object> data){
+        Map<String, Object> sinara = (Map<String, Object>) data.get("sinara");
+        String nature = null;
+        if (sinara != null){
+            nature = sinara.get("nature") instanceof String ? (String) sinara.get("nature") : null;
+        }
+        return nature != null && nature.equals("stock");
+    }
+
+    private int sortByLieu(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {
         String lieu = ezData.get("ezOperation_Lieu");
         /* I saw the values from pdf:
                 BORSE BERLIN EQUIDUCT TRADING - BERL
                 NEW YORK STOCK EXCHANGE, INC.
                 NASDAQ/NGS (GLOBAL SELECT MARKET)
          */
-        if (lieu == null) return Optional.empty();
-
-        return data.stream()
-                .filter(d -> d.get("label") != null)
-                .filter(d -> lieu.equalsIgnoreCase((String) d.get("label")))
-                .findFirst();
+        if (!StringUtils.isBlank(lieu)){
+            if (d1.get("label") != null && d2.get("label") != null) {
+                return levenshteinDistance.apply(lieu, (String) d1.get("label")) - levenshteinDistance.apply(lieu, (String) d2.get("label"));
+            }
+            else return 0;
+        }
+        else return 0; // do not perform a change in the list order
     }
+
+
+    private int sortByISIN(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {
+        String isin1 = (String) d1.get("isin");
+        String isin2 = (String) d2.get("isin");
+        if (isin1 != null && isin2 != null){
+            if (isin1.equals(isin2)) return 0;
+            if (isin1.equals(actionCode)) return -1;
+            return 1;
+
+        }
+        else if (isin1 == null){
+            if (isin2 == null) return 0;
+            return isin2.equals(actionCode) ? 1 : -1;
+        }
+        return isin1.equals(actionCode) ? -1 : 1;
+    }
+
+    private int sortByCountryCode(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {
+        if (actionCode.length() <= 3) throw new IllegalArgumentException("Action Code is too short: "+ actionCode + " ezData contains: "+ ezData);
+        String countryCode = actionCode.substring(0, 2);
+
+        String countryCode1 = (String) d1.get("Country");
+        String countryCode2 = (String) d2.get("Country");
+        if (countryCode1 != null && countryCode2 != null){
+            if (countryCode1.equals(countryCode2)) return 0;
+            if (countryCode1.equals(countryCode)) return -1;
+            return 1;
+
+        }
+        else if (countryCode1 == null){
+            if (countryCode2 == null) return 0;
+            return countryCode2.equals(countryCode) ? 1 : -1;
+        }
+        return countryCode1.equals(countryCode) ? -1 : 1;
+    }
+
+    private int sortByBestName(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {
+        String actionName = ezData.get("ezOperation_INFO3");
+        if (!StringUtils.isBlank(actionName)) {
+            return distanceActionName(d1, actionName) - distanceActionName(d2, actionName);
+        }
+        return 0;
+    }
+
+    private int distanceActionName(Map<String, Object> d1, String actionName) {
+        String name1 = (String) d1.get("name");
+        String name2 = (String) d1.get("Name");
+        if (name1 != null && name2 != null) {
+            return Math.min(levenshteinDistance.apply(actionName, name1),
+                    levenshteinDistance.apply(actionName, name2));
+        }
+        if (name1 != null) {
+            return levenshteinDistance.apply(actionName, name1);
+        }
+        if (name2 != null) {
+            return levenshteinDistance.apply(actionName, name2);
+        }
+        return Integer.MAX_VALUE;
+    }
+
+
 }

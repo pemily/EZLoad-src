@@ -52,6 +52,7 @@ public class MarketPlaceUtil {
             new EZMarketPlace("Euronext", "Paris", "XPAR", null, "EPA", CountryUtil.foundByCode("FR")),
             new EZMarketPlace("Shenzhen Stock Exchange", "Shenzhen", "XSHE", null, "SHE", CountryUtil.foundByCode("CN")),
             new EZMarketPlace("London Stock Exchange", "London", "XLON", "LSE", "LON", CountryUtil.foundByCode("GB")),
+            new EZMarketPlace("London Stock Exchange", "London", "XLOM", "LSE-MTF", "LON", CountryUtil.foundByCode("GB")),
             new EZMarketPlace("Toronto Stock Exchange", "Toronto", "XTSE", "TSX", "TSE", CountryUtil.foundByCode("CA")),
             new EZMarketPlace("Deutsche Börse", "Frankfurt", "XFRA", null, "FRA", CountryUtil.foundByCode("DE")),
             new EZMarketPlace("Deutsche Börse", "Frankfurt", "XETR", null, "ETR", CountryUtil.foundByCode("DE")),

@@ -32,6 +32,8 @@ import com.pascal.ezload.service.exporter.EZPortfolioManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.model.*;
@@ -252,9 +254,18 @@ public class EngineHandler {
         serverState.setEzReports(newReports);
         // recupere les valeurs analysé
         Set<ShareValue> newShareValues = newReports.stream()
-                                                    .flatMap(r -> r.getEzEditions().stream())
-                .flatMap(ezEdition -> ezEdition.getEzPortefeuilleEditions().stream())
-                .map(ezPortefeuilleEdition -> new ShareValue(ezPortefeuilleEdition.getTickerGoogleFinance(), ezPortefeuilleEdition.getAccountType(), ezPortefeuilleEdition.getBroker(), ezPortefeuilleEdition.getValeur(), false))
+                .flatMap(r -> r.getEzEditions().stream())
+                .map(ezEdition -> {
+                    if (ezEdition.getData().get(ActionData.share_ezCode) != null) {
+                        String ticker = ezEdition.getData().get(ActionData.share_ezCode);
+                        String type = ezEdition.getData().get(AccountData.account_type);
+                        EnumEZBroker broker = EnumEZBroker.getFomEzName(ezEdition.getData().get(BrokerData.broker_name.getName()));
+                        String shareName = ezEdition.getData().get(ActionData.share_ezName);
+                        return new ShareValue(ticker, type, broker, shareName, false);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         // fait la soustraction des 2 listes
         newShareValues.removeAll(knownShareValues);
