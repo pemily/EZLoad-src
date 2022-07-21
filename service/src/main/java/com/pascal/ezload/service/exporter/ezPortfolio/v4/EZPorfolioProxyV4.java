@@ -23,7 +23,7 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -53,7 +53,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public List<EzReport> save(EzProfil ezProfil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId){
+    public List<EzReport> save(EzProfil ezProfil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId, Set<ShareValue> newShareValues){
         throw new NotImplementedException();
     }
 
@@ -83,7 +83,12 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public Set<ShareValue> getShareValues() {
+    public Set<ShareValue> getShareValuesFromMonPortefeuille() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public Optional<SimpleShareValue> findShareByIsin(String isin) {
         throw new NotImplementedException();
     }
 

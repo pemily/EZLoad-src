@@ -18,7 +18,10 @@
 package com.pascal.ezload.service.util;
 
 import com.google.api.client.json.gson.GsonFactory;
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -47,21 +50,34 @@ public class FinanceTools {
     private final Map<String, EZAction> actionCode2BRAction = new HashMap<>();
 
 
-    public EZAction get(Reporting reporting, String actionCode, String accountType, EnumEZBroker broker, ShareUtil shareUtil, EzData ezData){
-        EZAction result = actionCode2BRAction.computeIfAbsent(actionCode, code -> {
+    public EZAction get(Reporting reporting, EZPortfolioProxy ezPortfolioProxy, String isin, String accountType, EnumEZBroker broker, ShareUtil shareUtil, EzData ezData){
+        EZAction result = actionCode2BRAction.computeIfAbsent(isin, code -> {
             try {
+                Optional<SimpleShareValue> simpleShVOpt = ezPortfolioProxy.findShareByIsin(isin);
+                Optional<EZAction> ezAct = simpleShVOpt.map(sv -> {
+                    EZAction ezAction = new EZAction();
+                    ezAction.setRawName(sv.getUserShareName());
+                    ezAction.setTicker(sv.getTickerCode());
+                    ezAction.setEzName(sv.getUserShareName());
+                    ezAction.setMarketPlace(null); // market place is used in searchActionFromBourseDirect to find the ticker
+                    ezAction.setType(sv.getType());
+                    ezAction.setIsin(sv.getIsin());
+                    return ezAction;
+                });
+                if (ezAct.isPresent()) return ezAct.get();
                 return searchActionFromBourseDirect(reporting, code, broker, ezData);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
         if (result == null) {
-            throw new RuntimeException("Pas d'information trouvé sur la valeur: "+actionCode);
+            throw new RuntimeException("Pas d'information trouvé sur la valeur: "+isin);
         }
         // re-apply the name outside of the cache, because the user can have changed the name
         String name = shareUtil.getEzName(result.getEzTicker());
         result.setEzName(name == null ? result.getRawName() : name);
-        shareUtil.createIfNeeded(result.getEzTicker(), accountType, broker, result.getEzName());
+        ShareValue sv = shareUtil.createIfNeeded(result.getEzTicker(), result.getType(), accountType, broker, result.getEzName());
+        sv.setIsin(isin);
         result.setPruCellReference(shareUtil.getPRUReference(result.getEzTicker()));
         return result;
     }
@@ -99,7 +115,6 @@ public class FinanceTools {
                 Map<String, Object> iso = (Map<String, Object>) actionData.get("iso");
                 action.setType((String)iso.get("type"));
                 action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
-
                 action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());
 
                 return action;

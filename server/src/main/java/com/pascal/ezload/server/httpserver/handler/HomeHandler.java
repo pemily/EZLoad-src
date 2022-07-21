@@ -161,12 +161,10 @@ public class HomeHandler {
     @Consumes(MediaType.APPLICATION_JSON)
     public void saveNewShareValue(ShareValue shareValue) {
         ezServerState.getNewShares().stream()
-            .filter(s -> s.getTickerCode().equals(shareValue.getTickerCode())
-                    && s.getBroker().equals(shareValue.getBroker())
-                    && s.getEzAccountType().equals(shareValue.getEzAccountType())
-            )
+            .filter(s -> s.getIsin().equals(shareValue.getIsin()))
             .forEach(s -> {
                 s.setUserShareName(shareValue.getUserShareName());
+                s.setTickerCode(shareValue.getTickerCode());
                 s.setDirty(true);
             });
     }

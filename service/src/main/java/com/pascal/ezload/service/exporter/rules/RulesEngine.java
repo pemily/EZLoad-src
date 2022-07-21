@@ -100,7 +100,7 @@ public class RulesEngine {
             ezEdition.setRuleDefinitionSummary(ruleDef);
             try {
                 String ezAccountType = getEzAccountType(new GetFinancialDataError(), ruleDef, ezData);
-                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ruleDef, ezData, ezAccountType, shareUtil);
+                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ezPortfolioProxy, ruleDef, ezData, ezAccountType, shareUtil);
                 if (ezOperationEditions.isEmpty()){
                     reporting.info("Cette opération n'a pas d'impact sur le portefeuille");
                     // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
@@ -164,15 +164,15 @@ public class RulesEngine {
         return eval(entity, "Erreur lors de l'appel à: "+ getEzAccountTypeFunction, getEzAccountTypeFunction +"()", data, functions);
     }
 
-    private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data, String ezAccountType, ShareUtil shareUtil) {
+    private List<EzOperationEdition> applyRuleForOperation(EZPortfolioProxy ezPortfolioProxy, RuleDefinition ruleDefinition, EzData data, String ezAccountType, ShareUtil shareUtil) {
         CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
 
         data.put(OperationData.operation_ezLiquidityName, shareUtil.getEzLiquidityName(ezAccountType, ruleDefinition.getBroker()));
 
         // compute the share Id
-        String shareId = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
-        if (!StringUtils.isBlank(shareId)){
-            EZAction action = FinanceTools.getInstance().get(reporting, shareId, ezAccountType, ruleDefinition.getBroker(), shareUtil, data);
+        String isin = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
+        if (!StringUtils.isBlank(isin)){
+            EZAction action = FinanceTools.getInstance().get(reporting, ezPortfolioProxy, isin, ezAccountType, ruleDefinition.getBroker(), shareUtil, data);
             action.fill(data);
         }
         else{

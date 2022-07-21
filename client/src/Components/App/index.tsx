@@ -320,6 +320,7 @@ export function App(){
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                
+                                    
                                     <Button alignSelf="start" margin="medium" 
                                                 disabled={newShareValuesDirty 
                                                         || processRunning 

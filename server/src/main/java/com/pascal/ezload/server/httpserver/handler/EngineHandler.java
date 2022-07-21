@@ -117,7 +117,7 @@ public class EngineHandler {
                     Reporting reporting = processLogger.getReporting();
 
                     EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(ezProfil, reporting);
-                    Set<ShareValue> knownValues = ezPortfolioProxy.getShareValues();
+                    Set<ShareValue> knownValues = ezPortfolioProxy.getShareValuesFromMonPortefeuille();
 
                     List<EZModel> allEZModels;
                     try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
@@ -131,7 +131,7 @@ public class EngineHandler {
                         new EZModelChecker(reporting).validateModels(allEZModels);
                     }
                     Set<ShareValue> shareValues = new HashSet<>();
-                    shareValues.addAll(ezPortfolioProxy.getShareValues());
+                    shareValues.addAll(ezPortfolioProxy.getShareValuesFromMonPortefeuille());
                     shareValues.addAll(serverState.getNewShares().stream().filter(f -> !StringUtils.isBlank(f.getUserShareName())).collect(Collectors.toList()));
                     ShareUtil shareUtil = new ShareUtil(shareValues);
 
@@ -140,7 +140,7 @@ public class EngineHandler {
 
                     // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présente dans des fichiers
                     // first allTickerCodes received all the ticker codes present in the ezPorfolio
-                    List<ShareValue> allTickerCodes = ezPortfolioProxy.getShareValues().stream()
+                    List<ShareValue> allTickerCodes = ezPortfolioProxy.getShareValuesFromMonPortefeuille().stream()
                             .filter(sv -> !sv.getTickerCode().isEmpty() && !sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
                             .collect(Collectors.toList());
                     List<ShareValue> allTickerCodesAnalyzed = allEzReports.stream()
@@ -198,10 +198,17 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
             try (Reporting rep = reporting.pushSection("Mise à jour de EZPortfolio")) {
-                Optional<ShareValue> invalidShare = serverState.getNewShares().stream().filter(n -> StringUtils.isBlank(n.getUserShareName())).findFirst();
+                Optional<ShareValue> invalidShare = serverState.getNewShares().stream()
+                        .filter(n -> StringUtils.isBlank(n.getUserShareName()) || StringUtils.isBlank(n.getIsin()) || StringUtils.isBlank(n.getTickerCode()))
+                        .findFirst();
                 if (invalidShare.isPresent()){
                     // if from the previous analysis the newShares are not correctly filled => stop the process
-                    reporting.error("La valeur: "+invalidShare.get().getTickerCode()+" n'a pas de nom");
+                    if (StringUtils.isBlank(invalidShare.get().getUserShareName()))
+                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de nom");
+                    if (StringUtils.isBlank(invalidShare.get().getTickerCode()))
+                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de ticker google");
+                    if (StringUtils.isBlank(invalidShare.get().getIsin()))
+                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de code ISIN");
                 }
                 else {
                     Optional<ShareValue> dirtyShare = serverState.getNewShares().stream().filter(ShareValue::isDirty).findFirst();
@@ -214,9 +221,9 @@ public class EngineHandler {
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
                         EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
 
-                        List<EzReport> result = ezPortfolioProxy.save(ezProfil, reporting, serverState.getEzReports(), ignoreEzEditionId);
+                        List<EzReport> result = ezPortfolioProxy.save(ezProfil, reporting, serverState.getEzReports(), ignoreEzEditionId, serverState.getNewShares());
 
-                        updateShareValuesAndEzReports(ezPortfolioProxy.getShareValues(), result);
+                        updateShareValuesAndEzReports(ezPortfolioProxy.getShareValuesFromMonPortefeuille(), result);
 
                         // get the new version, and update the list of file not yet loaded
                         updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
@@ -256,12 +263,15 @@ public class EngineHandler {
         Set<ShareValue> newShareValues = newReports.stream()
                 .flatMap(r -> r.getEzEditions().stream())
                 .map(ezEdition -> {
-                    if (ezEdition.getData().get(ActionData.share_ezCode) != null) {
+                    if (StringUtils.isNotBlank(ezEdition.getData().get(ActionData.share_ezCode))) {
                         String ticker = ezEdition.getData().get(ActionData.share_ezCode);
-                        String type = ezEdition.getData().get(AccountData.account_type);
+                        String accountType = ezEdition.getData().get(AccountData.account_type);
+                        String shareType = ezEdition.getData().get(ActionData.share_type);
                         EnumEZBroker broker = EnumEZBroker.getFomEzName(ezEdition.getData().get(BrokerData.broker_name.getName()));
                         String shareName = ezEdition.getData().get(ActionData.share_ezName);
-                        return new ShareValue(ticker, type, broker, shareName, false);
+                        ShareValue shareValue = new ShareValue(ticker, shareType, accountType, broker, shareName, false);
+                        shareValue.setIsin(ezEdition.getData().get(ActionData.share_isin));
+                        return shareValue;
                     }
                     return null;
                 })
@@ -326,7 +336,7 @@ public class EngineHandler {
                     ezReport.setEzEditions(Collections.singletonList(ezEdition));
                     clearCache();
 
-                    ezPortfolioProxy.save(ezProfil, reporting, Collections.singletonList(ezReport), new ArrayList<>());
+                    ezPortfolioProxy.save(ezProfil, reporting, Collections.singletonList(ezReport), new ArrayList<>(), new HashSet<>());
 
                     reporting.info("Date sauvegardé dans l'onglet 'MesOpérations'");
                 });

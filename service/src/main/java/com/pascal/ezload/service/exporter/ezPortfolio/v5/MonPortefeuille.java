@@ -98,7 +98,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public Set<ShareValue> getShareValues(){
         return this.portefeuille.getValues().stream()
                 .filter(r -> StringUtils.isNotBlank(r.getValueStr(TICKER_COL)))
-                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL), false))
+                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(TYPE_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL), false))
                 .collect(Collectors.toSet());
     }
 

@@ -22,7 +22,7 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
@@ -40,7 +40,7 @@ public interface EZPortfolioProxy {
     void load(Reporting reporting) throws Exception;
 
     // return the list of EzEdition operation not saved
-    List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operations, List<String> ignoreOperations) throws Exception;
+    List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operations, List<String> ignoreOperations, Set<ShareValue> newShareValues) throws Exception;
 
     Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account);
 
@@ -52,9 +52,12 @@ public interface EZPortfolioProxy {
 
     void fillFromMonPortefeuille(EzData data, String valeur, String accountType, EnumEZBroker broker);
 
-    Set<ShareValue> getShareValues();
+    Set<ShareValue> getShareValuesFromMonPortefeuille();
+
+    Optional<SimpleShareValue> findShareByIsin(String isin);
 
     EZPortfolioProxy createDeepCopy();
 
     Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue share);
+
 }

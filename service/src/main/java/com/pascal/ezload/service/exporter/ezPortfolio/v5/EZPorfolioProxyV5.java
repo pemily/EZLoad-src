@@ -25,6 +25,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
+import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
@@ -46,8 +47,14 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     public static final int FIRST_ROW_MON_PORTEFEUILLE = 4;
     public static final int FIRST_ROW_PRU = 5;
     public static final int FIRST_ROW_MES_OPERATIONS = 1;
+    public static final int FIRST_ROW_EZLOAD_SHARES = 1;
 
-    private GDriveSheets sheets;
+    private static final String MesOperationsSheet = "MesOperations";
+    private static final String MonPortefeuilleSheet = "MonPortefeuille";
+    private static final String EZLoadSharesSheet = "EZLoadActions";
+    private static final String PRUSheet = "PRU";
+
+    private final GDriveSheets sheets;
     private EZPortfolio ezPortfolio;
 
     public EZPorfolioProxyV5(GDriveSheets sheets){
@@ -63,29 +70,37 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     public void load(Reporting reporting) throws Exception {
         ezPortfolio = new EZPortfolio("v5");
 
-        List<SheetValues> ezSheets = sheets.batchGet(reporting,
-                                            "MesOperations!A"+FIRST_ROW_MES_OPERATIONS+":L",
-                                                    "MonPortefeuille!A"+FIRST_ROW_MON_PORTEFEUILLE+":AN",
-                                                    "PRU!A"+FIRST_ROW_PRU+":A");
+        sheets.createSheet(EZLoadSharesSheet);
 
-        SheetValues allOperations = ezSheets.get(0);
+        List<SheetValues> ezSheets = sheets.batchGet(reporting,
+                                                    EZLoadSharesSheet +"!A"+FIRST_ROW_EZLOAD_SHARES+":F",
+                                                    MesOperationsSheet +"!A"+FIRST_ROW_MES_OPERATIONS+":L",
+                                                    MonPortefeuilleSheet +"!A"+FIRST_ROW_MON_PORTEFEUILLE+":AN",
+                                                    PRUSheet +"!A"+FIRST_ROW_PRU+":A");
+
+        SheetValues allEZLoadShares = ezSheets.get(0);
+        EZLoadSimpleShareSheet ezLoadSimpleShareSheet = new EZLoadSimpleShareSheet(allEZLoadShares);
+        ezPortfolio.setEzLoadShareSheet(ezLoadSimpleShareSheet);
+        reporting.info(allEZLoadShares.getValues().size() + " rows from "+ EZLoadSharesSheet +" loaded.");
+
+        SheetValues allOperations = ezSheets.get(1);
         MesOperations mesOperations = new MesOperations(allOperations);
         ezPortfolio.setMesOperations(mesOperations);
-        reporting.info(allOperations.getValues().size() + " rows from MesOperations loaded.");
+        reporting.info(allOperations.getValues().size() + " rows from "+ MesOperationsSheet +" loaded.");
 
-        SheetValues portefeuille = ezSheets.get(1);
+        SheetValues portefeuille = ezSheets.get(2);
         MonPortefeuille monPortefeuille = new MonPortefeuille(portefeuille);
         ezPortfolio.setMonPortefeuille(monPortefeuille);
-        reporting.info(portefeuille.getValues().size() + " rows from MonPortefeuille loaded.");
+        reporting.info(portefeuille.getValues().size() + " rows from "+ MonPortefeuilleSheet +" loaded.");
 
-        SheetValues allPRUs = ezSheets.get(2);
+        SheetValues allPRUs = ezSheets.get(3);
         PRU pru = new PRU(allPRUs);
-        reporting.info(allPRUs.getValues().size() + " rows from PRU loaded.");
+        reporting.info(allPRUs.getValues().size() + " rows from "+ PRUSheet +" loaded.");
     }
 
     @Override
     // return the list of EzEdition operation not saved
-    public List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId) throws Exception {
+    public List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId, Set<ShareValue> newShareValues) throws Exception {
         reporting.info("Saving EZPortfolio...");
         MesOperations operations = ezPortfolio.getMesOperations();
 
@@ -151,11 +166,20 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             fixGoogleFinanceBug(sheets, reporting, monPortefeuille);
             // attend un peu pour etre sur que ce soit fait
             Sleep.waitSeconds(5);
+
+            EZLoadSimpleShareSheet ezLoadSheetShareValues = ezPortfolio.getEZLoadShareSheet();
+            newShareValues
+                    .forEach(sv -> ezLoadSheetShareValues.newShareValue(sv.createSimpleShareValue()));
+
+            // Update all the sheets of EZPortfolio in one call
             sheets.batchUpdate(reporting,
-                    SheetValues.createFromRowLists("MesOperations!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
+                    SheetValues.createFromRowLists(EZLoadSharesSheet+"!A" + (ezLoadSheetShareValues.getNbOfExistingShareValues()+FIRST_ROW_EZLOAD_SHARES) + ":D",
+                            ezLoadSheetShareValues.getNewShareValues()),
+                    SheetValues.createFromRowLists(MesOperationsSheet +"!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
                     monPortefeuille
             );
+
             ezPortfolio.getMesOperations().saveDone();
         }
 
@@ -178,7 +202,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
              */
 
         // MesOperations:I66:L66
-        gridRange.setSheetId(sheets.getSheetId("MesOperations"));
+        gridRange.setSheetId(sheets.getSheetId(MesOperationsSheet));
             /* https://stackoverflow.com/questions/52934537/how-to-use-sheet-id-in-google-sheets-api/66575843#66575843
                cellule a unmergé
                 MesOpérations:I66:L66
@@ -208,7 +232,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                         newRow.setValue(1, r.getValueStr(MonPortefeuille.COURS_VALEUR_COL));
                                                         return newRow;
                                                     }).collect(Collectors.toList());
-        sheets.update(reporting, "MonPortefeuille!N"+range[0].getRowNumber()+":O"+range[1].getRowNumber(), googleFinanceFcts);
+        sheets.update(reporting, MonPortefeuilleSheet +"!N"+range[0].getRowNumber()+":O"+range[1].getRowNumber(), googleFinanceFcts);
     }
 
     @Override
@@ -237,8 +261,13 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public Set<ShareValue> getShareValues() {
+    public Set<ShareValue> getShareValuesFromMonPortefeuille() {
         return ezPortfolio.getMonPortefeuille().getShareValues();
+    }
+
+    @Override
+    public Optional<SimpleShareValue> findShareByIsin(String isin) {
+        return ezPortfolio.getEZLoadShareSheet().findByIsin(isin);
     }
 
     @Override
@@ -257,7 +286,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         try(Reporting rep = reporting.pushSection("Vérification de la version d'EZPortfolio avec EZLoad")){
 
             // en V4 la colonne MesOperations.Periode existe, elle a été renommé en "Quantité" en V5
-            SheetValues s = sheets.getCells(reporting,"MesOperations!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
+            SheetValues s = sheets.getCells(reporting, MesOperationsSheet +"!D1:D1"); // récupère la cellule de la colonne D ligne 1 de MesOperations
             reporting.info("Valeur trouvée: "+ s.getValues().get(0).getValueStr(0));
             return s.getValues().get(0).getValueStr(0).equals("Quantité");
         }

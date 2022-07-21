@@ -36,7 +36,17 @@ export function NewShareValues(props: NewShareValuesProps){
              background={['light-2', 'light-4']}>
                 {(shareValue: ShareValue, index: number) => (
                     <Box direction="row" margin="xsmall">
-                        <Text size="small" alignSelf="center">{shareValue.tickerCode}</Text>
+                        <Text size="small" alignSelf="center">{shareValue.isin}</Text>                        
+                        <TextField
+                        onChange={newVal => {
+                                    if (newVal !== shareValue.tickerCode) 
+                                        props.saveShareValue({...shareValue, tickerCode:newVal, dirty:true})
+                                    }}
+                        value={shareValue.tickerCode}
+                        id={"shareTicker"+index}                                 
+                        isRequired={true}                  
+                        readOnly={props.processRunning}
+                        />                        
                         <TextField 
                         onChange={newVal => {
                                     if (newVal !== shareValue.userShareName) 

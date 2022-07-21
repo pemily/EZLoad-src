@@ -21,6 +21,7 @@ public class EZPortfolio {
     private final String ezPortfolioVersion;
     private MesOperations mesOperations;
     private MonPortefeuille monPortefeuille;
+    private EZLoadSimpleShareSheet ezLoadSimpleShareSheet;
 
     public EZPortfolio(String ezPortfolioVersion){
         this.ezPortfolioVersion = ezPortfolioVersion;
@@ -50,6 +51,16 @@ public class EZPortfolio {
         EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
         copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
         copy.setMesOperations(mesOperations.createDeepCopy());
+        copy.setEzLoadShareSheet(ezLoadSimpleShareSheet.createDeepCopy());
         return copy;
     }
+
+    public EZLoadSimpleShareSheet getEZLoadShareSheet() {
+        return ezLoadSimpleShareSheet;
+    }
+
+    public void setEzLoadShareSheet(EZLoadSimpleShareSheet ezLoadSimpleShareSheet) {
+        this.ezLoadSimpleShareSheet = ezLoadSimpleShareSheet;
+    }
+
 }

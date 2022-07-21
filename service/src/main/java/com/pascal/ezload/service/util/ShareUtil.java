@@ -46,7 +46,7 @@ public class ShareUtil {
                         && s.getEzAccountType().equals(ezAccountType))
                 .findFirst()
                 .map(ShareValue::getUserShareName)
-                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, ezAccountType, broker, "", false).getUserShareName());
+                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", ezAccountType, broker, "", false).getUserShareName());
     }
 
     public Optional<ShareValue> getShareValue(String ezTicker, String ezAccountType, EnumEZBroker broker){
@@ -64,10 +64,12 @@ public class ShareUtil {
         return "=query(PRU!A$5:B; \"select B where A = '"+userShareName+"' limit 1\")";
     }
 
-    public void createIfNeeded(String ezTicker, String ezAccountType, EnumEZBroker broker, String ezName) {
-        if (!getShareValue(ezTicker, ezAccountType, broker).isPresent()){
-            shareValues.add(new ShareValue(ezTicker, ezAccountType, broker, ezName, false));
-        }
+    public ShareValue createIfNeeded(String ezTicker, String shareType, String ezAccountType, EnumEZBroker broker, String ezName) {
+        return getShareValue(ezTicker, ezAccountType, broker).orElseGet(() -> {
+            ShareValue sv = new ShareValue(ezTicker, shareType, ezAccountType, broker, ezName, false);
+            shareValues.add(sv);
+            return sv;
+        });
     }
 }
 
