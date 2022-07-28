@@ -20,14 +20,15 @@ package com.pascal.ezload.service.util;
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.EZMarketPlace;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -47,46 +48,30 @@ public class FinanceTools {
         return instance;
     }
 
-    private final Map<String, EZAction> actionCode2BRAction = new HashMap<>();
-
-
-    public EZAction get(Reporting reporting, EZPortfolioProxy ezPortfolioProxy, String isin, String accountType, EnumEZBroker broker, ShareUtil shareUtil, EzData ezData){
-        EZAction result = actionCode2BRAction.computeIfAbsent(isin, code -> {
+    public EZAction get(Reporting reporting, EZPortfolioProxy ezPortfolioProxy, String isin, EnumEZBroker broker, EzData ezData){
+        Optional<EZAction> result = ezPortfolioProxy.findShareByIsin(isin);
+        result = result.or(() -> {
             try {
-                Optional<SimpleShareValue> simpleShVOpt = ezPortfolioProxy.findShareByIsin(isin);
-                Optional<EZAction> ezAct = simpleShVOpt.map(sv -> {
-                    EZAction ezAction = new EZAction();
-                    ezAction.setRawName(sv.getUserShareName());
-                    ezAction.setTicker(sv.getTickerCode());
-                    ezAction.setEzName(sv.getUserShareName());
-                    ezAction.setMarketPlace(null); // market place is used in searchActionFromBourseDirect to find the ticker
-                    ezAction.setType(sv.getType());
-                    ezAction.setIsin(sv.getIsin());
-                    return ezAction;
-                });
-                if (ezAct.isPresent()) return ezAct.get();
-                return searchActionFromBourseDirect(reporting, code, broker, ezData);
+                Optional<EZAction> r = searchActionFromBourseDirect(reporting, isin, broker, ezData);
+                r.ifPresent(ezPortfolioProxy::newAction);
+                return r;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-        if (result == null) {
-            throw new RuntimeException("Pas d'information trouvé sur la valeur: "+isin);
-        }
-        // re-apply the name outside of the cache, because the user can have changed the name
-        String name = shareUtil.getEzName(result.getEzTicker());
-        result.setEzName(name == null ? result.getRawName() : name);
-        ShareValue sv = shareUtil.createIfNeeded(result.getEzTicker(), result.getType(), accountType, broker, result.getEzName());
-        sv.setIsin(isin);
-        result.setPruCellReference(shareUtil.getPRUReference(result.getEzTicker()));
-        return result;
+        result.ifPresent(v -> v.setPruCellReference(getPRUReference(v.getEzName())));
+        return result.orElseThrow( () -> new RuntimeException("Pas d'information trouvé sur la valeur: "+isin));
     }
 
-    public EZAction searchActionFromBourseDirect(Reporting reporting, String actionCode, EnumEZBroker broker, EzData ezData) throws IOException {
-        if (StringUtils.isBlank(actionCode) || actionCode.contains(" ") || actionCode.length() > 16)
-            throw new BRException("Erreur, cette information ne semble par être une action: "+actionCode);
+    private String getPRUReference(String userShareName){
+        return "=query(PRU!A$5:B; \"select B where A = '"+userShareName+"' limit 1\")";
+    }
 
-        URL url = new URL("https://www.boursedirect.fr/api/search/"+actionCode);
+    public Optional<EZAction> searchActionFromBourseDirect(Reporting reporting, String isin, EnumEZBroker broker, EzData ezData) throws IOException {
+        if (StringUtils.isBlank(isin) || isin.contains(" ") || isin.length() > 16)
+            throw new BRException("Erreur, cette information ne semble par être une action: "+isin);
+
+        URL url = new URL("https://www.boursedirect.fr/api/search/"+isin);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
             try {
@@ -96,31 +81,34 @@ public class FinanceTools {
                 Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
                 Map<String, Object> instruments = (Map<String, Object>) top.get("instruments");
                 List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");
-                if (data.size() == 0) return null;
+                if (data.size() == 0) return Optional.empty();
                 Map<String, Object> actionData = null;
                 if (data.size() == 1) actionData = data.get(0);
                 if (data.size() > 1) {
-                    actionData = broker.getImpl().searchActionInDifferentMarket(actionCode, data, ezData)
+                    actionData = broker
+                            .getImpl()
+                            .searchActionInDifferentMarket(isin, data, ezData)
                             .orElseGet(() -> {
-                                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
+                                reporting.info("Plus d'un résultat trouvé pour l'action:  " + isin + ". La 1ère est sélectionné. Vérifié: "+url);
                                 return data.get(0);
                             });
                 }
-                EZAction action = new EZAction();
-                action.setRawName((String) actionData.get("name")); // WP CAREY INC
-                action.setTicker((String) actionData.get("ticker")); // WPC
-                action.setIsin((String) actionData.get("isin")); // US92936U1097
-                Map<String, Object> market = (Map<String, Object>) actionData.get("market");
-                Map<String, Object> currency = (Map<String, Object>) actionData.get("currency"); // currency.get("code") will return EUR
-                Map<String, Object> iso = (Map<String, Object>) actionData.get("iso");
-                action.setType((String)iso.get("type"));
-                action.setMarketPlace(MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
-                action.setEzTicker(action.getMarketPlace().getGoogleFinanceCode()+":"+action.getTicker());
 
-                return action;
+                String rawName = (String) actionData.get("name"); // WP CAREY INC
+                String ticker = (String) actionData.get("ticker"); // WPC
+                // (String) actionData.get("isin"); // US92936U1097
+                Map<String, Object> market = (Map<String, Object>) actionData.get("market");
+//                Map<String, Object> currency = (Map<String, Object>) actionData.get("currency"); // currency.get("code") will return EUR
+                Map<String, Object> iso = (Map<String, Object>) actionData.get("iso");
+                String type = (String)iso.get("type");
+                EZMarketPlace marketPlace = (MarketPlaceUtil.foundByMic((String) market.get("mic"))); // XNYS
+                String ezTicker = marketPlace.getGoogleFinanceCode()+":"+ticker;
+                String countryCode = marketPlace.getCountry().getCode();
+
+                return Optional.of(new EZAction(isin, ezTicker, rawName, type, countryCode));
             }
             catch(Throwable e){
-                throw new BRException("Erreur pendant la récupération d'information sur l'action: "+actionCode+" Info venant de: "+ url, e);
+                throw new BRException("Erreur pendant la récupération d'information sur l'action: "+isin+" Info venant de: "+ url, e);
             }
         }
         finally {
@@ -144,8 +132,8 @@ public class FinanceTools {
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
-            action.setRawName((String) actionData.get("longname")); // WP CAREY INC
-            action.setTicker((String) actionData.get("symbol")); // WPC
+            action.setEzName((String) actionData.get("longname")); // WP CAREY INC
+            action.setEzTicker((String) actionData.get("symbol")); // WPC
             // action.setMarketPlace(MarketPlaceUtil.foundByMic((String) actionData.get("exchange"))); // NYQ
             return action;
 
@@ -172,11 +160,11 @@ public class FinanceTools {
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
-            action.setRawName((String) actionData.get("name")); // WP CAREY INC
-            action.setTicker((String) actionData.get("symbol")); // WPC
+            action.setEzName((String) actionData.get("name")); // WP CAREY INC
+            action.setEzTicker((String) actionData.get("symbol")); // WPC
             Map<String, Object> exchange = (Map<String, Object>) actionData.get("stock_exchange");
             String mic = (String) exchange.get("mic"); // XNYS
-            action.setMarketPlace(MarketPlaceUtil.foundByMic(mic));
+            // action.setMarketPlace(MarketPlaceUtil.foundByMic(mic));
             return action;
 
         }

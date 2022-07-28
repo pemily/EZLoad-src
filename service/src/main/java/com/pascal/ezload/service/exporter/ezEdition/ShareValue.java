@@ -17,7 +17,6 @@
  */
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,21 +31,16 @@ public class ShareValue {
     private String shareType; // can be "", "stock"
     private String ezAccountType; // PEA, CTO, etc.
     private EnumEZBroker broker; // bourseDirect
-    private boolean isDirty; // vrai si depuis la derniere analyse, le user a changé le nom
 
     public ShareValue(){}
-    public ShareValue(String tickerCode, String shareType, String ezAccountType, EnumEZBroker broker, String userShareName, boolean isDirty){
+    public ShareValue(String tickerCode, String shareType, String ezAccountType, EnumEZBroker broker, String userShareName){
         this.tickerCode = tickerCode;
         this.userShareName = userShareName;
-        this.isDirty = isDirty;
         this.shareType = shareType;
         this.broker = broker;
         this.ezAccountType = ezAccountType;
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
             this.userShareName = "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
-        }
-        else if (StringUtils.isBlank(userShareName)){
-            this.isDirty = true; // on n'accepte pas de valeur vide
         }
     }
 
@@ -88,18 +82,6 @@ public class ShareValue {
 
     public String getIsin(){
         return isin;
-    }
-
-    public boolean isDirty() {
-        return isDirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        isDirty = dirty;
-    }
-
-    public SimpleShareValue createSimpleShareValue() {
-        return new SimpleShareValue(isin, tickerCode, userShareName, shareType);
     }
 
 

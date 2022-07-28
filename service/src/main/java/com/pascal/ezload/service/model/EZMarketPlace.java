@@ -17,10 +17,7 @@
  */
 package com.pascal.ezload.service.model;
 
-import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.MarketPlaceData;
-
-public class EZMarketPlace implements MarketPlaceData {
+public class EZMarketPlace {
 
     private String stockExchange;
     private String city;
@@ -62,13 +59,4 @@ public class EZMarketPlace implements MarketPlaceData {
         return googleFinanceCode;
     }
 
-    public void fill(EzData data) {
-//        data.put(market_exchange, stockExchange);
-//        data.put(market_city, city);
-        data.put(market_mic, mic);
-//        data.put(market_acronym, acronym);
-        data.put(market_countryCode, country.getCode());
-        data.put(market_country, country.getName());
-        data.put(market_googleCode, googleFinanceCode);
-    }
 }

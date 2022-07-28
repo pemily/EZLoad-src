@@ -28,7 +28,7 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, ShareValue, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZAction, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
 
 export function App(){
@@ -47,7 +47,7 @@ export function App(){
     const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
     const [editOperation, setEditOperation] = useState<EzEdition|undefined>(undefined);
     const [selectedRule, setSelectedRule] = useState<SelectedRule|undefined>(undefined);
-    const [newShareValues, setNewShareValues] = useState<ShareValue[]|undefined>(undefined);
+    const [newShareValues, setNewShareValues] = useState<EZAction[]|undefined>(undefined);
     const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
     const [reportGenerated, setReportGenerated] = useState<boolean>(false);
     const [exited, setExited] = useState<boolean>(false);
@@ -82,7 +82,7 @@ export function App(){
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
-             setNewShareValues(r.newShareValues);
+             setNewShareValues(r.newEZAction);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);
@@ -90,10 +90,7 @@ export function App(){
              setAllProfiles(r.allProfiles);
              if (newShareValues === undefined){
                 setNewShareValuesDirty(false);
-             } 
-             else{
-                setNewShareValuesDirty(newShareValues.filter(r => r.dirty).length > 0);
-             }
+             }              
         })
         .catch((error) => {
             console.error("Error while loading Data.", error);
@@ -187,9 +184,17 @@ export function App(){
         }
     }
 
-    function saveShareValue(newValue: ShareValue){
+    function saveShareValue(newValue: EZAction){        
         ezApi.home.saveNewShareValue(newValue)
             .then(r => {
+                // mettre a jour le modele des newShareValues
+                setNewShareValues(newShareValues?.map(e => e.isin === newValue.isin ? {
+                    ...e,
+                    ezTicker: newValue.ezTicker,
+                    countryCode: newValue.countryCode,
+                    ezName: newValue.ezName,
+                    type: newValue.type,                    
+                } : e));
                 setNewShareValuesDirty(true);
             })
             .catch(e => console.error(e));

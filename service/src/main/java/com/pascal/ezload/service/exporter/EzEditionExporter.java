@@ -17,19 +17,15 @@
  */
 package com.pascal.ezload.service.exporter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
-import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EZOperation;
-import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.ShareUtil;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -52,31 +48,31 @@ public class EzEditionExporter {
     /**
      * exports the allEZModels into the EZPortfolio
      */
-    public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy, ShareUtil shareUtil) throws IOException {
+    public List<EzReport> exportModels(List<EZModel> allEZModels, EZPortfolioProxy ezPortfolioProxy) throws IOException {
         rulesEngine.validateRules();
 
         try(Reporting rep = reporting.pushSection("Rapport EZPortfolio")){
             return allEZModels.stream()
-                    .map(ezModel -> loadOperations(ezPortfolioProxy, ezModel, ezModel.getOperations(), shareUtil))
+                    .map(ezModel -> loadOperations(ezPortfolioProxy, ezModel, ezModel.getOperations()))
                     .collect(Collectors.toList());
         }
     }
 
-    private EzReport loadOperations(EZPortfolioProxy ezPortfolioProxy, EZModel fromEzModel, List<EZOperation> operations, ShareUtil shareUtil) {
+    private EzReport loadOperations(EZPortfolioProxy ezPortfolioProxy, EZModel fromEzModel, List<EZOperation> operations) {
         EzReport ezReport = new EzReport(fromEzModel);
         List<EzEdition> editions = new LinkedList<>();
         for (EZOperation op : operations){
             EzData ezData = new EzData();
             fromEzModel.fill(ezData);
-            EzEdition edit = loadOperation(ezPortfolioProxy, op, ezData, shareUtil);
+            EzEdition edit = loadOperation(ezPortfolioProxy, op, ezData);
             editions.add(edit);
         }
         ezReport.setEzEditions(editions);
         return ezReport;
     }
 
-    private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation, EzData ezData, ShareUtil shareUtil) {
-        return rulesEngine.transform(ezPortfolioProxy, fromEzOperation, ezData, shareUtil);
+    private EzEdition loadOperation(EZPortfolioProxy ezPortfolioProxy, EZOperation fromEzOperation, EzData ezData) {
+        return rulesEngine.transform(ezPortfolioProxy, fromEzOperation, ezData);
     }
 
 }

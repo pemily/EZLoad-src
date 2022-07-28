@@ -23,10 +23,10 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
+import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
@@ -53,7 +53,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public List<EzReport> save(EzProfil ezProfil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId, Set<ShareValue> newShareValues){
+    public List<EzReport> save(EzProfil ezProfil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId){
         throw new NotImplementedException();
     }
 
@@ -88,18 +88,38 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<SimpleShareValue> findShareByIsin(String isin) {
+    public Optional<EZAction> findShareByIsin(String isin) {
         throw new NotImplementedException();
     }
 
     @Override
-    public EZPortfolioProxy createDeepCopy() {
+    public EZPortfolioProxy createDeepCopy(List<EZAction> newShares) {
         return null;
     }
 
     @Override
     public Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue ticker) {
         return Optional.empty();
+    }
+
+    @Override
+    public String getEzLiquidityName(String ezAccountType, EnumEZBroker broker) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void newAction(EZAction v) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<EZAction> getNewShares() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void updateNewShare(EZAction shareValue) {
+        throw new NotImplementedException();
     }
 
 }

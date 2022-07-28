@@ -22,9 +22,9 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
+import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
@@ -40,7 +40,7 @@ public interface EZPortfolioProxy {
     void load(Reporting reporting) throws Exception;
 
     // return the list of EzEdition operation not saved
-    List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operations, List<String> ignoreOperations, Set<ShareValue> newShareValues) throws Exception;
+    List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operations, List<String> ignoreOperations) throws Exception;
 
     Optional<EZDate> getLastOperationDate(EnumEZBroker courtier, EZAccountDeclaration account);
 
@@ -54,10 +54,17 @@ public interface EZPortfolioProxy {
 
     Set<ShareValue> getShareValuesFromMonPortefeuille();
 
-    Optional<SimpleShareValue> findShareByIsin(String isin);
+    Optional<EZAction> findShareByIsin(String isin);
 
-    EZPortfolioProxy createDeepCopy();
+    EZPortfolioProxy createDeepCopy(List<EZAction> newShares);
 
     Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue share);
 
+    String getEzLiquidityName(String ezAccountType, EnumEZBroker broker);
+
+    void newAction(EZAction v);
+
+    List<EZAction> getNewShares();
+
+    void updateNewShare(EZAction shareValue);
 }

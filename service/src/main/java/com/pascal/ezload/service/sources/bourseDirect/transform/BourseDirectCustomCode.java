@@ -75,7 +75,9 @@ public class BourseDirectCustomCode implements BrokerCustomCode {
         if (sinara != null){
             nature = sinara.get("nature") instanceof String ? (String) sinara.get("nature") : null;
         }
-        return nature != null && nature.equals("stock");
+        // si nature n'est pas une string, on a pas reussis a determiné, mais ca peut etre un stock quand meme, donc dans le doute
+        // on l'elimine pas
+        return nature == null || nature.equals("stock");
     }
 
     private int sortByLieu(String actionCode, EzData ezData, Map<String, Object> d1, Map<String, Object> d2) {

@@ -95,7 +95,7 @@ public class MesOperations  {
     }
 
     public void newOperation(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef){
-        newOperations.add(newOperationRow(EZPorfolioProxyV5.FIRST_ROW_MES_OPERATIONS+newOperations.size(), ezData, operationEdition, ruleDef));
+        newOperations.add(newOperationRow(EZPorfolioProxyV5.FIRST_ROW_MES_OPERATIONS+existingOperations.getValues().size()+newOperations.size(), ezData, operationEdition, ruleDef));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {

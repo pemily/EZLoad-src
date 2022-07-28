@@ -25,12 +25,12 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.SimpleShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
+import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
@@ -38,7 +38,10 @@ import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownl
 import com.pascal.ezload.service.util.Sleep;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -79,8 +82,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                     PRUSheet +"!A"+FIRST_ROW_PRU+":A");
 
         SheetValues allEZLoadShares = ezSheets.get(0);
-        EZLoadSimpleShareSheet ezLoadSimpleShareSheet = new EZLoadSimpleShareSheet(allEZLoadShares);
-        ezPortfolio.setEzLoadShareSheet(ezLoadSimpleShareSheet);
+        EZLoadShareSheet ezLoadShareSheet = new EZLoadShareSheet(allEZLoadShares);
+        ezLoadShareSheet.addHeaderIfMissing();
+        ezPortfolio.setEzLoadShareSheet(ezLoadShareSheet);
         reporting.info(allEZLoadShares.getValues().size() + " rows from "+ EZLoadSharesSheet +" loaded.");
 
         SheetValues allOperations = ezSheets.get(1);
@@ -100,7 +104,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
     @Override
     // return the list of EzEdition operation not saved
-    public List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId, Set<ShareValue> newShareValues) throws Exception {
+    public List<EzReport> save(EzProfil profil, Reporting reporting, List<EzReport> operationsToAdd, List<String> ignoreEzEditionId) throws Exception {
         reporting.info("Saving EZPortfolio...");
         MesOperations operations = ezPortfolio.getMesOperations();
 
@@ -167,13 +171,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
             // attend un peu pour etre sur que ce soit fait
             Sleep.waitSeconds(5);
 
-            EZLoadSimpleShareSheet ezLoadSheetShareValues = ezPortfolio.getEZLoadShareSheet();
-            newShareValues
-                    .forEach(sv -> ezLoadSheetShareValues.newShareValue(sv.createSimpleShareValue()));
+            EZLoadShareSheet ezLoadSheetShareValues = ezPortfolio.getEZLoadShareSheet();
 
             // Update all the sheets of EZPortfolio in one call
             sheets.batchUpdate(reporting,
-                    SheetValues.createFromRowLists(EZLoadSharesSheet+"!A" + (ezLoadSheetShareValues.getNbOfExistingShareValues()+FIRST_ROW_EZLOAD_SHARES) + ":D",
+                    SheetValues.createFromRowLists(EZLoadSharesSheet+"!A" + (ezLoadSheetShareValues.getNbOfExistingShareValues()+FIRST_ROW_EZLOAD_SHARES) + ":E",
                             ezLoadSheetShareValues.getNewShareValues()),
                     SheetValues.createFromRowLists(MesOperationsSheet +"!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
@@ -266,20 +268,50 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<SimpleShareValue> findShareByIsin(String isin) {
+    public Optional<EZAction> findShareByIsin(String isin) {
         return ezPortfolio.getEZLoadShareSheet().findByIsin(isin);
     }
 
     @Override
-    public EZPortfolioProxy createDeepCopy() {
+    public EZPortfolioProxy createDeepCopy(List<EZAction> newShares) {
         EZPorfolioProxyV5 copy = new EZPorfolioProxyV5(sheets);
-        copy.ezPortfolio = this.ezPortfolio.createDeepCopy();
+        copy.ezPortfolio = this.ezPortfolio.createDeepCopy(newShares);
         return copy;
     }
 
     @Override
     public Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue ticker) {
         return ezPortfolio.getMonPortefeuille().createFrom(ticker);
+    }
+
+    @Override
+    public String getEzLiquidityName(String ezAccountType, EnumEZBroker broker) {
+        return getShareValuesFromMonPortefeuille()
+                .stream()
+                .filter(s -> s.getTickerCode().equals(ShareValue.LIQUIDITY_CODE)
+                        && s.getBroker().equals(broker)
+                        && s.getEzAccountType().equals(ezAccountType))
+                .findFirst()
+                .map(ShareValue::getUserShareName)
+                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", ezAccountType, broker, "").getUserShareName());
+    }
+
+    @Override
+    public void newAction(EZAction v) {
+        ezPortfolio.getEZLoadShareSheet().newShareValue(v);
+    }
+
+    @Override
+    public List<EZAction> getNewShares() {
+        return ezPortfolio.getEZLoadShareSheet().getNewShareValues()
+                .stream()
+                .filter(EZLoadShareSheet::isNotHeader)
+                .map(EZLoadShareSheet::row2EZAction).collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateNewShare(EZAction shareValue) {
+        ezPortfolio.getEZLoadShareSheet().updateNewShareValue(shareValue);
     }
 
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {
