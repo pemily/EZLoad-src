@@ -338,7 +338,7 @@ public class SettingsManager {
         if (dividendCalendarConfig.getYearSelector() == null)
             dividendCalendarConfig.setYearSelector(MainSettings.EnumAlgoYearSelector.ANNEE_EN_COURS);
         if (dividendCalendarConfig.getPercentSelector() == null)
-            dividendCalendarConfig.setPercentSelector(MainSettings.EnumPercentSelector.ADAPTATIF);
+            dividendCalendarConfig.setPercentSelector(MainSettings.EnumPercentSelector.STABLE);
         return dividendCalendarConfig;
     }
 

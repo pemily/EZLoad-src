@@ -217,10 +217,12 @@ public class EngineHandler {
                     }
                     else {
 
-                        serverState.setOriginalEzPortfolioProxy(null); // don't use the cache version when uploading
-                        serverState.setEzNewPortfolioProxy(null); // will be also reloaded later
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
                         EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
+                        serverState.getEzNewPortfolioProxy().getNewShares().forEach(ezPortfolioProxy::newAction);
+
+                        serverState.setOriginalEzPortfolioProxy(null); // don't use the cache version when uploading
+                        serverState.setEzNewPortfolioProxy(null); // will be also reloaded later
 
                         List<EzReport> result = ezPortfolioProxy.save(ezProfil, reporting, serverState.getEzReports(), ignoreEzEditionId);
 

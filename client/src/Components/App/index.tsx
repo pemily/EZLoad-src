@@ -321,7 +321,10 @@ export function App(){
                                     <Button alignSelf="start" margin="medium"
                                         disabled={processRunning || ezProfil.bourseDirect?.accounts?.filter(ac => ac.active).length === 0} onClick={() =>
                                             jsonCall(ezApi.engine.analyze())
-                                            .then(r => followProcess(r))
+                                            .then(r => {
+                                                setNewShareValuesDirty(false);
+                                                return followProcess(r);
+                                            })
                                             .catch(e => console.error(e) )
                                         }
                                         size="small" icon={<Services size='small'/>} label="Générer les opérations"/>                                                

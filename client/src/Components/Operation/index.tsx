@@ -153,7 +153,17 @@ export function Operation(props: OperationProps){
                         </TableBody>
                     </Table>     
                     )}
-                </List>                     
+                </List>      
+                { props.operation.ezMaPerformanceEdition 
+                    && props.operation.ezMaPerformanceEdition?.value !== undefined
+                    && props.operation.ezMaPerformanceEdition?.value !== null
+                    && props.operation.ezMaPerformanceEdition?.value !== ""
+                    && props.operation.ezMaPerformanceEdition?.value !== "0"
+                    && (
+                    <Box margin="small" pad="none" alignSelf="center">
+                        <Text>{"Mise à jour de l'entrée/sortie dans MaPerformance, ajout de: "+props.operation.ezMaPerformanceEdition?.value }</Text>
+                    </Box>  )
+                }             
                 </>           
             )}
         </Box>

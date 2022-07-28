@@ -76,6 +76,9 @@ public class SheetValues {
         String r[] = StringUtils.divide(range, '!');
         assert r != null;
         String cells[] = StringUtils.divide(r[1], ":");
+        if (cells == null){
+            cells = new String[]{r[1], r[1]}; // no : to separate, the range correspond to only one cell
+        }
         CellXY start = extractCell(cells[0]);
         CellXY end = extractCell(cells[1]);
         return new CellXY[]{ start, end };

@@ -55,6 +55,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     private static final String MesOperationsSheet = "MesOperations";
     private static final String MonPortefeuilleSheet = "MonPortefeuille";
     private static final String EZLoadSharesSheet = "EZLoadActions";
+    private static final String MaPerformanceSheet = "MaPerformance";
     private static final String PRUSheet = "PRU";
 
     private final GDriveSheets sheets;
@@ -79,7 +80,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                                     EZLoadSharesSheet +"!A"+FIRST_ROW_EZLOAD_SHARES+":F",
                                                     MesOperationsSheet +"!A"+FIRST_ROW_MES_OPERATIONS+":L",
                                                     MonPortefeuilleSheet +"!A"+FIRST_ROW_MON_PORTEFEUILLE+":AN",
-                                                    PRUSheet +"!A"+FIRST_ROW_PRU+":A");
+                                                    PRUSheet +"!A"+FIRST_ROW_PRU+":A",
+                                                    MaPerformanceSheet+"!C4:C4");
 
         SheetValues allEZLoadShares = ezSheets.get(0);
         EZLoadShareSheet ezLoadShareSheet = new EZLoadShareSheet(allEZLoadShares);
@@ -100,6 +102,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         SheetValues allPRUs = ezSheets.get(3);
         PRU pru = new PRU(allPRUs);
         reporting.info(allPRUs.getValues().size() + " rows from "+ PRUSheet +" loaded.");
+
+        SheetValues performance = ezSheets.get(4);
+        MaPerformance maPerformance = new MaPerformance(performance);
+        ezPortfolio.setMaPerformance(maPerformance);
+        reporting.info(performance.getValues().size() + " rows from "+ MaPerformanceSheet +" loaded.");
     }
 
     @Override
@@ -150,6 +157,9 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                                         ezPortfolio.getMonPortefeuille().apply(ezPortefeuilleEdition);
                                         nbPortefeuilleRowSaved.incrementAndGet();
                                     });
+
+                                    ezPortfolio.getMaPerformance().updateWith(ezEdition.getEzMaPerformanceEdition());
+
                                 } else if (!ezEdition.getEzPortefeuilleEditions().isEmpty()) {
                                     throw new IllegalStateException("Il y a une opération sur le portefeuille qui n'est pas déclarée dans la liste des Opérations. le problème est avec la règle: "
                                             + ezEdition.getRuleDefinitionSummary().getBroker() + "_v" + ezEdition.getRuleDefinitionSummary().getBrokerFileVersion()
@@ -179,7 +189,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                             ezLoadSheetShareValues.getNewShareValues()),
                     SheetValues.createFromRowLists(MesOperationsSheet +"!A" + (operations.getNbOfExistingOperations()+FIRST_ROW_MES_OPERATIONS) + ":L",
                                 operations.getNewOperations()),
-                    monPortefeuille
+                    monPortefeuille,
+                    ezPortfolio.getMaPerformance().getSheetValues()
             );
 
             ezPortfolio.getMesOperations().saveDone();
@@ -312,6 +323,11 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     @Override
     public void updateNewShare(EZAction shareValue) {
         ezPortfolio.getEZLoadShareSheet().updateNewShareValue(shareValue);
+    }
+
+    @Override
+    public void applyOnPerformance(EzPerformanceEdition ezPerformanceEdition) {
+        ezPortfolio.getMaPerformance().updateWith(ezPerformanceEdition);
     }
 
     public static boolean isCompatible(Reporting reporting, GDriveSheets sheets) throws Exception {

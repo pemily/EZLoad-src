@@ -26,6 +26,7 @@ public class EZPortfolio {
     private MesOperations mesOperations;
     private MonPortefeuille monPortefeuille;
     private EZLoadShareSheet ezLoadShareSheet;
+    private MaPerformance maPerformance;
 
     public EZPortfolio(String ezPortfolioVersion){
         this.ezPortfolioVersion = ezPortfolioVersion;
@@ -51,14 +52,12 @@ public class EZPortfolio {
         return ezPortfolioVersion;
     }
 
-    public EZPortfolio createDeepCopy(List<EZAction> newShares){
-        EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
-        copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
-        copy.setMesOperations(mesOperations.createDeepCopy());
-        EZLoadShareSheet ezLoadShareSheetCopy = ezLoadShareSheet.createDeepCopy();
-        newShares.forEach(ezLoadShareSheetCopy::newShareValue);
-        copy.setEzLoadShareSheet(ezLoadShareSheetCopy);
-        return copy;
+    public MaPerformance getMaPerformance() {
+        return maPerformance;
+    }
+
+    public void setMaPerformance(MaPerformance maPerformance) {
+        this.maPerformance = maPerformance;
     }
 
     public EZLoadShareSheet getEZLoadShareSheet() {
@@ -67,6 +66,17 @@ public class EZPortfolio {
 
     public void setEzLoadShareSheet(EZLoadShareSheet ezLoadShareSheet) {
         this.ezLoadShareSheet = ezLoadShareSheet;
+    }
+
+    public EZPortfolio createDeepCopy(List<EZAction> newShares){
+        EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
+        copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
+        copy.setMesOperations(mesOperations.createDeepCopy());
+        copy.setMaPerformance(maPerformance.createDeepCopy());
+        EZLoadShareSheet ezLoadShareSheetCopy = ezLoadShareSheet.createDeepCopy();
+        newShares.forEach(ezLoadShareSheetCopy::newShareValue);
+        copy.setEzLoadShareSheet(ezLoadShareSheetCopy);
+        return copy;
     }
 
 }

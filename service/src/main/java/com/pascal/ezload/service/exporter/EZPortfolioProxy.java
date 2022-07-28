@@ -18,10 +18,7 @@
 package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.config.EzProfil;
-import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
-import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
+import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZAction;
@@ -67,4 +64,6 @@ public interface EZPortfolioProxy {
     List<EZAction> getNewShares();
 
     void updateNewShare(EZAction shareValue);
+
+    void applyOnPerformance(EzPerformanceEdition ezPerformanceEdition);
 }

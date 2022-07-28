@@ -127,6 +127,15 @@ public class RulesEngine {
                     else{
                         ezEdition.setEzPortefeuilleEditions(ezPortefeuilleEditions);
                     }
+
+                    EzPerformanceEdition performanceEdition = applyRuleForMaPerformance(ruleDef, ezPortfolioProxy, ezData);
+                    if (performanceEdition.hasErrors()){
+                        ezEdition.getErrors().add(performanceEdition.getErrors());
+                    }
+                    else {
+                        ezEdition.setEzMaPerformanceEdition(performanceEdition);
+                    }
+
                 }
             }
             catch(Exception e){
@@ -228,6 +237,21 @@ public class RulesEngine {
 
                 })
                 .collect(Collectors.toList());
+    }
+
+    private EzPerformanceEdition applyRuleForMaPerformance(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
+        EzPerformanceEdition ezPerformanceEdition = new EzPerformanceEdition();
+        String condition = ruleDefinition.getPerformanceRule().getCondition();
+        condition = StringUtils.isBlank(condition) ? "true" : condition;
+        if (Boolean.parseBoolean(eval(ezPerformanceEdition, ruleDefinition.getName()+".Performance.condition", condition, data, functions))) {
+            if (StringUtils.isNotBlank(ruleDefinition.getPerformanceRule().getInputOutputValueExpr())) {
+                String value = eval(ezPerformanceEdition, ruleDefinition.getName() + ".Performance.inputOutputValue", ruleDefinition.getPerformanceRule().getInputOutputValueExpr(), data, functions);
+                ezPerformanceEdition.setValue(value);
+                portfolioProxy.applyOnPerformance(ezPerformanceEdition);
+            }
+        }
+        return ezPerformanceEdition;
     }
 
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, String ezAccountType, EzData data) {
