@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.pascal.ezload</groupId>
         <artifactId>EZLoadRoot</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -221,5 +221,11 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

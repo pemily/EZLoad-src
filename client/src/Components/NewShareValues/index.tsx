@@ -17,12 +17,12 @@
  */
 import { Box, List, Text } from "grommet";
 import { TextField } from '../Tools/TextField';
-import { ShareValue } from '../../ez-api/gen-api/EZLoadApi';
+import { EZAction } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface NewShareValuesProps {
-    newShareValues: ShareValue[]|undefined;
+    newShareValues: EZAction[]|undefined;
     processRunning: boolean;
-    saveShareValue: (newVal: ShareValue) => void;
+    saveShareValue: (newVal: EZAction) => void;
 }      
 
 export function NewShareValues(props: NewShareValuesProps){
@@ -34,16 +34,36 @@ export function NewShareValues(props: NewShareValuesProps){
                 <Text size="small">Puis cliquez sur "Générer les opérations" pour prendre en compte vos modifications</Text></>)}
             <List data={props.newShareValues} margin="none" pad="none"
              background={['light-2', 'light-4']}>
-                {(shareValue: ShareValue, index: number) => (
+                {(shareValue: EZAction, index: number) => (
                     <Box direction="row" margin="xsmall">
-                        <Text size="small" alignSelf="center">{shareValue.tickerCode}</Text>
+                        <Text size="small" alignSelf="center">{shareValue.isin}</Text>                        
+                        <TextField
+                        onChange={newVal => {
+                                    if (newVal !== shareValue.ezTicker) 
+                                        props.saveShareValue({...shareValue, ezTicker:newVal})
+                                    }}
+                        value={shareValue.ezTicker}
+                        id={"shareTicker"+index}                                 
+                        isRequired={true}                  
+                        readOnly={props.processRunning}
+                        />                        
                         <TextField 
                         onChange={newVal => {
-                                    if (newVal !== shareValue.userShareName) 
-                                        props.saveShareValue({...shareValue, userShareName:newVal, dirty:true})
+                                    if (newVal !== shareValue.ezName) 
+                                        props.saveShareValue({...shareValue, ezName:newVal})
                                     }}
-                        value={shareValue.userShareName}
+                        value={shareValue.ezName}
                         id={"shareValue"+index}                                 
+                        isRequired={true}                  
+                        readOnly={props.processRunning}
+                        />
+                        <TextField 
+                        onChange={newVal => {
+                                    if (newVal !== shareValue.type) 
+                                        props.saveShareValue({...shareValue, type:newVal})
+                                    }}
+                        value={shareValue.type}
+                        id={"shareType"+index}                                 
                         isRequired={true}                  
                         readOnly={props.processRunning}
                         />

@@ -19,31 +19,24 @@ package com.pascal.ezload.service.model;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
+import com.pascal.ezload.service.util.CountryUtil;
 
 public class EZAction implements ActionData {
     private String ezName; // the name from the user preference
-    private String rawName; // the name from the site BourseDirect https://www.boursedirect.fr/api/search/
     private String ezTicker; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
-    private String ticker; // WPC, EPA
     private String isin;
-    private String pruCellReference;
-    private EZMarketPlace marketPlace; // the marketPlace.googleFinanceCode contains: NYSE, EPA
+    private String countryCode;
     private String type;
+    private String pruCellReference;
 
-    public String getRawName() {
-        return rawName;
-    }
+    public EZAction(){}
 
-    public void setRawName(String rawName) {
-        this.rawName = rawName;
-    }
-
-    public String getTicker() {
-        return ticker;
-    }
-
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
+    public EZAction(String isin, String ezTicker, String name, String type, String countryCode) {
+        this.isin = isin;
+        this.ezTicker = ezTicker;
+        this.ezName = name;
+        this.type = type;
+        this.countryCode = countryCode;
     }
 
     public String getIsin() {
@@ -52,14 +45,6 @@ public class EZAction implements ActionData {
 
     public void setIsin(String isin) {
         this.isin = isin;
-    }
-
-    public EZMarketPlace getMarketPlace() {
-        return marketPlace;
-    }
-
-    public void setMarketPlace(EZMarketPlace marketPlace) {
-        this.marketPlace = marketPlace;
     }
 
     public String getEzName() {
@@ -94,15 +79,25 @@ public class EZAction implements ActionData {
         return type;
     }
 
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+
     public void fill(EzData data) {
-        data.put(share_rawName, rawName);
-        data.put(share_ticker, ticker);
         data.put(share_isin, isin);
         data.put(share_ezName, ezName);
         data.put(share_ezCode, ezTicker);
         data.put(share_costPrice, pruCellReference);
         data.put(share_type, type);
-        marketPlace.fill(data);
+        data.put(share_countryCode, countryCode == null ? "" : countryCode);
+        EZCountry country = countryCode == null ? null : CountryUtil.foundByCode(countryCode);
+        data.put(share_country, country == null ? "" : country.getName());
     }
 
 }

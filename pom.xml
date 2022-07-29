@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pascal.ezload</groupId>
     <artifactId>EZLoadRoot</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <description>EZLoad an automatic loader for EZPortfolio</description>
     <inceptionYear>2021</inceptionYear>
 
@@ -236,12 +236,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-text</artifactId>
-                <version>1.9</version>
-            </dependency>
-
-            <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.11.0</version>
@@ -251,6 +245,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.21</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.9</version>
             </dependency>
 
             <dependency>

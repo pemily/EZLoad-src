@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.gdrive;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -27,10 +28,7 @@ import com.pascal.ezload.service.util.StringUtils;
 import com.pascal.ezload.service.util.SupplierWithException;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GDriveSheets {
@@ -64,10 +62,30 @@ public class GDriveSheets {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
+
             return response.getValues();
         });
         reporting.info("Google Drive lecture OK");
         return SheetValues.createFromObjectLists(range, r);
+    }
+
+    public void createSheet(String tabTitle) throws IOException {
+        // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#addsheetrequest
+        // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#AddChartRequest
+        /// return sheetsService.spreadsheets().batchUpdate(spreadSheetId, new BatchUpdateSpreadsheetRequest().setRequests(requests)).execute();
+        Request request = new Request();
+        request.setAddSheet(new AddSheetRequest().setProperties(new SheetProperties().setTitle(tabTitle).setHidden(true)));
+        try {
+            BatchUpdateSpreadsheetResponse resp = service.spreadsheets()
+                    .batchUpdate(spreadsheetId, new BatchUpdateSpreadsheetRequest().setRequests(List.of(request))).execute();
+        }
+        catch (GoogleJsonResponseException ex){
+            boolean alreadyExists = ex.getMessage() != null
+                    && (ex.getMessage().contains("déjà") || ex.getMessage().contains("already"));
+            if  (!alreadyExists){
+                throw ex;
+            }
+        }
     }
 
     public int update(Reporting reporting, String range, List<Row> values) throws Exception {

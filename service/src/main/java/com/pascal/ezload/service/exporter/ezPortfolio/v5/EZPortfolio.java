@@ -17,10 +17,16 @@
  */
 package com.pascal.ezload.service.exporter.ezPortfolio.v5;
 
+import com.pascal.ezload.service.model.EZAction;
+
+import java.util.List;
+
 public class EZPortfolio {
     private final String ezPortfolioVersion;
     private MesOperations mesOperations;
     private MonPortefeuille monPortefeuille;
+    private EZLoadShareSheet ezLoadShareSheet;
+    private MaPerformance maPerformance;
 
     public EZPortfolio(String ezPortfolioVersion){
         this.ezPortfolioVersion = ezPortfolioVersion;
@@ -46,10 +52,31 @@ public class EZPortfolio {
         return ezPortfolioVersion;
     }
 
-    public EZPortfolio createDeepCopy(){
+    public MaPerformance getMaPerformance() {
+        return maPerformance;
+    }
+
+    public void setMaPerformance(MaPerformance maPerformance) {
+        this.maPerformance = maPerformance;
+    }
+
+    public EZLoadShareSheet getEZLoadShareSheet() {
+        return ezLoadShareSheet;
+    }
+
+    public void setEzLoadShareSheet(EZLoadShareSheet ezLoadShareSheet) {
+        this.ezLoadShareSheet = ezLoadShareSheet;
+    }
+
+    public EZPortfolio createDeepCopy(List<EZAction> newShares){
         EZPortfolio copy = new EZPortfolio(ezPortfolioVersion);
         copy.setMonPortefeuille(monPortefeuille.createDeepCopy());
         copy.setMesOperations(mesOperations.createDeepCopy());
+        copy.setMaPerformance(maPerformance.createDeepCopy());
+        EZLoadShareSheet ezLoadShareSheetCopy = ezLoadShareSheet.createDeepCopy();
+        newShares.forEach(ezLoadShareSheetCopy::newShareValue);
+        copy.setEzLoadShareSheet(ezLoadShareSheetCopy);
         return copy;
     }
+
 }

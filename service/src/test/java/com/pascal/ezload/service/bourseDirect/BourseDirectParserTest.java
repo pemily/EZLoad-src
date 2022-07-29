@@ -17,28 +17,20 @@
  */
 package com.pascal.ezload.service.bourseDirect;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.PRU;
-import com.pascal.ezload.service.gdrive.Row;
-import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.FileUtil;
 import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.ShareUtil;
 import com.pascal.ezload.service.util.TextReporting;
 
-import org.junit.jupiter.api.Test;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BourseDirectParserTest {
 
@@ -79,7 +71,6 @@ public class BourseDirectParserTest {
         TextReporting reporting = new TextReporting();
         BourseDirectEZAccountDeclaration bracc = new BourseDirectEZAccountDeclaration();
         bracc.setName("Pascal CTO");
-        ShareUtil shareUtil = new ShareUtil(new HashSet<>());
         MainSettings mainSettings = new MainSettings();
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         mainSettings.setEzLoad(ezLoad);

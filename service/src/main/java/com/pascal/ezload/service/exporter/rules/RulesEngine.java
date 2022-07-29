@@ -23,19 +23,20 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
-import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
-import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZCountry;
+import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.CountryUtil;
 import com.pascal.ezload.service.util.FinanceTools;
 import com.pascal.ezload.service.util.JsonUtil;
-import com.pascal.ezload.service.util.ShareUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class RulesEngine {
         this.rulesManager = rulesManager;
     }
 
-    public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData, ShareUtil shareUtil) {
+    public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData) {
         operation.fill(ezData);
 
         EzEdition ezEdition = new EzEdition();
@@ -100,7 +101,7 @@ public class RulesEngine {
             ezEdition.setRuleDefinitionSummary(ruleDef);
             try {
                 String ezAccountType = getEzAccountType(new GetFinancialDataError(), ruleDef, ezData);
-                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ruleDef, ezData, ezAccountType, shareUtil);
+                List<EzOperationEdition> ezOperationEditions = applyRuleForOperation(ezPortfolioProxy, ruleDef, ezData, ezAccountType);
                 if (ezOperationEditions.isEmpty()){
                     reporting.info("Cette opération n'a pas d'impact sur le portefeuille");
                     // même si ignoré, je rajoute ces data, pour pouvoir voir dans la UI ce que l'on a récupéré
@@ -126,6 +127,15 @@ public class RulesEngine {
                     else{
                         ezEdition.setEzPortefeuilleEditions(ezPortefeuilleEditions);
                     }
+
+                    EzPerformanceEdition performanceEdition = applyRuleForMaPerformance(ruleDef, ezPortfolioProxy, ezData);
+                    if (performanceEdition.hasErrors()){
+                        ezEdition.getErrors().add(performanceEdition.getErrors());
+                    }
+                    else {
+                        ezEdition.setEzMaPerformanceEdition(performanceEdition);
+                    }
+
                 }
             }
             catch(Exception e){
@@ -164,22 +174,20 @@ public class RulesEngine {
         return eval(entity, "Erreur lors de l'appel à: "+ getEzAccountTypeFunction, getEzAccountTypeFunction +"()", data, functions);
     }
 
-    private List<EzOperationEdition> applyRuleForOperation(RuleDefinition ruleDefinition, EzData data, String ezAccountType, ShareUtil shareUtil) {
+    private List<EzOperationEdition> applyRuleForOperation(EZPortfolioProxy ezPortfolioProxy, RuleDefinition ruleDefinition, EzData data, String ezAccountType) {
         CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
 
-        data.put(OperationData.operation_ezLiquidityName, shareUtil.getEzLiquidityName(ezAccountType, ruleDefinition.getBroker()));
+        data.put(OperationData.operation_ezLiquidityName, ezPortfolioProxy.getEzLiquidityName(ezAccountType, ruleDefinition.getBroker()));
 
         // compute the share Id
-        String shareId = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
-        if (!StringUtils.isBlank(shareId)){
-            EZAction action = FinanceTools.getInstance().get(reporting, shareId, ezAccountType, ruleDefinition.getBroker(), shareUtil, data);
+        String isin = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
+        if (!StringUtils.isBlank(isin)){
+            EZAction action = FinanceTools.getInstance().get(reporting, ezPortfolioProxy, isin, ruleDefinition.getBroker(), data);
             action.fill(data);
         }
         else{
             // a stupid action just to have the variables list when creating a new rule
-            EZMarketPlace marketPlace = new EZMarketPlace("", "", "", "", "", new EZCountry("", ""));
             EZAction action = new EZAction();
-            action.setMarketPlace(marketPlace);
             action.fill(data);
         }
 
@@ -229,6 +237,21 @@ public class RulesEngine {
 
                 })
                 .collect(Collectors.toList());
+    }
+
+    private EzPerformanceEdition applyRuleForMaPerformance(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, EzData data) {
+        CommonFunctions functions = rulesManager.getCommonScript(ruleDefinition.getBroker(), ruleDefinition.getBrokerFileVersion());
+        EzPerformanceEdition ezPerformanceEdition = new EzPerformanceEdition();
+        String condition = ruleDefinition.getPerformanceRule().getCondition();
+        condition = StringUtils.isBlank(condition) ? "true" : condition;
+        if (Boolean.parseBoolean(eval(ezPerformanceEdition, ruleDefinition.getName()+".Performance.condition", condition, data, functions))) {
+            if (StringUtils.isNotBlank(ruleDefinition.getPerformanceRule().getInputOutputValueExpr())) {
+                String value = eval(ezPerformanceEdition, ruleDefinition.getName() + ".Performance.inputOutputValue", ruleDefinition.getPerformanceRule().getInputOutputValueExpr(), data, functions);
+                ezPerformanceEdition.setValue(value);
+                portfolioProxy.applyOnPerformance(ezPerformanceEdition);
+            }
+        }
+        return ezPerformanceEdition;
     }
 
     private List<EzPortefeuilleEdition> applyRuleForPortefeuille(RuleDefinition ruleDefinition, EZPortfolioProxy portfolioProxy, String ezAccountType, EzData data) {

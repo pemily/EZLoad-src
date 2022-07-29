@@ -19,21 +19,19 @@ package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class EzServerState {
     private boolean processRunning = false;
 
     private List<EzReport> ezReports = new LinkedList<>();
     private List<String> filesNotYetLoaded = new LinkedList<>();
-    private Set<ShareValue> newShares = new HashSet<>(); // liste des nouvelles actions detecté dans les operations
 
-    private EZPortfolioProxy ezPortfolioProxy; // cached, if null will be loaded from google drive, else clone it and use it
+    private EZPortfolioProxy ezOriginalPortfolioProxy; // cached, if null will be loaded from google drive, Do not modified it, it must kept in read only mode
+    private EZPortfolioProxy ezNewPortfolioProxy; // cached, if null will be loaded from google drive, it is used to contains the updates
+    private boolean ezActionDirty; // if the user changed the name of an action
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -59,27 +57,35 @@ public class EzServerState {
         this.filesNotYetLoaded = filesNotYetLoaded;
     }
 
-    public Set<ShareValue> getNewShares() {
-        return newShares;
+    public EZPortfolioProxy getOriginalEzPortfolioProxy() {
+        return ezOriginalPortfolioProxy;
     }
 
-    public void setNewShares(Set<ShareValue> newShares) {
-        this.newShares = newShares;
+    public void setOriginalEzPortfolioProxy(EZPortfolioProxy ezPortfolioProxy) {
+        this.ezOriginalPortfolioProxy = ezPortfolioProxy;
     }
 
-    public EZPortfolioProxy getEzPortfolioProxy() {
-        return ezPortfolioProxy;
+    public boolean isEzActionDirty() {
+        return ezActionDirty;
     }
 
-    public void setEzPortfolioProxy(EZPortfolioProxy ezPortfolioProxy) {
-        this.ezPortfolioProxy = ezPortfolioProxy;
+    public void setEzActionDirty(boolean ezActionDirty) {
+        this.ezActionDirty = ezActionDirty;
     }
 
     public void clear(){
-        ezPortfolioProxy = null;
+        ezOriginalPortfolioProxy = null;
         processRunning = false;
+        ezActionDirty = false;
         ezReports = new LinkedList<>();
         filesNotYetLoaded = new LinkedList<>();
-        newShares = new HashSet<>();
+    }
+
+    public EZPortfolioProxy getEzNewPortfolioProxy() {
+        return ezNewPortfolioProxy;
+    }
+
+    public void setEzNewPortfolioProxy(EZPortfolioProxy ezNewPortfolioProxy) {
+        this.ezNewPortfolioProxy = ezNewPortfolioProxy;
     }
 }

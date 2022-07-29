@@ -25,9 +25,9 @@ import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
+import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class HomeHandler {
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            ezServerState.getNewShares(),
+                            ezServerState.getEzNewPortfolioProxy() == null ? new ArrayList<>() : ezServerState.getEzNewPortfolioProxy().getNewShares(),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
                                     .stream()
@@ -159,16 +160,11 @@ public class HomeHandler {
     @POST
     @Path("/saveNewShareValue")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveNewShareValue(ShareValue shareValue) {
-        ezServerState.getNewShares().stream()
-            .filter(s -> s.getTickerCode().equals(shareValue.getTickerCode())
-                    && s.getBroker().equals(shareValue.getBroker())
-                    && s.getEzAccountType().equals(shareValue.getEzAccountType())
-            )
-            .forEach(s -> {
-                s.setUserShareName(shareValue.getUserShareName());
-                s.setDirty(true);
-            });
+    public void saveNewShareValue(EZAction shareValue) {
+        ezServerState.setEzActionDirty(true);
+        if (ezServerState.getEzNewPortfolioProxy() != null) {
+            ezServerState.getEzNewPortfolioProxy().updateNewShare(shareValue);
+        }
     }
 
     @GET

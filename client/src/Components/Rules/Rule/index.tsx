@@ -73,7 +73,7 @@ export function Rule(props: RuleProps){
 
     function cellData(colName: string, value: string|undefined, errorMsg: string|undefined, saveNewValue: (newValue: string) => void){
         return (
-            <Box direction="column" align="center" margin="small">
+            <Box direction="column" align="start" margin="small">
                 <Box direction="row" align="center">
                     <Text>{colName}</Text>
                     <EzDataField value={props.data} iconInfo={false}
@@ -339,7 +339,27 @@ export function Rule(props: RuleProps){
                     onClick={() => saveRule({...ruleDef, portefeuilleRules: [...ruleDef.portefeuilleRules!, {}]})}/>) }
                 </Box>
         </Box>
+        <Box margin="small" border="all" background="light-1" align="center">
+            <Box align="center">
+                <Heading level="3">Ma Performance</Heading>
+                <Text size="xxsmall">Les entrées/sorties de votre portefeuille ont un impact sur le calcul de votre performance</Text>
+            </Box>
+            <Box margin="none" pad="none" alignSelf="stretch">
+                {conditionCell(ruleDef.performanceRule?.condition, ruleDef.performanceRule?.field2ErrorMsg?.condition, (newVal) => {
+                    return saveRule({...ruleDef, performanceRule: {
+                        ...ruleDef.performanceRule,
+                        condition: newVal.trim(),
+                    }});
+                })}   
+                {cellData("Valeur d'entrée/sortie", ruleDef.performanceRule?.inputOutputValueExpr, ruleDef.performanceRule?.field2ErrorMsg?.inputOutputValueExpr, (newVal) => {
+                    return saveRule({...ruleDef, performanceRule: {
+                        ...ruleDef.performanceRule,
+                        inputOutputValueExpr: newVal.trim(),
+                    }});
 
+                })}                   
+            </Box>
+        </Box>
     </Box>
     );
 }

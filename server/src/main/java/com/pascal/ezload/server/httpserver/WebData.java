@@ -21,8 +21,8 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
-import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
+import com.pascal.ezload.service.model.EZAction;
 
 import java.util.List;
 import java.util.Set;
@@ -36,13 +36,13 @@ public class WebData {
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
-    private Set<ShareValue> newShareValues;
+    private List<EZAction> newEZAction;
     private List<String> allProfiles;
     private boolean processRunning;
     private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
-                   List<EzReport> reports, Set<ShareValue> newShareValues, List<String> filesNotYetLoaded,
+                   List<EzReport> reports, List<EZAction> newEZAction, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles){
         this.ezProfil = ezProfil;
         this.configFile = configFile;
@@ -52,7 +52,7 @@ public class WebData {
         this.reports = reports;
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
-        this.newShareValues = newShareValues;
+        this.newEZAction = newEZAction;
         this.ezLoadVersion = ezLoadVersion;
         this.allProfiles = allProfiles;
     }
@@ -105,12 +105,12 @@ public class WebData {
         this.filesNotYetLoaded = filesNotYetLoaded;
     }
 
-    public Set<ShareValue> getNewShareValues() {
-        return newShareValues;
+    public List<EZAction> getNewEZAction() {
+        return newEZAction;
     }
 
-    public void setNewShareValues(Set<ShareValue> newShareValues) {
-        this.newShareValues = newShareValues;
+    public void setNewEZAction(List<EZAction> newEZAction) {
+        this.newEZAction = newEZAction;
     }
 
     public String getConfigFile() {

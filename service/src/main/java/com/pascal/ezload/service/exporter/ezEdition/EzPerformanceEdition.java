@@ -15,16 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.exporter.ezEdition.EzData;
+public class EzPerformanceEdition implements WithErrors {
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+    private String errors;
 
-public interface BrokerCustomCode {
+    private String value;
 
-    Optional<Map<String, Object>> searchActionInDifferentMarket(String actionCode, List<Map<String, Object>> data, EzData ezData);
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String getErrors() {
+        return errors;
+    }
+
+    @Override
+    public void setErrors(String errors) {
+        this.errors = errors;
+    }
 
 }

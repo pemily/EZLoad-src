@@ -35,6 +35,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
     private String shareId; // the share id example: US5024311095 / FR0013269123
     private List<OperationRule> operationRules = new LinkedList<>();
     private List<PortefeuilleRule> portefeuilleRules = new LinkedList<>();
+    private PerformanceRule performanceRule = new PerformanceRule();
 
     public String getCondition() {
         return condition;
@@ -43,7 +44,6 @@ public class RuleDefinition extends RuleDefinitionSummary {
     public void setCondition(String condition) {
         this.condition = condition;
     }
-
 
     public int getEzLoadVersion() {
         return ezLoadVersion;
@@ -77,11 +77,20 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.shareId = shareId;
     }
 
+    public PerformanceRule getPerformanceRule(){
+        return performanceRule;
+    }
+
+    public void setPerformanceRule(PerformanceRule performanceRule){
+        this.performanceRule = performanceRule;
+    }
+
     @Override
     public void clearErrors(){
         setField2ErrorMsg(null);
         portefeuilleRules.forEach(PortefeuilleRule::clearErrors);
         operationRules.forEach(OperationRule::clearErrors);
+        performanceRule.clearErrors();
     }
 
 
@@ -95,6 +104,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
 
         operationRules.forEach(OperationRule::validate);
         portefeuilleRules.forEach(PortefeuilleRule::validate);
+        performanceRule.validate();
         return this;
     }
 
@@ -104,6 +114,7 @@ public class RuleDefinition extends RuleDefinitionSummary {
         this.shareId = normalizer.apply(this.shareId);
         this.operationRules.forEach(op -> op.beforeSave(normalizer));
         this.portefeuilleRules.forEach(po -> po.beforeSave(normalizer));
+        this.performanceRule.beforeSave(normalizer);
     }
 }
 
