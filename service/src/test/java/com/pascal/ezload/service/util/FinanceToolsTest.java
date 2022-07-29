@@ -99,6 +99,14 @@ public class FinanceToolsTest {
         assertEquals("ETR:ADS", action.get().getEzTicker());
     }
 
+    @Test
+    public void testFR0013269123() throws IOException {
+        EzData ezData = new EzData();
+        ezData.put(new EzDataKey("ezOperation_INFO3"), "RUBIS");
+        ezData.put(new EzDataKey("ezOperation_Lieu"), "BORSE BERLIN EQUIDUCT TRADING - BERL");
+        Optional<EZAction> action = FinanceTools.getInstance().searchActionFromBourseDirect(new LoggerReporting(), "FR0013269123", EnumEZBroker.BourseDirect, ezData);
+        assertEquals("EPA:RUI", action.get().getEzTicker());
+    }
 
     @Test
     public void testFR0000120222() throws IOException {

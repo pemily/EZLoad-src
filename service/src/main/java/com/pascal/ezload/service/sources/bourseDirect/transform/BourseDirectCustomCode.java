@@ -89,7 +89,12 @@ public class BourseDirectCustomCode implements BrokerCustomCode {
          */
         if (!StringUtils.isBlank(lieu)){
             if (d1.get("label") != null && d2.get("label") != null) {
-                return levenshteinDistance.apply(lieu, (String) d1.get("label")) - levenshteinDistance.apply(lieu, (String) d2.get("label"));
+                int lev1 = levenshteinDistance.apply(lieu, (String) d1.get("label"));
+                int lev2 = levenshteinDistance.apply(lieu, (String) d2.get("label"));
+                if (lev1 > 2 && lev2 > 2) return 0; // both are very different use the next criteria
+                if (lev1 <= 2 && lev2 <= 2) return 0; // both are too close to use this criteria only
+                if (lev1 <= 2) return -1; // d1 is close, d2 is far
+                return 1; // d2 is close, d1 is far
             }
             else return 0;
         }
