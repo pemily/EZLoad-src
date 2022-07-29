@@ -20,6 +20,7 @@ package com.pascal.ezload.service.util;
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZMarketPlace;
@@ -53,7 +54,24 @@ public class FinanceTools {
         result = result.or(() -> {
             try {
                 Optional<EZAction> r = searchActionFromBourseDirect(reporting, isin, broker, ezData);
-                r.ifPresent(ezPortfolioProxy::newAction);
+                r.ifPresent(action -> {
+                    // ici, je n'ai pas trouvé l'action dans l'onglet EZLoadActions, et je l'ai trouvé chez bourseDirect
+                    // Peut etre que c'est un vieux fichier EZPortfolio avec des données, et que la ligne dans l'onglet EZLoadActions n'a pas encore ete créé
+                    // => recherche dans monPortefeuille, si je trouve le meme Ticker
+                    Optional<ShareValue> svOpt = ezPortfolioProxy.getShareValuesFromMonPortefeuille()
+                            .stream()
+                            .filter(s -> Objects.equals(s.getTickerCode(), action.getEzTicker()))
+                            .findFirst();
+                    ezPortfolioProxy.newAction(svOpt.map(sv -> {
+                        EZAction ezAction = new EZAction();
+                        ezAction.setType(sv.getShareType());
+                        ezAction.setEzName(sv.getUserShareName());
+                        ezAction.setEzTicker(sv.getTickerCode());
+                        ezAction.setCountryCode(CountryUtil.foundByName(sv.getCountryName()).getCode());
+                        ezAction.setIsin(isin);
+                        return ezAction;
+                    }).orElse(action));
+                });
                 return r;
             } catch (IOException e) {
                 throw new RuntimeException(e);

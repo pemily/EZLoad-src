@@ -32,7 +32,7 @@ public class EzEdition {
     private RuleDefinitionSummary ruleDefinitionSummary;
     private List<EzOperationEdition> ezOperationEditions = new LinkedList<>();
     private List<EzPortefeuilleEdition> ezPortefeuilleEditions = new LinkedList<>();
-    private EzPerformanceEdition ezMaPerformanceEdition;
+    private EzPerformanceEdition ezMaPerformanceEdition = new EzPerformanceEdition();
     private List<String> errors = new LinkedList<>();
 
     private String operationInJsonFormat;

@@ -304,7 +304,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
                         && s.getEzAccountType().equals(ezAccountType))
                 .findFirst()
                 .map(ShareValue::getUserShareName)
-                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", ezAccountType, broker, "").getUserShareName());
+                .orElse(new ShareValue(ShareValue.LIQUIDITY_CODE, "", ezAccountType, broker, "", "").getUserShareName());
     }
 
     @Override

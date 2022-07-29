@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.exporter.ezEdition;
 
+import com.pascal.ezload.service.model.EZCountry;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,14 +32,16 @@ public class ShareValue {
     private String shareType; // can be "", "stock"
     private String ezAccountType; // PEA, CTO, etc.
     private EnumEZBroker broker; // bourseDirect
+    private String countryName;
 
     public ShareValue(){}
-    public ShareValue(String tickerCode, String shareType, String ezAccountType, EnumEZBroker broker, String userShareName){
+    public ShareValue(String tickerCode, String shareType, String ezAccountType, EnumEZBroker broker, String userShareName, String countryName){
         this.tickerCode = tickerCode;
         this.userShareName = userShareName;
         this.shareType = shareType;
         this.broker = broker;
         this.ezAccountType = ezAccountType;
+        this.countryName = countryName;
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
             this.userShareName = "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
         }
@@ -84,6 +87,9 @@ public class ShareValue {
         return isin;
     }
 
+    public String getCountryName() {
+        return countryName;
+    }
 
     @Override
     public boolean equals(Object o) {

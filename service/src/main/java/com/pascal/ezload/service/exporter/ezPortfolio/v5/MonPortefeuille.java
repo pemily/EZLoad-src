@@ -24,6 +24,7 @@ import com.pascal.ezload.service.exporter.ezEdition.data.common.MonPortefeuilleD
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.util.CountryUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public static final int ACCOUNT_TYPE_COL = 1;
     public static final int BROKER_COL = 2;
     public static final int TICKER_COL = 3;
-    public static final int COUNTRY_COL = 4;
+    public static final int COUNTRY_NAME_COL = 4;
     public static final int SECTOR_COL = 5;
     public static final int INDUSTRY_COL = 6;
     public static final int DEDUCTION_40_COL = 7;
@@ -98,7 +99,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public Set<ShareValue> getShareValues(){
         return this.portefeuille.getValues().stream()
                 .filter(r -> StringUtils.isNotBlank(r.getValueStr(TICKER_COL)))
-                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(TYPE_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL)))
+                .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(TYPE_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL), r.getValueStr(COUNTRY_NAME_COL)))
                 .collect(Collectors.toSet());
     }
 
@@ -121,7 +122,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
         int rowNumber = row.getRowNumber();
 
         row.setValue(VALEUR_COL, ezPortefeuilleEdition.getValeur());
-        row.setValue(COUNTRY_COL, ezPortefeuilleEdition.getCountry());
+        row.setValue(COUNTRY_NAME_COL, ezPortefeuilleEdition.getCountry());
         row.setValue(SECTOR_COL, ezPortefeuilleEdition.getSector());
         row.setValue(INDUSTRY_COL, ezPortefeuilleEdition.getIndustry());
         row.setValue(DEDUCTION_40_COL, ezPortefeuilleEdition.getEligibilityDeduction40());
@@ -174,7 +175,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
             data.put(ezPortfolio_portefeuille_account_type, row.getValueStr(ACCOUNT_TYPE_COL));
             data.put(ezPortfolio_portefeuille_broker, row.getValueStr(BROKER_COL));
             data.put(ezPortfolio_portefeuille_googleTicker, row.getValueStr(TICKER_COL));
-            data.put(ezPortfolio_portefeuille_country, row.getValueStr(COUNTRY_COL));
+            data.put(ezPortfolio_portefeuille_country, row.getValueStr(COUNTRY_NAME_COL));
             data.put(ezPortfolio_portefeuille_sector, row.getValueStr(SECTOR_COL));
             data.put(ezPortfolio_portefeuille_industry, row.getValueStr(INDUSTRY_COL));
             data.put(ezPortfolio_portefeuille_deduction40, row.getValueStr(DEDUCTION_40_COL));
@@ -212,7 +213,7 @@ public class MonPortefeuille implements MonPortefeuilleData {
                     ezPortefeuilleEdition.setValeur(row.getValueStr(VALEUR_COL));
                     ezPortefeuilleEdition.setAccountType(row.getValueStr(ACCOUNT_TYPE_COL));
                     ezPortefeuilleEdition.setBroker(EnumEZBroker.getFomEzName(row.getValueStr(BROKER_COL)));
-                    ezPortefeuilleEdition.setCountry(row.getValueStr(COUNTRY_COL));
+                    ezPortefeuilleEdition.setCountry(row.getValueStr(COUNTRY_NAME_COL));
                     ezPortefeuilleEdition.setSector(row.getValueStr(SECTOR_COL));
                     ezPortefeuilleEdition.setIndustry(row.getValueStr(INDUSTRY_COL));
                     ezPortefeuilleEdition.setEligibilityDeduction40(row.getValueStr(DEDUCTION_40_COL));
