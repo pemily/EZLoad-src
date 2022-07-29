@@ -12,7 +12,9 @@ To create a new version:
 Merge develop on main branch
 * git checkout main
 * git fetch
+* git pull
 * git merge origin/develop `Sur les conflits prendre tous les theirs (develop)`
+* git commit
 * mvn versions:set `fill the new version (without -SNAPSHOT)`
 * mvn clean install
 * git add . 
@@ -22,7 +24,7 @@ Merge develop on main branch
   * Cliquez sur Draft a new release
   * Cliquez sur choose a tag et entrer la version, exemple: "v1.2" puis "Create new tag v1.2 on publish"
   * Target: main
-  * Release title: V1.2
+  * Release title: v1.2
   * Describe this release: copier le contenu des changements venant de exec/src/main/resources/ReadMe.md
   * Aller dans le repertoire /release et prendre tous les fichiers pour les dropper sur la release
   * Cliquez sur Publish Release
