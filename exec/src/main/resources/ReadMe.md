@@ -5,6 +5,12 @@
 
 ## Historique 
 
+### Version 1.6
+* Amélioration de la recherche du google ticker des valeurs
+* Ajout de l'onglet EZLoadActions
+* Ajout de la gestion des entrées/sorties dans l'onglet MaPerformance
+* Ajout de nouvelles règles d'opération
+
 ### Version 1.5
 * Gestion de fichiers json pour créer des opérations manuellement
 * Affichage du json des opérations 
