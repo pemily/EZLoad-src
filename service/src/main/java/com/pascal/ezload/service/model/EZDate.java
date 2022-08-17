@@ -19,12 +19,26 @@ package com.pascal.ezload.service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.*;
+import java.time.chrono.ChronoPeriod;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
+import java.util.Date;
 import java.util.Objects;
+
+import static com.pascal.ezload.service.util.ModelUtils.str2Int;
 
 public class EZDate {
     private final int day;
     private final int month;
     private final int year;
+
+    public EZDate(long epochSecond){ // seconds from 1970/01/01
+        LocalDate localDate = Instant.ofEpochSecond(epochSecond).atZone(ZoneId.systemDefault()).toLocalDate();
+        this.year = localDate.getYear();
+        this.month = localDate.getMonthValue();
+        this.day = localDate.getDayOfMonth();
+    }
 
     public EZDate(String dateValue){
         // for json deserialization
@@ -64,6 +78,12 @@ public class EZDate {
 
     public String toDate(char separator){
         return year+""+separator+leadingZero(month)+separator+leadingZero(day);
+    }
+
+    // millisec since 1970/01/01
+    public long toEpochSecond(){
+        LocalDate localDate = LocalDate.of(year, month, day);
+        return localDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public static EZDate parseFrenchDate(String date, char separator) {

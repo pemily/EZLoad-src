@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pascal.ezload</groupId>
     <artifactId>EZLoadRoot</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <description>EZLoad an automatic loader for EZPortfolio</description>
     <inceptionYear>2021</inceptionYear>
 
