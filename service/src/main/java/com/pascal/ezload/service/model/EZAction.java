@@ -24,10 +24,14 @@ import com.pascal.ezload.service.util.CountryUtil;
 public class EZAction implements ActionData {
     private String ezName; // the name from the user preference
     private String ezTicker; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
+    private String yahooSymbol; // can be null if ISIN not found
     private String isin;
     private String countryCode;
     private String type;
     private String pruCellReference;
+
+    private String industry; // can be null if ISIN not found
+    private String sector;// can be null if ISIN not found, not the same than EZPortfolio.secteur
 
     public EZAction(){}
 
@@ -93,6 +97,7 @@ public class EZAction implements ActionData {
         data.put(share_isin, isin);
         data.put(share_ezName, ezName);
         data.put(share_ezCode, ezTicker);
+        data.put(share_industry, industry == null ? "" : industry);
         data.put(share_costPrice, pruCellReference);
         data.put(share_type, type);
         data.put(share_countryCode, countryCode == null ? "" : countryCode);
@@ -100,4 +105,27 @@ public class EZAction implements ActionData {
         data.put(share_country, country == null ? "" : country.getName());
     }
 
+    public String getYahooSymbol() {
+        return yahooSymbol;
+    }
+
+    public void setYahooSymbol(String yahooSymbol) {
+        this.yahooSymbol = yahooSymbol;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public String getSector() {
+        return sector;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
 }

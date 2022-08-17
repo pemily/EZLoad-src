@@ -4,6 +4,8 @@
 
 
 ## Historique 
+### Version 1.7
+* Va chercher sur yahoo finance une valeur pour le champ industrie dans MonPortefeuille (en Anglais)
 
 ### Version 1.6
 * Amélioration de la recherche du google ticker des valeurs
