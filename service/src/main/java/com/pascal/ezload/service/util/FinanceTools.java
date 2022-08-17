@@ -51,7 +51,7 @@ public class FinanceTools {
 
     public EZAction get(Reporting reporting, EZPortfolioProxy ezPortfolioProxy, String isin, EnumEZBroker broker, EzData ezData){
         Optional<EZAction> result = ezPortfolioProxy.findShareByIsin(isin);
-        result = result.or(() -> {
+        result.or(() -> {
             try {
                 Optional<EZAction> r = searchActionFromBourseDirect(reporting, isin, broker, ezData);
                 r.ifPresent(action -> {
@@ -77,12 +77,31 @@ public class FinanceTools {
                 throw new RuntimeException(e);
             }
         });
+        result.ifPresent(action -> {
+            if (action.getYahooSymbol() == null){
+                try {
+                    addYahooInfoTo(reporting, action);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
         result.ifPresent(v -> v.setPruCellReference(getPRUReference(v.getEzName())));
-        return result.orElseThrow( () -> new RuntimeException("Pas d'information trouvé sur la valeur: "+isin));
+        return result.orElseThrow( () -> new RuntimeException("Pas d'information trouvée sur la valeur: "+isin));
     }
 
     private String getPRUReference(String userShareName){
         return "=query(PRU!A$5:B; \"select B where A = '"+userShareName+"' limit 1\")";
+    }
+
+    private EZAction addYahooInfoTo(Reporting reporting, EZAction action) throws IOException {
+        Optional<EZAction> yahooActionOpt = searchActionFromYahooFinance(reporting, action.getIsin());
+        yahooActionOpt.ifPresent(yahooAction -> {
+            action.setYahooSymbol(yahooAction.getYahooSymbol());
+            action.setIndustry(yahooAction.getIndustry());
+            action.setSector(yahooAction.getSector());
+        });
+        return action;
     }
 
     public Optional<EZAction> searchActionFromBourseDirect(Reporting reporting, String isin, EnumEZBroker broker, EzData ezData) throws IOException {
@@ -134,8 +153,8 @@ public class FinanceTools {
         }
     }
 
-    public EZAction searchActionFromYahooFinance(Reporting reporting, String actionCode) throws IOException{
-        URL url = new URL("https://query1.finance.yahoo.com/v1/finance/search?q="+actionCode+"&lang=en-US&region=US&quotesCount=6&newsCount=2&listsCount=2&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&enableResearchReports=true&researchReportsCount=2");
+    public Optional<EZAction> searchActionFromYahooFinance(Reporting reporting, String actionISIN) throws IOException{
+        URL url = new URL("https://query1.finance.yahoo.com/v1/finance/search?q="+actionISIN);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
             con.setRequestMethod("GET");
@@ -144,17 +163,20 @@ public class FinanceTools {
 
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(input, Map.class);
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("quotes");
-            if (quotes.size() == 0) return null;
+            if (quotes.size() == 0) return Optional.empty();
             if (quotes.size() > 1) {
-                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionCode + ". La 1ère est sélectionné. Vérifié: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionISIN + ". La 1ère est sélectionné. Vérifié: "+url);
             }
             EZAction action = new EZAction();
             Map<String, Object> actionData = quotes.get(0);
             action.setEzName((String) actionData.get("longname")); // WP CAREY INC
-            action.setEzTicker((String) actionData.get("symbol")); // WPC
-            // action.setMarketPlace(MarketPlaceUtil.foundByMic((String) actionData.get("exchange"))); // NYQ
-            return action;
-
+            action.setYahooSymbol((String) actionData.get("symbol")); // WPC
+            action.setIndustry((String) actionData.get("industry"));
+            action.setSector((String) actionData.get("sector"));
+            action.setType((String) actionData.get("typeDisp")); // pas le meme type que BourseDirect
+            action.setCountryCode(actionISIN.substring(0,2));
+            action.setIsin(actionISIN);
+            return Optional.of(action);
         }
         finally {
             con.disconnect();

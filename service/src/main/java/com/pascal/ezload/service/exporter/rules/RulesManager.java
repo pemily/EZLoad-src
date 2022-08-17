@@ -165,7 +165,7 @@ public class RulesManager {
         String commonFile = getCommonFilePath(function.getBroker(), function.getBrokerFileVersion());
 
         // to ease the comparison in github
-        function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalize).collect(Collectors.toList()).toArray(new String[]{}));
+        function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalizeNoTrim).collect(Collectors.toList()).toArray(new String[]{}));
 
         function.beforeSave();
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
@@ -177,6 +177,13 @@ public class RulesManager {
         if (line == null) return null;
         line = line.replace("\t", "    "); // replace tabulation by 4 spaces
         line = line.trim();
+        return line;
+    }
+
+    public static String normalizeNoTrim(String line) {
+        if (line == null) return null;
+        line = line.replace("\t", "    "); // replace tabulation by 4 spaces
+        // no trim to not remove the indentation of function in common script
         return line;
     }
 

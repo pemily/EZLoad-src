@@ -28,5 +28,6 @@ public interface ActionData {
     EzDataKey share_type = new EzDataKey("ezShareType", "Le type d'action: stock");
     EzDataKey share_countryCode = new EzDataKey("ezShareCountryCode", "Le code pays de l'action");
     EzDataKey share_country = new EzDataKey("ezShareCountry", "Le pays de l'action");
+    EzDataKey share_industry = new EzDataKey("ezShareIndustry", "L'industrie de l'action");
     void fill(EzData data);
 }
