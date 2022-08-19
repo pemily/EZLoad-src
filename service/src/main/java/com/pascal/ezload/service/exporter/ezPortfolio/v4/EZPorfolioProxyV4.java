@@ -23,7 +23,6 @@ import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
-import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
@@ -85,12 +84,7 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
     }
 
     @Override
-    public Optional<EZAction> findShareByIsin(String isin) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public EZPortfolioProxy createDeepCopy(List<EZAction> newShares) {
+    public EZPortfolioProxy createDeepCopy() {
         return null;
     }
 
@@ -101,21 +95,6 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
 
     @Override
     public String getEzLiquidityName(String ezAccountType, EnumEZBroker broker) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public void newAction(EZAction v) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<EZAction> getNewShares() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public void updateNewShare(EZAction shareValue) {
         throw new NotImplementedException();
     }
 

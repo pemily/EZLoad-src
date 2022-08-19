@@ -21,27 +21,26 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
 import com.pascal.ezload.service.util.CountryUtil;
 
-public class EZAction implements ActionData {
+/**
+ * Si l'action a ete cree depuis la 1ere lecture d'un nouveau EZPortfolio, elle aura un ticker Google mais pas le ISIN
+ * Si l'action a ete cree depuis une recherche BourseDirect, elle aura un ISIN
+ * La UI ne permettra pas de faire des actions, si il n'y a pas de ISIN, ni de ticker Google
+ * les codes isin && seekingAlpha sont optionnels
+ */
+public class EZShare implements ActionData {
+    public static final String NEW_SHARE = "NEW";
+
     private String ezName; // the name from the user preference
-    private String ezTicker; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
-    private String yahooSymbol; // can be null if ISIN not found
-    private String isin;
+    private String googleCode; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
+    private String yahooCode; // can be null if ISIN not found
+    private String isin; // can be null for the share coming from the EZPortfolio (during the initialization), they will be selected to be invalid in EZActionManager
     private String countryCode;
     private String type;
-    private String pruCellReference;
+    private String seekingAlphaCode; // can be null
 
     private String industry; // can be null if ISIN not found
     private String sector;// can be null if ISIN not found, not the same than EZPortfolio.secteur
-
-    public EZAction(){}
-
-    public EZAction(String isin, String ezTicker, String name, String type, String countryCode) {
-        this.isin = isin;
-        this.ezTicker = ezTicker;
-        this.ezName = name;
-        this.type = type;
-        this.countryCode = countryCode;
-    }
+    private String description; // contains NEW_SHARE if the user has never seen then, and never edited
 
     public String getIsin() {
         return isin;
@@ -59,20 +58,12 @@ public class EZAction implements ActionData {
         this.ezName = ezName;
     }
 
-    public String getEzTicker() {
-        return ezTicker;
+    public String getGoogleCode() {
+        return googleCode;
     }
 
-    public void setEzTicker(String ezTicker) {
-        this.ezTicker = ezTicker;
-    }
-
-    public String getPruCellReference() {
-        return pruCellReference;
-    }
-
-    public void setPruCellReference(String pruCellReference) {
-        this.pruCellReference = pruCellReference;
+    public void setGoogleCode(String ezTicker) {
+        this.googleCode = ezTicker;
     }
 
     public void setType(String type) {
@@ -96,21 +87,21 @@ public class EZAction implements ActionData {
     public void fill(EzData data) {
         data.put(share_isin, isin);
         data.put(share_ezName, ezName);
-        data.put(share_ezCode, ezTicker);
+        data.put(share_ezCode, googleCode);
         data.put(share_industry, industry == null ? "" : industry);
-        data.put(share_costPrice, pruCellReference);
+        data.put(share_costPrice, "=query(PRU!A$5:B; \"select B where A = '"+ezName+"' limit 1\")");
         data.put(share_type, type);
         data.put(share_countryCode, countryCode == null ? "" : countryCode);
         EZCountry country = countryCode == null ? null : CountryUtil.foundByCode(countryCode);
         data.put(share_country, country == null ? "" : country.getName());
     }
 
-    public String getYahooSymbol() {
-        return yahooSymbol;
+    public String getYahooCode() {
+        return yahooCode;
     }
 
-    public void setYahooSymbol(String yahooSymbol) {
-        this.yahooSymbol = yahooSymbol;
+    public void setYahooCode(String yahooCode) {
+        this.yahooCode = yahooCode;
     }
 
     public String getIndustry() {
@@ -127,5 +118,21 @@ public class EZAction implements ActionData {
 
     public void setSector(String sector) {
         this.sector = sector;
+    }
+
+    public String getSeekingAlphaCode() {
+        return seekingAlphaCode;
+    }
+
+    public void setSeekingAlphaCode(String seekingAlphaCode) {
+        this.seekingAlphaCode = seekingAlphaCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

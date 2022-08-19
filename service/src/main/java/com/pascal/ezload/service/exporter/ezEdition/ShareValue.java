@@ -26,7 +26,6 @@ import java.util.Objects;
 public class ShareValue {
     public static final String LIQUIDITY_CODE = "LIQUIDITE";
 
-    private String isin; // can be null (is used to fill the page EZLoad in ezportfolio) and to present it to the user when creating the userName
     private String tickerCode; // Correspond a la colonne Ticker Google Finance dans MonPortefeuille
     private String userShareName; // can be null if it is not yet filled
     private String shareType; // can be "", "stock"
@@ -79,14 +78,6 @@ public class ShareValue {
         return ezAccountType;
     }
 
-    public void setIsin(String isin){
-        this.isin = isin;
-    }
-
-    public String getIsin(){
-        return isin;
-    }
-
     public String getCountryName() {
         return countryName;
     }
@@ -107,9 +98,6 @@ public class ShareValue {
     private String hash(){
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
             return "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
-        }
-        else if (isin != null){
-            return isin;
         }
         else{
             return tickerCode;

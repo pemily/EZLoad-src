@@ -24,30 +24,50 @@ import java.util.List;
 import java.util.Optional;
 
 public class DeviseUtil {
+    public static final String AUD = "AUD";
+    public static final String CAD = "CAD";
+    public static final String CHF = "CHF";
+    public static final String CNY = "CNY";
+    public static final String DKK = "DKK";
+    public static final String EUR = "EUR";
+    public static final String GBP = "GBP";
+    public static final String GBX = "GBX";
+    public static final String HKD = "HKD";
+    public static final String INR = "INR";
+    public static final String ISK = "ISK";
+    public static final String JPY = "JPY";
+    public static final String KRW = "KRW";
+    public static final String NOK = "NOK";
+    public static final String NZD = "NZD";
+    public static final String SEK = "SEK";
+    public static final String SGD = "SGD";
+    public static final String TWD = "TWD";
+    public static final String USD = "USD";
+    public static final String ZAR = "ZAR";
 
     // https://en.wikipedia.org/wiki/Currency
 
     private static List<EZDevise> devises = Arrays.asList(
-            new EZDevise("AUD", "A$"),
-            new EZDevise("CAD", "C$"),
-            new EZDevise("CHF", "CHF"),
-            new EZDevise("CNY", "元"),
-            new EZDevise("DKK", "Kr"),
-            new EZDevise("EUR", "€"),
-            new EZDevise("GBP", "£"),
-            new EZDevise("GBX", "£"), // non present sur le site, mais ezportfolio utilse gbx
-            new EZDevise("HKD", "HK$"),
-            new EZDevise("INR", "₹"),
-            new EZDevise("ISK", "krona"), // cette monaie n'a pas de symbol court
-            new EZDevise("JPY", "¥"),
-            new EZDevise("KRW", "₩"),
-            new EZDevise("NOK", "Kr"),
-            new EZDevise("NZD", "NZ$"),
-            new EZDevise("SEK", "kr"),
-            new EZDevise("SGD", "S$"),
-            new EZDevise("TWD", "NT$"),
-            new EZDevise("USD", "$"),
-            new EZDevise("ZAR", "R")
+            new EZDevise(AUD, "A$"),
+            new EZDevise(CAD, "C$"),
+            new EZDevise(CHF, "CHF"),
+            new EZDevise(CNY, "元"),
+            new EZDevise(DKK, "Kr"),
+            new EZDevise(EUR, "€"),
+            new EZDevise(GBP, "£"),
+            new EZDevise(GBX, "£"), // non present sur le site, mais ezportfolio utilse gbx
+            new EZDevise(HKD, "HK$"),
+            new EZDevise(INR, "₹"),
+            new EZDevise(ISK, "krona"), // cette monaie n'a pas de symbol court
+            new EZDevise(JPY, "¥"),
+            new EZDevise(KRW, "₩"),
+            new EZDevise(NOK, "Kr"),
+            new EZDevise(NZD, "NZ$"),
+            new EZDevise(SEK, "kr"),
+            new EZDevise(SGD, "S$"),
+            new EZDevise(TWD, "NT$"),
+            new EZDevise(USD, "$"),
+            new EZDevise(ZAR, "R")
             );
 
 

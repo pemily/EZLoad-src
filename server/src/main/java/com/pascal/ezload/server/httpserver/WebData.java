@@ -22,10 +22,9 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
-import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZShare;
 
 import java.util.List;
-import java.util.Set;
 
 public class WebData {
 
@@ -36,13 +35,13 @@ public class WebData {
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
-    private List<EZAction> newEZAction;
+    private List<EZShare> newEZShare;
     private List<String> allProfiles;
     private boolean processRunning;
     private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
-                   List<EzReport> reports, List<EZAction> newEZAction, List<String> filesNotYetLoaded,
+                   List<EzReport> reports, List<EZShare> newEZShare, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles){
         this.ezProfil = ezProfil;
         this.configFile = configFile;
@@ -52,7 +51,7 @@ public class WebData {
         this.reports = reports;
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
-        this.newEZAction = newEZAction;
+        this.newEZShare = newEZShare;
         this.ezLoadVersion = ezLoadVersion;
         this.allProfiles = allProfiles;
     }
@@ -105,12 +104,12 @@ public class WebData {
         this.filesNotYetLoaded = filesNotYetLoaded;
     }
 
-    public List<EZAction> getNewEZAction() {
-        return newEZAction;
+    public List<EZShare> getNewEZShare() {
+        return newEZShare;
     }
 
-    public void setNewEZAction(List<EZAction> newEZAction) {
-        this.newEZAction = newEZAction;
+    public void setNewEZShare(List<EZShare> newEZShare) {
+        this.newEZShare = newEZShare;
     }
 
     public String getConfigFile() {

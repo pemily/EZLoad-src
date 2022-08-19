@@ -23,7 +23,8 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.FinanceTools;
+import com.pascal.ezload.service.util.finance.Dividend;
+import com.pascal.ezload.service.util.finance.FinanceTools;
 import com.pascal.ezload.service.util.ModelUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,16 +54,16 @@ public abstract class DividendsAlgo {
         return ModelUtils.str2Float(val);
     }
 
-    protected List<FinanceTools.Dividend> getLastYearDividends(List<FinanceTools.Dividend> allHistoricalDividends, Function<FinanceTools.Dividend, EZDate> dvd2Date){
-        List<FinanceTools.Dividend> divs = allHistoricalDividends.stream()
-                                            .filter(d -> d.getFrequency() != FinanceTools.Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+    protected List<Dividend> getLastYearDividends(List<Dividend> allHistoricalDividends, Function<Dividend, EZDate> dvd2Date){
+        List<Dividend> divs = allHistoricalDividends.stream()
+                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
                                             .collect(Collectors.toList());
 
         // Tri annuel inverse
         List<Integer> yearsReversedOrder = divs.stream().map(d -> dvd2Date.apply(d).getYear()).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
 
         // Group par année (date de detachement) => liste des dividendes de l'année
-        Map<Integer, List<FinanceTools.Dividend>> dividendPerYear = divs.stream().collect(Collectors.groupingBy(d -> dvd2Date.apply(d).getYear()));
+        Map<Integer, List<Dividend>> dividendPerYear = divs.stream().collect(Collectors.groupingBy(d -> dvd2Date.apply(d).getYear()));
 
         // recheche dans l'historique la derniere année avec les dividendes complètes
         Optional<Integer> yearWithAllDivivdends = yearsReversedOrder.stream()
@@ -78,14 +79,14 @@ public abstract class DividendsAlgo {
     // => alors on va generer pour tous les mois suivant un dividende de 0.7$
     // si l'année n'a aucun dividende, on va prendre ceux de l'annee derniere
     // si je detecte plusieurs frequence cette année (exemple quarter + SEMI ANNUAL => je bascule sur ceux de l'annee derniere)
-    protected List<FinanceTools.Dividend> getCurrentYearDividends(List<FinanceTools.Dividend> allHistoricalDividends, Function<FinanceTools.Dividend, EZDate> dvd2Date){
+    protected List<Dividend> getCurrentYearDividends(List<Dividend> allHistoricalDividends, Function<Dividend, EZDate> dvd2Date){
         // Des exemples:
         // SEMESTRIEL + TRIMESTRIEL la meme année?????? https://seekingalpha.com/api/v3/symbols/BTSGY/dividend_history?&years=1
         // SEMI ANNUAL => <https://seekingalpha.com/api/v3/symbols/IGGHY/dividend_history?&years=2
         // UNKNOWN + ANNUAL https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
 
-        List<FinanceTools.Dividend> divs = allHistoricalDividends.stream()
-                                            .filter(d -> d.getFrequency() != FinanceTools.Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+        List<Dividend> divs = allHistoricalDividends.stream()
+                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
                                             .collect(Collectors.toList());
 
         // Tri annuel inverse
@@ -96,43 +97,43 @@ public abstract class DividendsAlgo {
         int lastYear = yearsReversedOrder.get(0);
 
         // Group par année (date de detachement) => liste des dividendes de l'année
-        List<FinanceTools.Dividend> lastYearDividendsSorted = divs.stream()
+        List<Dividend> lastYearDividendsSorted = divs.stream()
                                                                         .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
                                                                         .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYMMDD()))
                                                                         .collect(Collectors.toList());
 
-        Map<FinanceTools.Dividend.EnumFrequency, List<FinanceTools.Dividend>> freq2Dividends = lastYearDividendsSorted.stream()
-                                                                                                    .collect(Collectors.groupingBy(FinanceTools.Dividend::getFrequency));
+        Map<Dividend.EnumFrequency, List<Dividend>> freq2Dividends = lastYearDividendsSorted.stream()
+                                                                                                    .collect(Collectors.groupingBy(Dividend::getFrequency));
 
         if (lastYearDividendsSorted.size() == 0 || freq2Dividends.size() > 1) return getLastYearDividends(allHistoricalDividends, dvd2Date);
 
-        FinanceTools.Dividend.EnumFrequency freq = freq2Dividends.keySet().stream().findFirst().get();
-        List<FinanceTools.Dividend> dividends = freq2Dividends.get(freq);
+        Dividend.EnumFrequency freq = freq2Dividends.keySet().stream().findFirst().get();
+        List<Dividend> dividends = freq2Dividends.get(freq);
 
-        if (freq == FinanceTools.Dividend.EnumFrequency.ANNUEL){
+        if (freq == Dividend.EnumFrequency.ANNUEL){
             return dividends;
         }
 
-        List<FinanceTools.Dividend> lastYearDividends = getLastYearDividends(allHistoricalDividends, dvd2Date).stream()
+        List<Dividend> lastYearDividends = getLastYearDividends(allHistoricalDividends, dvd2Date).stream()
                                                                         .filter(d -> d.getFrequency() == freq).collect(Collectors.toList());
 
         int numberOfFinalDividends = 0;
         int everyNMonth = 0;
 
-        if (freq == FinanceTools.Dividend.EnumFrequency.SEMESTRIEL){
+        if (freq == Dividend.EnumFrequency.SEMESTRIEL){
             numberOfFinalDividends = 2;
             everyNMonth = 6;
         }
-        else if (freq == FinanceTools.Dividend.EnumFrequency.TRIMESTRIEL){
+        else if (freq == Dividend.EnumFrequency.TRIMESTRIEL){
             numberOfFinalDividends = 4;
             everyNMonth = 3;
         }
-        else if (freq == FinanceTools.Dividend.EnumFrequency.MENSUEL) {
+        else if (freq == Dividend.EnumFrequency.MENSUEL) {
             numberOfFinalDividends = 12;
             everyNMonth = 1;
         }
 
-        FinanceTools.Dividend lastDividend = dividends.get(dividends.size()-1);
+        Dividend lastDividend = dividends.get(dividends.size()-1);
         EZDate previousDate = dvd2Date.apply(lastDividend);
         for (int i = dividends.size() ; i < numberOfFinalDividends; i++) {
             EZDate nextDividendsDate = null;
@@ -144,7 +145,7 @@ public abstract class DividendsAlgo {
                 // prends le 1er + everyNMonth mois
                 nextDividendsDate = new EZDate(previousDate.getYear(), Math.min(previousDate.getMonth() + everyNMonth, 12), previousDate.getDay());
             }
-            FinanceTools.Dividend nextDividend = new FinanceTools.Dividend(lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, FinanceTools.Dividend.EnumFrequency.SEMESTRIEL);
+            Dividend nextDividend = new Dividend(lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, Dividend.EnumFrequency.SEMESTRIEL, lastDividend.getDevise());
             dividends.add(nextDividend);
         }
 
@@ -152,33 +153,33 @@ public abstract class DividendsAlgo {
 
     }
 
-    protected boolean containsAllDividends(List<FinanceTools.Dividend> yearlyDividends){
-        Map<FinanceTools.Dividend.EnumFrequency, List<FinanceTools.Dividend>> frequency2Dividends = yearlyDividends.stream()
-                .filter(d -> d.getFrequency() != FinanceTools.Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
-                .collect(Collectors.groupingBy(FinanceTools.Dividend::getFrequency));
+    protected boolean containsAllDividends(List<Dividend> yearlyDividends){
+        Map<Dividend.EnumFrequency, List<Dividend>> frequency2Dividends = yearlyDividends.stream()
+                .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+                .collect(Collectors.groupingBy(Dividend::getFrequency));
 
-        if (frequency2Dividends.containsKey(FinanceTools.Dividend.EnumFrequency.ANNUEL)) return true; // il y a au moins une dividende annuelle cette année
+        if (frequency2Dividends.containsKey(Dividend.EnumFrequency.ANNUEL)) return true; // il y a au moins une dividende annuelle cette année
 
-        if (frequency2Dividends.containsKey(FinanceTools.Dividend.EnumFrequency.MENSUEL)
-                && frequency2Dividends.get(FinanceTools.Dividend.EnumFrequency.MENSUEL).size() == 12) return true;
+        if (frequency2Dividends.containsKey(Dividend.EnumFrequency.MENSUEL)
+                && frequency2Dividends.get(Dividend.EnumFrequency.MENSUEL).size() == 12) return true;
 
-        if (frequency2Dividends.containsKey(FinanceTools.Dividend.EnumFrequency.TRIMESTRIEL)
-                && frequency2Dividends.get(FinanceTools.Dividend.EnumFrequency.TRIMESTRIEL).size() == 4) return true;
+        if (frequency2Dividends.containsKey(Dividend.EnumFrequency.TRIMESTRIEL)
+                && frequency2Dividends.get(Dividend.EnumFrequency.TRIMESTRIEL).size() == 4) return true;
 
         return false;
     }
 
-    protected Function<FinanceTools.Dividend, EZDate> getDividendYear(MainSettings.EnumAlgoDateSelector dateSelector) {
+    protected Function<Dividend, EZDate> getDividendYear(MainSettings.EnumAlgoDateSelector dateSelector) {
         if (dateSelector == MainSettings.EnumAlgoDateSelector.DATE_DE_DETACHEMENT)
-            return FinanceTools.Dividend::getDetachementDate;
+            return Dividend::getDetachementDate;
 
-        return FinanceTools.Dividend::getPayDate;
+        return Dividend::getPayDate;
     }
 
-    protected String sumOfAllDividends(Reporting reporting, List<FinanceTools.Dividend> dividends) {
+    protected String sumOfAllDividends(Reporting reporting, List<Dividend> dividends) {
         String addition = dividends
                 .stream()
-                .map(FinanceTools.Dividend::getAmount).collect(Collectors.joining(" + "));
+                .map(Dividend::getAmount).collect(Collectors.joining(" + "));
 
         String result = eval(reporting, addition);
         if (result == null) return "0";

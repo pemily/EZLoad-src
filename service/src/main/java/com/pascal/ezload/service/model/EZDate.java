@@ -56,6 +56,11 @@ public class EZDate {
         this.day = day;
     }
 
+    public static EZDate today(){
+        return new EZDate(Instant.now().getEpochSecond());
+    }
+
+
     public int getDay() {
         return day;
     }

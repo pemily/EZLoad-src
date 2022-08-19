@@ -99,6 +99,12 @@ public class MonPortefeuille implements MonPortefeuilleData {
     public Set<ShareValue> getShareValues(){
         return this.portefeuille.getValues().stream()
                 .filter(r -> StringUtils.isNotBlank(r.getValueStr(TICKER_COL)))
+                .map(r -> {
+                    if (StringUtils.isBlank(r.getValueStr(BROKER_COL))){
+                        throw new RuntimeException("La colonne 'Courtier' de la valeur: "+r.getValueStr(TICKER_COL)+" (Ligne "+r.getRowNumber()+") est vide! Vous devez la renseigner");
+                    }
+                    return r;
+                })
                 .map(r -> new ShareValue(r.getValueStr(TICKER_COL), r.getValueStr(TYPE_COL), r.getValueStr(ACCOUNT_TYPE_COL), EnumEZBroker.getFomEzName(r.getValueStr(BROKER_COL)), r.getValueStr(VALEUR_COL), r.getValueStr(COUNTRY_NAME_COL)))
                 .collect(Collectors.toSet());
     }

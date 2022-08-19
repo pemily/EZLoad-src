@@ -298,6 +298,8 @@ public class SettingsManager {
         if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(ezHome+File.separator+"logs");
         if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(getEzLoadRepoDir()+File.separator+"rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
+        if (ezLoad.getShareDataFile() == null) ezLoad.setShareDataFile(ezHome+File.separator+"shareData.json");
+        if (ezLoad.getCacheDir() == null) ezLoad.setCacheDir(ezHome+File.separator+"cache");
 
         new File(ezLoad.getLogsDir()).mkdirs();
 

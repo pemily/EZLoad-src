@@ -27,7 +27,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
-import com.pascal.ezload.service.model.EZAction;
+import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
@@ -44,7 +44,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,7 +83,7 @@ public class HomeHandler {
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            ezServerState.getEzNewPortfolioProxy() == null ? new ArrayList<>() : ezServerState.getEzNewPortfolioProxy().getNewShares(),
+                            mainSettings.getEzLoad().getEZActionManager().getIncompleteActionsOrNew(),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
                                     .stream()
@@ -160,11 +159,11 @@ public class HomeHandler {
     @POST
     @Path("/saveNewShareValue")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveNewShareValue(EZAction shareValue) {
+    public void saveNewShareValue(EZShare shareValue) throws Exception {
         ezServerState.setEzActionDirty(true);
-        if (ezServerState.getEzNewPortfolioProxy() != null) {
-            ezServerState.getEzNewPortfolioProxy().updateNewShare(shareValue);
-        }
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        mainSettings.getEzLoad().getEZActionManager().update(shareValue);
     }
 
     @GET

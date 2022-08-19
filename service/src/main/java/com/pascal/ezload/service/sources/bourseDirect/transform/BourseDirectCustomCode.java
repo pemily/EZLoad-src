@@ -29,7 +29,7 @@ public class BourseDirectCustomCode implements BrokerCustomCode {
     private LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
 
     @Override
-    public Optional<Map<String, Object>> searchActionInDifferentMarket(String actionCode, List<Map<String, Object>> data, EzData ezData) {
+    public Optional<Map<String, Object>> selectTheMostProbableShare(String actionCode, List<Map<String, Object>> data, EzData ezData) {
         List<Map<String, Object>> dataReduced = reduce(actionCode, ezData, data,
                 this::sortByISIN,
                 this::sortByStock,

@@ -21,7 +21,6 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
-import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
@@ -51,19 +50,12 @@ public interface EZPortfolioProxy {
 
     Set<ShareValue> getShareValuesFromMonPortefeuille();
 
-    Optional<EZAction> findShareByIsin(String isin);
-
-    EZPortfolioProxy createDeepCopy(List<EZAction> newShares);
+    EZPortfolioProxy createDeepCopy();
 
     Optional<EzPortefeuilleEdition> createNoOpEdition(ShareValue share);
 
     String getEzLiquidityName(String ezAccountType, EnumEZBroker broker);
 
-    void newAction(EZAction v);
-
-    List<EZAction> getNewShares();
-
-    void updateNewShare(EZAction shareValue);
 
     void applyOnPerformance(EzPerformanceEdition ezPerformanceEdition);
 }
