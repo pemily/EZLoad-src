@@ -4,6 +4,10 @@
 
 
 ## Historique 
+### Version 1.8
+* Vérification des codes yahoo & seekingalpha en utilisant le cours des actions
+* Ajout de message d'erreurs si un problème est détecté lors de l'ajout d'une action
+
 ### Version 1.7
 * Va chercher sur yahoo finance une valeur pour le champ industrie dans MonPortefeuille (en Anglais)
 
