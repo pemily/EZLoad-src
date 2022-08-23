@@ -31,7 +31,6 @@ import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
-import com.pascal.ezload.service.model.EZAction;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -43,7 +42,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +76,7 @@ public class EngineHandler {
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
-                        EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(ezProfil, reporting);
+                        EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
 
                         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings, ezProfil);
                         // Donwload the files, according to the last date retrieved from ezPortfolio
@@ -91,14 +89,14 @@ public class EngineHandler {
         }
     }
 
-    private EZPortfolioProxy loadOriginalEzPortfolioProxyOrGetFromCache(EzProfil ezProfil, Reporting reporting) throws Exception {
+    private EZPortfolioProxy loadOriginalEzPortfolioProxyOrGetFromCache(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting) throws Exception {
         EZPortfolioProxy original = serverState.getOriginalEzPortfolioProxy();
         if (original == null) {
             EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-            original = ezPortfolioManager.load();
+            original = ezPortfolioManager.load(mainSettings);
             serverState.setOriginalEzPortfolioProxy(original);
         }
-        EZPortfolioProxy newEZPortfolio = original.createDeepCopy(serverState.getEzNewPortfolioProxy() == null ? new ArrayList<>() : serverState.getEzNewPortfolioProxy().getNewShares());
+        EZPortfolioProxy newEZPortfolio = original.createDeepCopy();
         serverState.setEzNewPortfolioProxy(newEZPortfolio);
         return newEZPortfolio;
     }
@@ -117,7 +115,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(ezProfil, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
 
                     List<EZModel> allEZModels;
                     try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
@@ -154,7 +152,7 @@ public class EngineHandler {
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .map(ezPortefeuilleEdition  ->
-                                            Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
+                                            Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .collect(Collectors.toList());
@@ -195,31 +193,20 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
             try (Reporting rep = reporting.pushSection("Mise à jour de EZPortfolio")) {
-                Optional<EZAction> invalidShare = serverState.getOriginalEzPortfolioProxy().getNewShares().stream()
-                        .filter(n -> StringUtils.isBlank(n.getEzName()) || StringUtils.isBlank(n.getIsin()) || StringUtils.isBlank(n.getEzTicker()))
-                        .findFirst();
-                if (invalidShare.isPresent()){
+                // check if all shares are correct before
+                Set<String> invalidShare = mainSettings.getEzLoad().getEZActionManager().getActionWithError().getErrors();
+                if (!invalidShare.isEmpty()){
                     // if from the previous analysis the newShares are not correctly filled => stop the process
-                    if (StringUtils.isBlank(invalidShare.get().getEzName()))
-                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de nom");
-                    if (StringUtils.isBlank(invalidShare.get().getEzTicker()))
-                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de ticker google");
-                    if (StringUtils.isBlank(invalidShare.get().getIsin()))
-                        reporting.error("La valeur: "+invalidShare.get().getIsin()+" n'a pas de code ISIN");
+                    invalidShare.forEach(reporting::error);
                 }
                 else {
                     if (serverState.isEzActionDirty()) {
                         // depuis la derniere analyse, le user a changé le nom d'une nouvelle valeur
-                        reporting.error("Une valeur a chang éde nom, vous devez relancer la génération des opérations avant de mettre à jour EzPortfolio");
-                    }
-                    else if (serverState.getOriginalEzPortfolioProxy().getNewShares().stream().anyMatch(e -> StringUtils.isBlank(e.getEzName()))){
-                        reporting.error("Une valeur n'a pas de nom, vous devez la corriger et relancer la génération des opérations avant de mettre à jour EzPortfolio");
+                        reporting.error("Une valeur a changé de nom, vous devez relancer la génération des opérations avant de mettre à jour EzPortfolio");
                     }
                     else {
-
                         EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-                        EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
-                        serverState.getEzNewPortfolioProxy().getNewShares().forEach(ezPortfolioProxy::newAction);
+                        EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(mainSettings);
 
                         serverState.setOriginalEzPortfolioProxy(null); // don't use the cache version when uploading
                         serverState.setEzNewPortfolioProxy(null); // will be also reloaded later
@@ -230,6 +217,8 @@ public class EngineHandler {
 
                         // get the new version, and update the list of file not yet loaded
                         updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+
+                        mainSettings.getEzLoad().getEZActionManager().clearNewShareDescription();
                     }
                 }
             }
@@ -250,7 +239,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-                    EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load();
+                    EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(mainSettings);
                     updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
                 });
     }
@@ -296,7 +285,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(ezProfil, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
                     EzReport ezReport = new EzReport();
                     EzEdition ezEdition = new EzEdition();
                     RuleDefinitionSummary createStartDateRule = new RuleDefinitionSummary();

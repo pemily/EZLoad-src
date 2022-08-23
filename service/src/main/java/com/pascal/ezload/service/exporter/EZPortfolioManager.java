@@ -21,6 +21,8 @@ import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.pascal.ezload.service.config.EzProfil;
+import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class EZPortfolioManager {
 
@@ -43,9 +46,19 @@ public class EZPortfolioManager {
     }
 
 
-    public EZPortfolioProxy load() throws Exception {
+    public EZPortfolioProxy load(MainSettings mainSettings) throws Exception {
         try(Reporting rep = reporting.pushSection("Connection EZPortfolio...")){
-            return load(1);
+            EZPortfolioProxy ezPortfolioProxy = load(1);
+            ezPortfolioProxy.getShareValuesFromMonPortefeuille()
+                    .stream()
+                    .forEach(sv -> {
+                        try {
+                            mainSettings.getEzLoad().getEZActionManager().createIfNeeded(sv);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+            return ezPortfolioProxy;
         }
         catch(Exception e){
             if (e instanceof IllegalStateException){

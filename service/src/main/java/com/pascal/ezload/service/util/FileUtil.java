@@ -24,6 +24,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
@@ -32,15 +33,19 @@ import java.util.zip.ZipInputStream;
 
 public class FileUtil {
 
-    public static String file2String(String file) throws FileNotFoundException {
+    public static String file2String(String file) throws IOException {
         if (! new File(file).exists()) return null;
         return inputStream2String(new FileInputStream(file));
     }
 
-    public static String inputStream2String(InputStream inputStream) {
-        String text = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                .lines().collect(Collectors.joining("\n"));
-        return text;
+    public static String inputStream2String(InputStream inputStream) throws IOException {
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+                return bufferedReader.lines().collect(Collectors.joining("\n"));
+        }
+    }
+
+    public static InputStream read(File file) throws FileNotFoundException {
+        return new BufferedInputStream(new FileInputStream(file));
     }
 
     public static void string2file(String file, String content) throws IOException {
@@ -48,6 +53,14 @@ public class FileUtil {
         OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8);
         fileWriter.write(content);
         fileWriter.close();
+    }
+
+    public static void write(File file, InputStream content) throws IOException {
+        file.getParentFile().mkdirs();
+        java.nio.file.Files.copy(
+                content,
+                file.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static void unzip(InputStream is, String targetDirStr, boolean fileOverwrite) throws IOException {

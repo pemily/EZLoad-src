@@ -29,20 +29,20 @@ import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
-import com.pascal.ezload.service.model.EZAction;
-import com.pascal.ezload.service.model.EZCountry;
+import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.CountryUtil;
-import com.pascal.ezload.service.util.FinanceTools;
 import com.pascal.ezload.service.util.JsonUtil;
+import com.pascal.ezload.service.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -58,13 +58,15 @@ public class RulesEngine {
     private Reporting reporting;
     private MainSettings mainSettings;
     private RulesManager rulesManager;
+    private EZActionManager ezActionManager;
     private List<RuleDefinition> allRules;
 
-    public RulesEngine(Reporting reporting, MainSettings mainSettings, RulesManager rulesManager) throws IOException {
+    public RulesEngine(Reporting reporting, MainSettings mainSettings, RulesManager rulesManager, EZActionManager ezActionManager) throws IOException {
         this.reporting = reporting;
         this.mainSettings = mainSettings;
         this.allRules = rulesManager.getAllRules();
         this.rulesManager = rulesManager;
+        this.ezActionManager = ezActionManager;
     }
 
     public EzEdition transform(EZPortfolioProxy ezPortfolioProxy, EZOperation operation, EzData ezData) {
@@ -182,12 +184,12 @@ public class RulesEngine {
         // compute the share Id
         String isin = eval(new GetFinancialDataError(), ruleDefinition.getName()+".shareId", ruleDefinition.getShareId(), data, functions);
         if (!StringUtils.isBlank(isin)){
-            EZAction action = FinanceTools.getInstance().get(reporting, ezPortfolioProxy, isin, ruleDefinition.getBroker(), data);
+            EZShare action = ezActionManager.getOrCreate(reporting, isin, ruleDefinition.getBroker(), data);
             action.fill(data);
         }
         else{
             // a stupid action just to have the variables list when creating a new rule
-            EZAction action = new EZAction();
+            EZShare action = new EZShare();
             action.fill(data);
         }
 
@@ -307,7 +309,7 @@ public class RulesEngine {
 
         try {
             EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
-            computeDividendCalendarAndAnnual(ezProfil, reporting, ezPortefeuilleEdition);
+            computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition);
         } catch (Exception e) {
             ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
             logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
@@ -321,13 +323,14 @@ public class RulesEngine {
     }
 
     // return true if update, false else
-    public static boolean computeDividendCalendarAndAnnual(EzProfil ezProfil, Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition) {
+    public static boolean computeDividendCalendarAndAnnual(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition) {
         boolean result = false;
         if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
             try{
                 // recherche les dividendes sur seekingalpha
-                EZCountry countryCode = CountryUtil.foundByName(ezPortefeuilleEdition.getCountry());
-                List<FinanceTools.Dividend> dividends = FinanceTools.getInstance().searchDividends(countryCode.getCode(), ezPortefeuilleEdition.getTickerGoogleFinance());
+                Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager().getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
+                if (ezAction.isEmpty()) return false;
+                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager().searchDividends(ezAction.get());
                 if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)

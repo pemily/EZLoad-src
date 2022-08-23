@@ -28,7 +28,7 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZAction, BourseDirectEZAccountDeclaration } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
 
 export function App(){
@@ -47,7 +47,7 @@ export function App(){
     const [rules, setRules] = useState<RuleDefinitionSummary[]>([]);
     const [editOperation, setEditOperation] = useState<EzEdition|undefined>(undefined);
     const [selectedRule, setSelectedRule] = useState<SelectedRule|undefined>(undefined);
-    const [newShareValues, setNewShareValues] = useState<EZAction[]|undefined>(undefined);
+    const [actionWithMsg, setActionWithMsg] = useState<ActionWithMsg|undefined>(undefined);
     const [newShareValuesDirty, setNewShareValuesDirty] = useState<boolean>(false);
     const [reportGenerated, setReportGenerated] = useState<boolean>(false);
     const [exited, setExited] = useState<boolean>(false);
@@ -82,13 +82,13 @@ export function App(){
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
-             setNewShareValues(r.newEZAction);
+             setActionWithMsg(r.actionWithMsg);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);
              setVersion(r.ezLoadVersion);
              setAllProfiles(r.allProfiles);
-             if (newShareValues === undefined){
+             if (actionWithMsg === undefined){
                 setNewShareValuesDirty(false);
              }              
         })
@@ -184,17 +184,11 @@ export function App(){
         }
     }
 
-    function saveShareValue(newValue: EZAction){        
+    function saveShareValue(newValue: EZShare){        
         ezApi.home.saveNewShareValue(newValue)
             .then(r => {
                 // mettre a jour le modele des newShareValues
-                setNewShareValues(newShareValues?.map(e => e.isin === newValue.isin ? {
-                    ...e,
-                    ezTicker: newValue.ezTicker,
-                    countryCode: newValue.countryCode,
-                    ezName: newValue.ezName,
-                    type: newValue.type,                    
-                } : e));
+                reloadAllData();
                 setNewShareValuesDirty(true);
             })
             .catch(e => console.error(e));
@@ -347,7 +341,7 @@ export function App(){
                                         && (<Anchor alignSelf="center" target={"ezPortfolio"+mainSettings.activeEzProfilName} color="brand" href={ezProfil.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
                                 { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
-                                <NewShareValues newShareValues={newShareValues} processRunning={processRunning} saveShareValue={saveShareValue}/>
+                                <NewShareValues actionWithMsg={actionWithMsg} processRunning={processRunning} saveShareValue={saveShareValue}/>
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
                                         isOperationIgnored={isOperationIgnored}

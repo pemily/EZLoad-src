@@ -40,9 +40,9 @@ public class EzEditionExporter {
     private final Reporting reporting;
     private final RulesEngine rulesEngine;
 
-    public EzEditionExporter(String ezRepoDir, MainSettings mainSettings, Reporting reporting) throws IOException {
+    public EzEditionExporter(String ezRepoDir, MainSettings mainSettings, Reporting reporting) throws Exception {
         this.reporting = reporting;
-        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(ezRepoDir, mainSettings));
+        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(ezRepoDir, mainSettings), mainSettings.getEzLoad().getEZActionManager());
     }
 
     /**

@@ -21,6 +21,7 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.util.LoggerReporting;
 import com.pascal.ezload.service.util.ModelUtils;
+import com.pascal.ezload.service.util.NumberUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +53,7 @@ public class ExpressionEvaluatorTest {
     public void testStringVariableConcatWithFloat(){
         EzData ezdata = new EzData();
         ezdata.put(new EzDataKey("varOne"), "debut");
-        ezdata.put(new EzDataKey("varTwo"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varTwo"), NumberUtils.float2Str(2500.5f));
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("debut2500.5", result);
     }
@@ -92,7 +93,7 @@ public class ExpressionEvaluatorTest {
     @Test
     public void testAdditionFloatAndInteger(){
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("varOne"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varOne"), NumberUtils.float2Str(2500.5f));
         ezdata.put(new EzDataKey("varTwo"), "2500");
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5000,5", result);
@@ -101,8 +102,8 @@ public class ExpressionEvaluatorTest {
     @Test
     public void testAdditionFloats(){
         EzData ezdata = new EzData();
-        ezdata.put(new EzDataKey("varOne"), ModelUtils.float2Str(2500.5f));
-        ezdata.put(new EzDataKey("varTwo"), ModelUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varOne"), NumberUtils.float2Str(2500.5f));
+        ezdata.put(new EzDataKey("varTwo"), NumberUtils.float2Str(2500.5f));
         String result = ExpressionEvaluator.getSingleton().evaluateAsString(new LoggerReporting(), "varOne + varTwo", ezdata);
         assertEquals("5001", result);
     }

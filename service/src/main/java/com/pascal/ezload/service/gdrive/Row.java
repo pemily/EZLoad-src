@@ -17,8 +17,8 @@
  */
 package com.pascal.ezload.service.gdrive;
 
-import static com.pascal.ezload.service.util.ModelUtils.str2Float;
-import static com.pascal.ezload.service.util.ModelUtils.str2Int;
+import com.pascal.ezload.service.model.EZDate;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,12 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.api.services.sheets.v4.model.CellData;
-import com.google.api.services.sheets.v4.model.CellFormat;
-import com.google.api.services.sheets.v4.model.ExtendedValue;
-import com.google.api.services.sheets.v4.model.NumberFormat;
-import com.pascal.ezload.service.model.EZDate;
-import org.apache.commons.lang3.StringUtils;
+import static com.pascal.ezload.service.util.NumberUtils.str2Float;
+import static com.pascal.ezload.service.util.NumberUtils.str2Int;
 
 public class Row {
 

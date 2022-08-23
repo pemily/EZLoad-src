@@ -25,6 +25,6 @@ import java.util.Optional;
 
 public interface BrokerCustomCode {
 
-    Optional<Map<String, Object>> searchActionInDifferentMarket(String actionCode, List<Map<String, Object>> data, EzData ezData);
+    Optional<Map<String, Object>> selectTheMostProbableShare(String actionCode, List<Map<String, Object>> data, EzData ezData);
 
 }

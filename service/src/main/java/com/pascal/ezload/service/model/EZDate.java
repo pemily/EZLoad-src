@@ -19,14 +19,10 @@ package com.pascal.ezload.service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.time.*;
-import java.time.chrono.ChronoPeriod;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
-
-import static com.pascal.ezload.service.util.ModelUtils.str2Int;
 
 public class EZDate {
     private final int day;
@@ -55,6 +51,33 @@ public class EZDate {
         this.month = month;
         this.day = day;
     }
+
+    public static EZDate today(){
+        return new EZDate(Instant.now().getEpochSecond());
+    }
+
+    public EZDate yesterday() {
+        LocalDate localDate = LocalDate.of(year, month, day).minusDays(1);
+        return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+    }
+
+    public EZDate tomorrow(){
+        LocalDate localDate = LocalDate.of(year, month, day).plusDays(1);
+        return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+    }
+
+    // return true if this is after dateToTest
+    public boolean isAfter(EZDate dateToTest){
+        if (this.equals(dateToTest)) return false;
+        return this.toEpochSecond() > dateToTest.toEpochSecond();
+    }
+
+    // return true if this is before dateToTest
+    public boolean isBefore(EZDate dateToTest){
+        if (this.equals(dateToTest)) return false;
+        return this.toEpochSecond() < dateToTest.toEpochSecond();
+    }
+
 
     public int getDay() {
         return day;
@@ -93,6 +116,19 @@ public class EZDate {
         if (elem.length != 3) return null;
         try {
             return new EZDate(Integer.parseInt(elem[2]), Integer.parseInt(elem[1]), Integer.parseInt(elem[0]));
+        }
+        catch(NumberFormatException ne){
+            return null;
+        }
+    }
+
+    public static EZDate parseYYYMMDDDate(String date, char separator) {
+        if (date == null) return null;
+        String elem[] = date.trim().split(separator+"");
+        // la valeur de la Date en String dans une Row est: yyyy/mm/dd
+        if (elem.length != 3) return null;
+        try {
+            return new EZDate(Integer.parseInt(elem[0]), Integer.parseInt(elem[1]), Integer.parseInt(elem[2]));
         }
         catch(NumberFormatException ne){
             return null;
@@ -144,4 +180,5 @@ public class EZDate {
                 ", year=" + year +
                 '}';
     }
+
 }

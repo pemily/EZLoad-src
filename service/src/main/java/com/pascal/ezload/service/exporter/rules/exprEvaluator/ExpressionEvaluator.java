@@ -17,13 +17,14 @@
  */
 package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.ModelUtils;
-import org.apache.commons.jexl3.*;
-
-import java.util.Map;
+import com.pascal.ezload.service.util.NumberUtils;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlScript;
 
 //    https://us-east-2.console.aws.amazon.com/codesuite/codecommit/repositories/JarvisHome/browse/refs/heads/master/--/Nestor%40Home/nestorhome/src/main/java/com/emily/nestor/home/common/engine/util/exprEvaluator/VariableResolver.java?region=us-east-2
 
@@ -93,12 +94,12 @@ public class ExpressionEvaluator {
         if (resultObj instanceof Float){
             // simplify if possible, in case the result of the expression is a float: 5000.00
             // convert it into an int if possible to obtain a string: 5000
-            return ModelUtils.float2Str((Float)resultObj );
+            return NumberUtils.float2Str((Float)resultObj );
         }
         if (resultObj instanceof Double){
             // simplify if possible, in case the result of the expression is a float: 5000.00
             // convert it into an int if possible to obtain a string: 5000
-            return ModelUtils.double2Str((Double)resultObj );
+            return NumberUtils.double2Str((Double)resultObj );
         }
         return resultObj+"";
     }
