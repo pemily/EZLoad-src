@@ -20,26 +20,26 @@ package com.pascal.ezload.service.util.finance;
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.HttpUtil;
+import com.pascal.ezload.service.util.HttpUtilCached;
 
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 // https://rapidapi.com/category/Finance
-public class FinanceTools {
-    private static final Logger logger = Logger.getLogger("FinanceTools");
+public class MarketStackTools {
+    private static final Logger logger = Logger.getLogger("MarketStackTools");
 
-    static final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
+    static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    public static EZShare searchActionFromMarketstack(Reporting reporting, String actionTicker) throws Exception {
+    public static EZShare searchActionFromMarketstack(HttpUtilCached cache, Reporting reporting, String actionTicker) throws Exception {
         String url = "https://marketstack.com/stock_api.php?offset=0&exchange=&search="+actionTicker;
-        return HttpUtil.download(url, null, inputStream -> {
+        return cache.get("marketstack_share_"+actionTicker, url, inputStream -> {
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("data");
             if (quotes.size() == 0) return null;
             if (quotes.size() > 1) {
-                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionTicker + ". La 1ère est sélectionné. Vérifié: "+url);
+                reporting.info("Plus d'un résultat trouvé pour l'action:  " + actionTicker + ". La 1ère est sélectionné. Vérifié: " + url);
             }
             EZShare action = new EZShare();
             Map<String, Object> actionData = quotes.get(0);

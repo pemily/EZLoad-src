@@ -19,6 +19,7 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.util.ModelUtils;
+import com.pascal.ezload.service.util.NumberUtils;
 import org.apache.commons.jexl3.JexlContext;
 
 import java.util.HashMap;
@@ -46,12 +47,12 @@ public class VariableResolver  implements JexlContext {
         String v = allVariables.get(name);
         if (v != null){
             try {
-                int i = ModelUtils.str2Int(v);
+                int i = NumberUtils.str2Int(v);
                 return i;
             }
             catch(NumberFormatException e){
                 try {
-                    float f = ModelUtils.str2Float(v);
+                    float f = NumberUtils.str2Float(v);
                     return f;
                 }
                 catch(NumberFormatException e2){

@@ -22,9 +22,8 @@ import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.rules.dividends.DividendsAlgo;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.NumberUtils;
 import com.pascal.ezload.service.util.finance.Dividend;
-import com.pascal.ezload.service.util.finance.FinanceTools;
-import com.pascal.ezload.service.util.ModelUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -58,8 +57,8 @@ public class DividendsCalendar extends DividendsAlgo {
                                                     .keySet();
 
         float percentForMonth = 100f / monthWithDividends.size();
-        String value = ModelUtils.float2Str(percentForMonth);
-        String percentValueForYear = ModelUtils.float2Str(percentForMonth / 100f);
+        String value = NumberUtils.float2Str(percentForMonth);
+        String percentValueForYear = NumberUtils.float2Str(percentForMonth / 100f);
 
         boolean result = false;
         for (int month = 1; month <= 12; month++) {
@@ -78,14 +77,14 @@ public class DividendsCalendar extends DividendsAlgo {
         Map<Integer, List<Dividend>> monthWithDividends =  dividends.stream()
                                                     .collect(Collectors.groupingBy(d -> dateSelector.apply(d).getMonth()));
 
-        float totalAmount = ModelUtils.str2Float(sumOfAllDividends(reporting, dividends));
+        float totalAmount = NumberUtils.str2Float(sumOfAllDividends(reporting, dividends));
 
         boolean result = false;
         for (int month = 1; month <= 12; month++) {
             String newValue;
             if (totalAmount != 0 && monthWithDividends.containsKey(month)) {
-                float monthAmount = ModelUtils.str2Float(sumOfAllDividends(reporting, monthWithDividends.get(month)));
-                newValue = ModelUtils.float2Str(monthAmount * 100f / totalAmount)+"%";
+                float monthAmount = NumberUtils.str2Float(sumOfAllDividends(reporting, monthWithDividends.get(month)));
+                newValue = NumberUtils.float2Str(monthAmount * 100f / totalAmount)+"%";
             }
             else newValue = "";
 

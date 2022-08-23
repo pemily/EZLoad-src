@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.pascal.ezload.service.util.ModelUtils.str2Float;
-import static com.pascal.ezload.service.util.ModelUtils.str2Int;
+import static com.pascal.ezload.service.util.NumberUtils.str2Float;
+import static com.pascal.ezload.service.util.NumberUtils.str2Int;
 
 public class EzData {
 

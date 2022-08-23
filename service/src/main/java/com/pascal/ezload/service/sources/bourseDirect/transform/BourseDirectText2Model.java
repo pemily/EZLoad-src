@@ -135,20 +135,20 @@ public class BourseDirectText2Model {
                                 .replaceAll("__", "_");
                         if (op.getFields().containsKey(key))
                             throw new UnsupportedOperationException("Field " + key + " already set. Unknown pdf format near the text: " + pt.getText());
-                        op.getFields().put("ezOperation_"+key, ModelUtils.normalizeAmount(text[1].trim()));
+                        op.getFields().put("ezOperation_"+key, NumberUtils.normalizeAmount(text[1].trim()));
                     }
                 }
                 else if (pt.isAfter(DebitColX) && pt.isBefore(CreditColX)){
                     // dans la colonne débit:
                     BourseDirectOperation op = findOrThrow(allOperations, pt);
                     if (op.getFields().containsKey("ezOperation_DEBIT")) throw new UnsupportedOperationException("Débit already set. Unknown pdf format near the text: "+pt.getText());
-                    op.getFields().put("ezOperation_DEBIT", ModelUtils.normalizeAmount(pt.getText()));
+                    op.getFields().put("ezOperation_DEBIT", NumberUtils.normalizeAmount(pt.getText()));
                 }
                 else if (pt.isAfter(CreditColX)){
                     // dans la colonne credit:
                     BourseDirectOperation op = findOrThrow(allOperations, pt);
                     if (op.getFields().containsKey("ezOperation_CREDIT")) throw new UnsupportedOperationException("Crédit already set. Unknown pdf format near the text: "+pt.getText());
-                    op.getFields().put("ezOperation_CREDIT", ModelUtils.normalizeAmount(pt.getText()));
+                    op.getFields().put("ezOperation_CREDIT", NumberUtils.normalizeAmount(pt.getText()));
                 }
             }
         }

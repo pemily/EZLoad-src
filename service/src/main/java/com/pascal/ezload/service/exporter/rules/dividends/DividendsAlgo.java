@@ -23,9 +23,9 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.finance.Dividend;
-import com.pascal.ezload.service.util.finance.FinanceTools;
 import com.pascal.ezload.service.util.ModelUtils;
+import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.service.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -51,7 +51,7 @@ public abstract class DividendsAlgo {
         if (val.isBlank()){
             val = "0";
         }
-        return ModelUtils.str2Float(val);
+        return NumberUtils.str2Float(val);
     }
 
     protected List<Dividend> getLastYearDividends(List<Dividend> allHistoricalDividends, Function<Dividend, EZDate> dvd2Date){
@@ -183,6 +183,6 @@ public abstract class DividendsAlgo {
 
         String result = eval(reporting, addition);
         if (result == null) return "0";
-        return ModelUtils.normalizeAmount(result);
+        return NumberUtils.normalizeAmount(result);
     }
 }

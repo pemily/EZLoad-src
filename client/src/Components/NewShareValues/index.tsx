@@ -18,10 +18,10 @@
 import { Box, List, Text, Anchor } from "grommet";
 import { FormSearch } from 'grommet-icons';
 import { TextField } from '../Tools/TextField';
-import { EZShare } from '../../ez-api/gen-api/EZLoadApi';
+import { EZShare, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
 
 export interface NewShareValuesProps {
-    newShareValues: EZShare[]|undefined;
+    actionWithMsg: ActionWithMsg|undefined;
     processRunning: boolean;
     saveShareValue: (newVal: EZShare) => void;
 }      
@@ -29,11 +29,14 @@ export interface NewShareValuesProps {
 export function NewShareValues(props: NewShareValuesProps){
     return (
         <Box margin="medium" >            
-            {props.newShareValues && props.newShareValues.length > 0 
+            {props.actionWithMsg?.actions && props.actionWithMsg.actions.length > 0 
                 && (<><Text>Nouvelle(s) valeur(s) detectée(s)!</Text>
                 <Text>Vous pouvez le(s) renommer maintenant (il sera plus difficile de le faire dans EZPortfolio)</Text>
                 <Text size="small">Puis cliquez sur "Générer les opérations" pour prendre en compte vos modifications</Text></>)}
-            <List data={props.newShareValues} margin="none" pad="none"
+            <List data={props.actionWithMsg?.errors} margin="small" pad="none">
+                {(error: string) => (<Text size="small" color='status-critical'>{error}</Text>)}
+            </List>
+            <List data={props.actionWithMsg?.actions} margin="none" pad="none"
              background={['light-2', 'light-4']}>
                 {(shareValue: EZShare, index: number) => (
                     <Box direction="row-responsive" margin="xsmall">                        

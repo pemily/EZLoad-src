@@ -44,16 +44,15 @@ public class HttpUtil {
         IOUtils.copy(new URL(url), output);
     }
 
+
     public static <R> R download(String urlStr, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
         URL url = new URL(urlStr);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         try {
-            con.setUseCaches(false);
+            // con.setUseCaches(false);
             if (requestProperties != null) {
                 requestProperties
-                        .entrySet()
-                        .stream()
-                        .forEach(entry -> con.addRequestProperty(entry.getKey(), entry.getValue()));
+                        .forEach(con::addRequestProperty);
 
             }
             con.setRequestMethod("GET");

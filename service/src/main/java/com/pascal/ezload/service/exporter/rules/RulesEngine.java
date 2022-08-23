@@ -18,7 +18,6 @@
 package com.pascal.ezload.service.exporter.rules;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pascal.ezload.service.config.EZActionManager;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
@@ -30,14 +29,13 @@ import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
-import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZOperation;
+import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.finance.Dividend;
-import com.pascal.ezload.service.util.finance.FinanceTools;
 import com.pascal.ezload.service.util.JsonUtil;
-import com.pascal.ezload.service.util.finance.SeekingAlphaFinanceTools;
+import com.pascal.ezload.service.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -332,7 +330,7 @@ public class RulesEngine {
                 // recherche les dividendes sur seekingalpha
                 Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager().getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
                 if (ezAction.isEmpty()) return false;
-                List<Dividend> dividends = SeekingAlphaFinanceTools.searchDividends(ezAction.get());
+                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager().searchDividends(ezAction.get());
                 if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)

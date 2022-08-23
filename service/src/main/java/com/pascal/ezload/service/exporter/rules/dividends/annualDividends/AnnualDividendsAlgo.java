@@ -23,7 +23,6 @@ import com.pascal.ezload.service.exporter.rules.dividends.DividendsAlgo;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.finance.Dividend;
-import com.pascal.ezload.service.util.finance.FinanceTools;
 
 import java.util.List;
 import java.util.function.Function;

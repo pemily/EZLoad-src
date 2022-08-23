@@ -26,6 +26,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.pascal.ezload.service.exporter.rules.RuleDefinition;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 public class JsonUtil {
     private final static DefaultIndenter defaultIndenter = new DefaultIndenter("  ", "\n"); // tab with 2 spaces and \n instead of \n\r
@@ -62,4 +69,13 @@ public class JsonUtil {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
+
+    public static <R, C extends Class<R>> R readWithDefaultMapper(InputStream inputStream, C clazz) throws IOException {
+        return JsonUtil.createDefaultMapper().readValue(inputStream, clazz);
+    }
+
+    public static <R, C extends Class<R>> R readWithLazyMapper(InputStream inputStream, C clazz) throws IOException {
+        return JsonUtil.createDefaultMapper().readValue(inputStream, clazz);
+    }
+
 }

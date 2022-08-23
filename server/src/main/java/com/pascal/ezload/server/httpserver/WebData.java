@@ -22,7 +22,7 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
-import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.financial.ActionWithMsg;
 
 import java.util.List;
 
@@ -35,13 +35,13 @@ public class WebData {
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
-    private List<EZShare> newEZShare;
+    private ActionWithMsg actionWithMsg;
     private List<String> allProfiles;
     private boolean processRunning;
     private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
-                   List<EzReport> reports, List<EZShare> newEZShare, List<String> filesNotYetLoaded,
+                   List<EzReport> reports, ActionWithMsg actionWithMsg, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles){
         this.ezProfil = ezProfil;
         this.configFile = configFile;
@@ -51,7 +51,7 @@ public class WebData {
         this.reports = reports;
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
-        this.newEZShare = newEZShare;
+        this.actionWithMsg = actionWithMsg;
         this.ezLoadVersion = ezLoadVersion;
         this.allProfiles = allProfiles;
     }
@@ -104,14 +104,6 @@ public class WebData {
         this.filesNotYetLoaded = filesNotYetLoaded;
     }
 
-    public List<EZShare> getNewEZShare() {
-        return newEZShare;
-    }
-
-    public void setNewEZShare(List<EZShare> newEZShare) {
-        this.newEZShare = newEZShare;
-    }
-
     public String getConfigFile() {
         return configFile;
     }
@@ -142,5 +134,13 @@ public class WebData {
 
     public void setAllProfiles(List<String> allProfiles) {
         this.allProfiles = allProfiles;
+    }
+
+    public ActionWithMsg getActionWithMsg() {
+        return actionWithMsg;
+    }
+
+    public void setActionWithMsg(ActionWithMsg actionWithMsg) {
+        this.actionWithMsg = actionWithMsg;
     }
 }

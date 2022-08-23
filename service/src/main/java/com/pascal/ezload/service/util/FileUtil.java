@@ -24,6 +24,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.stream.Collectors;
@@ -43,11 +44,23 @@ public class FileUtil {
         }
     }
 
+    public static InputStream read(File file) throws FileNotFoundException {
+        return new BufferedInputStream(new FileInputStream(file));
+    }
+
     public static void string2file(String file, String content) throws IOException {
         new File(file).getParentFile().mkdirs();
         OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8);
         fileWriter.write(content);
         fileWriter.close();
+    }
+
+    public static void write(File file, InputStream content) throws IOException {
+        file.getParentFile().mkdirs();
+        java.nio.file.Files.copy(
+                content,
+                file.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static void unzip(InputStream is, String targetDirStr, boolean fileOverwrite) throws IOException {
