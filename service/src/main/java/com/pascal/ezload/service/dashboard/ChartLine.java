@@ -7,6 +7,7 @@ public class ChartLine {
     private String title;
     private List<Float> values;
     private String colorLine; // rgba(255,99,132,1);
+    private String idAxisY; // un id optionel, pour ajouter une autre echelle sur l'axe des Y (pour faire la distinction entre action/devise par exemple)
 
     public String getTitle() {
         return title;
@@ -30,5 +31,13 @@ public class ChartLine {
 
     public void setColorLine(String colorLine) {
         this.colorLine = colorLine;
+    }
+
+    public String getIdAxisY() {
+        return idAxisY;
+    }
+
+    public void setIdAxisY(String idAxisY) {
+        this.idAxisY = idAxisY;
     }
 }

@@ -10,9 +10,7 @@ import com.pascal.ezload.service.util.finance.CurrencyMap;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChartsManager {
@@ -45,6 +43,10 @@ public class ChartsManager {
     // Toutes les listes doivent avoir le meme nombre de ligne
     public Chart getShareChart(List<EZDate> dates, List<Prices> data) {
         Chart chart = new Chart();
+        Map<String, String> axisTitleY = new HashMap<>();
+        axisTitleY.put("yAxisShare", "Prix de l'action");
+        axisTitleY.put("yAxisDevise", "Prix de la devise vers l'Euro");
+        chart.setAxisId2titleY(axisTitleY);
 
         if (!data.stream().allMatch(prices -> prices.getPrices().size() == data.get(0).getPrices().size())){
             throw new IllegalStateException("Il y a une liste qui n'a pas le meme n'ombre d'elements");
@@ -58,6 +60,7 @@ public class ChartsManager {
                             ChartLine chartLine = new ChartLine();
                             chartLine.setTitle(prices.getLabel());
                             chartLine.setColorLine(colors.nextColor());
+                            chartLine.setIdAxisY(prices.getLabel().equals(prices.getDevise().getSymbol()) ? "yAxisDevise" : "yAxisShare");
                             chartLine.setValues(prices.getPrices()
                                                     .stream()
                                                     .map(PriceAtDate::getPrice).collect(Collectors.toList()));

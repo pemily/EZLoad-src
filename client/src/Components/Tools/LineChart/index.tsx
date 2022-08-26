@@ -45,6 +45,7 @@ export function LineChart(props: LineChartProps){
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
+             yAxisID: chartLine.idAxisY,        
              fill: false,
              cubicInterpolationMode: 'monotone', 
              tension: 0.4, // le niveau de courbure    
@@ -98,7 +99,7 @@ export function LineChart(props: LineChartProps){
                 display: true,
                 title: {
                     display: true,
-                    text: props.chart.titleX === null ? undefined : props.chart.titleX
+                    text: props.chart.axisId2titleX!['x']
                 },
                 ticks: {
                     // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -120,13 +121,26 @@ export function LineChart(props: LineChartProps){
                     color: '#000000',                    
                 }
             },
-            y: {
+            yAxisShare: {
                 display: true,
+                position: 'left',
                 title: {
                   display: true,
-                  text: props.chart.titleY === null ? undefined : props.chart.titleY
+                  text: props.chart.axisId2titleY!['yAxisShare']
                 }
-              }
+              },
+            yAxisDevise:{
+                display: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: props.chart.axisId2titleY!['yAxisDevise']
+                },
+                // grid line settings
+                grid: {
+                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },                
+            }
         }
     }
 
