@@ -24,6 +24,7 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.Chart;
+import com.pascal.ezload.service.dashboard.ChartManager;
 import com.pascal.ezload.service.dashboard.ChartsTools;
 import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.financial.EZActionManager;
@@ -40,6 +41,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,56 +83,12 @@ public class DashboardHandler {
         EZDate from = today.minusYears(2); // mettre la date du debut de nos investissement, -10 ans, -1ans <== faire le choix par une combo lors de la composition de nos charts
         List<EZShare> shares = mainSettings.getEzLoad().getEZActionManager().listAllShares();
 
-
-        Chart chart = getSharesChart(mainSettings.getEzLoad().getEZActionManager(), today, from, shares);
+        ChartManager chartManager = new ChartManager(mainSettings.getEzLoad().getEZActionManager());
+        Chart chart = chartManager.getSharesChart(today, from, shares);
         chartList.add(chart);
 
         return dashboardData;
     }
 
-    private Chart getSharesChart(EZActionManager actionManager, EZDate today, EZDate from, List<EZShare> shares) {
-        List<EZDate> dates = ChartsTools.getDatesSample(from, today, 150);
-
-        Map<EZDevise, CurrencyMap> allCurrencyMapToEuro = new HashMap<>();
-        List<Prices> prices = shares
-                .stream()
-                .map(ezShare -> {
-                    try {
-                        Prices p = actionManager.getPrices(ezShare, dates);
-                        if (p != null) {
-                            CurrencyMap currencyMap = allCurrencyMapToEuro.computeIfAbsent(p.getDevise(),
-                                    d -> {
-                                        try {
-                                            return actionManager.getCurrencyMap(d, DeviseUtil.EUR, dates);
-                                        } catch (Exception e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                            p = currencyMap.convertPrices(p);
-                        }
-                        return p;
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        allCurrencyMapToEuro.values().stream()
-                .filter(currencyMap -> !currencyMap.getFrom().equals(DeviseUtil.EUR))
-                .forEach(currencyMap -> {
-                    try {
-                        currencyMap.getFactors().setLabel(currencyMap.getFrom().getSymbol());
-                        prices.add(currencyMap.getFactors());
-                    }
-                    catch (Exception e){
-                        throw new RuntimeException(e);
-                    }
-                });
-
-        Chart chart = ChartsTools.getShareChart(dates, prices);
-        chart.setMainTitle("Prix des actions ("+DeviseUtil.EUR.getSymbol()+")");
-        return chart;
-    }
 
 }
