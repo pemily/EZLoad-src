@@ -1,24 +1,18 @@
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZDevise;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
-import com.pascal.ezload.service.util.finance.CurrencyMap;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ChartsManager {
 
-    private EZActionManager ezActionManager;
-
-    public ChartsManager(EZActionManager ezActionManager) {
-        this.ezActionManager = ezActionManager;
+    public ChartsManager() {
     }
 
 
@@ -40,7 +34,7 @@ public class ChartsManager {
         return allDates;
     }
 
-    // Toutes les listes doivent avoir le meme nombre de ligne
+    // Toutes les list: data.getPrices() doivent avoir le meme nombre de lignes
     public Chart getShareChart(List<EZDate> dates, List<Prices> data) {
         Chart chart = new Chart();
         Map<String, String> axisTitleY = new HashMap<>();
@@ -49,7 +43,7 @@ public class ChartsManager {
         chart.setAxisId2titleY(axisTitleY);
 
         if (!data.stream().allMatch(prices -> prices.getPrices().size() == data.get(0).getPrices().size())){
-            throw new IllegalStateException("Il y a une liste qui n'a pas le meme n'ombre d'elements");
+            throw new IllegalStateException("Il y a une liste qui n'a pas le meme nombre d'éléments");
         }
 
         Colors colors = new Colors(data.size());

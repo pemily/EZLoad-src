@@ -26,8 +26,10 @@ import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.Chart;
 import com.pascal.ezload.service.dashboard.ChartsManager;
 import com.pascal.ezload.service.dashboard.DashboardData;
+import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZDevise;
+import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
@@ -70,7 +72,7 @@ public class DashboardHandler {
 
 
     public DashboardData getDashboardData(MainSettings mainSettings) throws Exception {
-        ChartsManager chartsManager = new ChartsManager(mainSettings.getEzLoad().getEZActionManager());
+        ChartsManager chartsManager = new ChartsManager();
 
         DashboardData dashboardData = new DashboardData();
         List<Chart> chartList = new ArrayList<>();
@@ -78,22 +80,29 @@ public class DashboardHandler {
 
         EZDate today = EZDate.today();
         EZDate from = today.minusYears(2); // mettre la date du debut de nos investissement, -10 ans, -1ans <== faire le choix par une combo lors de la composition de nos charts
+        List<EZShare> shares = mainSettings.getEzLoad().getEZActionManager().listAllShares();
 
+
+        Chart chart = getSharesChart(mainSettings.getEzLoad().getEZActionManager(), chartsManager, today, from, shares);
+        chartList.add(chart);
+
+        return dashboardData;
+    }
+
+    private Chart getSharesChart(EZActionManager actionManager, ChartsManager chartsManager, EZDate today, EZDate from, List<EZShare> shares) {
         List<EZDate> dates = ChartsManager.getDatesSample(from, today, 150);
 
         Map<EZDevise, CurrencyMap> allCurrencyMapToEuro = new HashMap<>();
-        List<Prices> prices = mainSettings.getEzLoad()
-                .getEZActionManager()
-                .listAllShares()
+        List<Prices> prices = shares
                 .stream()
                 .map(ezShare -> {
                     try {
-                        Prices p = mainSettings.getEzLoad().getEZActionManager().getPrices(ezShare, dates);
+                        Prices p = actionManager.getPrices(ezShare, dates);
                         if (p != null) {
                             CurrencyMap currencyMap = allCurrencyMapToEuro.computeIfAbsent(p.getDevise(),
                                     d -> {
                                         try {
-                                            return mainSettings.getEzLoad().getEZActionManager().getCurrencyMap(d, DeviseUtil.EUR, dates);
+                                            return actionManager.getCurrencyMap(d, DeviseUtil.EUR, dates);
                                         } catch (Exception e) {
                                             throw new RuntimeException(e);
                                         }
@@ -121,10 +130,8 @@ public class DashboardHandler {
                 });
 
         Chart chart = chartsManager.getShareChart(dates, prices);
-        chart.setMainTitle("Toutes vos actions ("+DeviseUtil.EUR.getSymbol()+")");
-        chartList.add(chart);
-
-        return dashboardData;
+        chart.setMainTitle("Prix des actions ("+DeviseUtil.EUR.getSymbol()+")");
+        return chart;
     }
 
 }
