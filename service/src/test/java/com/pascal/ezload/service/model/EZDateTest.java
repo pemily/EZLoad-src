@@ -20,8 +20,6 @@ package com.pascal.ezload.service.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
-
 public class EZDateTest {
     @Test
     public void testBeforeOrEquals(){
@@ -51,8 +49,8 @@ public class EZDateTest {
         Assertions.assertEquals(946681200, new EZDate(2000,01,01).toEpochSecond());
         Assertions.assertEquals(1660687200, new EZDate(2022,8,17).toEpochSecond());
 
-        Assertions.assertEquals("2000/01/01", new EZDate(946681200).toYYMMDD());
-        Assertions.assertEquals("2022/08/17", new EZDate(1660687200).toYYMMDD());
+        Assertions.assertEquals("2000/01/01", new EZDate(946681200).toYYYYMMDD());
+        Assertions.assertEquals("2022/08/17", new EZDate(1660687200).toYYYYMMDD());
 
     }
 }

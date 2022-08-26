@@ -21,7 +21,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.model.EZMarketPlace;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.EZSharePrices;
+import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.BRException;
@@ -73,7 +73,7 @@ public class BourseDirectTools {
     }
 
 
-    public static EZSharePrices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
         // getActionData()
         // Probleme ici, je n'ai plus les ezData pour appeler le getActionData
         // "https://www.boursedirect.fr/api/instrument/download/history/"+marketPlace.getMic()+"/AVGO/USD";

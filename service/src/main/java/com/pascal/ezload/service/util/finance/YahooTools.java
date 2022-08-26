@@ -21,6 +21,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
+import static com.pascal.ezload.service.util.CsvUtil.CsvRow;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,43 +32,63 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class YahooTools {
     private static final Logger logger = Logger.getLogger("YahooTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    public static EZSharePrices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
-            EZDate from = new EZDate(1950, 1, 1);
-            EZDate to = EZDate.today();
-
-
-            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+ezShare.getYahooCode()+"?period1="+from.toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
-            return cache.get("yahoo_history_"+ezShare.getYahooCode()+"_"+to.toYYMMDD(), url, inputStream -> {
-                List<CsvUtil.CsvRow> rows = CsvUtil.load(inputStream, ",", 1);
-                List<EZSharePrice> prices = rows.stream()
-                        .filter(row -> !row.get(0).equals("null") && !row.get(4).equals("null"))
-                        .map(
-                                row -> {
-                                    // Date,Open,High,Low,Close,Adj Close,Volume
-                                    // 2006-05-25,4.030000,4.605000,4.020000,4.600000,4.261155,395343000
-                                    String date = row.get(0); // format: 2020-10-25
-                                    String closePrice = row.get(4); // take the close
-                                    EZSharePrice sharePrice = new EZSharePrice();
-                                    sharePrice.setPrice(NumberUtils.str2Float((closePrice)));
-                                    sharePrice.setDate(EZDate.parseYYYMMDDDate(date, '-'));
-                                    return sharePrice;
-                                }
-                        )
-                        .collect(Collectors.toList());
-                EZSharePrices sharePrices = new EZSharePrices();
-                sharePrices.setPrices(prices);
+            Prices sharePrices = new Prices();
+            processSharePriceCvsRows(cache, ezShare.getYahooCode(), listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+                new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
                 sharePrices.setDevise(getDevise(cache, ezShare));
-                return sharePrices;
+                sharePrices.setLabel(ezShare.getEzName());
             });
+            return sharePrices;
         }
         return null;
+    }
+
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
+        if (!StringUtils.isBlank(ezShare.getYahooCode())) {
+            Prices sharePrices = new Prices();
+            processSharePriceCvsRows(cache, ezShare.getYahooCode(), from, to, rows -> {
+                rows.map(YahooTools::createPriceAtDate)
+                    .filter(p -> p.getDate().isAfterOrEquals(from) && p.getDate().isBeforeOrEquals(to))
+                    .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+
+                sharePrices.setDevise(getDevise(cache, ezShare));
+                sharePrices.setLabel(ezShare.getEzName());
+            });
+            return sharePrices;
+        }
+        return null;
+    }
+
+    private static PriceAtDate createPriceAtDate(CsvRow row) {
+        // Date,Open,High,Low,Close,Adj Close,Volume
+        // 2006-05-25,4.030000,4.605000,4.020000,4.600000,4.261155,395343000
+        String date = row.get(0); // format: 2020-10-25
+        String closePrice = row.get(4); // take the close
+        PriceAtDate sharePrice = new PriceAtDate();
+        sharePrice.setPrice(NumberUtils.str2Float((closePrice)));
+        sharePrice.setDate(EZDate.parseYYYMMDDDate(date, '-'));
+        return sharePrice;
+    }
+
+    private static void processSharePriceCvsRows(HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
+        if (!StringUtils.isBlank(yahooCode)) {
+            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
+            cache.get("yahoo_history_"+yahooCode+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
+                rowsConsumer.accept(
+                        CsvUtil.load(inputStream, ",", 1)
+                        .filter(row -> !row.get(0).equals("null") && !row.get(4).equals("null")));
+                return null;
+            });
+        }
     }
 
     static private EZDevise getDevise(HttpUtilCached cache, EZShare ezShare) throws Exception {
@@ -140,8 +161,8 @@ public class YahooTools {
             EZDate last2Year = new EZDate(today.getYear()-2, today.getMonth(), today.getDay());
             String url = "https://query1.finance.yahoo.com/v7/finance/download/" + ezShare.getSeekingAlphaCode() + "?period1="+ last2Year.toEpochSecond()+"&period2="+today.toEpochSecond()+"&interval=1d&events=div&includeAdjustedClose=true";
             try {
-                return cache.get("yahoo_dividends_"+ ezShare.getSeekingAlphaCode()+"_"+today.toYYMMDD(), url, inputStream -> {
-                    List<CsvUtil.CsvRow> rows = CsvUtil.load(inputStream, ",", 1);
+                return cache.get("yahoo_dividends_"+ ezShare.getSeekingAlphaCode()+"_"+today.toYYYYMMDD(), url, inputStream -> {
+                    List<CsvRow> rows = CsvUtil.load(inputStream, ",", 1).collect(Collectors.toList());
                     Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL; // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
                     // 2 ans == 24 mois
                     if (rows.size() == 0)
@@ -172,43 +193,17 @@ public class YahooTools {
     }
 
 
-    static public CurrencyMap getCurrencyMap(HttpUtilCached cache, EZDevise from, EZDevise to) throws Exception {
-        if (from.getCode().equals(to.getCode())){
-            return new CurrencyMap(from, to, null);
-        }
-        String reversedCacheName = "yahoo_currency_"+to.getCode()+"-"+from.getCode()+"_"+EZDate.today().toYYMMDD();
-        if (cache.exists(reversedCacheName)){
-            // au lieu de USD -> EUR on a deja telecharge EUR -> USD
-            // on le parse et on retourne le reverse
-            try(InputStream inputStream = cache.getInputStream(reversedCacheName)){
-                return getCurrencyMap(to, from, inputStream).reverse();
-            }
+    static public CurrencyMap getCurrencyMap(HttpUtilCached cache, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
+        if (fromDevise.equals(toDevise)){
+            return new CurrencyMap(fromDevise, toDevise, null);
         }
 
-        EZDate fromDate = new EZDate(1950, 1, 1);
-        EZDate toDate = EZDate.today();
-        String url = "https://query1.finance.yahoo.com/v7/finance/download/" + from.getCode()+to.getCode()  + "=X?period1="+fromDate.toEpochSecond()+"&period2="+toDate.toEpochSecond()+"&interval=1d&includeAdjustedClose=true";
-        return cache.get("yahoo_currency_"+from.getCode()+"-"+to.getCode()+"_"+EZDate.today().toYYMMDD(), url, inputStream -> getCurrencyMap(from, to, inputStream));
-    }
+        Prices devisePrices = new Prices();
+        processSharePriceCvsRows(cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+            new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, devisePrices).fillPricesForAListOfDates();
+        });
 
-    private static CurrencyMap getCurrencyMap(EZDevise from, EZDevise to, InputStream inputStream) throws IOException {
-        List<CsvUtil.CsvRow> rows = CsvUtil.load(inputStream, ",", 1);
-        List<EZSharePrice> prices = rows.stream()
-                .filter(row -> !row.get(0).equals("null") && !row.get(4).equals("null"))
-                .map(
-                        row -> {
-                            // Date,Open,High,Low,Close,Adj Close,Volume
-                            // 2006-05-25,4.030000,4.605000,4.020000,4.600000,4.261155,395343000
-                            String date = row.get(0); // format: 2020-10-25
-                            String closePrice = row.get(4); // take the close
-                            EZSharePrice sharePrice = new EZSharePrice();
-                            sharePrice.setPrice(NumberUtils.str2Float((closePrice)));
-                            sharePrice.setDate(EZDate.parseYYYMMDDDate(date, '-'));
-                            return sharePrice;
-                        }
-                )
-                .collect(Collectors.toList());
-        return new CurrencyMap(from, to, prices);
+        return new CurrencyMap(fromDevise, toDevise, devisePrices.getPrices());
     }
 
 }

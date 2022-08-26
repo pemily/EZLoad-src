@@ -23,7 +23,6 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.ModelUtils;
 import com.pascal.ezload.service.util.NumberUtils;
 import com.pascal.ezload.service.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
@@ -99,7 +98,7 @@ public abstract class DividendsAlgo {
         // Group par année (date de detachement) => liste des dividendes de l'année
         List<Dividend> lastYearDividendsSorted = divs.stream()
                                                                         .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
-                                                                        .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYMMDD()))
+                                                                        .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYYYMMDD()))
                                                                         .collect(Collectors.toList());
 
         Map<Dividend.EnumFrequency, List<Dividend>> freq2Dividends = lastYearDividendsSorted.stream()

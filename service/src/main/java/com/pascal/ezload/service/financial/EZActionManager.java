@@ -203,67 +203,55 @@ public class EZActionManager {
 
         if (!StringUtils.isBlank(ezShare.getYahooCode()) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             // Validate that seeking alpha & yahoo code are aligned
-            EZSharePrices yahooPrices = null;
+            Prices yahooPrices = null;
+            EZDate to = EZDate.today();
+            EZDate from = to.minusDays(10);
             try {
-                yahooPrices = YahooTools.getPrices(cache, ezShare);
+                yahooPrices = YahooTools.getPrices(cache, ezShare, from, to);
             }
             catch (Exception e){
                 errors.add(toString(ezShare)+": Le code Yahoo ne fonctionne pas");
             }
-            EZSharePrices seekingPrices = null;
+            Prices seekingPrices = null;
             try {
-                seekingPrices = SeekingAlphaTools.getPrices(cache, ezShare);
+                seekingPrices = SeekingAlphaTools.getPrices(cache, ezShare, from, to);
             }
             catch (Exception e){
                 errors.add(toString(ezShare)+": Le code SeekingAlpha ne fonctionne pas");
             }
 
             if (yahooPrices != null && seekingPrices != null) {
-                EZDate date = findCommonDate(yahooPrices, seekingPrices);
-                if (date != null) {
-                    try {
-                        EZSharePrice yahooPriceInEuro = getPrice(date, yahooPrices, DeviseUtil.EUR);
-                        EZSharePrice seekingPriceInEuro = getPrice(date, seekingPrices, DeviseUtil.EUR);
+                EZDate today = EZDate.today();
+                try {
+                    PriceAtDate yahooPrice = yahooPrices.getPriceAt(today);
+                    PriceAtDate seekingPrice = seekingPrices.getPriceAt(today);
+                    if (yahooPrice.getPrice() != 0 && seekingPrice.getPrice() != 0) {
+                        List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
+                        CurrencyMap local2Euro = getCurrencyMap(yahooPrices.getDevise(), DeviseUtil.EUR, lastWeek);
+                        float yahooPriceInEuro = local2Euro.getPrice(yahooPrice);
+                        float seekingPriceInEuro = local2Euro.getPrice(seekingPrice);
 
-                        float diff = Math.abs(yahooPriceInEuro.getPrice() - seekingPriceInEuro.getPrice());
-                        float percentOfDiff = diff * 100.f / yahooPriceInEuro.getPrice();
+                        float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
+                        float percentOfDiff = diff * 100.f / yahooPriceInEuro;
                         if (percentOfDiff > 3) { // si la difference est plus grande que 3% c'est surement pas la meme action
-                            errors.add(toString(ezShare)+": Les codes Yahoo & SeekingAlpha ne semble pas être pas la meme action");
+                            errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semble pas être pas la meme action");
                         }
                     }
-                    catch (Exception e){
-                        logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action "+toString(ezShare), e);
-                    }
                 }
+                catch (Exception e){
+                    logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action "+toString(ezShare), e);
+                }
+
             }
        }
 
         return errors;
     }
 
-    private EZDate findCommonDate(EZSharePrices l1, EZSharePrices l2) {
-        int indexList1 = l1.getPrices().size() - 1;
-        int indexList2 = l2.getPrices().size() - 1;
-
-        while (indexList1 != 0 && indexList2 != 0) {
-            EZSharePrice l1Price = l1.getPrices().get(indexList1);
-            EZSharePrice l2Price = l2.getPrices().get(indexList2);
-
-            if (l1Price.getDate().equals(l2Price.getDate()))
-                return l1Price.getDate();
-
-            if (l1Price.getDate().isAfter(l2Price.getDate())) indexList1--;
-            else indexList2--;
-        }
-
-        return null;
+    public CurrencyMap getCurrencyMap(EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
+        return YahooTools.getCurrencyMap(cache, fromDevise, toDevise, listOfDates);
     }
 
-    // si la date n'est pas presente dans prices.getPrices, il prendra la date precedente
-    public EZSharePrice getPrice(EZDate date, EZSharePrices prices, EZDevise finalDevise) throws Exception {
-        CurrencyMap currencyMap = YahooTools.getCurrencyMap(cache, prices.getDevise(), finalDevise);
-        return currencyMap.getPrice(prices.getPriceAt(date));
-    }
 
     private String toString(EZShare action){
         if (StringUtils.isBlank(action.getEzName())){
@@ -306,4 +294,29 @@ public class EZActionManager {
     }
 
 
+    public List<EZShare> listAllShares() {
+        return ezShareData.getShares();
+    }
+
+    public Prices getPrices(EZShare ez, EZDate from, EZDate to) throws Exception {
+        Prices prices = YahooTools.getPrices(cache, ez, from, to);
+        if (prices == null){
+            prices = SeekingAlphaTools.getPrices(cache, ez, from, to);
+        }
+        if (prices == null){
+            logger.log(Level.SEVERE, "Pas de prix trouvé pour l'action "+ez.getEzName());
+        }
+        return prices;
+    }
+
+    public Prices getPrices(EZShare ez, List<EZDate> listOfDates) throws Exception {
+        Prices prices = YahooTools.getPrices(cache, ez, listOfDates);
+        if (prices == null){
+            prices = SeekingAlphaTools.getPrices(cache, ez, listOfDates);
+        }
+        if (prices == null){
+            logger.log(Level.SEVERE, "Pas de prix trouvé pour l'action "+ez.getEzName());
+        }
+        return prices;
+    }
 }

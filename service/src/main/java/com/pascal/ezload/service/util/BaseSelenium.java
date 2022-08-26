@@ -189,7 +189,7 @@ public class BaseSelenium {
     }
 
 
-    public <T> T retryOnError(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
+    public <T> T retryOnError(Reporting reporting, int n,  SupplierThatThrow<T> fct) throws Exception {
         try {
             return fct.get();
         }

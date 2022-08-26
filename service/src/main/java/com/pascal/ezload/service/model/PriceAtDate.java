@@ -17,16 +17,23 @@
  */
 package com.pascal.ezload.service.model;
 
-public class EZSharePrice {
+public class PriceAtDate {
 
-    private Float price;
+    private float price;
     private EZDate date;
 
-    public Float getPrice() {
+    public PriceAtDate(){}
+
+    public PriceAtDate(EZDate date, float price){
+        this.date = date;
+        this.price = price;
+    }
+
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

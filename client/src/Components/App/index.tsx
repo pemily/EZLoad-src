@@ -17,7 +17,7 @@
  */
 import { useState, useEffect } from "react";
 import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } from "grommet";
-import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption } from 'grommet-icons';
+import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption, LineChart } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { ProfileSelector } from '../ProfileSelector';
@@ -28,14 +28,17 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg, DashboardData } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
+import { Dashboard } from "../Dashboard";
 
 export function App(){
     
-    const EXECUTION_TAB_INDEX = 2;
-    const RULES_TAB_INDEX = 4;
-    const [activeIndex, setActiveIndex] = useState<number>(0);
+    const EXECUTION_TAB_INDEX = 3;
+    const RULES_TAB_INDEX = 5;    
+    const [activeIndex, setActiveIndex] = useState<number>(0); // si je mets EXECUTION_TAB_INDEX directement,
+                                                                // le useEffect(showLog, []) dans ViewLog n'est
+                                                                // pas executé lorsque la page est affcihé
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [configFile, setConfigFile] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
@@ -55,6 +58,7 @@ export function App(){
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
     const [allProfiles, setAllProfiles] = useState<string[]>([]);
+    const [dashboardData, setDashboardData] = useState<DashboardData|undefined>(undefined);
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -91,7 +95,7 @@ export function App(){
              if (actionWithMsg === undefined){
                 setNewShareValuesDirty(false);
              }              
-        })
+        })        
         .catch((error) => {
             console.error("Error while loading Data.", error);
         })
@@ -99,7 +103,7 @@ export function App(){
                     .then(setBourseDirectAuthInfo)
                     .catch((error) => {
                         console.error("Error while loading BourseDirect Username", error);
-                    }));
+                    }))
     }
         
     function isOperationIgnored(op: EzEdition | undefined) : boolean {
@@ -205,7 +209,12 @@ export function App(){
         )
         .catch((error) => {
             console.error("Error while checking update...", error);
-        });
+        })
+        .then(r => jsonCall(ezApi.dashboard.getDashboardData())
+                    .then(setDashboardData)
+                    .catch((error) => {
+                        console.error("Error while loading DashboardData", error);
+                    }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ ]);
 
@@ -284,6 +293,9 @@ export function App(){
             { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
+                    <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
+                        <Dashboard dashboardData={dashboardData} enabled={mainSettings && !processRunning}/>
+                    </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
                         <Box fill overflow="auto">      
                             {processRunning && 
