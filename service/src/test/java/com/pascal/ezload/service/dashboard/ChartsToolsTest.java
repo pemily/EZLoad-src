@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class ChartsManagerTest {
+public class ChartsToolsTest {
 
     @Test
     public void getDatesSample3Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 3);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 3);
         Assert.assertEquals(3, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,5), r.get(1));
@@ -19,7 +19,7 @@ public class ChartsManagerTest {
 
     @Test
     public void getDatesSample4Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 4);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 4);
         Assert.assertEquals(4, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,4), r.get(1));
@@ -29,7 +29,7 @@ public class ChartsManagerTest {
 
     @Test
     public void getDatesSample5Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 5);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 5);
         Assert.assertEquals(5, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,3), r.get(1));
@@ -40,7 +40,7 @@ public class ChartsManagerTest {
 
     @Test
     public void getDatesSample6Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 6);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 6);
         Assert.assertEquals(6, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -52,7 +52,7 @@ public class ChartsManagerTest {
 
     @Test
     public void getDatesSample7Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 7);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 7);
         Assert.assertEquals(7, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -66,7 +66,7 @@ public class ChartsManagerTest {
 
     @Test
     public void getDatesSample10Points(){
-        List<EZDate> r = ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 10);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 10);
         Assert.assertEquals(10, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -83,6 +83,6 @@ public class ChartsManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void getDatesSample11Points(){
-        ChartsManager.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 11);
+        ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 11);
     }
 }

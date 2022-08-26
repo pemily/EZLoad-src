@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ChartsManager {
-
-    public ChartsManager() {
-    }
-
+public class ChartsTools {
 
     public static List<EZDate> getDatesSample(EZDate from, EZDate to, int nbOfPoint){
         if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
@@ -35,7 +31,7 @@ public class ChartsManager {
     }
 
     // Toutes les list: data.getPrices() doivent avoir le meme nombre de lignes
-    public Chart getShareChart(List<EZDate> dates, List<Prices> data) {
+    public static Chart getShareChart(List<EZDate> dates, List<Prices> data) {
         Chart chart = new Chart();
         Map<String, String> axisTitleY = new HashMap<>();
         axisTitleY.put("yAxisShare", "Prix de l'action");

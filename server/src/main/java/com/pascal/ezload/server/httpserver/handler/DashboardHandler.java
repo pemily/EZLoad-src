@@ -24,7 +24,7 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.Chart;
-import com.pascal.ezload.service.dashboard.ChartsManager;
+import com.pascal.ezload.service.dashboard.ChartsTools;
 import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZDate;
@@ -72,7 +72,6 @@ public class DashboardHandler {
 
 
     public DashboardData getDashboardData(MainSettings mainSettings) throws Exception {
-        ChartsManager chartsManager = new ChartsManager();
 
         DashboardData dashboardData = new DashboardData();
         List<Chart> chartList = new ArrayList<>();
@@ -83,14 +82,14 @@ public class DashboardHandler {
         List<EZShare> shares = mainSettings.getEzLoad().getEZActionManager().listAllShares();
 
 
-        Chart chart = getSharesChart(mainSettings.getEzLoad().getEZActionManager(), chartsManager, today, from, shares);
+        Chart chart = getSharesChart(mainSettings.getEzLoad().getEZActionManager(), today, from, shares);
         chartList.add(chart);
 
         return dashboardData;
     }
 
-    private Chart getSharesChart(EZActionManager actionManager, ChartsManager chartsManager, EZDate today, EZDate from, List<EZShare> shares) {
-        List<EZDate> dates = ChartsManager.getDatesSample(from, today, 150);
+    private Chart getSharesChart(EZActionManager actionManager, EZDate today, EZDate from, List<EZShare> shares) {
+        List<EZDate> dates = ChartsTools.getDatesSample(from, today, 150);
 
         Map<EZDevise, CurrencyMap> allCurrencyMapToEuro = new HashMap<>();
         List<Prices> prices = shares
@@ -129,7 +128,7 @@ public class DashboardHandler {
                     }
                 });
 
-        Chart chart = chartsManager.getShareChart(dates, prices);
+        Chart chart = ChartsTools.getShareChart(dates, prices);
         chart.setMainTitle("Prix des actions ("+DeviseUtil.EUR.getSymbol()+")");
         return chart;
     }
