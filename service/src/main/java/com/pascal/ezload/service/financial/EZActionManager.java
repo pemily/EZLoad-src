@@ -17,8 +17,10 @@
  */
 package com.pascal.ezload.service.financial;
 
+import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
@@ -29,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class EZActionManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");
@@ -47,15 +50,21 @@ public class EZActionManager {
         if (sv.getTickerCode() != null && sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
             return;
 
-        if (StringUtils.isBlank(sv.getTickerCode())){
-            throw new RuntimeException("Il n'y a pas de Ticker Google dans votre EzPortfolio pour l'action "+sv.getUserShareName());
-        }
         Optional<EZShare> action = getFromGoogleTicker(sv.getTickerCode());
+        if (action.isEmpty()) {
+            action = getFromName(sv.getUserShareName());
+        }
+
         if (action.isEmpty()){
             EZShare newAction = new EZShare();
             newAction.setIsin(null);
             newAction.setDescription(EZShare.NEW_SHARE);
-            newAction.setCountryCode(CountryUtil.foundByName(sv.getCountryName()).getCode());
+            try {
+                newAction.setCountryCode(CountryUtil.foundByName(sv.getCountryName()).getCode());
+            }
+            catch(Exception ignore){
+                // the countryCode will be null
+            }
             newAction.setType(sv.getShareType());
             newAction.setGoogleCode(sv.getTickerCode());
             newAction.setEzName(sv.getUserShareName());
@@ -86,11 +95,21 @@ public class EZActionManager {
                 });
     }
 
-    public ActionWithMsg getIncompleteActionsOrNew() {
+    public ActionWithMsg getIncompleteSharesOrNew() {
         ActionWithMsg actionWithMsg = getActionWithError();
         ezShareData.getShares().stream()
                 .filter(s -> EZShare.NEW_SHARE.equals(s.getDescription()))
                 .forEach(ezShare -> actionWithMsg.addMsg(ezShare, null)); // ce n'est pas une erreur, c'est juste pour qu'elle s'affiche dans la page, pour qu'on puisse la voir, et l'editer
+        return actionWithMsg;
+    }
+
+    public List<EZShare> getAllEZShares(){
+        return ezShareData.getShares();
+    }
+
+    public ActionWithMsg getAllEZSharesWithMessages(){
+        ActionWithMsg actionWithMsg = getActionWithError();
+        actionWithMsg.setShares(ezShareData.getShares());
         return actionWithMsg;
     }
 
@@ -102,6 +121,11 @@ public class EZActionManager {
     public Optional<EZShare> getFromGoogleTicker(String gooleTicker) {
         if (StringUtils.isBlank(gooleTicker)) return Optional.empty();
         return ezShareData.getShares().stream().filter(a -> a.getGoogleCode() != null && a.getGoogleCode().equals(gooleTicker)).findFirst();
+    }
+
+    public Optional<EZShare> getFromName(String shareName) {
+        if (StringUtils.isBlank(shareName)) return Optional.empty();
+        return ezShareData.getShares().stream().filter(a -> a.getEzName() != null && a.getEzName().equals(shareName)).findFirst();
     }
 
     private void loadEZActions() throws IOException {
@@ -116,6 +140,8 @@ public class EZActionManager {
     }
 
     private void saveEZActions() throws IOException {
+        ezShareData.getShares()
+                .sort(Comparator.comparing(EZShare::getEzName, Comparator.nullsLast(Comparator.naturalOrder())));
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(shareDataFile, StandardCharsets.UTF_8), ezShareData);
     }
 
@@ -126,6 +152,7 @@ public class EZActionManager {
         Map<String, EZShare> yahooFound = new HashMap<>();
         Map<String, EZShare> seekingAlphaFound = new HashMap<>();
         Map<String, EZShare> nameFound = new HashMap<>();
+
         ezShareData.getShares().forEach(ezAction -> {
             actionWithMsg.addMsgs(ezAction, getError(ezAction));
 
@@ -198,7 +225,7 @@ public class EZActionManager {
             errors.add(toString(ezShare)+": Le ticker Google est vide");
         }
         if (StringUtils.isBlank(ezShare.getCountryCode())){
-            errors.add(toString(ezShare)+"Le code pays de l'action est vide");
+            errors.add(toString(ezShare)+": Le code pays de l'action est vide");
         }
 
         if (!StringUtils.isBlank(ezShare.getYahooCode()) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
@@ -228,13 +255,13 @@ public class EZActionManager {
                     if (yahooPrice.getPrice() != 0 && seekingPrice.getPrice() != 0) {
                         List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
                         CurrencyMap local2Euro = getCurrencyMap(yahooPrices.getDevise(), DeviseUtil.EUR, lastWeek);
-                        float yahooPriceInEuro = local2Euro.getPrice(yahooPrice);
-                        float seekingPriceInEuro = local2Euro.getPrice(seekingPrice);
+                        float yahooPriceInEuro = local2Euro.getTargetPrice(yahooPrice);
+                        float seekingPriceInEuro = local2Euro.getTargetPrice(seekingPrice);
 
                         float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
                         float percentOfDiff = diff * 100.f / yahooPriceInEuro;
-                        if (percentOfDiff > 3) { // si la difference est plus grande que 3% c'est surement pas la meme action
-                            errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semble pas être pas la meme action");
+                        if (percentOfDiff > 5) { // si la difference est plus grande que 5% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
+                            errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
                         }
                     }
                 }
@@ -255,42 +282,50 @@ public class EZActionManager {
 
     private String toString(EZShare action){
         if (StringUtils.isBlank(action.getEzName())){
-            if (StringUtils.isBlank(action.getIsin())) return action.getGoogleCode();
-            return action.getIsin();
+            if (StringUtils.isBlank(action.getIsin())) return action.getGoogleCode() == null ? "" : action.getGoogleCode();
+            return action.getIsin() == null ? "" : action.getIsin();
         }
-        return action.getEzName();
+        return action.getEzName() == null ? "" : action.getEzName();
     }
 
 
-    public void update(EZShare shareValue) throws IOException {
-        if (StringUtils.isBlank(shareValue.getIsin()) && StringUtils.isBlank(shareValue.getGoogleCode()))
-            throw new IllegalStateException("Il n'y a pas de ISIN ni de ticker google pour cette action. "+shareValue);
-
-        Optional<EZShare> oldOpt = getFromISIN(shareValue.getIsin());
-        if (oldOpt.isEmpty()){
-            // le code ISIN a ete edité?
-            oldOpt = getFromGoogleTicker(shareValue.getGoogleCode());
-        }
-        if (oldOpt.isEmpty()){
-            throw new IllegalStateException("Vous ne devez pas changer dans la meme opération les valeurs ISIN et le google ticker ");
-        }
-        EZShare old = oldOpt.get();
-
-        if (!old.getIsin().equals(shareValue.getIsin()) && !StringUtils.isBlank(old.getIsin())) {
-            throw new IllegalStateException("Nous ne devez pas changer le code ISIN, car celui ci est celui fournit par BourseDirect dans vos relevé d'opérations");
-        }
-
-        old.setSeekingAlphaCode(shareValue.getSeekingAlphaCode());
-        old.setCountryCode(shareValue.getCountryCode());
-        old.setType(shareValue.getType());
-        old.setIndustry(shareValue.getIndustry());
-        old.setSector(shareValue.getSector());
-        old.setGoogleCode(shareValue.getGoogleCode());
-        old.setIsin(shareValue.getIsin());
-        old.setYahooCode(shareValue.getYahooCode());
-        old.setEzName(shareValue.getEzName());
-        old.setDescription(EZShare.NEW_SHARE.equals(shareValue.getDescription()) ? "" : shareValue.getDescription()); // it is no more a NEW SHARE as the user update it and saw it
+    public void deleteShare(int index) throws IOException {
+        ezShareData.getShares().remove(index);
         saveEZActions();
+    }
+
+    public void newShare() throws IOException {
+        boolean emptyRow = ezShareData.getShares().stream().anyMatch(sh ->
+            StringUtils.isBlank(sh.getEzName())
+                    && StringUtils.isBlank(sh.getIsin())
+                    && StringUtils.isBlank(sh.getGoogleCode())
+                    && StringUtils.isBlank(sh.getYahooCode())
+                    && StringUtils.isBlank(sh.getSeekingAlphaCode())
+                    && StringUtils.isBlank(sh.getCountryCode())
+                    && StringUtils.isBlank(sh.getDescription())
+        );
+        if (!emptyRow) {
+            ezShareData.getShares().add(new EZShare());
+            saveEZActions();
+        }
+    }
+
+    public void update(int index, EZShare shareValue) throws IOException {
+        if (index >= 0 && index < ezShareData.getShares().size()) {
+            EZShare old = ezShareData.getShares().get(index);
+
+            old.setSeekingAlphaCode(shareValue.getSeekingAlphaCode());
+            old.setCountryCode(shareValue.getCountryCode());
+            old.setType(shareValue.getType());
+            old.setIndustry(shareValue.getIndustry());
+            old.setSector(shareValue.getSector());
+            old.setGoogleCode(shareValue.getGoogleCode());
+            old.setIsin(shareValue.getIsin());
+            old.setYahooCode(shareValue.getYahooCode());
+            old.setEzName(shareValue.getEzName());
+            old.setDescription(EZShare.NEW_SHARE.equals(shareValue.getDescription()) ? "" : shareValue.getDescription()); // it is no more a NEW SHARE as the user update it and saw it
+            saveEZActions();
+        }
     }
 
 

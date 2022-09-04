@@ -77,20 +77,22 @@ public class HomeHandler {
         new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
                 .initRepoIfNeeded();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+
         return new WebData(SettingsManager.searchConfigFilePath(),
                             mainSettings,
                             ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            mainSettings.getEzLoad().getEZActionManager().getIncompleteActionsOrNew(),
+                            mainSettings.getEzLoad().getEZActionManager().getIncompleteSharesOrNew(),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)
                                     .collect(Collectors.toList()),
                             SettingsManager.getVersion(),
-                            settingsManager.listAllEzProfiles()
+                            settingsManager.listAllEzProfiles(),
+                            mainSettings.getEzLoad().getEZActionManager().getAllEZSharesWithMessages()
                 );
     }
 
@@ -157,13 +159,34 @@ public class HomeHandler {
     }
 
     @POST
-    @Path("/saveNewShareValue")
+    @Path("/saveShareValue")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void saveNewShareValue(EZShare shareValue) throws Exception {
+    public void saveShareValue(@NotNull @QueryParam("index") int index, EZShare shareValue) throws Exception {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager().update(shareValue);
+        mainSettings.getEzLoad().getEZActionManager().update(index, shareValue);
+    }
+
+
+    @POST
+    @Path("/createShareValue")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void createShareValue() throws Exception {
+        ezServerState.setEzActionDirty(true);
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        mainSettings.getEzLoad().getEZActionManager().newShare();
+    }
+
+    @DELETE
+    @Path("/deleteShareValue")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void deleteShareValue(@NotNull @QueryParam("index") int index) throws Exception {
+        ezServerState.setEzActionDirty(true);
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        MainSettings mainSettings = settingsManager.loadProps();
+        mainSettings.getEzLoad().getEZActionManager().deleteShare(index);
     }
 
     @GET

@@ -19,6 +19,7 @@ package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.ezEdition.*;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZDate;
@@ -58,4 +59,6 @@ public interface EZPortfolioProxy {
 
 
     void applyOnPerformance(EzPerformanceEdition ezPerformanceEdition);
+
+    MesOperations getAllOperations();
 }

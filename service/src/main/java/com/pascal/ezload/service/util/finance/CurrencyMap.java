@@ -44,7 +44,7 @@ public class CurrencyMap {
         return from.getSymbol() + " -> " + to.getSymbol();
     }
 
-    public float getPrice(PriceAtDate fromPrice){
+    public float getTargetPrice(PriceAtDate fromPrice){
         if (from.equals(to)) {
             return fromPrice.getPrice();
         }
@@ -64,11 +64,11 @@ public class CurrencyMap {
         return to;
     }
 
-    public Prices convertPrices(Prices p) {
+    public Prices convertPricesToTarget(Prices p) {
         Prices r = new Prices();
         r.setLabel(p.getLabel());
         r.setDevise(from);
-        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getPrice(price))));
+        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price))));
         return r;
     }
 }

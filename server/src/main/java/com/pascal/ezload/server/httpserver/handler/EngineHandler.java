@@ -76,7 +76,7 @@ public class EngineHandler {
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
-                        EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
+                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
 
                         BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings, ezProfil);
                         // Donwload the files, according to the last date retrieved from ezPortfolio
@@ -89,17 +89,6 @@ public class EngineHandler {
         }
     }
 
-    private EZPortfolioProxy loadOriginalEzPortfolioProxyOrGetFromCache(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting) throws Exception {
-        EZPortfolioProxy original = serverState.getOriginalEzPortfolioProxy();
-        if (original == null) {
-            EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-            original = ezPortfolioManager.load(mainSettings);
-            serverState.setOriginalEzPortfolioProxy(original);
-        }
-        EZPortfolioProxy newEZPortfolio = original.createDeepCopy();
-        serverState.setEzNewPortfolioProxy(newEZPortfolio);
-        return newEZPortfolio;
-    }
 
     @GET
     @Path("/analyze")
@@ -115,7 +104,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
 
                     List<EZModel> allEZModels;
                     try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
@@ -285,7 +274,7 @@ public class EngineHandler {
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = loadOriginalEzPortfolioProxyOrGetFromCache(mainSettings, ezProfil, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
                     EzReport ezReport = new EzReport();
                     EzEdition ezEdition = new EzEdition();
                     RuleDefinitionSummary createStartDateRule = new RuleDefinitionSummary();

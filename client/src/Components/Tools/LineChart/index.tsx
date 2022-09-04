@@ -71,7 +71,7 @@ export function LineChart(props: LineChartProps){
         },
         plugins: {
             title: {
-                display: true,
+                display: false,
                 text: props.chart.mainTitle
             },
             tooltip: {
@@ -121,34 +121,33 @@ export function LineChart(props: LineChartProps){
                     color: '#000000',                    
                 }
             },
-            yAxisShare: {
+            yAxisLeft: {
                 display: true,
                 position: 'left',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['yAxisShare']
+                  text: props.chart.axisId2titleY!['yAxisLeft']
                 }
               },
-            yAxisDevise:{
+            yAxisRight:{
                 display: true,
                 position: 'right',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['yAxisDevise']
+                  text: props.chart.axisId2titleY!['yAxisRight']
                 },
                 // grid line settings
                 grid: {
                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                 },                
-            }
+            },
+
         }
     }
 
     ChartJS.register(CategoryScale, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
 //
     return (
-        <Box width="100%" height="75vh" pad="small" >
-            <ReactChartJS type="line" data={config}  options={options} />           
-        </Box>
+        <ReactChartJS type="line" data={config}  options={options} />           
     ); 
 }

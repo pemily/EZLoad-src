@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -125,37 +124,7 @@ public class EZDate implements Comparable<EZDate> {
     public String toYYYYMMDD(){
         return year+"/"+leadingZero(month)+"/"+leadingZero(day);
     }
-/*
-    public String toDDMMYYYY(){
-        return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
-    }
 
-    public String toMMYY(String separator){
-        return month+separator+(year+"").substring(2);
-    }
-
-    public String toMMstrYY(String separator){
-        return toMonthStr(month)+separator+(year+"").substring(2);
-    }
-
-    private String toMonthStr(int month) {
-        switch (month){
-            case 1: return "Jan";
-            case 2: return "Fev";
-            case 3: return "Mar";
-            case 4: return "Avr";
-            case 5: return "Mai";
-            case 6: return "Juin";
-            case 7: return "Juil";
-            case 8: return "Aout";
-            case 9: return "Sept";
-            case 10: return "Oct";
-            case 11: return "Nov";
-            case 12: return "Dec";
-        }
-        throw new IllegalArgumentException("Erreur sur le mois :"+month);
-    }
-*/
     public LocalDate toLocalDate(){
         return LocalDate.of(year, month, day);
     }

@@ -20,9 +20,11 @@ package com.pascal.ezload.server.httpserver;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
+import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.financial.ActionWithMsg;
+import com.pascal.ezload.service.model.EZShare;
 
 import java.util.List;
 
@@ -35,14 +37,15 @@ public class WebData {
     private List<EzReport> reports;
     private List<RuleDefinitionSummary> rules;
     private List<String> filesNotYetLoaded;
-    private ActionWithMsg actionWithMsg;
+    private ActionWithMsg newSharesOrWithError;
+    private ActionWithMsg allShares;
     private List<String> allProfiles;
     private boolean processRunning;
     private String ezLoadVersion;
 
     public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
-                   List<EzReport> reports, ActionWithMsg actionWithMsg, List<String> filesNotYetLoaded,
-                   List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles){
+                   List<EzReport> reports, ActionWithMsg newSharesOrErrors, List<String> filesNotYetLoaded,
+                   List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles, ActionWithMsg allShares){
         this.ezProfil = ezProfil;
         this.configFile = configFile;
         this.mainSettings = mainSettings;
@@ -51,9 +54,10 @@ public class WebData {
         this.reports = reports;
         this.filesNotYetLoaded = filesNotYetLoaded;
         this.rules = allRules;
-        this.actionWithMsg = actionWithMsg;
+        this.newSharesOrWithError = newSharesOrErrors;
         this.ezLoadVersion = ezLoadVersion;
         this.allProfiles = allProfiles;
+        this.allShares = allShares;
     }
 
     public MainSettings getMainSettings() {
@@ -136,11 +140,20 @@ public class WebData {
         this.allProfiles = allProfiles;
     }
 
-    public ActionWithMsg getActionWithMsg() {
-        return actionWithMsg;
+    public ActionWithMsg getNewSharesOrWithError() {
+        return newSharesOrWithError;
     }
 
-    public void setActionWithMsg(ActionWithMsg actionWithMsg) {
-        this.actionWithMsg = actionWithMsg;
+    public void setNewSharesOrWithError(ActionWithMsg newSharesOrWithError) {
+        this.newSharesOrWithError = newSharesOrWithError;
     }
+
+    public ActionWithMsg getAllShares() {
+        return allShares;
+    }
+
+    public void setAllShares(ActionWithMsg allShares) {
+        this.allShares = allShares;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.pascal.ezload.service.dashboard;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +9,8 @@ public class Chart {
 
     private String mainTitle;
     private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
-    private List<Object> labels;
-    private List<ChartLine> lines;
+    private List<Object> labels = new LinkedList<>();
+    private final List<ChartLine> lines = new LinkedList<>();
 
     public List<Object> getLabels() {
         return labels;
@@ -23,9 +24,6 @@ public class Chart {
         return lines;
     }
 
-    public void setValues(List<ChartLine> lines) {
-        this.lines = lines;
-    }
 
     public String getMainTitle() {
         return mainTitle;
@@ -50,4 +48,5 @@ public class Chart {
     public void setAxisId2titleY(Map<String, String> axisId2titleY) {
         this.axisId2titleY = axisId2titleY;
     }
+
 }

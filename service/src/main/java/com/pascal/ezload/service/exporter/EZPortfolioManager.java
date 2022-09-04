@@ -24,15 +24,15 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.StringUtils;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class EZPortfolioManager {
 
@@ -49,13 +49,33 @@ public class EZPortfolioManager {
     public EZPortfolioProxy load(MainSettings mainSettings) throws Exception {
         try(Reporting rep = reporting.pushSection("Connection EZPortfolio...")){
             EZPortfolioProxy ezPortfolioProxy = load(1);
+            Set<String> allShareNames = new HashSet<>();
             ezPortfolioProxy.getShareValuesFromMonPortefeuille()
-                    .stream()
                     .forEach(sv -> {
                         try {
+                            allShareNames.add(sv.getUserShareName());
                             mainSettings.getEzLoad().getEZActionManager().createIfNeeded(sv);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
+                        }
+                    });
+            ezPortfolioProxy.getAllOperations()
+                    .getExistingOperations()
+                    .forEach(op -> {
+                        String shareName = op.getValueStr(MesOperations.ACTION_NAME_COL);
+                        if (!StringUtils.isBlank(shareName)
+                                && !shareName.equals("Valeur")
+                                && (!shareName.toLowerCase(Locale.ROOT).contains("liquidit")) // pas le e pour si le user a ecrit avec ou sans accent dans ses operations
+                                && !allShareNames.contains(shareName))
+                        {
+                            ShareValue sv = new ShareValue();
+                            sv.setUserShareName(op.getValueStr(MesOperations.ACTION_NAME_COL));
+                            try {
+                                mainSettings.getEzLoad().getEZActionManager().createIfNeeded(sv);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            ;
                         }
                     });
             return ezPortfolioProxy;

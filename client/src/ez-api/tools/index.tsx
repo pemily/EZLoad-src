@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardSettings } from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -75,6 +75,12 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
             }
           });
     });
+}
+
+export function saveDashboardConfig(dashConfig: DashboardSettings, updModel: (dashConfig: DashboardSettings) => void){      
+  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig))
+    .then(r => updModel(r))
+    .catch(e => console.error("Save Dashboard Error: ", e));
 }
 
 export function saveEzProfile(settings: EzProfil, updModel: (settings: EzProfil) => void){      

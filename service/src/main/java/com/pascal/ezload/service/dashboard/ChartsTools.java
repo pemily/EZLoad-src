@@ -4,13 +4,26 @@ import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChartsTools {
+
+    public enum LineStyle {
+        LINE_WITH_LEGENT_AT_LEFT("yAxisLeft"),
+        LINE_WITH_LEGENT_AT_RIGHT("yAxistRight"),
+        BAR("bar");
+
+        private String style;
+
+        LineStyle(String style){
+            this.style = style;
+        }
+
+        String getStyle(){
+            return style;
+        }
+    }
 
     public static List<EZDate> getDatesSample(EZDate from, EZDate to, int nbOfPoint){
         if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
@@ -30,36 +43,26 @@ public class ChartsTools {
         return allDates;
     }
 
-    // Toutes les list: data.getPrices() doivent avoir le meme nombre de lignes
-    public static Chart getShareChart(List<EZDate> dates, List<Prices> data) {
+    public static Chart createChart(List<EZDate> dates) {
         Chart chart = new Chart();
-        Map<String, String> axisTitleY = new HashMap<>();
-        axisTitleY.put("yAxisShare", "Prix de l'action");
-        axisTitleY.put("yAxisDevise", "Prix de la devise vers l'Euro");
-        chart.setAxisId2titleY(axisTitleY);
-
-        if (!data.stream().allMatch(prices -> prices.getPrices().size() == data.get(0).getPrices().size())){
-            throw new IllegalStateException("Il y a une liste qui n'a pas le meme nombre d'éléments");
-        }
-
-        Colors colors = new Colors(data.size());
         chart.setLabels(dates.stream().map(EZDate::toEpochSecond).map(l -> l*1000).collect(Collectors.toList()));
-
-        chart.setValues(data.stream()
-                        .map(prices -> {
-                            ChartLine chartLine = new ChartLine();
-                            chartLine.setTitle(prices.getLabel());
-                            chartLine.setColorLine(colors.nextColor());
-                            chartLine.setIdAxisY(prices.getLabel().equals(prices.getDevise().getSymbol()) ? "yAxisDevise" : "yAxisShare");
-                            chartLine.setValues(prices.getPrices()
-                                                    .stream()
-                                                    .map(PriceAtDate::getPrice).collect(Collectors.toList()));
-                            return chartLine;
-                        })
-                        .collect(Collectors.toList()));
         return chart;
+    }
+
+    public static void addChartLine(Chart chart, LineStyle lineStyle, String lineTitle, String color, Prices prices){
+        if (chart.getLabels().size() != prices.getPrices().size()){
+            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
+        }
+        ChartLine chartLine = new ChartLine();
+        chartLine.setTitle(prices.getLabel());
+        chartLine.setIdAxisY(lineStyle.getStyle());
+        chartLine.setColorLine(color);
+        chartLine.setIdAxisY(lineTitle);
+        chartLine.setValues(prices.getPrices()
+                                    .stream()
+                                    .map(PriceAtDate::getPrice).collect(Collectors.toList()));
+        chart.getLines().add(chartLine);
     }
 
 
 }
-;

@@ -295,4 +295,8 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
         }
     }
 
+    @Override
+    public MesOperations getAllOperations(){
+        return ezPortfolio.getMesOperations();
+    }
 }
