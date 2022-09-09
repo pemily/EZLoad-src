@@ -39,32 +39,42 @@ public class YahooTools {
     private static final Logger logger = Logger.getLogger("YahooTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
-            processSharePriceCvsRows(cache, ezShare.getYahooCode(), listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
-                new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
-                sharePrices.setDevise(getDevise(cache, ezShare));
-                sharePrices.setLabel(ezShare.getEzName());
-            });
-            return sharePrices;
+            try {
+                processSharePriceCvsRows(cache, ezShare.getYahooCode(), listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                    new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
+                    sharePrices.setDevise(getDevise(cache, ezShare));
+                    sharePrices.setLabel(ezShare.getEzName());
+                });
+                return sharePrices;
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+            }
         }
         return null;
     }
 
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
-            processSharePriceCvsRows(cache, ezShare.getYahooCode(), from, to, rows -> {
-                rows.map(YahooTools::createPriceAtDate)
-                    .filter(p -> p.getDate().isAfterOrEquals(from) && p.getDate().isBeforeOrEquals(to))
-                    .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+            try {
+                processSharePriceCvsRows(cache, ezShare.getYahooCode(), from, to, rows -> {
+                    rows.map(YahooTools::createPriceAtDate)
+                            .filter(p -> p.getDate().isAfterOrEquals(from) && p.getDate().isBeforeOrEquals(to))
+                            .forEach(p -> sharePrices.addPrice(p.getDate(), p));
 
-                sharePrices.setDevise(getDevise(cache, ezShare));
-                sharePrices.setLabel(ezShare.getEzName());
-            });
-            return sharePrices;
-        }
+                    sharePrices.setDevise(getDevise(cache, ezShare));
+                    sharePrices.setLabel(ezShare.getEzName());
+                });
+                return sharePrices;
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+            }
+    }
         return null;
     }
 

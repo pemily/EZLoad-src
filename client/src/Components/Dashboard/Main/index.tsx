@@ -18,7 +18,7 @@
 import { Box, Anchor, Button, Text, TextArea, Grid, Layer } from "grommet";
 import { useState, useRef, useEffect } from "react";
 import { Add, Download, Refresh, Menu, Trash } from 'grommet-icons';
-import { AuthInfo, Chart, EzProcess, ChartSettings, DashboardData, DashboardSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
+import { AuthInfo, Chart, EzProcess, ChartSettings, DashboardData, DashboardSettings, EZShare, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -29,7 +29,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 export interface DashboardMainProps {
     enabled: boolean;
     processRunning: boolean;
-    allShares: EZShare[];
+    actionWithMsg: ActionWithMsg|undefined;
     followProcess: (process: EzProcess|undefined) => void;
 }      
 
@@ -75,21 +75,31 @@ export function DashboardMain(props: DashboardMainProps){
  
     return (                
         <Box>
-        { !readOnly && !dashConfig && (!dashCharts || dashCharts.length == 0) && (            
+        { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (            
+                <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
+                    Aller dans Configuration/Vos actions pour renseigner les paramètres de vos actions</Text></Box> 
+            )
+        }  
+        { !readOnly && (!dashCharts || dashCharts.length === 0) && (            
                 <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                     Cliquez sur "Rafraichir" pour charger vos données</Text></Box> 
             )
         }    
+        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) == 0 && (            
+                <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
+                    Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box> 
+            )
+        }    
+        
         <Button alignSelf="end" margin="small" size="small" icon={<Refresh size='small' />}
-                disabled={readOnly}
+                disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length == 0}
                 label="Rafraichir" onClick={() => refresh()} />   
 
         <Box width="100%" height="75vh" pad="small" >            
             {
-                dashCharts?.map((chart, index) => {
-                    console.log("Creation LineChart");
+                dashCharts?.map((chart, index) => {                    
                     return (                        
-                        <Box width="100%" height="25vh" pad="small" border="all" margin="xxsmall" background="lightgray" flex="grow">
+                        <Box width="100%" height="25vh" pad="small" border="all" margin="xxsmall" background="white" flex="grow">
                             <Box direction="row" margin="small">
                                 <Box flex="grow" direction="column" alignSelf="center">
                                     <Text alignSelf="center"  margin="0">{chart.mainTitle}</Text>
@@ -153,7 +163,7 @@ export function DashboardMain(props: DashboardMainProps){
             <Layer full position="center" margin="large" onClickOutside={() => setConfigIndexEdit(-1)}  onEsc={() => setConfigIndexEdit(-1)} >
                 <Box margin="medium" height="large" align="center" alignContent="stretch" overflow="auto">
                     <ChartSettingsEditor
-                        allShares={props.allShares}
+                        allShares={props.actionWithMsg?.actions ? props.actionWithMsg.actions : []}
                         chartSettings={dashConfig.chartSettings[configIndexEdited]}
                         save={newChartSettsValue => 
                             saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)}, setDashConfig)}

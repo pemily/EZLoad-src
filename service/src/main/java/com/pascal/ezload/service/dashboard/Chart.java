@@ -10,7 +10,7 @@ public class Chart {
     private String mainTitle;
     private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
     private List<Object> labels = new LinkedList<>();
-    private final List<ChartLine> lines = new LinkedList<>();
+    private List<ChartLine> lines = new LinkedList<>();
 
     public List<Object> getLabels() {
         return labels;
@@ -19,11 +19,6 @@ public class Chart {
     public void setLabels(List<Object> labels) {
         this.labels = labels;
     }
-
-    public List<ChartLine> getLines() {
-        return lines;
-    }
-
 
     public String getMainTitle() {
         return mainTitle;
@@ -49,4 +44,11 @@ public class Chart {
         this.axisId2titleY = axisId2titleY;
     }
 
+    public List<ChartLine> getLines() {
+        return lines;
+    }
+
+    public void setLines(List<ChartLine> lines) {
+        this.lines = lines;
+    }
 }

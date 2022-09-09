@@ -5,6 +5,7 @@ import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
 
 import java.util.HashMap;
@@ -84,11 +85,11 @@ public class PortfolioValuesBuilder {
         }
     }
 
-    public Result build(EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters){
+    public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters){
         Result r = new Result();
         r.targetDevise = targetDevise;
         r.dates = dates;
-        buildPricesForShares(r);
+        buildPricesForShares(reporting, r);
         buildPricesDevisesFound(r);
         if (operations != null)
             buildPricesFor(brokersFilter, accountTypeFilter, portfolioFilters, r);
@@ -96,10 +97,12 @@ public class PortfolioValuesBuilder {
     }
 
     // this method will fill r.allSharesPrices & r.devise2TargetDevise
-    private void buildPricesForShares(Result r) {
+    private void buildPricesForShares(Reporting reporting, Result r) {
         actionManager.getAllEZShares().forEach(ezShare -> {
             try {
-                r.allSharesTargetPrices.put(ezShare, convertPricesToTargetDevise(actionManager.getPrices(ezShare, r.dates), r));
+                Prices prices = actionManager.getPrices(reporting, ezShare, r.dates);
+                if (prices != null)
+                    r.allSharesTargetPrices.put(ezShare, convertPricesToTargetDevise(prices, r));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

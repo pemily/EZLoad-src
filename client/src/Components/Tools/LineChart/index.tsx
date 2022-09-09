@@ -20,7 +20,7 @@ import { useState, useRef } from "react";
 import { Download } from 'grommet-icons';
 import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
-import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend } from 'chart.js';
 
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
@@ -39,19 +39,29 @@ export function LineChart(props: LineChartProps){
     
     const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map(chartLine =>
         {
-         return {            
+            if (chartLine.lineStyle === "BAR"){
+                return {    
+                    type: 'bar',
+                    label: chartLine.title,
+                    data: chartLine.values,
+                    borderColor: chartLine.colorLine,
+                    backgroundColor: chartLine.colorLine
+                };       
+            }
+            return {    
+             type: 'line',
              label: chartLine.title,
              data: chartLine.values,
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
-             yAxisID: chartLine.idAxisY,        
+             yAxisID: chartLine.lineStyle,        
              fill: false,
              cubicInterpolationMode: 'monotone', 
              tension: 0.4, // le niveau de courbure    
              pointStyle: 'circle',
              pointRadius: 1,// la taille du point
-             pointHoverRadius: 1 // la taille du point quand la souris est au dessus
+             pointHoverRadius: 1.5 // la taille du point quand la souris est au dessus
                                   // (si trop gros et qu'il y a trop de point sur l'axe des abscisses, le tooltip peut contenir les infos en double')
          };        
      });
@@ -121,7 +131,8 @@ export function LineChart(props: LineChartProps){
                     color: '#000000',                    
                 }
             },
-            yAxisLeft: {
+            LINE_WITH_LEGENT_AT_LEFT: {
+                type: 'linear',
                 display: true,
                 position: 'left',
                 title: {
@@ -129,8 +140,9 @@ export function LineChart(props: LineChartProps){
                   text: props.chart.axisId2titleY!['yAxisLeft']
                 }
               },
-            yAxisRight:{
-                display: true,
+            LINE_WITH_LEGENT_AT_RIGHT:{
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.lineStyle === "LINE_WITH_LEGENT_AT_RIGHT").length > 0,
                 position: 'right',
                 title: {
                   display: true,
@@ -145,7 +157,7 @@ export function LineChart(props: LineChartProps){
         }
     }
 
-    ChartJS.register(CategoryScale, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
+    ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
 //
     return (
         <ReactChartJS type="line" data={config}  options={options} />           

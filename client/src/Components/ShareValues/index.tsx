@@ -57,7 +57,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Nom"
                         onChange={newVal => {
                                     if (newVal !== shareValue.ezName) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, ezName:newVal})
                                     }}}
                         value={shareValue.ezName}
@@ -70,7 +69,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label='ISIN'
                         onChange={newVal => {
                                     if (newVal !== shareValue.isin) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, isin:newVal})
                                     }}}
                         value={shareValue.isin}
@@ -84,7 +82,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Google Code"
                         onChange={newVal => {
                                     if (newVal !== shareValue.googleCode) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, googleCode:newVal})
                                     }}}
                         value={shareValue.googleCode}
@@ -98,7 +95,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="SeekingAlpha Code"
                         onChange={newVal => {
                                     if (newVal !== shareValue.seekingAlphaCode) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, seekingAlphaCode:newVal})
                                     }}}
                         value={shareValue.seekingAlphaCode}
@@ -112,7 +108,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Yahoo Code"             
                         onChange={newVal => {
                                     if (newVal !== shareValue.yahooCode) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, yahooCode:newVal})
                                     }}}
                         value={shareValue.yahooCode}
@@ -126,7 +121,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Pays"
                         onChange={newVal => {
                                     if (newVal !== shareValue.countryCode) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, countryCode:newVal})
                                     }}}
                         value={shareValue.countryCode}
@@ -139,7 +133,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Type"
                         onChange={newVal => {
                                     if (newVal !== shareValue.type) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, type:newVal})
                                     }}}
                         value={shareValue.type}
@@ -152,7 +145,6 @@ export function ShareValues(props: NewShareValuesProps){
                         label="Industrie"
                         onChange={newVal => {
                                     if (newVal !== shareValue.industry) {
-                                        setReadOnly(true);
                                         props.saveShareValue(index, {...shareValue, industry:newVal})
                                     }}}
                         value={shareValue.industry}

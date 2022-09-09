@@ -69,12 +69,10 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
         }
         else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
              && (!props.chartSettings.portfolioFilters || props.chartSettings.portfolioFilters.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
-                console.log('BB');
                 newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
         }
         else if (newValue.indexOf('ALL_SHARES') !== -1
             && (!props.chartSettings.portfolioFilters || props.chartSettings.portfolioFilters.indexOf('ALL_SHARES') === -1)){
-                console.log('CC');
                 newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
         }
         return newValue;        

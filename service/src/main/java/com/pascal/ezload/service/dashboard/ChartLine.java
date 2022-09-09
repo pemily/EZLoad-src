@@ -4,10 +4,27 @@ import java.util.List;
 
 public class ChartLine {
 
+
+    public enum LineStyle {
+        LINE_WITH_LEGENT_AT_LEFT("yAxisLeft"),
+        LINE_WITH_LEGENT_AT_RIGHT("yAxisRight"),
+        BAR("bar");
+
+        private String style;
+
+        LineStyle(String style) {
+            this.style = style;
+        }
+
+        String getStyle() {
+            return style;
+        }
+    }
+
     private String title;
     private List<Float> values;
     private String colorLine; // rgba(255,99,132,1);
-    private String idAxisY; // un id optionel, pour ajouter une autre echelle sur l'axe des Y (pour faire la distinction entre action/devise par exemple)
+    private LineStyle lineStyle; // optionel, pour ajouter une autre echelle sur l'axe des Y (pour faire la distinction entre action/devise par exemple)
 
     public String getTitle() {
         return title;
@@ -33,11 +50,12 @@ public class ChartLine {
         this.colorLine = colorLine;
     }
 
-    public String getIdAxisY() {
-        return idAxisY;
+    public LineStyle getLineStyle() {
+        return lineStyle;
     }
 
-    public void setIdAxisY(String idAxisY) {
-        this.idAxisY = idAxisY;
+    public void setLineStyle(LineStyle lineStyle) {
+        this.lineStyle = lineStyle;
     }
+
 }

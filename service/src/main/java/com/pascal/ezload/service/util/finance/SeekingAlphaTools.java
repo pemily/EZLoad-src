@@ -90,33 +90,43 @@ public class SeekingAlphaTools {
 
 
     // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            Prices sharePrices = new Prices();
-            processRows(cache, ezShare, from, to, rows -> {
-                rows.filter(entry -> {
-                            EZDate date = parseDate(entry);
-                            return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
-                    })
-                    .map(SeekingAlphaTools::createPriceAtDate)
-                    .forEach(p -> sharePrices.addPrice(p.getDate(), p));
-                sharePrices.setDevise(DeviseUtil.USD);
-                sharePrices.setLabel(ezShare.getEzName());
-            });
-            return sharePrices;
+            try {
+                Prices sharePrices = new Prices();
+                processRows(cache, ezShare, from, to, rows -> {
+                    rows.filter(entry -> {
+                                EZDate date = parseDate(entry);
+                                return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
+                            })
+                            .map(SeekingAlphaTools::createPriceAtDate)
+                            .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+                    sharePrices.setDevise(DeviseUtil.USD);
+                    sharePrices.setLabel(ezShare.getEzName());
+                });
+                return sharePrices;
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
+            }
         }
         return null;
     }
 
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            Prices sharePrices = new Prices();
-            processRows(cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
-                new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
-                sharePrices.setDevise(DeviseUtil.USD);
-                sharePrices.setLabel(ezShare.getEzName());
-            });
-            return sharePrices;
+            try{
+                Prices sharePrices = new Prices();
+                processRows(cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+                    new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
+                    sharePrices.setDevise(DeviseUtil.USD);
+                    sharePrices.setLabel(ezShare.getEzName());
+                });
+                return sharePrices;
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
+            }
         }
         return null;
     }

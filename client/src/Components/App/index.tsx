@@ -86,7 +86,7 @@ export function App(){
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
-             setActionWithMsg(r.actionWithMsg);
+             setActionWithMsg(r.allShares);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);
@@ -314,7 +314,7 @@ export function App(){
                     <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
                         <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
                                         followProcess={followProcess}
-                                        allShares={allShares?.actions ? allShares?.actions : [] }/>
+                                        actionWithMsg={actionWithMsg}/>
                     </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
                         <Box fill overflow="auto">      

@@ -13,14 +13,38 @@ public class Colors {
         colors = generateRainbowPalette(numColors);
     }
 
-    public String nextColor(){
+    public String nextColor(float transparency){
         if (colorIndex >= colors.size()){
             colorIndex = 0;
         }
-        return colors.get(colorIndex++);
+        return colors.get(colorIndex++)+","+transparency+")";
     }
 
-    private static List<String> generateRainbowPalette(int numColors)
+    private static List<String> generateRainbowPalette(int numColors){
+        var toRet = new ArrayList<String>();
+        var phase = 0;
+        var center = 128;
+        var width = 127;
+        var frequency = Math.PI*2/numColors;
+        for (var i = 0; i < numColors; ++i)
+        {
+            var red   = (int) (Math.sin(frequency*i+2+phase) * width + center);
+            var green = (int) (Math.sin(frequency*i+0+phase) * width + center);
+            var blue  = (int) (Math.sin(frequency*i+4+phase) * width + center);
+            /*
+            //generate hex string:
+            var redHex = Integer.toHexString(red);
+            var greenHex = Integer.toHexString(green);
+            var blueHex = Integer.toHexString(blue);
+            */
+            toRet.add("rgba("+red+","+green+","+blue);
+        }
+        return toRet;
+    }
+
+
+
+    private static List<String> generateRainbowPalette2(int numColors)
     {
         var toRet = new ArrayList<String>();
         var n = (float)numColors;

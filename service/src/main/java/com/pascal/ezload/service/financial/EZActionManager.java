@@ -333,24 +333,25 @@ public class EZActionManager {
         return ezShareData.getShares();
     }
 
-    public Prices getPrices(EZShare ez, EZDate from, EZDate to) throws Exception {
+    public Prices getPrices(Reporting reporting, EZShare ez, EZDate from, EZDate to) {
         Prices prices = YahooTools.getPrices(cache, ez, from, to);
-        if (prices == null){
+        if (prices == null) {
             prices = SeekingAlphaTools.getPrices(cache, ez, from, to);
         }
-        if (prices == null){
-            logger.log(Level.SEVERE, "Pas de prix trouvé pour l'action "+ez.getEzName());
+        if (prices == null) {
+            reporting.error("Pas de prix trouvé pour l'action "+ez.getEzName());
         }
         return prices;
+
     }
 
-    public Prices getPrices(EZShare ez, List<EZDate> listOfDates) throws Exception {
+    public Prices getPrices(Reporting reporting, EZShare ez, List<EZDate> listOfDates) {
         Prices prices = YahooTools.getPrices(cache, ez, listOfDates);
-        if (prices == null){
+        if (prices == null) {
             prices = SeekingAlphaTools.getPrices(cache, ez, listOfDates);
         }
-        if (prices == null){
-            logger.log(Level.SEVERE, "Pas de prix trouvé pour l'action "+ez.getEzName());
+        if (prices == null) {
+            reporting.error("Pas de prix trouvé pour l'action "+ez.getEzName());
         }
         return prices;
     }

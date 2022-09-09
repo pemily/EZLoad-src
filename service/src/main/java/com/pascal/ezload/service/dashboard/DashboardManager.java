@@ -105,14 +105,13 @@ public class DashboardManager {
         }
 
         List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, 150);
-        Colors colors = new Colors(dates.size());
         EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
         PortfolioValuesBuilder portfolioValuesBuilder = new PortfolioValuesBuilder(ezActionManager,
                 portfolio
                         .getAllOperations()
                         .getExistingOperations());
-        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(), chartSettings.getPortfolioFilters());
+        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(), chartSettings.getPortfolioFilters());
 
 
         final Set<EZShare> selectedShares = chartSettings.getAdditionalShareNames()
@@ -123,48 +122,49 @@ public class DashboardManager {
                                 .filter(s -> s.getEzName().equals(shareName)))
                 .collect(Collectors.toSet());
 
+        List<ChartLine> allChartLines = new LinkedList<>();
 
         Chart chart = ChartsTools.createChart(dates);
         chart.setMainTitle(chartSettings.getTitle()+" ("+targetDevise.getSymbol()+")");
         chartSettings.getPortfolioFilters().forEach(p -> {
             String lineTitle = null;
-            ChartsTools.LineStyle lineStyle = null;
+            ChartLine.LineStyle lineStyle = null;
             switch(p){
                 case INSTANT_DIVIDENDES:
-                    lineStyle = ChartsTools.LineStyle.BAR;
+                    lineStyle = ChartLine.LineStyle.BAR;
                     lineTitle ="Dividendes";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case CUMUL_DIVIDENDES:
-                    lineStyle = ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Dividendes Cumulés";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case CUMUL_VALEUR_PORTEFEUILLE:
-                    lineStyle = ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Valeur du portefeuille";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
-                    lineStyle = ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Valeur du portefeuille Cumulés";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case CUMUL_ENTREES_SORTIES:
-                    lineStyle = ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Entrées/Sorties Cumulés";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case INSTANT_ENTREES_SORTIES:
-                    lineStyle = ChartsTools.LineStyle.BAR;
+                    lineStyle = ChartLine.LineStyle.BAR;
                     lineTitle = "Entrées/Sorties";
-                    ChartsTools.addChartLine(chart, lineStyle, lineTitle, colors.nextColor(), result.getPortfolioFilter2TargetPrices().get(p));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
                 case CURRENCIES:
                     result.getDevisesFound2TargetPrices()
                             .values()
                             .forEach(prices ->
-                                    ChartsTools.addChartLine(chart, ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_RIGHT, prices.getLabel(), colors.nextColor(), prices));
+                                    allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_WITH_LEGENT_AT_RIGHT, prices.getLabel(), prices)));
                     break;
                 case ALL_SHARES:
                     selectedShares.addAll(ezActionManager.getAllEZShares());
@@ -179,33 +179,36 @@ public class DashboardManager {
                             .collect(Collectors.toList()));
                     break;
                 case TEN_WITH_MOST_IMPACTS:
-                    int skip = result.getDate2share2ShareNb().size() - 10;
-                    if (skip < 10) skip = 0;
-                    selectedShares.addAll(result.getDate2share2ShareNb()
-                            .get(today)
-                            .entrySet()
-                            .stream()
-                            .sorted(Comparator.comparingDouble(e -> {
-                                float nbOfAction = e.getValue();
-                                Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
-                                if (prices == null) return 0;
-                                float targetPrice = prices.getPriceAt(today).getPrice();
-                                return nbOfAction * targetPrice;
-                            }))
-                            .skip(skip)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toList()));
+
+                    List<Map.Entry<EZShare, Float>> mostValuableShares = new ArrayList<>(result.getDate2share2ShareNb()
+                                                                                                        .get(today)
+                                                                                                        .entrySet());
+                    mostValuableShares.sort(Comparator.comparingDouble(e -> {
+                        float nbOfAction = e.getValue();
+                        Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
+                        if (prices == null) return 0;
+                        float targetPrice = prices.getPriceAt(today).getPrice();
+                        String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
+                        return NumberUtils.str2Double(fPrice);
+                    }));
+                    selectedShares.addAll(mostValuableShares.stream()
+                                                                .limit(10)
+                                                                .map(Map.Entry::getKey)
+                                                                .collect(Collectors.toList()));
                     break;
             }
         });
-
 
         selectedShares
                 .forEach(ezShare -> {
                     Prices p = result.getAllSharesTargetPrices().get(ezShare);
                     if (p != null)
-                        ChartsTools.addChartLine(chart, ChartsTools.LineStyle.LINE_WITH_LEGENT_AT_LEFT, p.getLabel(), colors.nextColor(), p);
+                        allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT, p.getLabel(), p));
                 });
+
+        Colors colors = new Colors(allChartLines.size() );
+        allChartLines.forEach(chartLine -> chartLine.setColorLine(colors.nextColor(chartLine.getLineStyle() == ChartLine.LineStyle.BAR ? 0.5f : 1f)));
+        chart.setLines(allChartLines);
         return chart;
     }
 
