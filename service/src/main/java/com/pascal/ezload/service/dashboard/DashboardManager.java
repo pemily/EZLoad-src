@@ -150,6 +150,11 @@ public class DashboardManager {
                     lineTitle = "Valeur du portefeuille Cumulés";
                     allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
                     break;
+                case CUMUL_LIQUIDITE:
+                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                    lineTitle = "Liquidité";
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    break;
                 case CUMUL_ENTREES_SORTIES:
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Entrées/Sorties Cumulés";

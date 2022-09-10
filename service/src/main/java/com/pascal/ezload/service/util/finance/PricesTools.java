@@ -1,14 +1,16 @@
 package com.pascal.ezload.service.util.finance;
 
 import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class PricesTools<PD>  {
+class PricesTools<PD>  {
 
     private int listOfDatesIndex = 0;
     private List<EZDate> listOfDates;
@@ -29,7 +31,7 @@ public class PricesTools<PD>  {
     }
 
 
-    public void fillPricesForAListOfDates() {
+    public void fillPricesForAListOfDates(Reporting reporting) {
         listOfDatesIndex = -1;
         setNextSearchedDate();
         allPrices

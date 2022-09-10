@@ -44,12 +44,12 @@ public class EZActionManagerTest {
         Assert.assertNotNull(action.getSeekingAlphaCode());
         Assert.assertFalse(action.getSeekingAlphaCode().isEmpty());
 
-        ActionWithMsg msg = actionManager.getActionWithError();
+        ActionWithMsg msg = actionManager.getActionWithError(new LoggerReporting());
         Assert.assertEquals(0, msg.getErrors().size());
 
         // set a wrong yahoo code for tesla
         action.setYahooCode("RUI.PA");
-        msg = actionManager.getActionWithError();
+        msg = actionManager.getActionWithError(new LoggerReporting());
         Assert.assertEquals(1, msg.getErrors().size());
 
     }

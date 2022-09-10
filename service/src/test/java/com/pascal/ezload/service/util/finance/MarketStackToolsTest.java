@@ -43,7 +43,7 @@ public class MarketStackToolsTest {
 
     @Test
     public void testSearchMarketStack() throws Exception {
-        EZShare action = MarketStackTools.searchActionFromMarketstack(cache(), new LoggerReporting(), "WPC");
+        EZShare action = MarketStackTools.searchActionFromMarketstack(new LoggerReporting(), cache(), "WPC");
         assertNotNull(action);
         Assertions.assertEquals("WPC", action.getGoogleCode());
         Assertions.assertEquals("W. P. Carey Inc", action.getEzName());

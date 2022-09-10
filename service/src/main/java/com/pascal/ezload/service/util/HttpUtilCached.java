@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.pascal.ezload.service.sources.Reporting;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -30,20 +32,25 @@ public class HttpUtilCached {
         this.cacheDir = cacheDir;
     }
 
-    public <R> R get(String cacheName, String url, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
-        return get(cacheName, url, null, toObjMapper);
+    public <R> R get(Reporting reporting, String cacheName, String url, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
+        return get(reporting, cacheName, url, null, toObjMapper);
     }
 
-    public <R> R get(String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
-        File cache = new File(cacheDir+File.separator+format(cacheName)+".json");
-        if (cache.exists()){
+    public <R> R get(Reporting reporting, String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
+        try(Reporting rep = reporting.pushSection("Extraction de "+cacheName)) {
+            File cache = new File(cacheDir + File.separator + format(cacheName) + ".json");
+            if (cache.exists()) {
+                rep.info("Fichier de cache trouvé: "+cache.getAbsolutePath());
+                return toObjMapper.apply(FileUtil.read(cache));
+            }
+            rep.info("Fichier de cache non trouvé, téléchargement des données");
+            HttpUtil.download(url, requestProperties, inputStream -> {
+                FileUtil.write(cache, inputStream);
+                return cache;
+            });
+            rep.info("Fin de téléchargement");
             return toObjMapper.apply(FileUtil.read(cache));
         }
-        HttpUtil.download(url, requestProperties, inputStream -> {
-            FileUtil.write(cache, inputStream);
-            return cache;
-        });
-        return toObjMapper.apply(FileUtil.read(cache));
     }
 
     private String format(String cacheName) {

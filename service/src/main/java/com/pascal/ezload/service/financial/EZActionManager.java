@@ -79,9 +79,9 @@ public class EZActionManager {
                 .orElseGet(() -> {
                     // does not yet exist, create it
                     try {
-                        Optional<EZShare> ezAction = BourseDirectTools.searchAction(cache, reporting, isin, broker, ezData);
+                        Optional<EZShare> ezAction = BourseDirectTools.searchAction(reporting, cache, isin, broker, ezData);
                         if (ezAction.isPresent()){
-                            YahooTools.addYahooInfoTo(cache, reporting, ezAction.get());
+                            YahooTools.addYahooInfoTo(reporting, cache, ezAction.get());
                             EZShare newAction = ezAction.get();
                             newAction.setDescription(EZShare.NEW_SHARE);
                             ezShareData.getShares().add(newAction);
@@ -95,8 +95,8 @@ public class EZActionManager {
                 });
     }
 
-    public ActionWithMsg getIncompleteSharesOrNew() {
-        ActionWithMsg actionWithMsg = getActionWithError();
+    public ActionWithMsg getIncompleteSharesOrNew(Reporting reporting) throws IOException {
+        ActionWithMsg actionWithMsg = getActionWithError(reporting);
         ezShareData.getShares().stream()
                 .filter(s -> EZShare.NEW_SHARE.equals(s.getDescription()))
                 .forEach(ezShare -> actionWithMsg.addMsg(ezShare, null)); // ce n'est pas une erreur, c'est juste pour qu'elle s'affiche dans la page, pour qu'on puisse la voir, et l'editer
@@ -107,8 +107,8 @@ public class EZActionManager {
         return ezShareData.getShares();
     }
 
-    public ActionWithMsg getAllEZSharesWithMessages(){
-        ActionWithMsg actionWithMsg = getActionWithError();
+    public ActionWithMsg getAllEZSharesWithMessages(Reporting reporting) throws IOException {
+        ActionWithMsg actionWithMsg = getActionWithError(reporting);
         actionWithMsg.setShares(ezShareData.getShares());
         return actionWithMsg;
     }
@@ -145,7 +145,7 @@ public class EZActionManager {
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(shareDataFile, StandardCharsets.UTF_8), ezShareData);
     }
 
-    public ActionWithMsg getActionWithError() {
+    public ActionWithMsg getActionWithError(Reporting reporting) throws IOException {
         ActionWithMsg actionWithMsg = new ActionWithMsg();
         Map<String, EZShare> isinFound = new HashMap<>();
         Map<String, EZShare> gTickerFound = new HashMap<>();
@@ -153,8 +153,8 @@ public class EZActionManager {
         Map<String, EZShare> seekingAlphaFound = new HashMap<>();
         Map<String, EZShare> nameFound = new HashMap<>();
 
-        ezShareData.getShares().forEach(ezAction -> {
-            actionWithMsg.addMsgs(ezAction, getError(ezAction));
+        for (EZShare ezAction : ezShareData.getShares()) {
+            actionWithMsg.addMsgs(ezAction, getError(reporting, ezAction));
 
             if (!StringUtils.isBlank(ezAction.getIsin())) {
                 EZShare old = isinFound.put(ezAction.getIsin(), ezAction);
@@ -195,7 +195,7 @@ public class EZActionManager {
                     actionWithMsg.addMsg(old, "Le nom: "+ezAction.getEzName()+" est présent sur plusieurs actions!");
                 }
             }
-        });
+        }
 
         return actionWithMsg;
     }
@@ -208,82 +208,84 @@ public class EZActionManager {
         saveEZActions();
     }
 
-    public List<Dividend> searchDividends(EZShare ezShare) {
-        return SeekingAlphaTools.searchDividends(cache, ezShare);
+    public List<Dividend> searchDividends(Reporting rep, EZShare ezShare) throws IOException {
+        try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
+            return SeekingAlphaTools.searchDividends(reporting, cache, ezShare);
+        }
     }
 
 
-    private List<String> getError(EZShare ezShare) {
-        List<String> errors = new LinkedList<>();
-        if (StringUtils.isBlank(ezShare.getIsin())){
-            errors.add(toString(ezShare)+": Le code ISIN est vide");
-        }
-        if (StringUtils.isBlank(ezShare.getEzName())){
-            errors.add(toString(ezShare)+": Le nom de l'action est vide");
-        }
-        if (StringUtils.isBlank(ezShare.getGoogleCode())){
-            errors.add(toString(ezShare)+": Le ticker Google est vide");
-        }
-        if (StringUtils.isBlank(ezShare.getCountryCode())){
-            errors.add(toString(ezShare)+": Le code pays de l'action est vide");
-        }
-
-        if (!StringUtils.isBlank(ezShare.getYahooCode()) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            // Validate that seeking alpha & yahoo code are aligned
-            Prices yahooPrices = null;
-            EZDate to = EZDate.today();
-            EZDate from = to.minusDays(10);
-            try {
-                yahooPrices = YahooTools.getPrices(cache, ezShare, from, to);
+    private List<String> getError(Reporting rep, EZShare ezShare) throws IOException {
+        try(Reporting reporting = rep.pushSection("Verification de l'action: "+ezShare.getEzName())){
+            List<String> errors = new LinkedList<>();
+            if (StringUtils.isBlank(ezShare.getIsin())) {
+                errors.add(toString(ezShare) + ": Le code ISIN est vide");
             }
-            catch (Exception e){
-                errors.add(toString(ezShare)+": Le code Yahoo ne fonctionne pas");
+            if (StringUtils.isBlank(ezShare.getEzName())) {
+                errors.add(toString(ezShare) + ": Le nom de l'action est vide");
             }
-            Prices seekingPrices = null;
-            try {
-                seekingPrices = SeekingAlphaTools.getPrices(cache, ezShare, from, to);
+            if (StringUtils.isBlank(ezShare.getGoogleCode())) {
+                errors.add(toString(ezShare) + ": Le ticker Google est vide");
             }
-            catch (Exception e){
-                errors.add(toString(ezShare)+": Le code SeekingAlpha ne fonctionne pas");
+            if (StringUtils.isBlank(ezShare.getCountryCode())) {
+                errors.add(toString(ezShare) + ": Le code pays de l'action est vide");
             }
 
-            if (yahooPrices == null){
-                errors.add(toString(ezShare)+": Le code Yahoo ne fonctionne pas");
-            }
-            if (seekingPrices == null){
-                errors.add(toString(ezShare)+": Le code SeekingAlpha ne fonctionne pas");
-            }
-
-            if (yahooPrices != null && seekingPrices != null) {
-                EZDate today = EZDate.today();
+            if (!StringUtils.isBlank(ezShare.getYahooCode()) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+                // Validate that seeking alpha & yahoo code are aligned
+                Prices yahooPrices = null;
+                EZDate to = EZDate.today();
+                EZDate from = to.minusDays(10);
                 try {
-                    PriceAtDate yahooPrice = yahooPrices.getPriceAt(today);
-                    PriceAtDate seekingPrice = seekingPrices.getPriceAt(today);
-                    if (yahooPrice.getPrice() != 0 && seekingPrice.getPrice() != 0) {
-                        List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
-                        CurrencyMap local2Euro = getCurrencyMap(yahooPrices.getDevise(), DeviseUtil.EUR, lastWeek);
-                        float yahooPriceInEuro = local2Euro.getTargetPrice(yahooPrice);
-                        float seekingPriceInEuro = local2Euro.getTargetPrice(seekingPrice);
+                    yahooPrices = YahooTools.getPrices(reporting, cache, ezShare, from, to);
+                } catch (Exception e) {
+                    errors.add(toString(ezShare) + ": Le code Yahoo ne fonctionne pas");
+                }
+                Prices seekingPrices = null;
+                try {
+                    seekingPrices = SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to);
+                } catch (Exception e) {
+                    errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
+                }
 
-                        float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
-                        float percentOfDiff = diff * 100.f / yahooPriceInEuro;
-                        if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
-                            errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
+                if (yahooPrices == null) {
+                    errors.add(toString(ezShare) + ": Le code Yahoo ne fonctionne pas");
+                }
+                if (seekingPrices == null) {
+                    errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
+                }
+
+                if (yahooPrices != null && seekingPrices != null) {
+                    EZDate today = EZDate.today();
+                    try {
+                        PriceAtDate yahooPrice = yahooPrices.getPriceAt(today);
+                        PriceAtDate seekingPrice = seekingPrices.getPriceAt(today);
+                        if (yahooPrice.getPrice() != 0 && seekingPrice.getPrice() != 0) {
+                            List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
+                            CurrencyMap local2Euro = getCurrencyMap(reporting, yahooPrices.getDevise(), DeviseUtil.EUR, lastWeek);
+                            float yahooPriceInEuro = local2Euro.getTargetPrice(yahooPrice);
+                            float seekingPriceInEuro = local2Euro.getTargetPrice(seekingPrice);
+
+                            float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
+                            float percentOfDiff = diff * 100.f / yahooPriceInEuro;
+                            if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
+                                errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
+                            }
                         }
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
                     }
-                }
-                catch (Exception e){
-                    logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action "+toString(ezShare), e);
-                }
 
+                }
             }
-       }
-
-        return errors;
+            return errors;
+        }
     }
 
-    public CurrencyMap getCurrencyMap(EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
-        return YahooTools.getCurrencyMap(cache, fromDevise, toDevise, listOfDates);
+    public CurrencyMap getCurrencyMap(Reporting rep, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
+        try(Reporting reporting = rep.pushSection("Extraction de la conversion "+fromDevise+" vers "+toDevise)) {
+            return YahooTools.getCurrencyMap(reporting, cache, fromDevise, toDevise, listOfDates);
+        }
     }
 
 
@@ -340,26 +342,29 @@ public class EZActionManager {
         return ezShareData.getShares();
     }
 
-    public Prices getPrices(Reporting reporting, EZShare ez, EZDate from, EZDate to) {
-        Prices prices = YahooTools.getPrices(cache, ez, from, to);
-        if (prices == null) {
-            prices = SeekingAlphaTools.getPrices(cache, ez, from, to);
+    public Prices getPrices(Reporting rep, EZShare ez, EZDate from, EZDate to) throws IOException {
+        try(Reporting reporting = rep.pushSection("Extraction du prix pour "+ez.getEzName())) {
+            Prices prices = YahooTools.getPrices(reporting, cache, ez, from, to);
+            if (prices == null) {
+                prices = SeekingAlphaTools.getPrices(reporting, cache, ez, from, to);
+            }
+            if (prices == null) {
+                reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
+            }
+            return prices;
         }
-        if (prices == null) {
-            reporting.error("Pas de prix trouvé pour l'action "+ez.getEzName());
-        }
-        return prices;
-
     }
 
-    public Prices getPrices(Reporting reporting, EZShare ez, List<EZDate> listOfDates) {
-        Prices prices = YahooTools.getPrices(cache, ez, listOfDates);
-        if (prices == null) {
-            prices = SeekingAlphaTools.getPrices(cache, ez, listOfDates);
+    public Prices getPrices(Reporting rep, EZShare ez, List<EZDate> listOfDates) throws IOException {
+        try(Reporting reporting = rep.pushSection("Extraction du prix pour "+ez.getEzName())) {
+            Prices prices = YahooTools.getPrices(reporting, cache, ez, listOfDates);
+            if (prices == null) {
+                prices = SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates);
+            }
+            if (prices == null) {
+                reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
+            }
+            return prices;
         }
-        if (prices == null) {
-            reporting.error("Pas de prix trouvé pour l'action "+ez.getEzName());
-        }
-        return prices;
     }
 }

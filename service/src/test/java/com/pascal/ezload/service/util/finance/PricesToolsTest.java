@@ -1,9 +1,9 @@
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.util.finance;
 
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
-import com.pascal.ezload.service.util.finance.PricesTools;
+import com.pascal.ezload.service.util.LoggerReporting;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,31 +15,31 @@ public class PricesToolsTest {
 
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest1() {
-        List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1)
+        List<PriceAtDate> pricesAtDates = List.of(
+                new PriceAtDate(new EZDate(2000, 1, 10), 1)
         );
-        List<EZDate> dates = Arrays.asList(
-                new EZDate(2002,1,10)
+        List<EZDate> dates = List.of(
+                new EZDate(2002, 1, 10)
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         
         Assert.assertEquals(1, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2002,1,10), prices.getPrices().get(0).getDate());
     }
 
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest2() {
-        List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1)
+        List<PriceAtDate> pricesAtDates = List.of(
+                new PriceAtDate(new EZDate(2000, 1, 10), 1)
         );
-        List<EZDate> dates = Arrays.asList(
-                new EZDate(1999,1,10)
+        List<EZDate> dates = List.of(
+                new EZDate(1999, 1, 10)
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(1, prices.getPrices().size());
         Assert.assertEquals(new EZDate(1999,1,10), prices.getPrices().get(0).getDate());
         Assert.assertEquals(0, prices.getPrices().get(0).getPrice(), 0);
@@ -47,15 +47,15 @@ public class PricesToolsTest {
 
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest3() {
-        List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1)
+        List<PriceAtDate> pricesAtDates = List.of(
+                new PriceAtDate(new EZDate(2000, 1, 10), 1)
         );
-        List<EZDate> dates = Arrays.asList(
-                new EZDate(2000,1,10)
+        List<EZDate> dates = List.of(
+                new EZDate(2000, 1, 10)
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(1, prices.getPrices().size());
         Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
         Assert.assertEquals(1, prices.getPrices().get(0).getPrice(), 0);
@@ -75,10 +75,10 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(2, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(0).getDate());
-        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2002,1,10), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2002,1,11), prices.getPrices().get(1).getDate());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(2, prices.getPrices().size());
         Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
         Assert.assertEquals(0, prices.getPrices().get(0).getPrice(), 0);
@@ -115,11 +115,11 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(2, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2000,1,11), prices.getPrices().get(0).getDate());
         Assert.assertEquals(1, prices.getPrices().get(0).getPrice(), 0);
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(1).getDate());
         Assert.assertEquals(1, prices.getPrices().get(1).getPrice(), 0);
     }
 
@@ -130,21 +130,21 @@ public class PricesToolsTest {
                 new PriceAtDate(new EZDate(2000,1,10), 1),
                 new PriceAtDate(new EZDate(2001,1,10), 1)
         );
-        List<EZDate> dates = Arrays.asList(
-                new EZDate(2000,1,12)
+        List<EZDate> dates = List.of(
+                new EZDate(2000, 1, 12)
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(1, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(0).getDate());
     }
 
 
     @Test
     public void fillPricesForAListOfDatesSimpleTest5() {
-        List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1)
+        List<PriceAtDate> pricesAtDates = List.of(
+                new PriceAtDate(new EZDate(2000, 1, 10), 1)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,12),
@@ -152,10 +152,10 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(2, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2002,1,12), prices.getPrices().get(1).getDate());
     }
 
     @Test
@@ -170,10 +170,10 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(2, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
-        Assert.assertEquals(new EZDate(2001,1,10), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2002,1,12), prices.getPrices().get(1).getDate());
     }
 
 
@@ -201,7 +201,7 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(6, prices.getPrices().size());
         Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
         Assert.assertEquals(new EZDate(2002,1,10), prices.getPrices().get(1).getDate());
@@ -236,14 +236,14 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(6, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(0).getDate());
-        Assert.assertEquals(new EZDate(2002,1,10), prices.getPrices().get(1).getDate());
-        Assert.assertEquals(new EZDate(2004,1,10), prices.getPrices().get(2).getDate());
-        Assert.assertEquals(new EZDate(2006,1,10), prices.getPrices().get(3).getDate());
-        Assert.assertEquals(new EZDate(2008,1,10), prices.getPrices().get(4).getDate());
-        Assert.assertEquals(new EZDate(2009,1,10), prices.getPrices().get(5).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2002,1,12), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2004,1,12), prices.getPrices().get(2).getDate());
+        Assert.assertEquals(new EZDate(2006,1,12), prices.getPrices().get(3).getDate());
+        Assert.assertEquals(new EZDate(2008,1,12), prices.getPrices().get(4).getDate());
+        Assert.assertEquals(new EZDate(2009,1,12), prices.getPrices().get(5).getDate());
     }
 
 
@@ -271,13 +271,13 @@ public class PricesToolsTest {
         );
 
         Prices prices = new Prices();
-        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates();
+        new PricesTools<>(pricesAtDates.stream(), dates, PriceAtDate::getDate, p -> p, prices).fillPricesForAListOfDates(new LoggerReporting());
         Assert.assertEquals(6, prices.getPrices().size());
-        Assert.assertEquals(new EZDate(2000,1,1), prices.getPrices().get(0).getDate());
-        Assert.assertEquals(new EZDate(2000,1,5), prices.getPrices().get(1).getDate());
-        Assert.assertEquals(new EZDate(2000,1,10), prices.getPrices().get(2).getDate());
-        Assert.assertEquals(new EZDate(2000,1,15), prices.getPrices().get(3).getDate());
-        Assert.assertEquals(new EZDate(2000,1,15), prices.getPrices().get(4).getDate());
-        Assert.assertEquals(new EZDate(2000,1,20), prices.getPrices().get(5).getDate());
+        Assert.assertEquals(new EZDate(2000,1,2), prices.getPrices().get(0).getDate());
+        Assert.assertEquals(new EZDate(2000,1,7), prices.getPrices().get(1).getDate());
+        Assert.assertEquals(new EZDate(2000,1,12), prices.getPrices().get(2).getDate());
+        Assert.assertEquals(new EZDate(2000,1,17), prices.getPrices().get(3).getDate());
+        Assert.assertEquals(new EZDate(2000,1,18), prices.getPrices().get(4).getDate());
+        Assert.assertEquals(new EZDate(2000,1,23), prices.getPrices().get(5).getDate());
     }
 }

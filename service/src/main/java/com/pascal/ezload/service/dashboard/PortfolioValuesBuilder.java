@@ -8,34 +8,39 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PortfolioValuesBuilder {
 
     public enum PortfolioFilter {
-        INSTANT_DIVIDENDES(true),
-        CUMUL_DIVIDENDES(true),
-        CUMUL_VALEUR_PORTEFEUILLE(true),
-        CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES(true),
-        CUMUL_ENTREES_SORTIES(true),
-        INSTANT_ENTREES_SORTIES(true),
-        ALL_SHARES(false),
-        CURRENT_SHARES(false),
-        TEN_WITH_MOST_IMPACTS(false),
-        CURRENCIES(false);
+        INSTANT_DIVIDENDES(true, 1),
+        CUMUL_DIVIDENDES(true, 1),
+        CUMUL_VALEUR_PORTEFEUILLE(true, 2),
+        CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES(true, 2),
+        CUMUL_ENTREES_SORTIES(true, 1),
+        INSTANT_ENTREES_SORTIES(true, 1),
+        CUMUL_LIQUIDITE(true, 1),
+        ALL_SHARES(false, 0),
+        CURRENT_SHARES(false, 0),
+        TEN_WITH_MOST_IMPACTS(false, 0),
+        CURRENCIES(false, 0);
 
         boolean requireBuild;
+        int buildOrder;
 
-        PortfolioFilter(boolean requireBuild){
+        PortfolioFilter(boolean requireBuild, int buildOrder){
             this.requireBuild = requireBuild;
+            this.buildOrder = buildOrder;
         }
 
         boolean isRequireBuild(){
             return requireBuild;
+        }
+
+        int getBuildOrder(){
+            return buildOrder;
         }
     };
 
@@ -92,7 +97,7 @@ public class PortfolioValuesBuilder {
         buildPricesForShares(reporting, r);
         buildPricesDevisesFound(r);
         if (operations != null)
-            buildPricesFor(brokersFilter, accountTypeFilter, portfolioFilters, r);
+            buildPricesFor(reporting, brokersFilter, accountTypeFilter, portfolioFilters, r);
         return r;
     }
 
@@ -102,7 +107,7 @@ public class PortfolioValuesBuilder {
             try {
                 Prices prices = actionManager.getPrices(reporting, ezShare, r.dates);
                 if (prices != null)
-                    r.allSharesTargetPrices.put(ezShare, convertPricesToTargetDevise(prices, r));
+                    r.allSharesTargetPrices.put(ezShare, convertPricesToTargetDevise(reporting, prices, r));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -125,21 +130,24 @@ public class PortfolioValuesBuilder {
     }
 
 
-    private void buildPricesFor(Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters, Result r){
+    private void buildPricesFor(Reporting reporting, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters, Result r){
         List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, brokersFilter, accountTypeFilter);
 
         states.forEach(state -> r.date2share2ShareNb.put(state.getDate(), state.getShareNb()));
-        portfolioFilters.stream()
+        List<PortfolioFilter> portfolioFiltersSorted = portfolioFilters.stream()
                 .filter(PortfolioFilter::isRequireBuild)
-                .forEach(portfolioFilter -> r.portfolioFilter2TargetPrices.put(portfolioFilter, createPricesFor(portfolioFilter, states, r)));
+                .sorted(Comparator.comparing(PortfolioFilter::getBuildOrder))
+                .collect(Collectors.toList());
+
+        portfolioFiltersSorted.forEach(portfolioFilter -> r.portfolioFilter2TargetPrices.put(portfolioFilter, createPricesFor(reporting, portfolioFilter, states, r)));
     }
 
-    private Prices createPricesFor(PortfolioFilter portfolioFilter, List<PortfolioStateAtDate> states, Result r) {
+    private Prices createPricesFor(Reporting reporting, PortfolioFilter portfolioFilter, List<PortfolioStateAtDate> states, Result r) {
         Prices prices = new Prices();
         prices.setDevise(r.targetDevise);
         prices.setLabel(portfolioFilter.name());
         states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(portfolioFilter, state, r))));
-        return convertPricesToTargetDevise(prices, r);
+        return convertPricesToTargetDevise(reporting, prices, r);
     }
 
     private float getTargetPrice(PortfolioFilter portfolioFilter, PortfolioStateAtDate state, Result r) {
@@ -152,6 +160,8 @@ public class PortfolioValuesBuilder {
                 return state.getInputOutput().getInstant();
             case CUMUL_ENTREES_SORTIES:
                 return state.getInputOutput().getCumulative();
+            case CUMUL_LIQUIDITE:
+                return state.getLiquidity().getCumulative();
             case CUMUL_VALEUR_PORTEFEUILLE:
             case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
                 float portfolioValue = state.getShareNb()
@@ -198,12 +208,12 @@ public class PortfolioValuesBuilder {
     }
 
 
-    private Prices convertPricesToTargetDevise(Prices p, Result r) {
+    private Prices convertPricesToTargetDevise(Reporting reporting, Prices p, Result r) {
         if (p != null) {
             CurrencyMap currencyMap = r.devise2CurrencyMap.computeIfAbsent(p.getDevise(),
                     d -> {
                         try {
-                            return actionManager.getCurrencyMap(d, r.targetDevise, r.dates);
+                            return actionManager.getCurrencyMap(reporting, d, r.targetDevise, r.dates);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }

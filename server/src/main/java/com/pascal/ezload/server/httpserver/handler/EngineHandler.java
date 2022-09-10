@@ -183,7 +183,7 @@ public class EngineHandler {
                     Reporting reporting = processLogger.getReporting();
             try (Reporting rep = reporting.pushSection("Mise à jour de EZPortfolio")) {
                 // check if all shares are correct before
-                Set<String> invalidShare = mainSettings.getEzLoad().getEZActionManager().getActionWithError().getErrors();
+                Set<String> invalidShare = mainSettings.getEzLoad().getEZActionManager().getActionWithError(reporting).getErrors();
                 if (!invalidShare.isEmpty()){
                     // if from the previous analysis the newShares are not correctly filled => stop the process
                     invalidShare.forEach(reporting::error);

@@ -34,6 +34,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
 import com.pascal.ezload.service.util.FileUtil;
+import com.pascal.ezload.service.util.LoggerReporting;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
@@ -77,14 +78,14 @@ public class HomeHandler {
         new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
                 .initRepoIfNeeded();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-
+        Reporting reporting = new LoggerReporting();
         return new WebData(SettingsManager.searchConfigFilePath(),
                             mainSettings,
                             ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            mainSettings.getEzLoad().getEZActionManager().getIncompleteSharesOrNew(),
+                            mainSettings.getEzLoad().getEZActionManager().getIncompleteSharesOrNew(reporting),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
                                     .stream()
@@ -92,7 +93,7 @@ public class HomeHandler {
                                     .collect(Collectors.toList()),
                             SettingsManager.getVersion(),
                             settingsManager.listAllEzProfiles(),
-                            mainSettings.getEzLoad().getEZActionManager().getAllEZSharesWithMessages()
+                            mainSettings.getEzLoad().getEZActionManager().getAllEZSharesWithMessages(reporting)
                 );
     }
 

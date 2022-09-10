@@ -22,6 +22,7 @@ import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 
 import java.util.HashMap;
@@ -33,18 +34,18 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SeekingAlphaTools {
+public class SeekingAlphaTools extends ExternalSiteTools{
     private static final Logger logger = Logger.getLogger("SeekingAlphaTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     // return null if the dividend cannot be downloaded for this action
-    static public List<Dividend> searchDividends(HttpUtilCached cache, EZShare ezShare) {
+    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())){
             Map<String, String> props = new HashMap<>();
             props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
             String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?&years=2";
             try {
-                return cache.get("seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+EZDate.today().toYYYYMMDD(), url, props, inputStream -> {
+                return cache.get(reporting, "seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+EZDate.today().toYYYYMMDD(), url, props, inputStream -> {
                     Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
 
                     if (top.containsKey("errors")) return new LinkedList<>();
@@ -90,13 +91,13 @@ public class SeekingAlphaTools {
 
 
     // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             try {
                 Prices sharePrices = new Prices();
                 sharePrices.setDevise(DeviseUtil.USD);
                 sharePrices.setLabel(ezShare.getEzName());
-                processRows(cache, ezShare, from, to, rows -> {
+                processRows(reporting, cache, ezShare, from, to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
                                 return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
@@ -104,7 +105,8 @@ public class SeekingAlphaTools {
                             .map(SeekingAlphaTools::createPriceAtDate)
                             .forEach(p -> sharePrices.addPrice(p.getDate(), p));
                 });
-                return sharePrices;
+                long nbOfDays = from.nbOfDaysTo(to) / 7; // seeking alpha give only 1 value per week
+                return checkResult(reporting, ezShare, sharePrices, nbOfDays);
             }
             catch (Exception e){
                 logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
@@ -113,16 +115,17 @@ public class SeekingAlphaTools {
         return null;
     }
 
-    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             try{
                 Prices sharePrices = new Prices();
                 sharePrices.setLabel(ezShare.getEzName());
                 sharePrices.setDevise(DeviseUtil.USD);
-                processRows(cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
-                    new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
+                processRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+                    new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
+                            .fillPricesForAListOfDates(reporting);
                 });
-                return sharePrices;
+                return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
             }
             catch (Exception e){
                 logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
@@ -132,10 +135,10 @@ public class SeekingAlphaTools {
     }
 
 
-    private static void processRows(HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
+    private static void processRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
-            cache.get("seekingAlpha_history_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
+            cache.get(reporting, "seekingAlpha_history_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
                 Map<String, Object> r = new HashMap<>();
                 r = JsonUtil.readWithLazyMapper(inputStream, r.getClass());
                 r = (Map<String, Object>) r.get("attributes");

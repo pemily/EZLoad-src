@@ -47,7 +47,7 @@ public class SeekingAlphaToolsTest {
     public void testSearchDividendeHistory() throws IOException {
         EZShare action = new EZShare();
         action.setSeekingAlphaCode("WSR");
-        List<Dividend> dividends = SeekingAlphaTools.searchDividends(cache(), action);
+        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action);
         Assertions.assertTrue(dividends.size() > 12);
     }
 
