@@ -62,17 +62,17 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
 
 
-    function cleanPortfolioValues(newValue: any[]): any[]{    
+    function organizePortfolioValues(newValue: any[]): any[]{    
         if (newValue.indexOf('CURRENT_SHARES') !== -1
-             && (!props.chartSettings.portfolioFilters || props.chartSettings.portfolioFilters.indexOf('CURRENT_SHARES') === -1)){
+             && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('CURRENT_SHARES') === -1)){
                 newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'ALL_SHARES');
         }
         else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
-             && (!props.chartSettings.portfolioFilters || props.chartSettings.portfolioFilters.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
+             && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
                 newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
         }
         else if (newValue.indexOf('ALL_SHARES') !== -1
-            && (!props.chartSettings.portfolioFilters || props.chartSettings.portfolioFilters.indexOf('ALL_SHARES') === -1)){
+            && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('ALL_SHARES') === -1)){
                 newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
         }
         return newValue;        
@@ -131,18 +131,18 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 label="Courbes prédéfinie"
                                 errorMsg={undefined}
                                 readOnly={false}
-                                selectedCodeValues={props.chartSettings.portfolioFilters ? props.chartSettings.portfolioFilters : []}                            
+                                selectedCodeValues={props.chartSettings.chartSelection ? props.chartSettings.chartSelection : []}                            
                                 userValues={[ 
-                                    'Vos actions actuelles',
-                                    'Vos 10 plus grosses actions',
-                                    'Toutes vos actions',
-                                    'Valeur du portefeuille cumulées',
-                                    'Valeur du portefeuille avec dividendes cumulées',
+                                    'Vos valeurs actuelles',
+                                    'Vos 10 plus grosses valeurs actuelles',
+                                    'Toutes vos valeurs',
+                                    'Valeur du portefeuille',
+                                    'Valeur du portefeuille avec dividendes',
                                     'Liquidité',
-                                    'Entrées/Sorties cumulées',
-                                    'Barre des dividendes',
-                                    'Courbes des dividendes cumulés',
-                                    'Barre des Entrées/Sorties',
+                                    'Entrées/Sorties',
+                                    'Entrées/Sorties cumulés',
+                                    'Dividendes cumulés',
+                                    'Dividendes',
                                     'Devises']}
                                 codeValues={[
                                     'CURRENT_SHARES',
@@ -150,15 +150,15 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'ALL_SHARES',
                                     'CUMUL_VALEUR_PORTEFEUILLE',
                                     'CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES',
-                                    'CUMUL_LIQUIDITE',
+                                    'CUMUL_LIQUIDITE',                                    
+                                    'INSTANT_ENTREES_SORTIES',
                                     'CUMUL_ENTREES_SORTIES',
                                     'INSTANT_DIVIDENDES',
                                     'CUMUL_DIVIDENDES',
-                                    'INSTANT_ENTREES_SORTIES',
                                     'CURRENCIES']}
                                 description=""
                                 onChange={newValue => 
-                                    props.save({...props.chartSettings, portfolioFilters: cleanPortfolioValues(newValue)})
+                                    props.save({...props.chartSettings, chartSelection: organizePortfolioValues(newValue)})
                                 }/>
 
             <ComboMultiple id="shareNames"

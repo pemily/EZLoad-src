@@ -10,8 +10,14 @@ public class PortfolioStateAtDate {
 
     private EZDate date;
 
-    // entree sorties sur le compte
-    private final StateValue inputOutput;
+    // entree sur le compte
+    private final StateValue input;  // input tout seul pour avoir une barre séparée dans la UI
+
+    // sortie sur le compte
+    private final StateValue output; // output tout seul pour avoir une barre séparée dans la UI
+
+    // entrees sorties cumulées
+    private final StateValue inputOutput;  // input output ensemble pour avoir une ligne cumulée dans la UI
 
     // dividends
     private final StateValue dividends;
@@ -23,6 +29,8 @@ public class PortfolioStateAtDate {
     private final StateValue liquidity;
 
     public PortfolioStateAtDate() {
+        input = new StateValue();
+        output = new StateValue();
         inputOutput = new StateValue();
         dividends = new StateValue();
         liquidity = new StateValue();
@@ -30,6 +38,8 @@ public class PortfolioStateAtDate {
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
+        this.input = new StateValue(previousState.input);
+        this.output = new StateValue(previousState.output);
         this.inputOutput = new StateValue(previousState.inputOutput);
         this.dividends = new StateValue(previousState.dividends);
         this.liquidity = new StateValue(previousState.liquidity);
@@ -45,9 +55,15 @@ public class PortfolioStateAtDate {
         this.date = date;
     }
 
-    public StateValue getInputOutput() {
-        return inputOutput;
+    public StateValue getInput() {
+        return input;
     }
+
+    public StateValue getOutput() {
+        return output;
+    }
+
+    public StateValue getInputOutput(){ return inputOutput; }
 
     public StateValue getDividends() {
         return dividends;

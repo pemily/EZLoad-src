@@ -7,42 +7,12 @@ import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class PortfolioValuesBuilder {
-
-    public enum PortfolioFilter {
-        INSTANT_DIVIDENDES(true, 1),
-        CUMUL_DIVIDENDES(true, 1),
-        CUMUL_VALEUR_PORTEFEUILLE(true, 2),
-        CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES(true, 2),
-        CUMUL_ENTREES_SORTIES(true, 1),
-        INSTANT_ENTREES_SORTIES(true, 1),
-        CUMUL_LIQUIDITE(true, 1),
-        ALL_SHARES(false, 0),
-        CURRENT_SHARES(false, 0),
-        TEN_WITH_MOST_IMPACTS(false, 0),
-        CURRENCIES(false, 0);
-
-        boolean requireBuild;
-        int buildOrder;
-
-        PortfolioFilter(boolean requireBuild, int buildOrder){
-            this.requireBuild = requireBuild;
-            this.buildOrder = buildOrder;
-        }
-
-        boolean isRequireBuild(){
-            return requireBuild;
-        }
-
-        int getBuildOrder(){
-            return buildOrder;
-        }
-    };
 
     private EZActionManager actionManager;
     private List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
@@ -90,14 +60,14 @@ public class PortfolioValuesBuilder {
         }
     }
 
-    public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters){
+    public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<ChartSelection> chartSelection){
         Result r = new Result();
         r.targetDevise = targetDevise;
         r.dates = dates;
         buildPricesForShares(reporting, r);
         buildPricesDevisesFound(r);
         if (operations != null)
-            buildPricesFor(reporting, brokersFilter, accountTypeFilter, portfolioFilters, r);
+            buildPricesFor(reporting, brokersFilter, accountTypeFilter, PortfolioFilter.toPortfolioFilter(chartSelection), r);
         return r;
     }
 
@@ -134,12 +104,9 @@ public class PortfolioValuesBuilder {
         List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, brokersFilter, accountTypeFilter);
 
         states.forEach(state -> r.date2share2ShareNb.put(state.getDate(), state.getShareNb()));
-        List<PortfolioFilter> portfolioFiltersSorted = portfolioFilters.stream()
+        portfolioFilters.stream()
                 .filter(PortfolioFilter::isRequireBuild)
-                .sorted(Comparator.comparing(PortfolioFilter::getBuildOrder))
-                .collect(Collectors.toList());
-
-        portfolioFiltersSorted.forEach(portfolioFilter -> r.portfolioFilter2TargetPrices.put(portfolioFilter, createPricesFor(reporting, portfolioFilter, states, r)));
+                .forEach(portfolioFilter -> r.portfolioFilter2TargetPrices.put(portfolioFilter, createPricesFor(reporting, portfolioFilter, states, r)));
     }
 
     private Prices createPricesFor(Reporting reporting, PortfolioFilter portfolioFilter, List<PortfolioStateAtDate> states, Result r) {
@@ -156,10 +123,12 @@ public class PortfolioValuesBuilder {
                 return state.getDividends().getInstant();
             case CUMUL_DIVIDENDES:
                 return state.getDividends().getCumulative();
-            case INSTANT_ENTREES_SORTIES:
-                return state.getInputOutput().getInstant();
+            case INSTANT_ENTREES:
+                return state.getInput().getInstant();
             case CUMUL_ENTREES_SORTIES:
                 return state.getInputOutput().getCumulative();
+            case INSTANT_SORTIES:
+                return state.getOutput().getInstant();
             case CUMUL_LIQUIDITE:
                 return state.getLiquidity().getCumulative();
             case CUMUL_VALEUR_PORTEFEUILLE:
@@ -224,3 +193,4 @@ public class PortfolioValuesBuilder {
     }
 
 }
+

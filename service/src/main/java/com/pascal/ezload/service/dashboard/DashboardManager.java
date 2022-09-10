@@ -111,7 +111,7 @@ public class DashboardManager {
                 portfolio
                         .getAllOperations()
                         .getExistingOperations());
-        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(), chartSettings.getPortfolioFilters());
+        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(), chartSettings.getChartSelection());
 
 
         final Set<EZShare> selectedShares = chartSettings.getAdditionalShareNames()
@@ -126,44 +126,58 @@ public class DashboardManager {
 
         Chart chart = ChartsTools.createChart(dates);
         chart.setMainTitle(chartSettings.getTitle()+" ("+targetDevise.getSymbol()+")");
-        chartSettings.getPortfolioFilters().forEach(p -> {
+        chartSettings.getChartSelection().forEach(p -> {
             String lineTitle = null;
             ChartLine.LineStyle lineStyle = null;
             switch(p){
                 case INSTANT_DIVIDENDES:
                     lineStyle = ChartLine.LineStyle.BAR;
                     lineTitle ="Dividendes";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_DIVIDENDES)));
                     break;
                 case CUMUL_DIVIDENDES:
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Dividendes Cumulés";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_DIVIDENDES)));
                     break;
                 case CUMUL_VALEUR_PORTEFEUILLE:
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Valeur du portefeuille";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    lineTitle = "Valeur du portefeuille sans dividendes";
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE)));
                     break;
                 case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Valeur du portefeuille Cumulés";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    lineTitle = "Valeur du portefeuille avec dividendes";
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)));
                     break;
                 case CUMUL_LIQUIDITE:
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Liquidité";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_LIQUIDITE)));
                     break;
                 case CUMUL_ENTREES_SORTIES:
+                    // The outputs
                     lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                     lineTitle = "Entrées/Sorties Cumulés";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES)));
                     break;
                 case INSTANT_ENTREES_SORTIES:
+                    // The inputs
                     lineStyle = ChartLine.LineStyle.BAR;
-                    lineTitle = "Entrées/Sorties";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, result.getPortfolioFilter2TargetPrices().get(p)));
+                    lineTitle = "Versements de fonds";
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_ENTREES)));
+                    // The outputs
+                    lineStyle = ChartLine.LineStyle.BAR;
+                    lineTitle = "Retrait de fonds";
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_SORTIES)));
                     break;
                 case CURRENCIES:
                     result.getDevisesFound2TargetPrices()

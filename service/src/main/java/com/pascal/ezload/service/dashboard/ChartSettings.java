@@ -13,7 +13,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private String title;
     private Set<String> brokers = new HashSet<>();
     private Set<String> accountTypes = new HashSet<>();
-    private Set<PortfolioValuesBuilder.PortfolioFilter> portfolioFilters = new HashSet<>();
+    private Set<ChartSelection> chartSelection = new HashSet<>();
     private DashboardManager.StartDateSelection selectedStartDateSelection;
     private Set<String> additionalShareNames = new HashSet<>(); // ezName
 
@@ -49,12 +49,12 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.accountTypes = accountTypes;
     }
 
-    public Set<PortfolioValuesBuilder.PortfolioFilter> getPortfolioFilters() {
-        return portfolioFilters;
+    public Set<ChartSelection> getChartSelection() {
+        return chartSelection;
     }
 
-    public void setPortfolioFilters(Set<PortfolioValuesBuilder.PortfolioFilter> portfolioFilters) {
-        this.portfolioFilters = portfolioFilters;
+    public void setChartSelection(Set<ChartSelection> chartSelection) {
+        this.chartSelection = chartSelection;
     }
 
     public DashboardManager.StartDateSelection getSelectedStartDateSelection() {

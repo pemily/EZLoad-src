@@ -147,7 +147,7 @@ export function DashboardMain(props: DashboardMainProps){
                         selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                         targetDevise: 'EUR',
 
-                        portfolioFilters: ['TEN_WITH_MOST_IMPACTS']
+                        chartSelection: ['TEN_WITH_MOST_IMPACTS']
                     };
                     
                     saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 

@@ -67,6 +67,7 @@ public class PortfolioStateAccumulator {
 
     private void process(Row operation) {
         String operationType = operation.getValueStr(MesOperations.OPERATION_TYPE_COL);
+        boolean addLiquidityAmount = true;
         switch (operationType){
             case "Achat titres":
                 buyShare(operation);
@@ -79,6 +80,11 @@ public class PortfolioStateAccumulator {
                 break;
             case "Retrait fonds":
                 addOutputQuantity(operation);
+                // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en négatif dans EZPortfolio :( dommage
+                addLiquidityAmount = false;
+                Row negativeAmount = operation.createDeepCopy();
+                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-"+operation.getValueStr(MesOperations.AMOUNT_COL));
+                addLiquidityAmount(negativeAmount);
                 break;
             case "Vente titres":
                 sellShare(operation);
@@ -97,7 +103,7 @@ public class PortfolioStateAccumulator {
             case "Divers":
                 break;
         }
-        addLiquidityAmount(operation);
+        if (addLiquidityAmount) addLiquidityAmount(operation);
     }
 
 
@@ -113,11 +119,13 @@ public class PortfolioStateAccumulator {
 
     private void addInputQuantity(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        previousState.getInput().plus(newNb);
         previousState.getInputOutput().plus(newNb);
     }
 
     private void addOutputQuantity(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        previousState.getOutput().plus(newNb);
         previousState.getInputOutput().minus(newNb);
     }
 
