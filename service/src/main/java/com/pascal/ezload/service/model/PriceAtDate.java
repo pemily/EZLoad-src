@@ -44,4 +44,8 @@ public class PriceAtDate {
     public void setDate(EZDate date) {
         this.date = date;
     }
+
+    public String toString(){
+        return date.toString()+" price: "+price;
+    }
 }

@@ -94,6 +94,8 @@ public class SeekingAlphaTools {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             try {
                 Prices sharePrices = new Prices();
+                sharePrices.setDevise(DeviseUtil.USD);
+                sharePrices.setLabel(ezShare.getEzName());
                 processRows(cache, ezShare, from, to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
@@ -101,8 +103,6 @@ public class SeekingAlphaTools {
                             })
                             .map(SeekingAlphaTools::createPriceAtDate)
                             .forEach(p -> sharePrices.addPrice(p.getDate(), p));
-                    sharePrices.setDevise(DeviseUtil.USD);
-                    sharePrices.setLabel(ezShare.getEzName());
                 });
                 return sharePrices;
             }
@@ -117,10 +117,10 @@ public class SeekingAlphaTools {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             try{
                 Prices sharePrices = new Prices();
+                sharePrices.setLabel(ezShare.getEzName());
+                sharePrices.setDevise(DeviseUtil.USD);
                 processRows(cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
                     new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices).fillPricesForAListOfDates();
-                    sharePrices.setDevise(DeviseUtil.USD);
-                    sharePrices.setLabel(ezShare.getEzName());
                 });
                 return sharePrices;
             }

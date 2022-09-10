@@ -30,12 +30,12 @@ public class PortfolioStateAccumulator {
         operationRows
             .sorted(Comparator.comparing(r1 -> r1.getValueDate(MesOperations.DATE_COL)))
             .forEach(r -> {
-                process(r);
                 EZDate opDate = r.getValueDate(MesOperations.DATE_COL);
-                while (selectedDate != null && selectedDate.isBeforeOrEquals(opDate)){
+                while (selectedDate != null && selectedDate.isBefore(opDate)){
                     useSelectedDate();
                     incSelectedDate();
                 }
+                process(r);
             });
         EZDate lastDate = dates.get(dates.size()-1);
         while (selectedDate != null && selectedDate.isBeforeOrEquals(lastDate)){
@@ -70,7 +70,6 @@ public class PortfolioStateAccumulator {
         switch (operationType){
             case "Achat titres":
                 buyShare(operation);
-                addLiquidityAmount(operation);
                 break;
             case "Dividende versé":
             case "Dividende brut":
@@ -96,19 +95,15 @@ public class PortfolioStateAccumulator {
             case "Courtage sur achat de titres":
             case "Courtage sur vente de titres":
             case "Divers":
-                addOthersInputOutputAmount(operation);
                 break;
         }
+        addLiquidityAmount(operation);
     }
+
 
     private void addLiquidityAmount(Row operation){
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
-        previousState.addLiquidity(newNb);
-    }
-
-    private void addOthersInputOutputAmount(Row operation){
-        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
-        previousState.getOthersInputOutput().plus(newNb);
+        previousState.getLiquidity().plus(newNb);
     }
 
     private void addDividendsQuantity(Row operation) {
@@ -136,8 +131,8 @@ public class PortfolioStateAccumulator {
 
     private void buyShare(Row operation) {
         EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
-        float nbOfSellShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
         previousState.getShareNb()
-                .compute(share, (sh, oldValue) -> oldValue == null ? nbOfSellShare : oldValue + nbOfSellShare);
+                .compute(share, (sh, oldValue) -> oldValue == null ? nbOfBuyShare : oldValue + nbOfBuyShare);
     }
 }

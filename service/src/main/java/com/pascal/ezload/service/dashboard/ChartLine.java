@@ -58,4 +58,7 @@ public class ChartLine {
         this.lineStyle = lineStyle;
     }
 
+    public String toString(){
+        return title;
+    }
 }

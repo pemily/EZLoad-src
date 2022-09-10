@@ -13,9 +13,6 @@ public class PortfolioStateAtDate {
     // entree sorties sur le compte
     private final StateValue inputOutput;
 
-    // liquidité
-    private float instantLiquidity;
-
     // dividends
     private final StateValue dividends;
 
@@ -23,21 +20,19 @@ public class PortfolioStateAtDate {
     private final Map<EZShare, Float> shareNb;
 
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
-    private final StateValue othersInputOutput;
+    private final StateValue liquidity;
 
     public PortfolioStateAtDate() {
         inputOutput = new StateValue();
         dividends = new StateValue();
-        othersInputOutput = new StateValue();
+        liquidity = new StateValue();
         shareNb = new HashMap<>();
-        instantLiquidity = 0f;
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
-        this.instantLiquidity = 0f;
         this.inputOutput = new StateValue(previousState.inputOutput);
         this.dividends = new StateValue(previousState.dividends);
-        this.othersInputOutput = new StateValue(previousState.othersInputOutput);
+        this.liquidity = new StateValue(previousState.liquidity);
         this.shareNb = new HashMap<>();
         this.shareNb.putAll(previousState.shareNb);
     }
@@ -62,16 +57,8 @@ public class PortfolioStateAtDate {
         return shareNb;
     }
 
-    public StateValue getOthersInputOutput() {
-        return othersInputOutput;
-    }
-
-    public float getInstantLiquidity() {
-        return instantLiquidity;
-    }
-
-    public void addLiquidity(float amount){
-        this.instantLiquidity += amount;
+    public StateValue getLiquidity() {
+        return liquidity;
     }
 
     public static class StateValue {
@@ -117,6 +104,13 @@ public class PortfolioStateAtDate {
             cumulative -= newNb;
             return this;
         }
+
+        public String toString(){
+            return "Instant: "+ instant+ " Cumulative: "+cumulative;
+        }
     }
 
+    public String toString(){
+        return this.date.toString();
+    }
 }

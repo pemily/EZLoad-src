@@ -42,7 +42,7 @@ public class Prices {
     // la date et le price.getDate() peuvent etre different (dans les graphes, si je demande le prix un dimanche, j'aurais la date du vendredi)
     public void addPrice(EZDate date, PriceAtDate price){
         if (price.getDate() == null) return;
-        pricesList.add(price);
+        pricesList.add(new PriceAtDate(date, price.getPrice()));
         pricesMap.put(date, price);
     }
 
@@ -50,9 +50,9 @@ public class Prices {
     public PriceAtDate getPriceAt(EZDate date){
         PriceAtDate p = pricesMap.get(date);
         if (p == null) {
-            // test jusqu'a 7 jours de moins
+            // test jusqu'a 20 jours de moins
             EZDate test = date.yesterday();
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < 20; i++) {
                 p = pricesMap.get(test);
                 if (p != null) break;
                 test = test.yesterday();
@@ -72,5 +72,9 @@ public class Prices {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String toString(){
+        return label+" ("+devise+")";
     }
 }

@@ -71,4 +71,8 @@ public class CurrencyMap {
         p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price))));
         return r;
     }
+
+    public String toString(){
+        return "From "+from+" To "+to;
+    }
 }

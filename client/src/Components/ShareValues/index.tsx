@@ -32,6 +32,11 @@ export interface NewShareValuesProps {
     deleteShareValue?: (index: number) => void;
 }      
 
+function shareSearchUrl(field: string|undefined, share: EZShare) : string | undefined {    
+    if (field !== undefined && field !== "" && field !== null) return field;
+    return share.ezName ? encodeURIComponent(share.ezName) : share.googleCode;        
+}
+
 export function ShareValues(props: NewShareValuesProps){
     const [readOnly, setReadOnly] = useState<boolean>(props.processRunning);
 
@@ -76,7 +81,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />                         
-                        <Anchor alignSelf="center" target={"yahoo"+shareValue.isin} color="brand" href={"https://www.boursedirect.fr/fr/marches/recherche?q="+shareValue.isin} icon={<FormSearch size="medium"/>}/>
+                        <Anchor alignSelf="center" target={"boursedirect"+shareValue.isin} color="brand" href={"https://www.boursedirect.fr/fr/marches/recherche?q="+shareSearchUrl(shareValue.isin, shareValue)} icon={<FormSearch size="medium"/>}/>
 
                         <TextField
                         label="Google Code"
@@ -89,7 +94,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />    
-                        <Anchor alignSelf="center" target={"yahoo"+shareValue.googleCode} color="brand" href={"https://www.google.com/finance/quote/"+shareValue.googleCode} icon={<FormSearch size="medium"/>}/>
+                        <Anchor alignSelf="center" target={"google"+shareValue.googleCode} color="brand" href={"https://www.google.com/finance/quote/"+shareSearchUrl(shareValue.googleCode, shareValue)} icon={<FormSearch size="medium"/>}/>
 
                         <TextField
                         label="SeekingAlpha Code"
@@ -102,7 +107,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />                                   
-                        <Anchor alignSelf="center" target={"seeking"+shareValue.seekingAlphaCode} color="brand" href={"https://seekingalpha.com/symbol/"+shareValue.seekingAlphaCode} icon={<FormSearch size="medium"/>}/>                        
+                        <Anchor alignSelf="center" target={"seeking"+shareValue.seekingAlphaCode} color="brand" href={"https://seekingalpha.com/symbol/"+shareSearchUrl(shareValue.seekingAlphaCode, shareValue)} icon={<FormSearch size="medium"/>}/>                        
     
                         <TextField           
                         label="Yahoo Code"             
@@ -115,7 +120,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />            
-                        <Anchor alignSelf="center" target={"yahoo"+shareValue.yahooCode} color="brand" href={"https://finance.yahoo.com/quote/"+shareValue.yahooCode} icon={<FormSearch size="medium"/>}/>
+                        <Anchor alignSelf="center" target={"yahoo"+shareValue.yahooCode} color="brand" href={"https://finance.yahoo.com/quote/"+shareSearchUrl(shareValue.yahooCode, shareValue)} icon={<FormSearch size="medium"/>}/>
 
                         <TextField 
                         label="Pays"

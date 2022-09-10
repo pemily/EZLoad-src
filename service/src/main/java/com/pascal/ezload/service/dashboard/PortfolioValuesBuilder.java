@@ -154,11 +154,12 @@ public class PortfolioValuesBuilder {
                 return state.getInputOutput().getCumulative();
             case CUMUL_VALEUR_PORTEFEUILLE:
             case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
-                float shareValues = state.getShareNb()
+                float portfolioValue = state.getShareNb()
                                         .entrySet()
                                         .stream()
                                         .map(e -> {
                                             float nbOfShare = e.getValue();
+                                            if (nbOfShare == 0) return 0f;
                                             Prices prices = r.getAllSharesTargetPrices().get(e.getKey());
                                             float price = prices == null ? 0 : prices.getPriceAt(state.getDate()).getPrice();
                                             return nbOfShare*price;
@@ -166,11 +167,10 @@ public class PortfolioValuesBuilder {
                                         .reduce(Float::sum)
                                         .orElse(0f);
 
-                shareValues+=state.getInputOutput().getCumulative();
-                shareValues+=state.getOthersInputOutput().getCumulative();
-                if (portfolioFilter == PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)
-                    shareValues+=state.getDividends().getCumulative();
-                return shareValues;
+                portfolioValue+=state.getLiquidity().getCumulative();
+                if (portfolioFilter != PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)
+                    portfolioValue-=state.getDividends().getCumulative();
+                return portfolioValue;
         }
         throw new IllegalStateException("Unknown filter: "+ portfolioFilter);
     }

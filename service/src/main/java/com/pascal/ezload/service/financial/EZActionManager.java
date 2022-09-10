@@ -247,6 +247,13 @@ public class EZActionManager {
                 errors.add(toString(ezShare)+": Le code SeekingAlpha ne fonctionne pas");
             }
 
+            if (yahooPrices == null){
+                errors.add(toString(ezShare)+": Le code Yahoo ne fonctionne pas");
+            }
+            if (seekingPrices == null){
+                errors.add(toString(ezShare)+": Le code SeekingAlpha ne fonctionne pas");
+            }
+
             if (yahooPrices != null && seekingPrices != null) {
                 EZDate today = EZDate.today();
                 try {
@@ -260,7 +267,7 @@ public class EZActionManager {
 
                         float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
                         float percentOfDiff = diff * 100.f / yahooPriceInEuro;
-                        if (percentOfDiff > 5) { // si la difference est plus grande que 5% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
+                        if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
                             errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
                         }
                     }

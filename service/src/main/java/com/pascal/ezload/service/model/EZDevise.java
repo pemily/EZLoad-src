@@ -53,4 +53,8 @@ public class EZDevise {
     public int hashCode() {
         return Objects.hash(symbol, code);
     }
+
+    public String toString(){
+        return symbol;
+    }
 }

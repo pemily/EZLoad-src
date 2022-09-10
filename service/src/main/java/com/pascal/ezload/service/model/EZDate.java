@@ -199,11 +199,7 @@ public class EZDate implements Comparable<EZDate> {
 
     @Override
     public String toString() {
-        return "EZDate{" +
-                "day=" + day +
-                ", month=" + month +
-                ", year=" + year +
-                '}';
+        return toEzPortoflioDate();
     }
 
     @Override

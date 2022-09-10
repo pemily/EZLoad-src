@@ -47,7 +47,7 @@ public class EZShare implements ActionData {
     }
 
     public void setIsin(String isin) {
-        this.isin = isin;
+        this.isin = isin != null ? isin.trim() : null;
     }
 
     public String getEzName() {
@@ -55,7 +55,7 @@ public class EZShare implements ActionData {
     }
 
     public void setEzName(String ezName) {
-        this.ezName = ezName;
+        this.ezName = ezName != null ? ezName.trim() : null;
     }
 
     public String getGoogleCode() {
@@ -63,11 +63,11 @@ public class EZShare implements ActionData {
     }
 
     public void setGoogleCode(String ezTicker) {
-        this.googleCode = ezTicker;
+        this.googleCode = ezTicker != null ? ezTicker.trim() : null;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.type = type != null ? type.trim() : null;;
     }
 
     public String getType() {
@@ -80,7 +80,7 @@ public class EZShare implements ActionData {
     }
 
     public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
+        this.countryCode = countryCode != null ? countryCode.trim() : null;
     }
 
 
@@ -101,7 +101,7 @@ public class EZShare implements ActionData {
     }
 
     public void setYahooCode(String yahooCode) {
-        this.yahooCode = yahooCode;
+        this.yahooCode = yahooCode != null ? yahooCode.trim() : null;
     }
 
     public String getIndustry() {
@@ -125,7 +125,7 @@ public class EZShare implements ActionData {
     }
 
     public void setSeekingAlphaCode(String seekingAlphaCode) {
-        this.seekingAlphaCode = seekingAlphaCode;
+        this.seekingAlphaCode = seekingAlphaCode != null ? seekingAlphaCode.trim() : null;
     }
 
     public String getDescription() {
@@ -134,5 +134,9 @@ public class EZShare implements ActionData {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String toString(){
+        return ezName;
     }
 }

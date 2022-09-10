@@ -81,6 +81,7 @@ public class EzServerState {
         ezActionDirty = false;
         ezReports = new LinkedList<>();
         filesNotYetLoaded = new LinkedList<>();
+        dashboardData = null;
     }
 
     public EZPortfolioProxy getEzNewPortfolioProxy() {
