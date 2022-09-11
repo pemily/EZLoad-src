@@ -86,7 +86,7 @@ export function App(){
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
-             setActionWithMsg(r.allShares);
+             setActionWithMsg(r.newSharesOrWithError);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);

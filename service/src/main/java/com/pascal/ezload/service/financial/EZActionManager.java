@@ -97,10 +97,12 @@ public class EZActionManager {
 
     public ActionWithMsg getIncompleteSharesOrNew(Reporting reporting) throws IOException {
         ActionWithMsg actionWithMsg = getActionWithError(reporting);
+        ActionWithMsg onlyNewAndErrorMsg = new ActionWithMsg();
+        onlyNewAndErrorMsg.getErrors().addAll(actionWithMsg.getErrors());
         ezShareData.getShares().stream()
                 .filter(s -> EZShare.NEW_SHARE.equals(s.getDescription()))
-                .forEach(ezShare -> actionWithMsg.addMsg(ezShare, null)); // ce n'est pas une erreur, c'est juste pour qu'elle s'affiche dans la page, pour qu'on puisse la voir, et l'editer
-        return actionWithMsg;
+                .forEach(ezShare -> onlyNewAndErrorMsg.addMsg(ezShare, null)); // ce n'est pas une erreur, c'est juste pour qu'elle s'affiche dans la page, pour qu'on puisse la voir, et l'editer
+        return onlyNewAndErrorMsg;
     }
 
     public List<EZShare> getAllEZShares(){

@@ -48,6 +48,13 @@ public class StringValue {
         return this;
     }
 
+    public StringValue validateWithLimitedValues(String... acceptedValues){
+        if (Arrays.stream(acceptedValues).noneMatch(acceptedValue ->  acceptedValue.equals(value))){
+            checkable.setErrorMsg(field, "Valeurs possible: "+Arrays.asList(acceptedValues));
+        }
+        return this;
+    }
+
 
     public void checkPrefixMatch(String matchPrefix){
         if (matchPrefix == null){
