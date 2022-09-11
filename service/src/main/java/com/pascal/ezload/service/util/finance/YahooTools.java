@@ -93,7 +93,9 @@ public class YahooTools extends ExternalSiteTools{
 
     private static void processSharePriceCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(yahooCode)) {
-            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
+            //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/AMT?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
+            // remove 3 days to the from date because of the WE, to be sure to have a data for the from date (and avoid a 0)
+            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.minusDays(3).toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
             cache.get(reporting, "yahoo_history_"+yahooCode+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
                 rowsConsumer.accept(
                         CsvUtil.load(inputStream, ",", 1)
@@ -103,8 +105,10 @@ public class YahooTools extends ExternalSiteTools{
         }
     }
 
+
     static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
+            //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
             String url = "https://query1.finance.yahoo.com/v7/finance/options/"+ezShare.getYahooCode()+"?date="+EZDate.today().toEpochSecond();
             return cache.get(reporting, "yahoo_devise_"+ezShare.getYahooCode(), url, inputStream -> {
                 Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);

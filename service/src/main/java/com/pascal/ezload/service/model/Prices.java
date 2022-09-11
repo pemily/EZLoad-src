@@ -46,7 +46,7 @@ public class Prices {
         pricesMap.put(date, price);
     }
 
-    // si la date exacte n'est pas présente, on teste sur les 7 derniers jours
+    // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
     public PriceAtDate getPriceAt(EZDate date){
         PriceAtDate p = pricesMap.get(date);
         if (p == null) {

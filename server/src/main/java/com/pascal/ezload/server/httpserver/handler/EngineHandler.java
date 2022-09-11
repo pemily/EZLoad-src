@@ -103,29 +103,29 @@ public class EngineHandler {
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-analyze.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
+                    try (Reporting mainRepoIgnored = reporting.pushSection("Analyse des nouvelles opérations")) {
+                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
 
-                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
+                        List<EZModel> allEZModels;
+                        try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
+                            // get the new version, and update the list of file not yet loaded
+                            updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
 
-                    List<EZModel> allEZModels;
-                    try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
-                        // get the new version, and update the list of file not yet loaded
-                        updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+                            allEZModels = new BourseDirectAnalyser(mainSettings, ezProfil).start(reporting, ezPortfolioProxy);
+                        }
 
-                        allEZModels = new BourseDirectAnalyser(mainSettings, ezProfil).start(reporting, ezPortfolioProxy);
-                    }
+                        try (Reporting ignored = reporting.pushSection("Vérification des Opérations")) {
+                            new EZModelChecker(reporting).validateModels(allEZModels);
+                        }
 
-                    try (Reporting ignored = reporting.pushSection("Vérification des Opérations")) {
-                        new EZModelChecker(reporting).validateModels(allEZModels);
-                    }
+                        List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting)
+                                .exportModels(allEZModels, ezPortfolioProxy);
 
-                    List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting)
-                            .exportModels(allEZModels, ezPortfolioProxy);
-
-                    // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présente dans des fichiers
-                    // first allTickerCodes received all the ticker codes present in the ezPorfolio
-                    List<ShareValue> allTickerCodes = ezPortfolioProxy.getShareValuesFromMonPortefeuille().stream()
-                            .filter(sv -> !sv.getTickerCode().isEmpty() && !sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
-                            .collect(Collectors.toList());
+                        // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présente dans des fichiers
+                        // first allTickerCodes received all the ticker codes present in the ezPorfolio
+                        List<ShareValue> allTickerCodes = ezPortfolioProxy.getShareValuesFromMonPortefeuille().stream()
+                                .filter(sv -> !sv.getTickerCode().isEmpty() && !sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
+                                .collect(Collectors.toList());
 /*                  List<ShareValue> allTickerCodesAnalyzed = allEzReports.stream()
                             .flatMap(report -> report.getEzEditions().stream())
                             .flatMap(ezEdition -> ezEdition.getEzPortefeuilleEditions().stream())
@@ -136,31 +136,31 @@ public class EngineHandler {
                             .collect(Collectors.toList());
                     allTickerCodes.removeAll(allTickerCodesAnalyzed);*/
 
-                    List<EzPortefeuilleEdition> dividendsEdition = allTickerCodes.stream()
-                                    .map(ezPortfolioProxy::createNoOpEdition)
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .map(ezPortefeuilleEdition  ->
-                                            Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .collect(Collectors.toList());
+                        List<EzPortefeuilleEdition> dividendsEdition = allTickerCodes.stream()
+                                .map(ezPortfolioProxy::createNoOpEdition)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .map(ezPortefeuilleEdition ->
+                                        Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .collect(Collectors.toList());
 
-                    if (dividendsEdition.size() > 0) {
-                        EzReport dividendsReport = new EzReport();
-                        dividendsReport.setReportType(EzReport.ReportType.IS_DIVIDEND_UPDATE);
-                        List<EzEdition> dividendsEditions = new LinkedList<>();
-                        dividendsReport.setEzEditions(dividendsEditions);
-                        EzEdition ez = new EzEdition();
-                        ez.setId("DividendsUpdate");
-                        ez.setEzPortefeuilleEditions(dividendsEdition);
-                        dividendsEditions.add(ez);
-                        allEzReports.add(dividendsReport);
+                        if (dividendsEdition.size() > 0) {
+                            EzReport dividendsReport = new EzReport();
+                            dividendsReport.setReportType(EzReport.ReportType.IS_DIVIDEND_UPDATE);
+                            List<EzEdition> dividendsEditions = new LinkedList<>();
+                            dividendsReport.setEzEditions(dividendsEditions);
+                            EzEdition ez = new EzEdition();
+                            ez.setId("DividendsUpdate");
+                            ez.setEzPortefeuilleEditions(dividendsEdition);
+                            dividendsEditions.add(ez);
+                            allEzReports.add(dividendsReport);
+                        }
+
+                        serverState.setEzReports(allEzReports);
+                        serverState.setEzActionDirty(false);
                     }
-
-                    serverState.setEzReports(allEzReports);
-                    serverState.setEzActionDirty(false);
-
                 });
 
     }

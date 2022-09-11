@@ -33,8 +33,22 @@ export interface NewShareValuesProps {
 }      
 
 function shareSearchUrl(field: string|undefined, share: EZShare) : string | undefined {    
-    if (field !== undefined && field !== "" && field !== null) return field;
-    return share.ezName ? encodeURIComponent(share.ezName) : share.googleCode;        
+    if (field === undefined || field === "" || field === null)
+        return share.ezName ? encodeURIComponent(share.ezName) : share.googleCode;        
+    return field;
+}
+
+function googleCodeReversed(share: EZShare) : string|undefined {    
+    // googleCodeFromEzPortfolio EPA:FDJ => return FDJ:EPA 
+    var googleCodeFromEzPortfolio = share.googleCode;
+    if (googleCodeFromEzPortfolio === undefined) return undefined;
+    console.log("PASCAL: ", googleCodeFromEzPortfolio);
+    var code = googleCodeFromEzPortfolio?.split(":")
+    console.log("PASCAL: ", code);
+    if (code === undefined ||code?.length <= 1) return googleCodeFromEzPortfolio;    
+    var r = code[1]+":"+code[0];
+    console.log("PASCAL: ", r);
+    return r;
 }
 
 export function ShareValues(props: NewShareValuesProps){
@@ -94,7 +108,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />    
-                        <Anchor alignSelf="center" target={"google"+shareValue.googleCode} color="brand" href={"https://www.google.com/finance/quote/"+shareSearchUrl(shareValue.googleCode, shareValue)} icon={<FormSearch size="medium"/>}/>
+                        <Anchor alignSelf="center" target={"google"+shareValue.googleCode} color="brand" href={"https://www.google.com/finance/quote/"+shareSearchUrl(googleCodeReversed(shareValue), shareValue)} icon={<FormSearch size="medium"/>}/>
 
                         <TextField
                         label="SeekingAlpha Code"

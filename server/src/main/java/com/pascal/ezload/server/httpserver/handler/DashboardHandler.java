@@ -29,6 +29,7 @@ import com.pascal.ezload.service.dashboard.DashboardSettings;
 import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.dashboard.DashboardManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
+import com.pascal.ezload.service.sources.Reporting;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;
@@ -82,14 +83,16 @@ public class DashboardHandler {
                 "Création du Tableau de bord",
                 ProcessManager.getLog(mainSettings, "dashboard", "-upload.html"),
                 (processLogger) -> {
-                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, mainSettings, ezProfil, processLogger.getReporting());
-                    DashboardManager dashboardManager = new DashboardManager(mainSettings.getEzLoad());
-                    DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
-                    List<Chart> charts = dashboardManager.loadDashboard(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
-                    DashboardData dashboardData = new DashboardData();
-                    dashboardData.setDashboardSettings(dashboardSettings);
-                    dashboardData.setCharts(charts);
-                    ezServerState.setDashboardData(dashboardData);
+                    try(Reporting reporting = processLogger.getReporting().pushSection("Génération des Graphiques")) {
+                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, mainSettings, ezProfil, reporting);
+                        DashboardManager dashboardManager = new DashboardManager(mainSettings.getEzLoad());
+                        DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
+                        List<Chart> charts = dashboardManager.loadDashboard(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
+                        DashboardData dashboardData = new DashboardData();
+                        dashboardData.setDashboardSettings(dashboardSettings);
+                        dashboardData.setCharts(charts);
+                        ezServerState.setDashboardData(dashboardData);
+                    }
                 });
     }
 

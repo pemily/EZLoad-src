@@ -104,7 +104,7 @@ public class DashboardManager {
                 throw new IllegalStateException("Unknown selected value: "+ chartSettings.getSelectedStartDateSelection());
         }
 
-        List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, 150);
+        List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, chartSettings.getNbOfPoints());
         EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
         PortfolioValuesBuilder portfolioValuesBuilder = new PortfolioValuesBuilder(ezActionManager,

@@ -17,7 +17,7 @@
  */
 import { Box, Anchor, Button, Text, TextArea, Grid, Layer } from "grommet";
 import { useState, useRef, useEffect } from "react";
-import { Add, Download, Refresh, Menu, Trash } from 'grommet-icons';
+import { Add, Download, Refresh, Menu, Trash, Configure, Expand, Contract, ZoomIn, ZoomOut } from 'grommet-icons';
 import { AuthInfo, Chart, EzProcess, ChartSettings, DashboardData, DashboardSettings, EZShare, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
@@ -99,13 +99,25 @@ export function DashboardMain(props: DashboardMainProps){
             {
                 dashCharts?.map((chart, index) => {                    
                     return (                        
-                        <Box width="100%" height="25vh" pad="small" border="all" margin="xxsmall" background="white" flex="grow">
+                        <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
+                                          pad="small" border="all" margin="xxsmall" background="white" flex="grow">
                             <Box direction="row" margin="small">
                                 <Box flex="grow" direction="column" alignSelf="center">
                                     <Text alignSelf="center"  margin="0">{chart.mainTitle}</Text>
                                 </Box>
                                     <Box  direction="row" alignSelf="end"  margin="0" pad="0">
-                                        <Button fill={false} size="small" alignSelf="start" icon={<Menu size='small' />} gap="xxsmall" margin="xxsmall"
+                                        <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
+                                                plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
+                                                                                                                chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                                                                                    { ...c, height: c.height!+10 }
+                                                                                                                    : c ) }
+                                                                                                            , r => setDashConfig(r)) }/>
+                                        <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
+                                                plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
+                                                                                                                chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                                                                                    { ...c, height: c.height!-10 }
+                                                                                                                    : c ) }
+                                                                                                            , r => setDashConfig(r)) }/>                                        <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                                 plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
                                         <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' />} gap="xxsmall" margin="xxsmall"
                                                 plain={true} label="" onClick={() =>{

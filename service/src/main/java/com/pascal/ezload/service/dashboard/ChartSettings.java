@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ChartSettings extends Checkable<ChartSettings> {
+
     enum Field {targetDevise, title, brokers, accountTypes, portfolioFilters, selectedStartDateSelection, shareNames, shareSelection, additionalShareNames, showCurrency}
 
     private String targetDevise; // EUR, USD
@@ -16,6 +17,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private Set<ChartSelection> chartSelection = new HashSet<>();
     private DashboardManager.StartDateSelection selectedStartDateSelection;
     private Set<String> additionalShareNames = new HashSet<>(); // ezName
+    private int height = 50;
+    private int nbOfPoints = 200;
 
     public String getTargetDevise() {
         return targetDevise;
@@ -71,6 +74,22 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public void setAdditionalShareNames(Set<String> additionalShareNames) {
         this.additionalShareNames = additionalShareNames;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = Math.max(height, 20);
+    }
+
+    public int getNbOfPoints() {
+        return nbOfPoints;
+    }
+
+    public void setNbOfPoints(int nbOfPoints) {
+        this.nbOfPoints = nbOfPoints;
     }
 
     public ChartSettings validate() {

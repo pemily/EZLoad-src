@@ -97,7 +97,8 @@ public class SeekingAlphaTools extends ExternalSiteTools{
                 Prices sharePrices = new Prices();
                 sharePrices.setDevise(DeviseUtil.USD);
                 sharePrices.setLabel(ezShare.getEzName());
-                processRows(reporting, cache, ezShare, from, to, rows -> {
+                // remove 7 days to the from date because seeking alpha have only 1 data per week, this is to be sure to have a data for the from date (and avoid a 0)
+                processRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
                                 return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);

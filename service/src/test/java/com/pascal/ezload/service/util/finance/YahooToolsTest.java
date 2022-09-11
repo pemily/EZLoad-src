@@ -17,7 +17,10 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.HttpUtilCached;
 import com.pascal.ezload.service.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
@@ -25,9 +28,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class YahooToolsTest {
 
@@ -136,6 +140,19 @@ public class YahooToolsTest {
         Assertions.assertNull(action.get().getSector());
         Assertions.assertEquals("ETF", action.get().getType());
         Assertions.assertEquals("FR0011871128", action.get().getIsin());
+    }
+
+
+    @Test
+    public void testCurrencyMap() throws Exception {
+        EZDate from = EZDate.parseYYYMMDDDate("2022/09/04", '/');
+        EZDate to = EZDate.parseYYYMMDDDate("2022/09/11", '/');
+        List<EZDate> dates = List.of(from, to);
+        CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
+        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1));
+        assertNotEquals(0, px);
+        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1));
+        assertNotEquals(0, px);
     }
 
 }

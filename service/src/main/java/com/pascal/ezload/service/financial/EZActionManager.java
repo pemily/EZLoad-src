@@ -233,54 +233,65 @@ public class EZActionManager {
                 errors.add(toString(ezShare) + ": Le code pays de l'action est vide");
             }
 
-            if (!StringUtils.isBlank(ezShare.getYahooCode()) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-                // Validate that seeking alpha & yahoo code are aligned
-                Prices yahooPrices = null;
-                EZDate to = EZDate.today();
-                EZDate from = to.minusDays(10);
-                try {
-                    yahooPrices = YahooTools.getPrices(reporting, cache, ezShare, from, to);
-                } catch (Exception e) {
-                    errors.add(toString(ezShare) + ": Le code Yahoo ne fonctionne pas");
-                }
-                Prices seekingPrices = null;
-                try {
-                    seekingPrices = SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to);
-                } catch (Exception e) {
-                    errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
-                }
-
-                if (yahooPrices == null) {
-                    errors.add(toString(ezShare) + ": Le code Yahoo ne fonctionne pas");
-                }
-                if (seekingPrices == null) {
-                    errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
-                }
-
-                if (yahooPrices != null && seekingPrices != null) {
-                    EZDate today = EZDate.today();
-                    try {
-                        PriceAtDate yahooPrice = yahooPrices.getPriceAt(today);
-                        PriceAtDate seekingPrice = seekingPrices.getPriceAt(today);
-                        if (yahooPrice.getPrice() != 0 && seekingPrice.getPrice() != 0) {
-                            List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
-                            CurrencyMap local2Euro = getCurrencyMap(reporting, yahooPrices.getDevise(), DeviseUtil.EUR, lastWeek);
-                            float yahooPriceInEuro = local2Euro.getTargetPrice(yahooPrice);
-                            float seekingPriceInEuro = local2Euro.getTargetPrice(seekingPrice);
-
-                            float diff = Math.abs(yahooPriceInEuro - seekingPriceInEuro);
-                            float percentOfDiff = diff * 100.f / yahooPriceInEuro;
-                            if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
-                                errors.add(toString(ezShare) + ": Les codes Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
-                    }
-
-                }
+            // Validate that google code & seeking alpha & yahoo code are aligned
+            Prices yahooPrices = null;
+            EZDate to = EZDate.today();
+            EZDate from = to.minusDays(10);
+            try {
+                yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : YahooTools.getPrices(reporting, cache, ezShare, from, to);
+            } catch (Exception e) {
             }
+            Prices seekingPrices = null;
+            try {
+                seekingPrices = StringUtils.isBlank(ezShare.getSeekingAlphaCode()) ? null : SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to);
+            } catch (Exception e) {
+            }
+            Prices googlePrices = null;
+            try {
+                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : GoogleTools.getCurrentPrice(reporting, cache, ezShare);
+            }
+            catch (Exception e){
+            }
+
+            if (yahooPrices == null && !StringUtils.isBlank(ezShare.getYahooCode())) {
+                errors.add(toString(ezShare) + ": Le code Yahoo ne fonctionne pas");
+            }
+            if (seekingPrices == null && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+                errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
+            }
+            if (googlePrices == null && !StringUtils.isBlank(ezShare.getGoogleCode())) {
+                errors.add(toString(ezShare) + ": Le code Google ne fonctionne pas");
+            }
+
+            try {
+                checkPrices(ezShare, reporting, errors, yahooPrices, seekingPrices, "Le code Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
+                checkPrices(ezShare, reporting, errors, yahooPrices, googlePrices, "Le code Yahoo & Google ne semblent pas être pas la meme action");
+                checkPrices(ezShare, reporting, errors, googlePrices, seekingPrices, "Le code Google & SeekingAlpha ne semblent pas être pas la meme action");
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
+            }
+
             return errors;
+        }
+    }
+
+    private void checkPrices(EZShare ezShare, Reporting reporting, List<String> errors, Prices prices1, Prices prices2, String errorMessage) throws Exception {
+        if (prices1 == null || prices2 == null) return;
+        EZDate today = EZDate.today();
+        PriceAtDate todayPrice1 = prices1.getPriceAt(today);
+        PriceAtDate todayPrice2 = prices2.getPriceAt(today);
+        if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0) {
+            List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
+            CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, lastWeek);
+            CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, lastWeek);
+            float price1InEuro = local2Euro1.getTargetPrice(todayPrice1);
+            float price2InEuro = local2Euro2.getTargetPrice(todayPrice2);
+
+            float diff = Math.abs(price1InEuro - price2InEuro);
+            float percentOfDiff = diff * 100.f / price1InEuro;
+            if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
+                errors.add(toString(ezShare) + ": "+errorMessage);
+            }
         }
     }
 
