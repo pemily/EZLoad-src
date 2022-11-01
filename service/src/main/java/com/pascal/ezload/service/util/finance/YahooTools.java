@@ -75,7 +75,7 @@ public class YahooTools extends ExternalSiteTools{
             catch (Exception e){
                 logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
             }
-    }
+        }
         return null;
     }
 

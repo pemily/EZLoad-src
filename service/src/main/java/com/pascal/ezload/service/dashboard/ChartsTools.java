@@ -12,7 +12,7 @@ public class ChartsTools {
     public static List<EZDate> getDatesSample(EZDate from, EZDate to, int nbOfPoint){
         if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
         long nbOfTotalDays = from.nbOfDaysTo(to);
-        if (nbOfTotalDays+1 < nbOfPoint) throw new IllegalArgumentException("NbOfPoint must be lower than the number of days between the 2 dates");
+        if (nbOfTotalDays+1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDays;
 
         var allDates = new ArrayList<EZDate>(nbOfPoint);
 
