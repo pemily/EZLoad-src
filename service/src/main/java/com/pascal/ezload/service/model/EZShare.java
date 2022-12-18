@@ -89,7 +89,8 @@ public class EZShare implements ActionData {
         data.put(share_ezName, ezName);
         data.put(share_ezCode, googleCode);
         data.put(share_industry, industry == null ? "" : industry);
-        data.put(share_costPrice, "=query(PRU!A$5:B; \"select B where A = '"+ezName+"' limit 1\")");
+        // data.put(share_costPrice, "=query(PRU!A$5:B; \"select B where A = '"+ezName+"' limit 1\")"); // Version 5 d'EZPortfolio
+        data.put(share_costPrice, "=query(PRU!A$6:B; \"select B where A = '"+ezName+"' limit 1\")"); // Version 6 d'EZPortfolio (il y a une ligne de plus dans le header de l'onglet PRU)
         data.put(share_type, type);
         data.put(share_countryCode, countryCode == null ? "" : countryCode);
         EZCountry country = countryCode == null ? null : CountryUtil.foundByCode(countryCode);

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.exporter.ezPortfolio.v5;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
 public class EZPortfolio {
     private final String ezPortfolioVersion;

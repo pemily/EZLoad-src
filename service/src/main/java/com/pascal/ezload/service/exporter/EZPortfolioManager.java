@@ -19,19 +19,16 @@ package com.pascal.ezload.service.exporter;
 
 import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.EZPorfolioProxyV5;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.EZPorfolioProxyV5_V6;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.StringUtils;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 public class EZPortfolioManager {
@@ -95,8 +92,8 @@ public class EZPortfolioManager {
 
             reporting.info("Récupération des données de Google Drive...");
             // ici detection de la version de EZPortfolio
-            if (EZPorfolioProxyV5.isCompatible(reporting, sheets)) {
-                EZPorfolioProxyV5 proxy = new EZPorfolioProxyV5(sheets);
+            if (EZPorfolioProxyV5_V6.isCompatible(reporting, sheets)) {
+                EZPorfolioProxyV5_V6 proxy = new EZPorfolioProxyV5_V6(sheets);
                 proxy.load(reporting);
                 return proxy;
             }

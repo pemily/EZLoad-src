@@ -1,6 +1,6 @@
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;

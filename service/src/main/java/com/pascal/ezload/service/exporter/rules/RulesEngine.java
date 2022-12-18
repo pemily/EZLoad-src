@@ -25,7 +25,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;

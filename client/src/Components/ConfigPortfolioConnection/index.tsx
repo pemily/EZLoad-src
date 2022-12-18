@@ -211,7 +211,7 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
                                }, props.ezProfilStateSetter)
                                }/>
 
-                            <Anchor alignSelf="center" target="_blank" href="https://docs.google.com/spreadsheets/d/1ibgKcrkwnqZNHXNKr9Fv8vqACsbFfjvNAO3qOqe3TiE/edit#gid=227754599">Nouveau</Anchor>
+                            <Anchor alignSelf="center" target="_blank" href="https://docs.google.com/spreadsheets/d/1AFsF-BilEc0mfN0v8Nqili0bdisgmn2AtDw3nxejsVQ/edit#gid=227754599">Nouveau</Anchor>
                        </Box>                        
                     </Box>
 

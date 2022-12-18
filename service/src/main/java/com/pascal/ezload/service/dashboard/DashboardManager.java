@@ -2,7 +2,7 @@ package com.pascal.ezload.service.dashboard;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;

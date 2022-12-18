@@ -17,10 +17,8 @@
  */
 package com.pascal.ezload.service.financial;
 
-import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
@@ -31,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class EZActionManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");

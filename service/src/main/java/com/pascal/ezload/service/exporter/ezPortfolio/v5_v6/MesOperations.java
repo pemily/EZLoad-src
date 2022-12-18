@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.exporter.ezPortfolio.v5;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
@@ -99,7 +99,7 @@ public class MesOperations  {
     }
 
     public void newOperation(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef){
-        newOperations.add(newOperationRow(EZPorfolioProxyV5.FIRST_ROW_MES_OPERATIONS+existingOperations.getValues().size()+newOperations.size(), ezData, operationEdition, ruleDef));
+        newOperations.add(newOperationRow(EZPorfolioProxyV5_V6.FIRST_ROW_MES_OPERATIONS+existingOperations.getValues().size()+newOperations.size(), ezData, operationEdition, ruleDef));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {

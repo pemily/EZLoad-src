@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.exporter.ezPortfolio.v5;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.Request;
@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class EZPorfolioProxyV5 implements EZPortfolioProxy {
+public class EZPorfolioProxyV5_V6 implements EZPortfolioProxy {
 
     public static final int FIRST_ROW_MON_PORTEFEUILLE = 4;
     public static final int FIRST_ROW_MES_OPERATIONS = 1;
@@ -56,7 +56,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
     private final GDriveSheets sheets;
     private EZPortfolio ezPortfolio;
 
-    public EZPorfolioProxyV5(GDriveSheets sheets){
+    public EZPorfolioProxyV5_V6(GDriveSheets sheets){
         this.sheets = sheets;
     }
 
@@ -258,7 +258,7 @@ public class EZPorfolioProxyV5 implements EZPortfolioProxy {
 
     @Override
     public EZPortfolioProxy createDeepCopy() {
-        EZPorfolioProxyV5 copy = new EZPorfolioProxyV5(sheets);
+        EZPorfolioProxyV5_V6 copy = new EZPorfolioProxyV5_V6(sheets);
         copy.ezPortfolio = this.ezPortfolio.createDeepCopy();
         return copy;
     }

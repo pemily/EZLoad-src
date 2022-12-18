@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.exporter.ezPortfolio.v5;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
@@ -24,7 +24,6 @@ import com.pascal.ezload.service.exporter.ezEdition.data.common.MonPortefeuilleD
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.CountryUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
