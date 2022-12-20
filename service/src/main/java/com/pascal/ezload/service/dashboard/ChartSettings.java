@@ -14,9 +14,12 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private String title;
     private Set<String> brokers = new HashSet<>();
     private Set<String> accountTypes = new HashSet<>();
-    private Set<ChartSelection> chartSelection = new HashSet<>();
     private DashboardManager.StartDateSelection selectedStartDateSelection;
+
+    private Set<ChartIndex> indexSelection = new HashSet<>();
+    private Set<ChartIndexPerf> perfIndexSelection = new HashSet<>();
     private Set<String> additionalShareNames = new HashSet<>(); // ezName
+
     private int height = 50;
     private int nbOfPoints = 200;
 
@@ -52,13 +55,22 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.accountTypes = accountTypes;
     }
 
-    public Set<ChartSelection> getChartSelection() {
-        return chartSelection;
+    public Set<ChartIndex> getIndexSelection() {
+        return indexSelection;
     }
 
-    public void setChartSelection(Set<ChartSelection> chartSelection) {
-        this.chartSelection = chartSelection;
+    public void setIndexSelection(Set<ChartIndex> indexSelection) {
+        this.indexSelection = indexSelection;
     }
+
+    public Set<ChartIndexPerf> getPerfIndexSelection() {
+        return perfIndexSelection;
+    }
+
+    public void setPerfIndexSelection(Set<ChartIndexPerf> perfIndexSelection) {
+        this.perfIndexSelection = perfIndexSelection;
+    }
+
 
     public DashboardManager.StartDateSelection getSelectedStartDateSelection() {
         return selectedStartDateSelection;

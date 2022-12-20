@@ -62,7 +62,7 @@ public class PortfolioValuesBuilder {
         }
     }
 
-    public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<ChartSelection> chartSelection){
+    public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<ChartIndex> chartSelection){
         Result r = new Result();
         r.targetDevise = targetDevise;
         r.dates = dates;
@@ -133,7 +133,7 @@ public class PortfolioValuesBuilder {
                 return state.getOutput().getInstant();
             case CUMUL_LIQUIDITE:
                 return state.getLiquidity().getCumulative();
-            case CUMUL_VALEUR_PORTEFEUILLE:
+            case CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES:
             case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
                 float portfolioValue = state.getShareNb()
                                         .entrySet()

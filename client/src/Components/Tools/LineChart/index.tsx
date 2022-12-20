@@ -133,7 +133,7 @@ export function LineChart(props: LineChartProps){
             },
             LINE_WITH_LEGENT_AT_LEFT: {
                 type: 'linear',
-                display: true,
+                display: props.chart.lines.filter(l => l.lineStyle === "LINE_WITH_LEGENT_AT_LEFT").length > 0,
                 position: 'left',
                 title: {
                   display: true,
@@ -153,7 +153,15 @@ export function LineChart(props: LineChartProps){
                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                 },                
             },
-
+            PERF_LINE: {
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.lineStyle === "PERF_LINE").length > 0,
+                position: 'left',
+                title: {
+                  display: true,
+                  text: props.chart.axisId2titleY!['yAxisPerf']
+                }
+            }
         }
     }
 

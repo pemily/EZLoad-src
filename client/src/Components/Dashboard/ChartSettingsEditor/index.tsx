@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea, Grid, Layer, Calendar, CheckBox } from "grommet";
+import { Box, Anchor, Button, Text, TextArea, Grid, Layer, Calendar, CheckBox, Heading } from "grommet";
 import { useState, useRef, useEffect } from "react";
 import { Add, Download, SchedulePlay } from 'grommet-icons';
 import { AuthInfo, Chart, EzProcess, EzProfil, DashboardData, ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
@@ -62,19 +62,35 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
 
 
-    function organizePortfolioValues(newValue: any[]): any[]{    
+    function organizeIndexes(newValue: any[]): any[]{    
         if (newValue.indexOf('CURRENT_SHARES') !== -1
-             && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('CURRENT_SHARES') === -1)){
+             && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('CURRENT_SHARES') === -1)){
                 newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'ALL_SHARES');
         }
         else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
-             && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
+             && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
                 newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
         }
         else if (newValue.indexOf('ALL_SHARES') !== -1
-            && (!props.chartSettings.chartSelection || props.chartSettings.chartSelection.indexOf('ALL_SHARES') === -1)){
+            && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('ALL_SHARES') === -1)){
                 newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
         }
+        return newValue;        
+    }
+
+    function organizePerfIndexes(newValue: any[]): any[]{    
+       /* if (newValue.indexOf('CURRENT_SHARES') !== -1
+             && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('CURRENT_SHARES') === -1)){
+                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'ALL_SHARES');
+        }
+        else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
+             && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
+                newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
+        }
+        else if (newValue.indexOf('ALL_SHARES') !== -1
+            && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('ALL_SHARES') === -1)){
+                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
+        }*/
         return newValue;        
     }
     
@@ -126,17 +142,18 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 userValues={brokers}
                                 description=""
                                 onChange={newValue  => props.save({...props.chartSettings, brokers: newValue})}/>
+            
 
             <ComboMultiple id="PortfolioValues"
-                                label="Courbes prédéfinie"
+                                label="Indexes"
                                 errorMsg={undefined}
                                 readOnly={false}
-                                selectedCodeValues={props.chartSettings.chartSelection ? props.chartSettings.chartSelection : []}                            
+                                selectedCodeValues={props.chartSettings.indexSelection ? props.chartSettings.indexSelection : []}                            
                                 userValues={[ 
                                     'Vos valeurs actuelles',
                                     'Vos 10 plus grosses valeurs actuelles',
                                     'Toutes vos valeurs',
-                                    'Valeur du portefeuille',
+                                    'Valeur du portefeuille sans dividendes',
                                     'Valeur du portefeuille avec dividendes',
                                     'Liquidité',
                                     'Entrées/Sorties',
@@ -148,7 +165,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
                                     'ALL_SHARES',
-                                    'CUMUL_VALEUR_PORTEFEUILLE',
+                                    'CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES',
                                     'CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES',
                                     'CUMUL_LIQUIDITE',                                    
                                     'INSTANT_ENTREES_SORTIES',
@@ -158,11 +175,32 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CURRENCIES']}
                                 description=""
                                 onChange={newValue => 
-                                    props.save({...props.chartSettings, chartSelection: organizePortfolioValues(newValue)})
+                                    props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})
                                 }/>
 
+
+
+            <ComboMultiple id="PortfolioValues"
+                                label="Indexes de Performance"
+                                errorMsg={undefined}
+                                readOnly={false}
+                                selectedCodeValues={props.chartSettings.perfIndexSelection ? props.chartSettings.perfIndexSelection : []}                            
+                                userValues={[
+                                    'Valeur du portefeuille sans dividendes',
+                                    'Valeur du portefeuille avec dividendes']}
+                                codeValues={[
+                                    'PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES',
+                                    'PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES'
+                                ]}
+                                description=""
+                                onChange={newValue => 
+                                    props.save({...props.chartSettings, perfIndexSelection: organizePerfIndexes(newValue)})
+                                }/>
+
+
+
             <ComboMultiple id="shareNames"
-                                label="Actions à ajouter"
+                                label="Valeur d'Actions"
                                 selectedCodeValues={props.chartSettings.additionalShareNames ? props.chartSettings.additionalShareNames : []}                            
                                 errorMsg={undefined}
                                 readOnly={false}
@@ -171,6 +209,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 description=""
                                 onChange={newValue  => props.save({...props.chartSettings, additionalShareNames: newValue})}/>
 
+            
 
 
         </Box>

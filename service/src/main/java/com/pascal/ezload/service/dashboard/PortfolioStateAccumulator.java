@@ -80,7 +80,7 @@ public class PortfolioStateAccumulator {
                 break;
             case "Retrait fonds":
                 addOutputQuantity(operation);
-                // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en négatif dans EZPortfolio :( dommage
+                // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en valeur négative dans EZPortfolio :( dommage
                 addLiquidityAmount = false;
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-"+operation.getValueStr(MesOperations.AMOUNT_COL));
@@ -113,18 +113,18 @@ public class PortfolioStateAccumulator {
     }
 
     private void addDividendsQuantity(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getDividends().plus(newNb);
     }
 
     private void addInputQuantity(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getInput().plus(newNb);
         previousState.getInputOutput().plus(newNb);
     }
 
     private void addOutputQuantity(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getOutput().plus(newNb);
         previousState.getInputOutput().minus(newNb);
     }

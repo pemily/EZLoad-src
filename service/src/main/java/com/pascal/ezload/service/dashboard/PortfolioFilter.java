@@ -7,7 +7,7 @@ import java.util.Set;
 public enum PortfolioFilter {
         INSTANT_DIVIDENDES(true, 0),
         CUMUL_DIVIDENDES(true, 0),
-        CUMUL_VALEUR_PORTEFEUILLE(true, 0),
+        CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES(true, 0),
         CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES(true, 0),
         INSTANT_ENTREES(true, 0),
         CUMUL_ENTREES_SORTIES(true, 0),
@@ -34,14 +34,14 @@ public enum PortfolioFilter {
             return buildOrder;
         }
 
-        static Set<PortfolioFilter> toPortfolioFilter(Set<ChartSelection> selection){
+        static Set<PortfolioFilter> toPortfolioFilter(Set<ChartIndex> selection){
             Set<PortfolioFilter> r = new HashSet<>();
             selection.forEach(s -> {
                 switch (s){
                     case CURRENT_SHARES: r.add(CURRENT_SHARES); break;
                     case TEN_WITH_MOST_IMPACTS: r.add(TEN_WITH_MOST_IMPACTS); break;
                     case ALL_SHARES: r.add(ALL_SHARES); break;
-                    case CUMUL_VALEUR_PORTEFEUILLE: r.add(CUMUL_VALEUR_PORTEFEUILLE); break;
+                    case CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES: r.add(CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES); break;
                     case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES: r.add(CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES); break;
                     case CUMUL_LIQUIDITE: r.add(CUMUL_LIQUIDITE); break;
                     case INSTANT_ENTREES_SORTIES: r.addAll(List.of(INSTANT_ENTREES, INSTANT_SORTIES)); break;

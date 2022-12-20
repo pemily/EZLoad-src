@@ -8,6 +8,7 @@ public class ChartLine {
     public enum LineStyle {
         LINE_WITH_LEGENT_AT_LEFT("yAxisLeft"),
         LINE_WITH_LEGENT_AT_RIGHT("yAxisRight"),
+        PERF_LINE("yAxisPerf"),
         BAR("bar");
 
         private String style;
@@ -16,7 +17,7 @@ public class ChartLine {
             this.style = style;
         }
 
-        String getStyle() {
+        String getStyleName() {
             return style;
         }
     }

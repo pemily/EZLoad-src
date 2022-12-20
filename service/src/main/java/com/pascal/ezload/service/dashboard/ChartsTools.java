@@ -34,15 +34,19 @@ public class ChartsTools {
     }
 
     public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, Prices prices){
-        if (chart.getLabels().size() != prices.getPrices().size()){
+        return createChartLine(chart, lineStyle, lineTitle, prices.getPrices()
+                .stream()
+                .map(PriceAtDate::getPrice).collect(Collectors.toList()));
+    }
+
+    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, List<Float> values){
+        if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
         }
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValues(prices.getPrices()
-                                    .stream()
-                                    .map(PriceAtDate::getPrice).collect(Collectors.toList()));
+        chartLine.setValues(values);
         chart.getLines().add(chartLine);
         return chartLine;
     }

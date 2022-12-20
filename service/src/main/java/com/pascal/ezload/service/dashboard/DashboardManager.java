@@ -26,12 +26,6 @@ public class DashboardManager {
         FROM_MY_FIRST_OPERATION
     }
 
-    public enum ShareSelection {
-        ALL_SHARES,
-        CURRENT_ACTIONS, // eliminates actions that have 0 in the nbShare
-        TEN_WITH_MOST_IMPACTS,
-    }
-
 
     private final EZActionManager ezActionManager;
     private final String dashboardFile;
@@ -111,8 +105,11 @@ public class DashboardManager {
                 portfolio
                         .getAllOperations()
                         .getExistingOperations());
-        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(), chartSettings.getChartSelection());
-
+        Set<ChartIndex> allIndexes = new HashSet<>();
+        allIndexes.addAll(chartSettings.getIndexSelection());
+        allIndexes.addAll(getUsedIndexFromIndexPerf(chartSettings.getPerfIndexSelection()));
+        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
+                                                    allIndexes);
 
         final Set<EZShare> selectedShares = chartSettings.getAdditionalShareNames()
                 .stream()
@@ -126,97 +123,12 @@ public class DashboardManager {
 
         Chart chart = ChartsTools.createChart(dates);
         chart.setMainTitle(chartSettings.getTitle()+" ("+targetDevise.getSymbol()+")");
-        chartSettings.getChartSelection().forEach(p -> {
-            String lineTitle = null;
-            ChartLine.LineStyle lineStyle = null;
-            switch(p){
-                case INSTANT_DIVIDENDES:
-                    lineStyle = ChartLine.LineStyle.BAR;
-                    lineTitle ="Dividendes";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_DIVIDENDES)));
-                    break;
-                case CUMUL_DIVIDENDES:
-                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Dividendes Cumulés";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_DIVIDENDES)));
-                    break;
-                case CUMUL_VALEUR_PORTEFEUILLE:
-                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Valeur du portefeuille sans dividendes";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE)));
-                    break;
-                case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
-                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Valeur du portefeuille avec dividendes";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)));
-                    break;
-                case CUMUL_LIQUIDITE:
-                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Liquidité";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_LIQUIDITE)));
-                    break;
-                case CUMUL_ENTREES_SORTIES:
-                    // The outputs
-                    lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                    lineTitle = "Entrées/Sorties Cumulés";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES)));
-                    break;
-                case INSTANT_ENTREES_SORTIES:
-                    // The inputs
-                    lineStyle = ChartLine.LineStyle.BAR;
-                    lineTitle = "Versements de fonds";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_ENTREES)));
-                    // The outputs
-                    lineStyle = ChartLine.LineStyle.BAR;
-                    lineTitle = "Retrait de fonds";
-                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                            result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_SORTIES)));
-                    break;
-                case CURRENCIES:
-                    result.getDevisesFound2TargetPrices()
-                            .values()
-                            .forEach(prices ->
-                                    allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_WITH_LEGENT_AT_RIGHT, prices.getLabel(), prices)));
-                    break;
-                case ALL_SHARES:
-                    selectedShares.addAll(ezActionManager.getAllEZShares());
-                    break;
-                case CURRENT_SHARES:
-                    selectedShares.addAll(result.getDate2share2ShareNb()
-                            .get(today)
-                            .entrySet()
-                            .stream()
-                            .filter(e -> e.getValue() != 0)
-                            .map(Map.Entry::getKey)
-                            .collect(Collectors.toList()));
-                    break;
-                case TEN_WITH_MOST_IMPACTS:
-
-                    List<Map.Entry<EZShare, Float>> mostValuableShares = new ArrayList<>(result.getDate2share2ShareNb()
-                                                                                                        .get(today)
-                                                                                                        .entrySet());
-                    mostValuableShares.sort(Comparator.comparingDouble(e -> {
-                        float nbOfAction = e.getValue();
-                        Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
-                        if (prices == null) return 0;
-                        float targetPrice = prices.getPriceAt(today).getPrice();
-                        String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
-                        return NumberUtils.str2Double(fPrice);
-                    }));
-                    selectedShares.addAll(mostValuableShares.stream()
-                                                                .limit(10)
-                                                                .map(Map.Entry::getKey)
-                                                                .collect(Collectors.toList()));
-                    break;
-            }
-        });
+        chartSettings.getIndexSelection().forEach(chartIndex ->
+            addChartIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
+        );
+        chartSettings.getPerfIndexSelection().forEach(chartIndex ->
+            addChartPerfIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
+        );
 
         selectedShares
                 .forEach(ezShare -> {
@@ -225,11 +137,165 @@ public class DashboardManager {
                         allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT, p.getLabel(), p));
                 });
 
-        Colors colors = new Colors(allChartLines.size() );
+        Colors colors = new Colors(allChartLines.size());
         allChartLines.forEach(chartLine -> chartLine.setColorLine(colors.nextColor(chartLine.getLineStyle() == ChartLine.LineStyle.BAR ? 0.5f : 1f)));
         chart.setLines(allChartLines);
+        Map<String, String> axisTitles = new HashMap<>();
+        axisTitles.put(ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT.getStyleName(), targetDevise.getSymbol());
+        axisTitles.put(ChartLine.LineStyle.PERF_LINE.getStyleName(), "%");
+        chart.setAxisId2titleY(axisTitles);
         return chart;
     }
 
+    private void addChartIndex(EZDate today, PortfolioValuesBuilder.Result result, Set<EZShare> selectedShares, List<ChartLine> allChartLines, Chart chart, ChartIndex p) {
+        String lineTitle = null;
+        ChartLine.LineStyle lineStyle = null;
+        switch(p){
+            case INSTANT_DIVIDENDES:
+                lineStyle = ChartLine.LineStyle.BAR;
+                lineTitle ="Dividendes";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_DIVIDENDES)));
+                break;
+            case CUMUL_DIVIDENDES:
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Dividendes Cumulés";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_DIVIDENDES)));
+                break;
+            case CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES:
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Valeur du portefeuille sans dividendes";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES)));
+                break;
+            case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Valeur du portefeuille avec dividendes";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)));
+                break;
+            case CUMUL_LIQUIDITE:
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Liquidité";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_LIQUIDITE)));
+                break;
+            case CUMUL_ENTREES_SORTIES:
+                // The outputs
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Entrées/Sorties Cumulés";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES)));
+                break;
+            case INSTANT_ENTREES_SORTIES:
+                // The inputs
+                lineStyle = ChartLine.LineStyle.BAR;
+                lineTitle = "Versements de fonds";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_ENTREES)));
+                // The outputs
+                lineStyle = ChartLine.LineStyle.BAR;
+                lineTitle = "Retrait de fonds";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_SORTIES)));
+                break;
+            case CURRENCIES:
+                result.getDevisesFound2TargetPrices()
+                        .values()
+                        .forEach(prices ->
+                                allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_WITH_LEGENT_AT_RIGHT, prices.getLabel(), prices)));
+                break;
+            case ALL_SHARES:
+                selectedShares.addAll(ezActionManager.getAllEZShares());
+                break;
+            case CURRENT_SHARES:
+                selectedShares.addAll(result.getDate2share2ShareNb()
+                        .get(today)
+                        .entrySet()
+                        .stream()
+                        .filter(e -> e.getValue() != 0)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList()));
+                break;
+            case TEN_WITH_MOST_IMPACTS:
 
+                List<Map.Entry<EZShare, Float>> mostValuableShares = new ArrayList<>(result.getDate2share2ShareNb()
+                                                                                                    .get(today)
+                                                                                                    .entrySet());
+                mostValuableShares.sort(Comparator.comparingDouble(e -> {
+                    float nbOfAction = e.getValue();
+                    Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
+                    if (prices == null) return 0;
+                    float targetPrice = prices.getPriceAt(today).getPrice();
+                    String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
+                    return NumberUtils.str2Double(fPrice);
+                }));
+                selectedShares.addAll(mostValuableShares.stream()
+                                                            .limit(10)
+                                                            .map(Map.Entry::getKey)
+                                                            .collect(Collectors.toList()));
+                break;
+        }
+    }
+
+
+    private Set<ChartIndex> getUsedIndexFromIndexPerf(Set<ChartIndexPerf> perfIndexSelection) {
+        Set<ChartIndex> result = new HashSet<>();
+        for (ChartIndexPerf chartIndexPerf : perfIndexSelection){
+            switch (chartIndexPerf){
+                case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
+                    result.add(ChartIndex.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES);
+                    result.add(ChartIndex.CUMUL_ENTREES_SORTIES);
+                    break;
+                case PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES:
+                    result.add(ChartIndex.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
+                    result.add(ChartIndex.CUMUL_ENTREES_SORTIES);
+                    break;
+            }
+        }
+        return result;
+    }
+
+
+    private void addChartPerfIndex(EZDate today, PortfolioValuesBuilder.Result result, Set<EZShare> selectedShares, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
+        String lineTitle = null;
+        ChartLine.LineStyle lineStyle = ChartLine.LineStyle.PERF_LINE;
+        switch(p){
+            case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES: {
+                lineTitle = "Perf portefeuille avec dividendes";
+                List<Float> perf = new LinkedList<>();
+                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES);
+                Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
+
+                if (totalPortefeuille.getPrices().size() != cumulInputOutput.getPrices().size())
+                    throw new IllegalStateException("Pas le meme nombre de valeur");
+                for (int i = 0; i < totalPortefeuille.getPrices().size(); i++) {
+                    float total = totalPortefeuille.getPrices().get(i).getPrice();
+                    float cumulInOut = cumulInputOutput.getPrices().get(i).getPrice();
+                    perf.add((total - cumulInOut) * 100 / cumulInOut);
+                }
+
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, perf));
+                break;
+            }
+            case PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES: {
+                lineTitle = "Perf portefeuille sans dividendes";
+                List<Float> perf = new LinkedList<>();
+                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
+                Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
+
+                if (totalPortefeuille.getPrices().size() != cumulInputOutput.getPrices().size())
+                    throw new IllegalStateException("Pas le meme nombre de valeur");
+                for (int i = 0; i < totalPortefeuille.getPrices().size(); i++) {
+                    float total = totalPortefeuille.getPrices().get(i).getPrice();
+                    float cumulInOut = cumulInputOutput.getPrices().get(i).getPrice();
+                    perf.add((total - cumulInOut) * 100 / cumulInOut);
+                }
+
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, perf));
+                break;
+            }
+        }
+    }
 }
