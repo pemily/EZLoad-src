@@ -160,7 +160,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Entrées/Sorties cumulés',
                                     'Dividendes cumulés',
                                     'Dividendes',
-                                    'Devises']}
+                                    'Devises',
+                                    'Achats',
+                                    'Ventes']}
                                 codeValues={[
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
@@ -172,7 +174,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CUMUL_ENTREES_SORTIES',
                                     'INSTANT_DIVIDENDES',
                                     'CUMUL_DIVIDENDES',
-                                    'CURRENCIES']}
+                                    'CURRENCIES',
+                                    'BUY',
+                                    'SOLD']}
                                 description=""
                                 onChange={newValue => 
                                     props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})
@@ -187,10 +191,16 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 selectedCodeValues={props.chartSettings.perfIndexSelection ? props.chartSettings.perfIndexSelection : []}                            
                                 userValues={[
                                     'Valeur du portefeuille sans dividendes',
-                                    'Valeur du portefeuille avec dividendes']}
+                                    'Valeur du portefeuille avec dividendes',
+                                    'Croissance de vos valeurs actuelles',
+                                    'Rendement de vos valeurs actuelles',
+                                    'Croissement + Rendement de vos valeurs actuelles']}
                                 codeValues={[
                                     'PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES',
-                                    'PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES'
+                                    'PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES',
+                                    'PERF_CROISSANCE_CURRENT_SHARES',
+                                    'PERF_RENDEMENT_CURRENT_SHARES',
+                                    'PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES'
                                 ]}
                                 description=""
                                 onChange={newValue => 

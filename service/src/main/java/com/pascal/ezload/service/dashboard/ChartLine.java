@@ -4,7 +4,6 @@ import java.util.List;
 
 public class ChartLine {
 
-
     public enum LineStyle {
         LINE_WITH_LEGENT_AT_LEFT("yAxisLeft"),
         LINE_WITH_LEGENT_AT_RIGHT("yAxisRight"),
@@ -23,7 +22,8 @@ public class ChartLine {
     }
 
     private String title;
-    private List<Float> values;
+    private List<Float> values; // if null, valuesWithLabel will be used
+    private List<ValueWithLabel> valuesWithLabel;
     private String colorLine; // rgba(255,99,132,1);
     private LineStyle lineStyle; // optionel, pour ajouter une autre echelle sur l'axe des Y (pour faire la distinction entre action/devise par exemple)
 
@@ -41,6 +41,14 @@ public class ChartLine {
 
     public void setValues(List<Float> values) {
         this.values = values;
+    }
+
+    public List<ValueWithLabel> getValuesWithLabel() {
+        return valuesWithLabel;
+    }
+
+    public void setValuesWithLabel(List<ValueWithLabel> valuesWithLabel) {
+        this.valuesWithLabel = valuesWithLabel;
     }
 
     public String getColorLine() {
@@ -61,5 +69,26 @@ public class ChartLine {
 
     public String toString(){
         return title;
+    }
+
+    public static class ValueWithLabel {
+        private String label;
+        private Float value;
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public Float getValue() {
+            return value;
+        }
+
+        public void setValue(Float value) {
+            this.value = value;
+        }
     }
 }

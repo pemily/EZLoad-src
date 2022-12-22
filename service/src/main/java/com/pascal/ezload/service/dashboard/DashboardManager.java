@@ -127,7 +127,7 @@ public class DashboardManager {
             addChartIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
         );
         chartSettings.getPerfIndexSelection().forEach(chartIndex ->
-            addChartPerfIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
+            addChartPerfIndex(startDate, today, result, allChartLines, chart, chartIndex)
         );
 
         selectedShares
@@ -210,13 +210,7 @@ public class DashboardManager {
                 selectedShares.addAll(ezActionManager.getAllEZShares());
                 break;
             case CURRENT_SHARES:
-                selectedShares.addAll(result.getDate2share2ShareNb()
-                        .get(today)
-                        .entrySet()
-                        .stream()
-                        .filter(e -> e.getValue() != 0)
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList()));
+                selectedShares.addAll(getSharesAtDate(today, result));
                 break;
             case TEN_WITH_MOST_IMPACTS:
 
@@ -236,7 +230,58 @@ public class DashboardManager {
                                                             .map(Map.Entry::getKey)
                                                             .collect(Collectors.toList()));
                 break;
+            case BUY: {
+                lineTitle = "Achats";
+                List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+
+                for (EZDate date : result.getDates()) {
+                    Map<EZShare, Float> share2buySold = result.getDate2share2BuyAmount().get(date);
+                    ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                    valueWithLabel.setValue(0f);
+                    valueWithLabel.setLabel("");
+                    valuesWithLabel.add(valueWithLabel);
+                    share2buySold
+                            .forEach((key, value) -> {
+                                String newLabel = key.getEzName() + ": " + value;
+                                valueWithLabel.setLabel(valueWithLabel.getLabel().length() == 0 ? newLabel : valueWithLabel.getLabel()+"\n"+newLabel);
+                                valueWithLabel.setValue(valueWithLabel.getValue() + value);
+                            });
+
+                }
+                allChartLines.add(ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR, lineTitle, valuesWithLabel));
+                break;
+            }
+            case SOLD: {
+                lineTitle = "Ventes";
+                List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+
+                for (EZDate date : result.getDates()) {
+                    Map<EZShare, Float> share2buySold = result.getDate2share2SoldAmount().get(date);
+                    ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                    valueWithLabel.setValue(0f);
+                    valueWithLabel.setLabel("");
+                    valuesWithLabel.add(valueWithLabel);
+                    share2buySold
+                            .forEach((key, value) -> {
+                                valueWithLabel.setLabel(valueWithLabel.getLabel() + key.getEzName() + ": " + value + "\n");
+                                valueWithLabel.setValue(valueWithLabel.getValue() + value);
+                            });
+
+                }
+                allChartLines.add(ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR, lineTitle, valuesWithLabel));
+                break;
+            }
         }
+    }
+
+    private List<EZShare> getSharesAtDate(EZDate date, PortfolioValuesBuilder.Result result) {
+        return result.getDate2share2ShareNb()
+                .get(date)
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() != 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
 
@@ -252,18 +297,19 @@ public class DashboardManager {
                     result.add(ChartIndex.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
                     result.add(ChartIndex.CUMUL_ENTREES_SORTIES);
                     break;
+                case PERF_CROISSANCE_CURRENT_SHARES:
+                    break;
             }
         }
         return result;
     }
 
 
-    private void addChartPerfIndex(EZDate today, PortfolioValuesBuilder.Result result, Set<EZShare> selectedShares, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
-        String lineTitle = null;
+    private void addChartPerfIndex(EZDate startDate, EZDate today, PortfolioValuesBuilder.Result result, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.PERF_LINE;
         switch(p){
             case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES: {
-                lineTitle = "Perf portefeuille avec dividendes";
+                String lineTitle = "Perf portefeuille avec dividendes";
                 List<Float> perf = new LinkedList<>();
                 Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES);
                 Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
@@ -280,7 +326,7 @@ public class DashboardManager {
                 break;
             }
             case PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES: {
-                lineTitle = "Perf portefeuille sans dividendes";
+                String lineTitle = "Perf portefeuille sans dividendes";
                 List<Float> perf = new LinkedList<>();
                 Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
                 Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
@@ -290,11 +336,25 @@ public class DashboardManager {
                 for (int i = 0; i < totalPortefeuille.getPrices().size(); i++) {
                     float total = totalPortefeuille.getPrices().get(i).getPrice();
                     float cumulInOut = cumulInputOutput.getPrices().get(i).getPrice();
-                    perf.add((total - cumulInOut) * 100 / cumulInOut);
+                    perf.add((total - cumulInOut) * 100f / cumulInOut);
                 }
 
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, perf));
                 break;
+            }
+            case PERF_CROISSANCE_CURRENT_SHARES: {
+                for (EZShare share : getSharesAtDate(today, result)){
+                    Prices prices = result.getAllSharesTargetPrices().get(share);
+                    PriceAtDate firstPrice = prices.getPriceAt(startDate);
+                    String lineTitle = "Croissance "+prices.getLabel();
+                    allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                            prices.getPrices().stream()
+                                    .map(priveAtDate -> (priveAtDate.getPrice()- firstPrice.getPrice())*100f/firstPrice.getPrice()).collect(Collectors.toList())));
+                }
+            }
+            case PERF_RENDEMENT_CURRENT_SHARES: {
+            }
+            case PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES: {
             }
         }
     }

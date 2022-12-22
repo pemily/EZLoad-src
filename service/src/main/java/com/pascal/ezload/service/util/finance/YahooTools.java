@@ -175,6 +175,9 @@ public class YahooTools extends ExternalSiteTools{
         if (!StringUtils.isBlank(ezShare.getYahooCode())){
             EZDate today = EZDate.today();
             EZDate last2Year = new EZDate(today.getYear()-2, today.getMonth(), today.getDay());
+
+            //            https://query1.finance.yahoo.com/v8/finance/chart/4AB.F?formatted=true&crumb=9bPXKt3sPBQ&lang=en-US&region=US&includeAdjustedClose=true&interval=1d&period1=1356912000&period2=1671494400&events=capitalGain%7Cdiv%7Csplit&useYfid=true&corsDomain=finance.yahoo.com
+
             String url = "https://query1.finance.yahoo.com/v7/finance/download/" + ezShare.getSeekingAlphaCode() + "?period1="+ last2Year.toEpochSecond()+"&period2="+today.toEpochSecond()+"&interval=1d&events=div&includeAdjustedClose=true";
             try {
                 return cache.get(reporting, "yahoo_dividends_"+ ezShare.getSeekingAlphaCode()+"_"+today.toYYYYMMDD(), url, inputStream -> {

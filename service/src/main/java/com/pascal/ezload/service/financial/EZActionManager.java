@@ -277,7 +277,8 @@ public class EZActionManager {
         EZDate today = EZDate.today();
         PriceAtDate todayPrice1 = prices1.getPriceAt(today);
         PriceAtDate todayPrice2 = prices2.getPriceAt(today);
-        if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0) {
+        if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0
+            && Math.abs(todayPrice1.getDate().nbOfDaysTo(todayPrice2.getDate())) <= 1) {
             List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
             CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, lastWeek);
             CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, lastWeek);

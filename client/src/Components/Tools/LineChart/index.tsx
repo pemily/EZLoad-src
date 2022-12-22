@@ -18,7 +18,7 @@
 import { Box, Anchor, Button, Text, TextArea } from "grommet";
 import { useState, useRef } from "react";
 import { Download } from 'grommet-icons';
-import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend } from 'chart.js';
 
@@ -30,6 +30,7 @@ export interface LineChartProps {
     chart: Chart;    
 }      
 
+
 export function LineChart(props: LineChartProps){
     const [browserFileVisible, setBrowserFileVisible] = useState<boolean>(false);
 
@@ -38,12 +39,13 @@ export function LineChart(props: LineChartProps){
     }
     
     const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map(chartLine =>
-        {
+        {            
             if (chartLine.lineStyle === "BAR"){
                 return {    
                     type: 'bar',
                     label: chartLine.title,
-                    data: chartLine.values,
+                    data: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
+                    tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
                     borderColor: chartLine.colorLine,
                     backgroundColor: chartLine.colorLine
                 };       
@@ -51,7 +53,8 @@ export function LineChart(props: LineChartProps){
             return {    
              type: 'line',
              label: chartLine.title,
-             data: chartLine.values,
+             data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
+             tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
@@ -61,10 +64,11 @@ export function LineChart(props: LineChartProps){
              tension: 0.4, // le niveau de courbure    
              pointStyle: 'circle',
              pointRadius: 1,// la taille du point
-             pointHoverRadius: 1.5 // la taille du point quand la souris est au dessus
+             pointHoverRadius: 1.5, // la taille du point quand la souris est au dessus
                                   // (si trop gros et qu'il y a trop de point sur l'axe des abscisses, le tooltip peut contenir les infos en double')
-         };        
+        };        
      });
+
 
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
         labels: props.chart.labels,
@@ -87,6 +91,16 @@ export function LineChart(props: LineChartProps){
             tooltip: {
                 enabled: true,
                 position: "nearest",
+                callbacks: {
+                    label: function(context: any) {
+                        // https://www.chartjs.org/docs/latest/configuration/tooltip.html
+                        console.log(context);
+                        if (context.dataset.tooltips){
+                            return context.dataset.label+': '+context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                        }
+                        return context.dataset.label+': '+context.raw;
+                    }
+                }
             },
             legend: {
                 display: true,
@@ -100,18 +114,18 @@ export function LineChart(props: LineChartProps){
                type: "time",                
                time: {
                     unit: "month",                                        
-                },
-                adapters: { 
+               },
+               adapters: { 
                     date: {
                       locale: fr, 
                     },
-                  },                 
-                display: true,
-                title: {
+               },                 
+               display: true,
+               title: {
                     display: true,
                     text: props.chart.axisId2titleX!['x']
-                },
-                ticks: {
+               },
+               ticks: {
                     // For a category axis, the val is the index so the lookup via getLabelForValue is needed
                    /* callback: function(val, index) {                        
                         var d = this.getLabelForValue(index).split("/");                                                
@@ -125,11 +139,11 @@ export function LineChart(props: LineChartProps){
                     crossAlign: "near",
                     align: 'start'
 
-                  },
-                  grid: {
+               },
+               grid: {
                     drawBorder: false,
                     color: '#000000',                    
-                }
+               }
             },
             LINE_WITH_LEGENT_AT_LEFT: {
                 type: 'linear',

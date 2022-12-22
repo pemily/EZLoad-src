@@ -13,6 +13,8 @@ public enum PortfolioFilter {
         CUMUL_ENTREES_SORTIES(true, 0),
         INSTANT_SORTIES(true, 0),
         CUMUL_LIQUIDITE(true, 0),
+        BUY(false, 0),
+        SOLD(false, 0),
         ALL_SHARES(false, 0),
         CURRENT_SHARES(false, 0),
         TEN_WITH_MOST_IMPACTS(false, 0),
@@ -49,6 +51,8 @@ public enum PortfolioFilter {
                     case INSTANT_DIVIDENDES: r.add(INSTANT_DIVIDENDES); break;
                     case CUMUL_DIVIDENDES: r.add(CUMUL_DIVIDENDES); break;
                     case CURRENCIES: r.add(CURRENCIES); break;
+                    case BUY: r.add(BUY); break;
+                    case SOLD: r.add(SOLD); break;
                     default: throw new RuntimeException("Developer error, you forget: "+s);
                 }
             });

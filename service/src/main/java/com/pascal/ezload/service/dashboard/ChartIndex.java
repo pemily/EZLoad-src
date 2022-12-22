@@ -11,6 +11,7 @@ public enum ChartIndex {
     INSTANT_ENTREES_SORTIES,
     INSTANT_DIVIDENDES,
     CUMUL_DIVIDENDES,
-    CURRENCIES
-
+    CURRENCIES,
+    BUY,
+    SOLD
 }

@@ -39,6 +39,18 @@ public class ChartsTools {
                 .map(PriceAtDate::getPrice).collect(Collectors.toList()));
     }
 
+    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, List<ChartLine.ValueWithLabel> values){
+        if (chart.getLabels().size() != values.size()){
+            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
+        }
+        ChartLine chartLine = new ChartLine();
+        chartLine.setTitle(lineTitle);
+        chartLine.setLineStyle(lineStyle);
+        chartLine.setValuesWithLabel(values);
+        chart.getLines().add(chartLine);
+        return chartLine;
+    }
+
     public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, List<Float> values){
         if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");

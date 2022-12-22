@@ -87,7 +87,7 @@ public class PortfolioStateAccumulator {
                 addLiquidityAmount(negativeAmount);
                 break;
             case "Vente titres":
-                sellShare(operation);
+                soldShare(operation);
                 break;
             case "Versement fonds":
                 addInputQuantity(operation);
@@ -129,12 +129,16 @@ public class PortfolioStateAccumulator {
         previousState.getInputOutput().minus(newNb);
     }
 
-    private void sellShare(Row operation) {
+    private void soldShare(Row operation) {
         EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
-        // nbOfSellShare negative in EZPortfolio
-        float nbOfSellShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        // nbOfSoldShare negative in EZPortfolio
+        float nbOfSoldShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
         previousState.getShareNb()
-                .compute(share, (sh, oldValue) -> oldValue == null ? nbOfSellShare : oldValue + nbOfSellShare);
+                .compute(share, (sh, oldValue) -> oldValue == null ? nbOfSoldShare : oldValue + nbOfSoldShare);
+
+        // AMOUNT_COL is positive when sold
+        previousState.getShareSold()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -operation.getValueFloat(MesOperations.AMOUNT_COL) : oldValue - operation.getValueFloat(MesOperations.AMOUNT_COL));
     }
 
     private void buyShare(Row operation) {
@@ -142,5 +146,9 @@ public class PortfolioStateAccumulator {
         float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfBuyShare : oldValue + nbOfBuyShare);
+
+        // AMOUNT_COL is negative when buy
+        previousState.getShareBuy()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -operation.getValueFloat(MesOperations.AMOUNT_COL) : oldValue - operation.getValueFloat(MesOperations.AMOUNT_COL));
     }
 }

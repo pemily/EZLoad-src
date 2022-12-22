@@ -16,8 +16,8 @@ import java.util.function.Predicate;
 
 public class PortfolioValuesBuilder {
 
-    private EZActionManager actionManager;
-    private List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
+    private final EZActionManager actionManager;
+    private final List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
 
     public PortfolioValuesBuilder(EZActionManager actionManager, List<Row> operations){
         this.actionManager = actionManager;
@@ -32,6 +32,8 @@ public class PortfolioValuesBuilder {
         private final Map<EZDevise, Prices> devisesFound2TargetPrices = new HashMap<>();
         private final Map<PortfolioFilter, Prices> portfolioFilter2TargetPrices = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2ShareNb = new HashMap<>();
+        private final Map<EZDate, Map<EZShare, Float>> date2share2SoldAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
 
         public EZDevise getTargetDevise() {
             return targetDevise;
@@ -59,6 +61,13 @@ public class PortfolioValuesBuilder {
 
         public Map<EZDate, Map<EZShare, Float>> getDate2share2ShareNb() {
             return date2share2ShareNb;
+        }
+
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyAmount() {
+            return date2share2BuyAmount;
+        }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2SoldAmount() {
+            return date2share2SoldAmount;
         }
     }
 
@@ -105,7 +114,12 @@ public class PortfolioValuesBuilder {
     private void buildPricesFor(Reporting reporting, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<PortfolioFilter> portfolioFilters, Result r){
         List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, brokersFilter, accountTypeFilter);
 
-        states.forEach(state -> r.date2share2ShareNb.put(state.getDate(), state.getShareNb()));
+        states.forEach(state -> {
+                    r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
+                    r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
+                    r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
+        });
+
         portfolioFilters.stream()
                 .filter(PortfolioFilter::isRequireBuild)
                 .forEach(portfolioFilter -> r.portfolioFilter2TargetPrices.put(portfolioFilter, createPricesFor(reporting, portfolioFilter, states, r)));

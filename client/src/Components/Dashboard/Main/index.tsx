@@ -91,9 +91,33 @@ export function DashboardMain(props: DashboardMainProps){
             )
         }    
         
-        <Button alignSelf="end" margin="small" size="small" icon={<Refresh size='small' />}
+        <Box alignSelf="end" margin="small" direction="row">
+            <Button size="small" icon={<Refresh size='small' />}
                 disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length == 0}
                 label="Rafraichir" onClick={() => refresh()} />   
+
+            <Button size="small" icon={<Add size='small' />}
+                label="Nouveau" onClick={() => {
+                    // init
+                    const newChart: ChartSettings = {
+                        accountTypes: accountTypes,
+                        brokers: brokers,
+                        title: 'Titre à changer',
+                        additionalShareNames: [],
+                        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
+                        targetDevise: 'EUR',
+
+                        indexSelection: ['TEN_WITH_MOST_IMPACTS']
+                    };
+                    
+                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
+                                                                 : {...dashConfig, chartSettings: [newChart]}
+                                        , r => {
+                                            setDashConfig(r); 
+                                            setConfigIndexEdit(dashConfig.chartSettings!.length)
+                                        });                    
+                }} />   
+        </Box>
 
         <Box width="100%" height="75vh" pad="small" >            
             {
@@ -147,29 +171,7 @@ export function DashboardMain(props: DashboardMainProps){
                 })                
             }            
         </Box>
-        <Box direction="column" margin="small" pad="none" alignContent="end" >
-            <Button alignSelf="end" size="small" icon={<Add size='small' />}
-                label="Nouveau" onClick={() => {
-                    // init
-                    const newChart: ChartSettings = {
-                        accountTypes: accountTypes,
-                        brokers: brokers,
-                        title: 'Titre à changer',
-                        additionalShareNames: [],
-                        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
-                        targetDevise: 'EUR',
-
-                        indexSelection: ['TEN_WITH_MOST_IMPACTS']
-                    };
-                    
-                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
-                                                                 : {...dashConfig, chartSettings: [newChart]}
-                                        , r => {
-                                            setDashConfig(r); 
-                                            setConfigIndexEdit(dashConfig.chartSettings!.length)
-                                        });                    
-                }} />   
-        </Box>    
+   
 
         { configIndexEdited != -1 && dashConfig.chartSettings  && configIndexEdited < dashConfig.chartSettings.length && (
             <Layer full position="center" margin="large" onClickOutside={() => setConfigIndexEdit(-1)}  onEsc={() => setConfigIndexEdit(-1)} >
