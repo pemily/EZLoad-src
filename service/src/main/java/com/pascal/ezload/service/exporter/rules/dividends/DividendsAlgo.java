@@ -154,7 +154,7 @@ public abstract class DividendsAlgo {
 
     protected boolean containsAllDividends(List<Dividend> yearlyDividends){
         Map<Dividend.EnumFrequency, List<Dividend>> frequency2Dividends = yearlyDividends.stream()
-                .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+                .filter(d -> d.getFrequency() != null && d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
                 .collect(Collectors.groupingBy(Dividend::getFrequency));
 
         if (frequency2Dividends.containsKey(Dividend.EnumFrequency.ANNUEL)) return true; // il y a au moins une dividende annuelle cette année
