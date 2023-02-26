@@ -97,9 +97,9 @@ public abstract class DividendsAlgo {
 
         // Group par année (date de detachement) => liste des dividendes de l'année
         List<Dividend> lastYearDividendsSorted = divs.stream()
-                                                                        .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
-                                                                        .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYYYMMDD()))
-                                                                        .collect(Collectors.toList());
+                                                    .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
+                                                    .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYYYMMDD()))
+                                                    .collect(Collectors.toList());
 
         Map<Dividend.EnumFrequency, List<Dividend>> freq2Dividends = lastYearDividendsSorted.stream()
                                                                                                     .collect(Collectors.groupingBy(Dividend::getFrequency));
@@ -175,13 +175,8 @@ public abstract class DividendsAlgo {
         return Dividend::getPayDate;
     }
 
-    protected String sumOfAllDividends(Reporting reporting, List<Dividend> dividends) {
-        String addition = dividends
-                .stream()
-                .map(Dividend::getAmount).collect(Collectors.joining(" + "));
-
-        String result = eval(reporting, addition);
-        if (result == null) return "0";
-        return NumberUtils.normalizeAmount(result);
+    protected String sumOfAllDividends(List<Dividend> dividends) {
+        float result = dividends.stream().map(Dividend::getAmount).reduce(Float::sum).orElse(0f);
+        return NumberUtils.normalizeAmount(result+"");
     }
 }

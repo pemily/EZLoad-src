@@ -45,7 +45,7 @@ public class DividendsCalendar extends DividendsAlgo {
 
 
         if (algoConfig.getPercentSelector() == MainSettings.EnumPercentSelector.ADAPTATIF)
-            return computeCalendarWithAdaptativePercent(reporting, oneYearDividends, ezPortefeuilleEdition, dateSelector);
+            return computeCalendarWithAdaptativePercent(oneYearDividends, ezPortefeuilleEdition, dateSelector);
         else
             return computeCalendarWithRegularPercent(reporting, oneYearDividends, ezPortefeuilleEdition, dateSelector);
     }
@@ -73,17 +73,17 @@ public class DividendsCalendar extends DividendsAlgo {
     }
 
     // le pourcentage s'adapte au montant annuel des dividendes
-    private boolean computeCalendarWithAdaptativePercent(Reporting reporting, List<Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition, Function<Dividend, EZDate> dateSelector){
+    private boolean computeCalendarWithAdaptativePercent(List<Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition, Function<Dividend, EZDate> dateSelector){
         Map<Integer, List<Dividend>> monthWithDividends =  dividends.stream()
                                                     .collect(Collectors.groupingBy(d -> dateSelector.apply(d).getMonth()));
 
-        float totalAmount = NumberUtils.str2Float(sumOfAllDividends(reporting, dividends));
+        float totalAmount = NumberUtils.str2Float(sumOfAllDividends(dividends));
 
         boolean result = false;
         for (int month = 1; month <= 12; month++) {
             String newValue;
             if (totalAmount != 0 && monthWithDividends.containsKey(month)) {
-                float monthAmount = NumberUtils.str2Float(sumOfAllDividends(reporting, monthWithDividends.get(month)));
+                float monthAmount = NumberUtils.str2Float(sumOfAllDividends(monthWithDividends.get(month)));
                 newValue = NumberUtils.float2Str(monthAmount * 100f / totalAmount)+"%";
             }
             else newValue = "";

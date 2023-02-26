@@ -67,7 +67,7 @@ public class CurrencyMap {
     public Prices convertPricesToTarget(Prices p) {
         Prices r = new Prices();
         r.setLabel(p.getLabel());
-        r.setDevise(from);
+        r.setDevise(to);
         p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price))));
         return r;
     }

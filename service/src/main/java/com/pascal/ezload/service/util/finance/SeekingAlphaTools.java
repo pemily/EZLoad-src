@@ -39,13 +39,13 @@ public class SeekingAlphaTools extends ExternalSiteTools{
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     // return null if the dividend cannot be downloaded for this action
-    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare) {
+    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())){
             Map<String, String> props = new HashMap<>();
             props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
-            String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?&years=2";
+            String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?&period=MAX";
             try {
-                return cache.get(reporting, "seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+EZDate.today().toYYYYMMDD(), url, props, inputStream -> {
+                return cache.get(reporting, "seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"_"+to.toYYYYMMDD(), url, props, inputStream -> {
                     Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
 
                     if (top.containsKey("errors")) return new LinkedList<>();
@@ -69,7 +69,7 @@ public class SeekingAlphaTools extends ExternalSiteTools{
                                     frequency = Dividend.EnumFrequency.ANNUEL;
 
                                 return new Dividend(
-                                        attributes.get("amount").toString(),
+                                        NumberUtils.str2Float(attributes.get("amount").toString()),
                                         seekingAlphaDate(attributes.get("ex_date")),
                                         seekingAlphaDate(attributes.get("declare_date")),
                                         seekingAlphaDate(attributes.get("pay_date")),

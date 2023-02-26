@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class EZActionManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");
@@ -207,10 +208,15 @@ public class EZActionManager {
         saveEZActions();
     }
 
-    public List<Dividend> searchDividends(Reporting rep, EZShare ezShare) throws IOException {
+    // return null if not found
+    public List<Dividend> searchDividends(Reporting rep, EZShare ezShare, EZDate from, EZDate to) throws IOException {
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
-            return SeekingAlphaTools.searchDividends(reporting, cache, ezShare);
+            List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from, to);
+            if (dividends == null){
+                return YahooTools.searchDividends(reporting, cache, ezShare, from, to);
+            }
         }
+        return null;
     }
 
 
@@ -232,8 +238,8 @@ public class EZActionManager {
 
             // Validate that google code & seeking alpha & yahoo code are aligned
             Prices yahooPrices = null;
-            EZDate to = EZDate.today();
-            EZDate from = to.minusDays(10);
+            EZDate to = EZDate.today().minusDays(3); // do not take the current days, since the current price is not always up to date
+            EZDate from = to.minusDays(12);
             try {
                 yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : YahooTools.getPrices(reporting, cache, ezShare, from, to);
             } catch (Exception e) {
@@ -274,21 +280,26 @@ public class EZActionManager {
 
     private void checkPrices(EZShare ezShare, Reporting reporting, List<String> errors, Prices prices1, Prices prices2, String errorMessage) throws Exception {
         if (prices1 == null || prices2 == null) return;
-        EZDate today = EZDate.today();
-        PriceAtDate todayPrice1 = prices1.getPriceAt(today);
-        PriceAtDate todayPrice2 = prices2.getPriceAt(today);
-        if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0
-            && Math.abs(todayPrice1.getDate().nbOfDaysTo(todayPrice2.getDate())) <= 1) {
-            List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
-            CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, lastWeek);
-            CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, lastWeek);
-            float price1InEuro = local2Euro1.getTargetPrice(todayPrice1);
-            float price2InEuro = local2Euro2.getTargetPrice(todayPrice2);
+        Set<EZDate> allDatePrices1 = prices1.getPrices().stream().map(p -> p.getDate()).collect(Collectors.toSet());
+        Optional<EZDate> commonDate = prices2.getPrices().stream().map(PriceAtDate::getDate)
+                                                                .filter(allDatePrices1::contains).findFirst();
+        if (commonDate.isPresent()) {
+            EZDate date = commonDate.get();
+            PriceAtDate todayPrice1 = prices1.getPriceAt(date);
+            PriceAtDate todayPrice2 = prices2.getPriceAt(date);
+            if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0
+                    && Math.abs(todayPrice1.getDate().nbOfDaysTo(todayPrice2.getDate())) <= 1) {
+                List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
+                CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, lastWeek);
+                CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, lastWeek);
+                float price1InEuro = local2Euro1.getTargetPrice(todayPrice1);
+                float price2InEuro = local2Euro2.getTargetPrice(todayPrice2);
 
-            float diff = Math.abs(price1InEuro - price2InEuro);
-            float percentOfDiff = diff * 100.f / price1InEuro;
-            if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
-                errors.add(toString(ezShare) + ": "+errorMessage);
+                float diff = Math.abs(price1InEuro - price2InEuro);
+                float percentOfDiff = diff * 100.f / price1InEuro;
+                if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
+                    errors.add(toString(ezShare) + ": " + errorMessage);
+                }
             }
         }
     }

@@ -76,23 +76,30 @@ public class PortfolioStateAccumulator {
             case "Dividende brut":
             case "Dividende brut NON soumis à abattement":
             case "Dividende brut soumis à abattement":
-                addDividendsQuantity(operation);
+                addDividend(operation);
                 break;
-            case "Retrait fonds":
+            case "Retrait fonds": {
                 addOutputQuantity(operation);
                 // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en valeur négative dans EZPortfolio :( dommage
                 addLiquidityAmount = false;
                 Row negativeAmount = operation.createDeepCopy();
-                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-"+operation.getValueStr(MesOperations.AMOUNT_COL));
+                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
                 addLiquidityAmount(negativeAmount);
                 break;
+            }
             case "Vente titres":
                 soldShare(operation);
                 break;
             case "Versement fonds":
                 addInputQuantity(operation);
                 break;
-            case "Acompte Impôt sur le Revenu":
+            case "Acompte Impôt sur le Revenu": {
+                addLiquidityAmount = false;
+                Row negativeAmount = operation.createDeepCopy();
+                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
+                addLiquidityAmount(negativeAmount);
+                break;
+            }
             case "Retenue fiscale":
             case "Droits de garde/Frais divers":
             case "Prélèvements sociaux":
@@ -112,9 +119,14 @@ public class PortfolioStateAccumulator {
         previousState.getLiquidity().plus(newNb);
     }
 
-    private void addDividendsQuantity(Row operation) {
+    private void addDividend(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getDividends().plus(newNb);
+
+        EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        previousState.getShareBuy()
+                .compute(share, (sh, oldValue) -> oldValue == null ? newNb : oldValue +newNb);
+
     }
 
     private void addInputQuantity(Row operation) {

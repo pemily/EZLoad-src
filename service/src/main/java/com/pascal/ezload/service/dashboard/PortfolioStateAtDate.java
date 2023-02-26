@@ -31,6 +31,9 @@ public class PortfolioStateAtDate {
     // le montant d'action vendu
     private final Map<EZShare, Float> shareSold;
 
+    // le montant du dividende percu
+    private final Map<EZShare, Float> shareDividend;
+
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
     private final StateValue liquidity;
 
@@ -43,6 +46,7 @@ public class PortfolioStateAtDate {
         shareNb = new HashMap<>();
         shareBuy = new HashMap<>();
         shareSold = new HashMap<>();
+        shareDividend = new HashMap<>();
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
@@ -55,6 +59,7 @@ public class PortfolioStateAtDate {
         this.shareNb.putAll(previousState.shareNb);
         this.shareSold = new HashMap<>();
         this.shareBuy = new HashMap<>();
+        this.shareDividend = new HashMap<>();
     }
 
     public EZDate getDate() {
@@ -88,6 +93,9 @@ public class PortfolioStateAtDate {
     }
     public Map<EZShare, Float> getShareSold() {
         return shareSold;
+    }
+    public Map<EZShare, Float> getShareDividends(){
+        return shareDividend;
     }
 
     public StateValue getLiquidity() {

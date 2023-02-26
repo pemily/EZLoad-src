@@ -34,6 +34,7 @@ public class PortfolioValuesBuilder {
         private final Map<EZDate, Map<EZShare, Float>> date2share2ShareNb = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2SoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShare, Float>> date2share2Dividend = new HashMap<>();
 
         public EZDevise getTargetDevise() {
             return targetDevise;
@@ -68,6 +69,9 @@ public class PortfolioValuesBuilder {
         }
         public Map<EZDate, Map<EZShare, Float>> getDate2share2SoldAmount() {
             return date2share2SoldAmount;
+        }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2Dividend(){
+            return date2share2Dividend;
         }
     }
 
@@ -118,6 +122,7 @@ public class PortfolioValuesBuilder {
                     r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
                     r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
                     r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
+                    r.date2share2Dividend.put(state.getDate(), state.getShareDividends());
         });
 
         portfolioFilters.stream()
@@ -170,10 +175,10 @@ public class PortfolioValuesBuilder {
         throw new IllegalStateException("Unknown filter: "+ portfolioFilter);
     }
 
+    // ezPortfolio operation contains all operations in Euro
     private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter){
         PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, actionManager.getAllEZShares());
 
-        // ezPortfolio operation contains all operations in Euro
         return acc.process(operations
                             .stream()
                             .filter(getBrokerFilter(brokersFilter))

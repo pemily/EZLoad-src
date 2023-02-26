@@ -40,13 +40,13 @@ public class AnnualDividendsAlgo extends DividendsAlgo {
             oneYearDividends = getLastYearDividends(allDividends, getDividendYear(algoConfig.getDateSelector()));
 
 
-        return computeAnnualDividends(reporting, oneYearDividends, ezPortefeuilleEdition);
+        return computeAnnualDividends(oneYearDividends, ezPortefeuilleEdition);
     }
 
 
     // return true if update, false else
-    private boolean computeAnnualDividends(Reporting reporting, List<Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition) {
-        String sum = sumOfAllDividends(reporting, dividends);
+    private boolean computeAnnualDividends(List<Dividend> dividends, EzPortefeuilleEdition ezPortefeuilleEdition) {
+        String sum = sumOfAllDividends(dividends);
         if (evalNumberOrPercent(sum) != evalNumberOrPercent(ezPortefeuilleEdition.getAnnualDividend())) {
             ezPortefeuilleEdition.setAnnualDividend(sum);
             return true;

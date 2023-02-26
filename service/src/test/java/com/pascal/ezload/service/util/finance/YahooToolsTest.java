@@ -155,4 +155,33 @@ public class YahooToolsTest {
         assertNotEquals(0, px);
     }
 
+    @Test
+    public void testCurrencyMap2() throws Exception {
+        EZDate from = EZDate.parseYYYMMDDDate("2021/01/01", '/');
+        EZDate to = EZDate.parseYYYMMDDDate("2023/01/22", '/');
+        List<EZDate> dates = List.of(from, to);
+        CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
+        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1));
+        assertNotEquals(0, px);
+        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1));
+        assertNotEquals(0, px);
+    }
+
+    @Test
+    public void testSearchDividends() throws Exception {
+        Optional<EZShare> action = YahooTools.searchAction(new LoggerReporting(), cache(), "US92936U1097");
+        Assertions.assertEquals("W. P. Carey Inc.", action.get().getEzName());
+        List<Dividend> dividends = YahooTools.searchDividends(new LoggerReporting(), cache(), action.get(), EZDate.parseYYYMMDDDate("2021/01/01", '/'),
+                EZDate.parseYYYMMDDDate("2021/12/31", '/'));
+        Assertions.assertEquals(4, dividends.size());
+        Assertions.assertEquals("1.048000", dividends.get(0).getAmount());
+        Assertions.assertEquals("2021/03/30", dividends.get(0).getDate().toYYYYMMDD());
+        Assertions.assertEquals("1.050000", dividends.get(1).getAmount());
+        Assertions.assertEquals("2021/06/29", dividends.get(1).getDate().toYYYYMMDD());
+        Assertions.assertEquals("1.052000", dividends.get(2).getAmount());
+        Assertions.assertEquals("2021/09/29", dividends.get(2).getDate().toYYYYMMDD());
+        Assertions.assertEquals("1.055000", dividends.get(3).getAmount());
+        Assertions.assertEquals("2021/12/30", dividends.get(3).getDate().toYYYYMMDD());
+    }
+
 }

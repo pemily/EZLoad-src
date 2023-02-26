@@ -181,6 +181,12 @@ public class BaseSelenium {
         return driver.findElement(By.id(id));
     }
 
+    public WebElement findByCss(String css){
+        reporting.info("Find by css: "+css);
+        return driver.findElement(By.cssSelector(css));
+
+    }
+
     public void click(WebElement element){
         reporting.info("Click");
         if (!element.isEnabled())

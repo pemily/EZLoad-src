@@ -7,6 +7,7 @@ import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
+import com.pascal.ezload.service.util.finance.Dividend;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -127,7 +128,7 @@ public class DashboardManager {
             addChartIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
         );
         chartSettings.getPerfIndexSelection().forEach(chartIndex ->
-            addChartPerfIndex(startDate, today, result, allChartLines, chart, chartIndex)
+            addChartPerfIndex(reporting, startDate, today, result, allChartLines, chart, chartIndex)
         );
 
         selectedShares
@@ -217,18 +218,19 @@ public class DashboardManager {
                 List<Map.Entry<EZShare, Float>> mostValuableShares = new ArrayList<>(result.getDate2share2ShareNb()
                                                                                                     .get(today)
                                                                                                     .entrySet());
-                mostValuableShares.sort(Comparator.comparingDouble(e -> {
-                    float nbOfAction = e.getValue();
-                    Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
-                    if (prices == null) return 0;
-                    float targetPrice = prices.getPriceAt(today).getPrice();
-                    String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
-                    return NumberUtils.str2Double(fPrice);
-                }));
                 selectedShares.addAll(mostValuableShares.stream()
-                                                            .limit(10)
-                                                            .map(Map.Entry::getKey)
-                                                            .collect(Collectors.toList()));
+                                .filter(e -> e.getValue() > 0)
+                                .sorted(Comparator.comparingDouble(e -> {
+                                    float nbOfAction = e.getValue();
+                                    Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
+                                    if (prices == null) return 0;
+                                    float targetPrice = prices.getPriceAt(today).getPrice();
+                                    String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
+                                    return NumberUtils.str2Double(fPrice);
+                                }))
+                                .limit(10)
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toList()));
                 break;
             case BUY: {
                 lineTitle = "Achats";
@@ -287,6 +289,8 @@ public class DashboardManager {
 
     private Set<ChartIndex> getUsedIndexFromIndexPerf(Set<ChartIndexPerf> perfIndexSelection) {
         Set<ChartIndex> result = new HashSet<>();
+        // Quelles sont les ChartIndex a calculer afin de pouvoir calculer les ChartIndexPerf
+        // voir la fonction addChartPerfIndex ci dessous pour valider les dependences
         for (ChartIndexPerf chartIndexPerf : perfIndexSelection){
             switch (chartIndexPerf){
                 case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
@@ -305,7 +309,7 @@ public class DashboardManager {
     }
 
 
-    private void addChartPerfIndex(EZDate startDate, EZDate today, PortfolioValuesBuilder.Result result, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
+    private void addChartPerfIndex(Reporting reporting, EZDate startDate, EZDate today, PortfolioValuesBuilder.Result result, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.PERF_LINE;
         switch(p){
             case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES: {
@@ -349,13 +353,51 @@ public class DashboardManager {
                     String lineTitle = "Croissance "+prices.getLabel();
                     allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
                             prices.getPrices().stream()
-                                    .map(priveAtDate -> (priveAtDate.getPrice()- firstPrice.getPrice())*100f/firstPrice.getPrice()).collect(Collectors.toList())));
+                                    .map(priceAtDate -> (priceAtDate.getPrice() - firstPrice.getPrice())*100f/firstPrice.getPrice()).collect(Collectors.toList())));
                 }
             }
             case PERF_RENDEMENT_CURRENT_SHARES: {
+               /* String lineTitle = "Rendement";
+                List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+
+                for (EZShare share : getSharesAtDate(today, result)) {
+                    // compute the total dividend for all the years
+                  /*  Map<Integer, Float> year2DividendTotal = computeDividendPerYer(reporting, startDate.getYear(), today.getYear(), share);
+                    float currentYearValue = year2DividendTotal.get(EZDate.today().getYear());
+                    float lastYearValue = year2DividendTotal.get(EZDate.today().minusYears(1).getYear());
+                    if (lastYearValue > currentYearValue){
+                        // because in EZPortfolio selection, we select only dividend in expansion
+                        // so to compare the correct thing put the same value than the last year
+                        year2DividendTotal.put(EZDate.today().getYear(), lastYearValue);
+                    }
+                    Prices prices = result.getAllSharesTargetPrices().get(share);
+
+                    for (EZDate date : result.getDates()) {
+                        PriceAtDate priceAtDate = prices.getPriceAt(date);
+                        ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                       // float yearDividend = year2DividendTotal.get(date.getYear());
+                        valueWithLabel.setValue(-1f); // I don't know what to do
+                        valueWithLabel.setLabel(share.getEzName());
+                    }
+                    allChartLines.add(ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.PERF_LINE, lineTitle, valuesWithLabel));
+                }*/
             }
             case PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES: {
             }
         }
+    }
+
+    private Map<Integer, Float> computeDividendPerYer(Reporting reporting, int startYear, int toYear, EZShare share) {
+        Map<Integer, Float> year2DividendTotal = new HashMap<>();
+        try {
+            List<Dividend> dividends = ezActionManager.searchDividends(reporting, share, new EZDate(startYear, 1, 1), new EZDate(toYear, 12, 31));
+            if (dividends != null) {
+                dividends.forEach(div -> year2DividendTotal.compute(div.getDate().getYear(),
+                        (year, currValue) -> currValue == null ? div.getAmount() : currValue + div.getAmount()));
+            }
+        } catch (IOException e) {
+            reporting.error(e);
+        }
+        return year2DividendTotal;
     }
 }

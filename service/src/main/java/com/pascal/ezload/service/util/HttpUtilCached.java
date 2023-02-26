@@ -37,7 +37,7 @@ public class HttpUtilCached {
     }
 
     public <R> R get(Reporting reporting, String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
-        try(Reporting rep = reporting.pushSection("Extraction de "+cacheName)) {
+        try(Reporting rep = reporting.pushSection("Extraction de "+cacheName+" url: "+url)) {
             File cache = new File(cacheDir + File.separator + format(cacheName) + ".json");
             if (cache.exists()) {
                 rep.info("Fichier de cache trouvé: "+cache.getAbsolutePath());
