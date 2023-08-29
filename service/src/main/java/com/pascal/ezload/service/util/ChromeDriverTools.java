@@ -42,9 +42,9 @@ public class ChromeDriverTools {
     }
 
     public static String downloadChromeDriver(Reporting reporting, String chromeVersion, String currentChromeDriverPath) throws IOException {
-        String newDir = new File(currentChromeDriverPath).getParent().concat(File.separator+chromeVersion);
-        new File(newDir).mkdirs();
-        String newChromeDriver = newDir+File.separator+"chromeDriver.zip";
+        String dir = new File(currentChromeDriverPath).getParent();
+        new File(dir).mkdirs();
+        String newChromeDriver = currentChromeDriverPath;
 
         try(Reporting rep = reporting.pushSection("Download Chrome Driver for version "+chromeVersion)) {
             String majorVersion = StringUtils.divide(chromeVersion, '.')[0];

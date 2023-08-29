@@ -354,7 +354,7 @@ public class SettingsManager {
             chromeSettings.setUserDataDir(ezHome + File.separator + "chrome" + File.separator + "data");
         // chromeDriver is a file that does not exists, so next time it will be downloaded
         if (chromeSettings.getDriverPath() == null)
-            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver");
+            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver.zip");
         if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(13);
 
         new File(chromeSettings.getUserDataDir()).mkdirs();

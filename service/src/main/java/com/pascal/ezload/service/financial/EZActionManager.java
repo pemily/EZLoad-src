@@ -280,18 +280,19 @@ public class EZActionManager {
 
     private void checkPrices(EZShare ezShare, Reporting reporting, List<String> errors, Prices prices1, Prices prices2, String errorMessage) throws Exception {
         if (prices1 == null || prices2 == null) return;
-        Set<EZDate> allDatePrices1 = prices1.getPrices().stream().map(p -> p.getDate()).collect(Collectors.toSet());
-        Optional<EZDate> commonDate = prices2.getPrices().stream().map(PriceAtDate::getDate)
+        Set<EZDate> allDatePrices1 = prices1.getPrices().stream().map(PriceAtDate::getDate).collect(Collectors.toSet());
+        Optional<EZDate> mostRecentCommonDate = prices2.getPrices().stream().map(PriceAtDate::getDate)
+                                                                .sorted(Comparator.comparing(EZDate::toEpochSecond).reversed())
                                                                 .filter(allDatePrices1::contains).findFirst();
-        if (commonDate.isPresent()) {
-            EZDate date = commonDate.get();
-            PriceAtDate todayPrice1 = prices1.getPriceAt(date);
-            PriceAtDate todayPrice2 = prices2.getPriceAt(date);
+        if (mostRecentCommonDate.isPresent()) {
+            EZDate commonDate = mostRecentCommonDate.get();
+            PriceAtDate todayPrice1 = prices1.getPriceAt(commonDate);
+            PriceAtDate todayPrice2 = prices2.getPriceAt(commonDate);
             if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0
                     && Math.abs(todayPrice1.getDate().nbOfDaysTo(todayPrice2.getDate())) <= 1) {
-                List<EZDate> lastWeek = Arrays.asList(EZDate.today().minusDays(7), EZDate.today());
-                CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, lastWeek);
-                CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, lastWeek);
+                List<EZDate> dateRangeForCurrency = Arrays.asList(commonDate.minusDays(7), EZDate.today());
+                CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, dateRangeForCurrency);
+                CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, dateRangeForCurrency);
                 float price1InEuro = local2Euro1.getTargetPrice(todayPrice1);
                 float price2InEuro = local2Euro2.getTargetPrice(todayPrice2);
 

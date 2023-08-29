@@ -85,7 +85,7 @@ public abstract class DividendsAlgo {
         // UNKNOWN + ANNUAL https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
 
         List<Dividend> divs = allHistoricalDividends.stream()
-                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL && d.getFrequency() != null) // elimine les dividendes exceptionnelle
                                             .collect(Collectors.toList());
 
         // Tri annuel inverse
