@@ -4,6 +4,11 @@
 
 
 ## Historique 
+### Version 1.9
+* Correction de bugs sur les graphiques de performance & de liquidité
+* Ajout du graphique de crédit d'impôts cumulé
+* Correction de bugs sur ma configuration des actions 
+
 ### Version 1.8
 * Vérification des codes yahoo & seekingalpha en utilisant le cours des actions
 * Ajout de message d'erreurs si un problème est détecté lors de l'ajout d'une action
