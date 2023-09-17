@@ -4,7 +4,7 @@
 
 
 ## Historique 
-### Version 1.9
+### Version 2.0
 * Correction de bugs sur les graphiques de performance & de liquidité
 * Ajout du graphique de crédit d'impôts cumulé
 * Correction de bugs sur ma configuration des actions 
