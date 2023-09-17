@@ -115,6 +115,7 @@ public class PortfolioStateAccumulator {
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
                 addLiquidityAmount(negativeAmount);
+                addCreditImpot(operation);
                 break;
             }
             case "Retenue fiscale":
@@ -134,6 +135,11 @@ public class PortfolioStateAccumulator {
     private void addLiquidityAmount(Row operation){
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getLiquidity().plus(newNb);
+    }
+
+    private void addCreditImpot(Row operation){
+        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
+        previousState.getCreditImpot().plus(newNb);
     }
 
     private void addDividend(Row operation) {

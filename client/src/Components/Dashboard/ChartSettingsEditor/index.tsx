@@ -153,9 +153,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Vos valeurs actuelles',
                                     'Vos 10 plus grosses valeurs actuelles',
                                     'Toutes vos valeurs',
-                                    'Valeur du portefeuille sans dividendes',
-                                    'Valeur du portefeuille avec dividendes',
+                                    'Valeur du portefeuille',
                                     'Liquidité',
+                                    'Crédit d\'impots cumulés',
                                     'Entrées/Sorties',
                                     'Entrées/Sorties cumulés',
                                     'Dividendes cumulés',
@@ -167,9 +167,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
                                     'ALL_SHARES',
-                                    'CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES',
-                                    'CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES',
-                                    'CUMUL_LIQUIDITE',                                    
+                                    'INSTANT_VALEUR_PORTEFEUILLE',
+                                    'INSTANT_LIQUIDITE',                                    
+                                    'CUMUL_CREDIT_IMPOTS',
                                     'INSTANT_ENTREES_SORTIES',
                                     'CUMUL_ENTREES_SORTIES',
                                     'INSTANT_DIVIDENDES',
@@ -190,14 +190,12 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 readOnly={false}
                                 selectedCodeValues={props.chartSettings.perfIndexSelection ? props.chartSettings.perfIndexSelection : []}                            
                                 userValues={[
-                                    'Valeur du portefeuille sans dividendes',
-                                    'Valeur du portefeuille avec dividendes',
+                                    'Valeur du portefeuille',
                                     'Croissance de vos valeurs actuelles',
                                     'Rendement de vos valeurs actuelles',
                                     'Croissement + Rendement de vos valeurs actuelles']}
                                 codeValues={[
-                                    'PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES',
-                                    'PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES',
+                                    'PERF_VALEUR_PORTEFEUILLE',
                                     'PERF_CROISSANCE_CURRENT_SHARES',
                                     'PERF_RENDEMENT_CURRENT_SHARES',
                                     'PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES'

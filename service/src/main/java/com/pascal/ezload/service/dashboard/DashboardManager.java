@@ -60,6 +60,10 @@ public class DashboardManager {
                 dashboardSettings.validate();
                 return dashboardSettings;
             }
+            catch (Exception e){
+                System.out.println(e);
+                e.printStackTrace();
+            }
         }
         return new DashboardSettings();
     }
@@ -181,23 +185,17 @@ public class DashboardManager {
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
                         result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_DIVIDENDES)));
                 break;
-            case CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES:
+            case INSTANT_VALEUR_PORTEFEUILLE:
                 lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                lineTitle = "Valeur du portefeuille sans dividendes";
+                lineTitle = "Valeur du portefeuille";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES)));
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE)));
                 break;
-            case CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
-                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
-                lineTitle = "Valeur du portefeuille avec dividendes";
-                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES)));
-                break;
-            case CUMUL_LIQUIDITE:
+            case INSTANT_LIQUIDITE:
                 lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
                 lineTitle = "Liquidité";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
-                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_LIQUIDITE)));
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_LIQUIDITE)));
                 break;
             case CUMUL_ENTREES_SORTIES:
                 // The outputs
@@ -205,6 +203,13 @@ public class DashboardManager {
                 lineTitle = "Entrées/Sorties Cumulés";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
                         result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES)));
+                break;
+            case CUMUL_CREDIT_IMPOTS:
+                // The outputs
+                lineStyle = ChartLine.LineStyle.LINE_WITH_LEGENT_AT_LEFT;
+                lineTitle = "Crédit Impôts Cumulés";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_CREDIT_IMPOTS)));
                 break;
             case INSTANT_ENTREES_SORTIES:
                 // The inputs
@@ -310,13 +315,9 @@ public class DashboardManager {
         // voir la fonction addChartPerfIndex ci dessous pour valider les dependences
         for (ChartIndexPerf chartIndexPerf : perfIndexSelection){
             switch (chartIndexPerf){
-                case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES:
-                    result.add(ChartIndex.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES);
-                    result.add(ChartIndex.CUMUL_ENTREES_SORTIES);
-                    break;
-                case PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES:
-                    result.add(ChartIndex.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
-                    result.add(ChartIndex.CUMUL_ENTREES_SORTIES);
+                case PERF_VALEUR_PORTEFEUILLE:
+                    result.add(ChartIndex.INSTANT_VALEUR_PORTEFEUILLE);
+                    result.add(ChartIndex.INSTANT_LIQUIDITE);
                     break;
                 case PERF_CROISSANCE_CURRENT_SHARES:
                     break;
@@ -329,35 +330,18 @@ public class DashboardManager {
     private void addChartPerfIndex(Reporting reporting, EZDate startDate, EZDate today, PortfolioValuesBuilder.Result result, List<ChartLine> allChartLines, Chart chart, ChartIndexPerf p) {
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.PERF_LINE;
         switch(p){
-            case PERF_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES: {
-                String lineTitle = "Perf portefeuille avec dividendes";
+            case PERF_VALEUR_PORTEFEUILLE: {
+                String lineTitle = "Perf portefeuille";
                 List<Float> perf = new LinkedList<>();
-                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_AVEC_DIVIDENDES);
-                Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
+                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE);
+                Prices liquidité = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_LIQUIDITE);
 
-                if (totalPortefeuille.getPrices().size() != cumulInputOutput.getPrices().size())
+                if (totalPortefeuille.getPrices().size() != liquidité.getPrices().size())
                     throw new IllegalStateException("Pas le meme nombre de valeur");
                 for (int i = 0; i < totalPortefeuille.getPrices().size(); i++) {
                     float total = totalPortefeuille.getPrices().get(i).getPrice();
-                    float cumulInOut = cumulInputOutput.getPrices().get(i).getPrice();
-                    perf.add((total - cumulInOut) * 100 / cumulInOut);
-                }
-
-                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, perf));
-                break;
-            }
-            case PERF_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES: {
-                String lineTitle = "Perf portefeuille sans dividendes";
-                List<Float> perf = new LinkedList<>();
-                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_VALEUR_PORTEFEUILLE_SANS_DIVIDENDES);
-                Prices cumulInputOutput = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_ENTREES_SORTIES);
-
-                if (totalPortefeuille.getPrices().size() != cumulInputOutput.getPrices().size())
-                    throw new IllegalStateException("Pas le meme nombre de valeur");
-                for (int i = 0; i < totalPortefeuille.getPrices().size(); i++) {
-                    float total = totalPortefeuille.getPrices().get(i).getPrice();
-                    float cumulInOut = cumulInputOutput.getPrices().get(i).getPrice();
-                    perf.add((total - cumulInOut) * 100f / cumulInOut);
+                    float liquid = liquidité.getPrices().get(i).getPrice();
+                    perf.add((total - liquid) * 100f / liquid);
                 }
 
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, lineTitle, perf));

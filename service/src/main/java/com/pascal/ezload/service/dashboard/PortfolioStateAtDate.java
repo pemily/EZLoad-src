@@ -54,12 +54,15 @@ public class PortfolioStateAtDate {
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
     private final StateValue liquidity;
 
+    private final StateValue creditImpot;
+
     public PortfolioStateAtDate() {
         input = new StateValue();
         output = new StateValue();
         inputOutput = new StateValue();
         dividends = new StateValue();
         liquidity = new StateValue();
+        creditImpot = new StateValue();
         shareNb = new HashMap<>();
         shareBuy = new HashMap<>();
         shareSold = new HashMap<>();
@@ -72,6 +75,7 @@ public class PortfolioStateAtDate {
         this.inputOutput = new StateValue(previousState.inputOutput);
         this.dividends = new StateValue(previousState.dividends);
         this.liquidity = new StateValue(previousState.liquidity);
+        this.creditImpot = new StateValue(previousState.creditImpot);
         this.shareNb = new HashMap<>();
         this.shareNb.putAll(previousState.shareNb);
         this.shareSold = new HashMap<>();
@@ -117,6 +121,10 @@ public class PortfolioStateAtDate {
 
     public StateValue getLiquidity() {
         return liquidity;
+    }
+
+    public StateValue getCreditImpot() {
+        return creditImpot;
     }
 
     public static class StateValue {
@@ -169,6 +177,6 @@ public class PortfolioStateAtDate {
     }
 
     public String toString(){
-        return this.date.toString();
+        return this.date == null ? "No Date defined" : this.date.toString();
     }
 }

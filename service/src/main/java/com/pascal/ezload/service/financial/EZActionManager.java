@@ -265,6 +265,9 @@ public class EZActionManager {
             if (googlePrices == null && !StringUtils.isBlank(ezShare.getGoogleCode())) {
                 errors.add(toString(ezShare) + ": Le code Google ne fonctionne pas");
             }
+            if (StringUtils.isBlank(ezShare.getYahooCode()) && StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+                errors.add(toString(ezShare) + ": Un des codes Yahoo ou SeekingAlpha doit être remplis");
+            }
 
             try {
                 checkPrices(ezShare, reporting, errors, yahooPrices, seekingPrices, "Le code Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
