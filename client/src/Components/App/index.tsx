@@ -17,25 +17,28 @@
  */
 import { useState, useEffect } from "react";
 import { Box, Header, Heading, Tabs, Tab, Button, Text, Spinner, List, Anchor } from "grommet";
-import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption } from 'grommet-icons';
+import { Upload, Configure, Clipboard, DocumentStore, Command, Services, ClearOption, LineChart } from 'grommet-icons';
 import { BourseDirect } from '../Courtiers/BourseDirect';
 import { Config } from '../Config';
 import { ProfileSelector } from '../ProfileSelector';
 import { ConfigApp } from '../ConfigApp';
 import { Reports } from '../Reports';
-import { NewShareValues } from '../NewShareValues';
+import { ShareValues } from '../ShareValues';
 import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg, DashboardData } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
+import { DashboardMain } from "../Dashboard/Main";
 
 export function App(){
     
-    const EXECUTION_TAB_INDEX = 2;
-    const RULES_TAB_INDEX = 4;
-    const [activeIndex, setActiveIndex] = useState<number>(0);
+    const EXECUTION_TAB_INDEX = 3;
+    const RULES_TAB_INDEX = 5;    
+    const [activeIndex, setActiveIndex] = useState<number>(0); // si je mets EXECUTION_TAB_INDEX directement,
+                                                                // le useEffect(showLog, []) dans ViewLog n'est
+                                                                // pas executé lorsque la page est affcihé
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
     const [configFile, setConfigFile] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
@@ -55,6 +58,7 @@ export function App(){
     const [lastProcess, setLastProcess] = useState<EzProcess|undefined>(undefined);
     const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
     const [allProfiles, setAllProfiles] = useState<string[]>([]);
+    const [allShares, setAllShares] = useState<ActionWithMsg|undefined>(undefined); 
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -82,16 +86,17 @@ export function App(){
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
-             setActionWithMsg(r.actionWithMsg);
+             setActionWithMsg(r.newSharesOrWithError);
              setFilesNotLoaded(r.filesNotYetLoaded);             
              setMainSettings(r.mainSettings);  
              setEzProfil(r.ezProfil);
              setVersion(r.ezLoadVersion);
              setAllProfiles(r.allProfiles);
+             setAllShares(r.allShares);
              if (actionWithMsg === undefined){
                 setNewShareValuesDirty(false);
-             }              
-        })
+             }
+        })        
         .catch((error) => {
             console.error("Error while loading Data.", error);
         })
@@ -99,7 +104,7 @@ export function App(){
                     .then(setBourseDirectAuthInfo)
                     .catch((error) => {
                         console.error("Error while loading BourseDirect Username", error);
-                    }));
+                    }))
     }
         
     function isOperationIgnored(op: EzEdition | undefined) : boolean {
@@ -184,8 +189,8 @@ export function App(){
         }
     }
 
-    function saveShareValue(newValue: EZShare){        
-        ezApi.home.saveNewShareValue(newValue)
+    function saveShareValue(index: number, newValue: EZShare){        
+        ezApi.home.saveShareValue({index}, newValue)
             .then(r => {
                 // mettre a jour le modele des newShareValues
                 reloadAllData();
@@ -193,6 +198,27 @@ export function App(){
             })
             .catch(e => console.error(e));
     }
+
+    function newShareValue(){        
+        ezApi.home.createShareValue()
+            .then(r => {
+                // mettre a jour le modele des newShareValues
+                reloadAllData();
+                setNewShareValuesDirty(true);
+            })
+            .catch(e => console.error(e));
+    }
+
+    function deleteShareValue(index: number){        
+        ezApi.home.deleteShareValue({index})
+            .then(r => {
+                // mettre a jour le modele des newShareValues
+                reloadAllData();
+                setNewShareValuesDirty(true);
+            })
+            .catch(e => console.error(e));
+    }
+
 
     useEffect(() => {
         setInterval(() => ezApi.home.ping(), 20000);    // every 20 seconds call the ping
@@ -205,7 +231,7 @@ export function App(){
         )
         .catch((error) => {
             console.error("Error while checking update...", error);
-        });
+        })
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ ]);
 
@@ -217,6 +243,7 @@ export function App(){
           ]}
         />) : (<Clipboard size='small'/>);
     }
+
 
     function isConfigUrl(){
         return window.location.href.toLowerCase().endsWith('config');
@@ -284,6 +311,11 @@ export function App(){
             { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
                 <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
+                    <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
+                        <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
+                                        followProcess={followProcess}
+                                        actionWithMsg={actionWithMsg}/>
+                    </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
                         <Box fill overflow="auto">      
                             {processRunning && 
@@ -341,7 +373,11 @@ export function App(){
                                         && (<Anchor alignSelf="center" target={"ezPortfolio"+mainSettings.activeEzProfilName} color="brand" href={ezProfil.ezPortfolio?.ezPortfolioUrl} label="Ouvrir EzPortfolio"/>)}
                                 </Box>
                                 { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
-                                <NewShareValues actionWithMsg={actionWithMsg} processRunning={processRunning} saveShareValue={saveShareValue}/>
+                                <ShareValues actionWithMsg={actionWithMsg} 
+                                            processRunning={processRunning} 
+                                            saveShareValue={saveShareValue}
+                                            showNewSharesDetectedWarning={true}                                            
+                                            />
                                 <Reports followProcess={followProcess} processRunning={processRunning} reports={reports}
                                         showRules={mainSettings.ezLoad!.admin!.showRules!}
                                         isOperationIgnored={isOperationIgnored}
@@ -418,6 +454,10 @@ export function App(){
                                     bourseDirectAuthInfoSetter={setBourseDirectAuthInfo}
                                     readOnly={processRunning}
                                     saveStartDate={saveStartDate}
+                                    allShares={allShares}
+                                    saveShareValue={saveShareValue}
+                                    newShareValue={newShareValue}
+                                    deleteShareValue={deleteShareValue}
                                     />
                         </Box>
                     </Tab>

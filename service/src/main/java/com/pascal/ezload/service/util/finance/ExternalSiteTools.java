@@ -15,26 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.model;
+package com.pascal.ezload.service.util.finance;
 
-public class EZSharePrice {
+import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.sources.Reporting;
 
-    private Float price;
-    private EZDate date;
+public class ExternalSiteTools {
 
-    public Float getPrice() {
-        return price;
-    }
-
-    public void setPrice(Float price) {
-        this.price = price;
-    }
-
-    public EZDate getDate() {
-        return date;
-    }
-
-    public void setDate(EZDate date) {
-        this.date = date;
+    static Prices checkResult(Reporting reporting, EZShare ezShare, Prices sharePrices, long nbOfDays) {
+        int nbOfPrices = sharePrices.getPrices().size();
+        float percentOfData = nbOfPrices * 100f / nbOfDays;
+        if (percentOfData > 50){
+            return sharePrices;
+        }
+        reporting.info("Pas assez de données récupérés pour l'action: "+ ezShare.getEzName()+" nb de jours demandé: "+ nbOfDays +", nb de jours recu "+nbOfPrices);
+        return null;
     }
 }

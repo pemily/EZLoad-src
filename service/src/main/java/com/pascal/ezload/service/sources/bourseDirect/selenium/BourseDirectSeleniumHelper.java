@@ -68,7 +68,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
                 if (authInfo != null && authInfo.getPassword() !=null){
                     password.sendKeys(authInfo.getPassword());
                     Sleep.waitSeconds(1);
-                    findById("bd_auth_login_type_submit").click();
+                    findByCss("button[data-testid=\"button-submit\"]").click();
                 }
                 else{
                     // Pas de password

@@ -45,7 +45,7 @@ public class BourseDirectToolsTest {
     public void testSearchBourseDirect_US88160R1014() throws IOException {
         EzData data = new EzData();
         data.put(new EzDataKey("ezOperation_Lieu"), "NASDAQ/NGS (GLOBAL SELECT MARKET)");
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "US88160R1014", EnumEZBroker.BourseDirect, data);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(),"US88160R1014", EnumEZBroker.BourseDirect, data);
         assertTrue(action.isPresent());
         Assertions.assertEquals("TSLA:NASDAQ", action.get().getGoogleCode());
     }
@@ -53,7 +53,7 @@ public class BourseDirectToolsTest {
     @Test
     public void testSearchBourseDirect_US92936U1097() throws IOException {
         EzData data = new EzData();
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "US92936U1097", EnumEZBroker.BourseDirect, data);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "US92936U1097", EnumEZBroker.BourseDirect, data);
         assertTrue(action.isPresent());
         Assertions.assertEquals("WPC:NYSE", action.get().getGoogleCode());
     }
@@ -63,7 +63,7 @@ public class BourseDirectToolsTest {
     public void testSearchBourseDirect_FR0000063737() throws IOException {
         EzData ezData = new EzData();
         ezData.put(new EzDataKey("ezOperation_INFO3"), "AUBAY");
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "FR0000063737", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "FR0000063737", EnumEZBroker.BourseDirect, ezData);
         assertEquals("AUB:EPA", action.get().getGoogleCode());
     }
 
@@ -72,7 +72,7 @@ public class BourseDirectToolsTest {
     public void testSearchBourseDirect_FR0000120578() throws IOException {
         EzData ezData = new EzData();
         ezData.put(new EzDataKey("ezOperation_INFO3"), "SANOFI");
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "FR0000120578", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "FR0000120578", EnumEZBroker.BourseDirect, ezData);
         assertEquals("SAN:EPA", action.get().getGoogleCode());
     }
 
@@ -80,7 +80,7 @@ public class BourseDirectToolsTest {
     public void testSearchBourseDirect_DE000A1EWWW0() throws IOException {
         EzData ezData = new EzData();
         ezData.put(new EzDataKey("ezOperation_INFO3"), "ADIDAS NOM.");
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "DE000A1EWWW0", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "DE000A1EWWW0", EnumEZBroker.BourseDirect, ezData);
         assertEquals("ADS:ETR", action.get().getGoogleCode());
     }
 
@@ -89,7 +89,7 @@ public class BourseDirectToolsTest {
         EzData ezData = new EzData();
         ezData.put(new EzDataKey("ezOperation_INFO3"), "RUBIS");
         ezData.put(new EzDataKey("ezOperation_Lieu"), "BORSE BERLIN EQUIDUCT TRADING - BERL");
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "FR0013269123", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "FR0013269123", EnumEZBroker.BourseDirect, ezData);
         assertEquals("RUI:EPA", action.get().getGoogleCode());
     }
 
@@ -99,7 +99,7 @@ public class BourseDirectToolsTest {
         ezData.put(new EzDataKey("ezOperation_INFO3"), "RETRAIT OBLIG.");
         // j'ai eu ce cas lors d'un retrait d'obligation (espece sur OST dans INFO1) aucune autre info dans le pdf
         // mais le meme jour dans une autre opération, il y avait: INDEMNISATION FR0000120222 CNP ASSURANCES
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "FR0000120222", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(), "FR0000120222", EnumEZBroker.BourseDirect, ezData);
         ///////////////////////////////////////////// ICI Ce n'est pas le code que j'attendais, j'aurais voulu voir: https://www.google.com/finance/quote/CNPAF:OTCMKTS
         assertEquals("FR0000120222_EUR:LON", action.get().getGoogleCode());
     }
@@ -108,7 +108,7 @@ public class BourseDirectToolsTest {
     @Test
     public void testSearchBourseDirect_FR0011871128() throws IOException {
         EzData ezData = new EzData();
-        Optional<EZShare> action = BourseDirectTools.searchAction(cache(), new LoggerReporting(), "FR0011871128", EnumEZBroker.BourseDirect, ezData);
+        Optional<EZShare> action = BourseDirectTools.searchAction(new LoggerReporting(), cache(),  "FR0011871128", EnumEZBroker.BourseDirect, ezData);
         assertEquals("PSP5:EPA", action.get().getGoogleCode());
     }
 

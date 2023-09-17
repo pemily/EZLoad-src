@@ -20,8 +20,9 @@ package com.pascal.ezload.service.util.finance;
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.EZSharePrice;
-import com.pascal.ezload.service.model.EZSharePrices;
+import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 
 import java.util.HashMap;
@@ -31,19 +32,23 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class SeekingAlphaTools {
+public class SeekingAlphaTools extends ExternalSiteTools{
     private static final Logger logger = Logger.getLogger("SeekingAlphaTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     // return null if the dividend cannot be downloaded for this action
-    static public List<Dividend> searchDividends(HttpUtilCached cache, EZShare ezShare) {
+    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())){
             Map<String, String> props = new HashMap<>();
-            props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
-            String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?&years=2";
+            props.put("Accept-Encoding", "identity");
+            props.put("User-Agent", "Mozilla/5.0");
+            //props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
+            //props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+            String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
             try {
-                return cache.get("seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+EZDate.today().toYYMMDD(), url, props, inputStream -> {
+                return cache.get(reporting, "seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"_"+to.toYYYYMMDD(), url, props, inputStream -> {
                     Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
 
                     if (top.containsKey("errors")) return new LinkedList<>();
@@ -67,7 +72,7 @@ public class SeekingAlphaTools {
                                     frequency = Dividend.EnumFrequency.ANNUEL;
 
                                 return new Dividend(
-                                        attributes.get("amount").toString(),
+                                        NumberUtils.str2Float(attributes.get("amount").toString()),
                                         seekingAlphaDate(attributes.get("ex_date")),
                                         seekingAlphaDate(attributes.get("declare_date")),
                                         seekingAlphaDate(attributes.get("pay_date")),
@@ -88,36 +93,75 @@ public class SeekingAlphaTools {
     }
 
 
-    // Ce site fait de l'echantillonage et ne donne pas les chiffres exact
-    public static EZSharePrices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
+    // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
-            return cache.get("seekingAlpha_history_"+ezShare.getSeekingAlphaCode()+"_"+EZDate.today().toYYMMDD(), url, inputStream -> {
-                Map<String, Object> r = new HashMap<>();
-                r = JsonUtil.readWithLazyMapper(inputStream, r.getClass());
-                r = (Map<String, Object>) r.get("attributes");
-                List<EZSharePrice> prices = r.entrySet().stream().map(
-                                entry -> {
-                                    String dateTime = entry.getKey(); // format: 2020-10-25 00:00:00
-                                    Map<String, Number> value = (Map<String, Number>) entry.getValue();
-                                    String closePrice = value.get("close")+"";
-                                    EZSharePrice sharePrice = new EZSharePrice();
-                                    sharePrice.setPrice(NumberUtils.str2Float(closePrice));
-                                    String date = StringUtils.divide(dateTime, ' ')[0];
-                                    sharePrice.setDate(EZDate.parseYYYMMDDDate(date, '-'));
-                                    return sharePrice;
-                                }
-                        )
-                        .collect(Collectors.toList());
-                EZSharePrices sharePrices = new EZSharePrices();
-                sharePrices.setPrices(prices);
+            try {
+                Prices sharePrices = new Prices();
                 sharePrices.setDevise(DeviseUtil.USD);
-                return sharePrices;
-            });
+                sharePrices.setLabel(ezShare.getEzName());
+                // remove 7 days to the from date because seeking alpha have only 1 data per week, this is to be sure to have a data for the from date (and avoid a 0)
+                processRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
+                    rows.filter(entry -> {
+                                EZDate date = parseDate(entry);
+                                return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
+                            })
+                            .map(SeekingAlphaTools::createPriceAtDate)
+                            .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+                });
+                long nbOfDays = from.nbOfDaysTo(to) / 7; // seeking alpha give only 1 value per week
+                return checkResult(reporting, ezShare, sharePrices, nbOfDays);
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
+            }
         }
         return null;
     }
 
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
+        if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+            try{
+                Prices sharePrices = new Prices();
+                sharePrices.setLabel(ezShare.getEzName());
+                sharePrices.setDevise(DeviseUtil.USD);
+                processRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+                    new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
+                            .fillPricesForAListOfDates(reporting);
+                });
+                return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action "+ezShare.getEzName());
+            }
+        }
+        return null;
+    }
+
+
+    private static void processRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
+        if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+            String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
+            cache.get(reporting, "seekingAlpha_history_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
+                Map<String, Object> r = new HashMap<>();
+                r = JsonUtil.readWithLazyMapper(inputStream, r.getClass());
+                r = (Map<String, Object>) r.get("attributes");
+                rowsConsumer.accept(r.entrySet().stream());
+                return null;
+            });
+        }
+    }
+
+    private static PriceAtDate createPriceAtDate(Map.Entry<String, Object> entry) {
+        Map<String, Number> value = (Map<String, Number>) entry.getValue();
+        String closePrice = value.get("close")+"";
+        return new PriceAtDate(parseDate(entry), NumberUtils.str2Float(closePrice));
+    }
+
+    private static EZDate parseDate(Map.Entry<String, Object> entry){
+        String date = StringUtils.divide(entry.getKey(), ' ')[0]; // format: 2020-10-25 00:00:00
+        return EZDate.parseYYYMMDDDate(date, '-');
+    }
 
     static private EZDate seekingAlphaDate(Object date){
         if (date == null) return null;

@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.util;
 
-public interface SupplierWithException<R> {
-    R get() throws Exception;
+@FunctionalInterface
+public interface ConsumerThatThrows<T> {
+    void accept(T o) throws Exception;
 }

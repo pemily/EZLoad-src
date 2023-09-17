@@ -23,7 +23,6 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.ModelUtils;
 import com.pascal.ezload.service.util.NumberUtils;
 import com.pascal.ezload.service.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
@@ -86,7 +85,7 @@ public abstract class DividendsAlgo {
         // UNKNOWN + ANNUAL https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
 
         List<Dividend> divs = allHistoricalDividends.stream()
-                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+                                            .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL && d.getFrequency() != null) // elimine les dividendes exceptionnelle
                                             .collect(Collectors.toList());
 
         // Tri annuel inverse
@@ -98,9 +97,9 @@ public abstract class DividendsAlgo {
 
         // Group par année (date de detachement) => liste des dividendes de l'année
         List<Dividend> lastYearDividendsSorted = divs.stream()
-                                                                        .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
-                                                                        .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYMMDD()))
-                                                                        .collect(Collectors.toList());
+                                                    .filter(d -> dvd2Date.apply(d).getYear() == lastYear)
+                                                    .sorted(Comparator.comparing(d -> dvd2Date.apply(d).toYYYYMMDD()))
+                                                    .collect(Collectors.toList());
 
         Map<Dividend.EnumFrequency, List<Dividend>> freq2Dividends = lastYearDividendsSorted.stream()
                                                                                                     .collect(Collectors.groupingBy(Dividend::getFrequency));
@@ -155,7 +154,7 @@ public abstract class DividendsAlgo {
 
     protected boolean containsAllDividends(List<Dividend> yearlyDividends){
         Map<Dividend.EnumFrequency, List<Dividend>> frequency2Dividends = yearlyDividends.stream()
-                .filter(d -> d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
+                .filter(d -> d.getFrequency() != null && d.getFrequency() != Dividend.EnumFrequency.EXCEPTIONEL) // elimine les dividendes exceptionnelle
                 .collect(Collectors.groupingBy(Dividend::getFrequency));
 
         if (frequency2Dividends.containsKey(Dividend.EnumFrequency.ANNUEL)) return true; // il y a au moins une dividende annuelle cette année
@@ -176,13 +175,8 @@ public abstract class DividendsAlgo {
         return Dividend::getPayDate;
     }
 
-    protected String sumOfAllDividends(Reporting reporting, List<Dividend> dividends) {
-        String addition = dividends
-                .stream()
-                .map(Dividend::getAmount).collect(Collectors.joining(" + "));
-
-        String result = eval(reporting, addition);
-        if (result == null) return "0";
-        return NumberUtils.normalizeAmount(result);
+    protected String sumOfAllDividends(List<Dividend> dividends) {
+        float result = dividends.stream().map(Dividend::getAmount).reduce(Float::sum).orElse(0f);
+        return NumberUtils.normalizeAmount(result+"");
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.server.httpserver;
 
+import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
 
@@ -32,6 +33,7 @@ public class EzServerState {
     private EZPortfolioProxy ezOriginalPortfolioProxy; // cached, if null will be loaded from google drive, Do not modified it, it must kept in read only mode
     private EZPortfolioProxy ezNewPortfolioProxy; // cached, if null will be loaded from google drive, it is used to contains the updates
     private boolean ezActionDirty; // if the user changed the name of an action
+    private DashboardData dashboardData;
 
     public boolean isProcessRunning() {
         return processRunning;
@@ -79,6 +81,7 @@ public class EzServerState {
         ezActionDirty = false;
         ezReports = new LinkedList<>();
         filesNotYetLoaded = new LinkedList<>();
+        dashboardData = null;
     }
 
     public EZPortfolioProxy getEzNewPortfolioProxy() {
@@ -87,5 +90,13 @@ public class EzServerState {
 
     public void setEzNewPortfolioProxy(EZPortfolioProxy ezNewPortfolioProxy) {
         this.ezNewPortfolioProxy = ezNewPortfolioProxy;
+    }
+
+    public DashboardData getDashboardData() {
+        return dashboardData;
+    }
+
+    public void setDashboardData(DashboardData dashboardData) {
+        this.dashboardData = dashboardData;
     }
 }

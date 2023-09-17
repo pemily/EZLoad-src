@@ -25,7 +25,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.BRException;
 import com.pascal.ezload.service.util.Sleep;
 import com.pascal.ezload.service.util.StringUtils;
-import com.pascal.ezload.service.util.SupplierWithException;
+import com.pascal.ezload.service.util.SupplierThatThrow;
 
 import java.io.IOException;
 import java.util.*;
@@ -146,7 +146,7 @@ public class GDriveSheets {
         service.spreadsheets().batchUpdate(spreadsheetId, rq).execute();
     }
 
-    private <T> T retryOnTimeout(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
+    private <T> T retryOnTimeout(Reporting reporting, int n,  SupplierThatThrow<T> fct) throws Exception {
         try {
             return fct.get();
         }

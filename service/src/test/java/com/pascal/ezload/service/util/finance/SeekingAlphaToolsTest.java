@@ -19,6 +19,7 @@ package com.pascal.ezload.service.util.finance;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.HttpUtilCached;
@@ -47,7 +48,7 @@ public class SeekingAlphaToolsTest {
     public void testSearchDividendeHistory() throws IOException {
         EZShare action = new EZShare();
         action.setSeekingAlphaCode("WSR");
-        List<Dividend> dividends = SeekingAlphaTools.searchDividends(cache(), action);
+        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2), EZDate.today());
         Assertions.assertTrue(dividends.size() > 12);
     }
 

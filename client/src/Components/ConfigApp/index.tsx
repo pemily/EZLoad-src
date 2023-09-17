@@ -21,6 +21,7 @@ import { TextField } from '../Tools/TextField';
 import { ezApi, jsonCall } from '../../ez-api/tools';
 import { MainSettings } from '../../ez-api/gen-api/EZLoadApi';
 
+
 export interface ConfigAppProps {
      mainSettings: MainSettings;
 }      

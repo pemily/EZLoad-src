@@ -32,9 +32,9 @@ public class MarketStackTools {
 
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    public static EZShare searchActionFromMarketstack(HttpUtilCached cache, Reporting reporting, String actionTicker) throws Exception {
+    public static EZShare searchActionFromMarketstack(Reporting reporting, HttpUtilCached cache, String actionTicker) throws Exception {
         String url = "https://marketstack.com/stock_api.php?offset=0&exchange=&search="+actionTicker;
-        return cache.get("marketstack_share_"+actionTicker, url, inputStream -> {
+        return cache.get(reporting, "marketstack_share_"+actionTicker, url, inputStream -> {
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
             List<Map<String, Object>> quotes = (List<Map<String, Object>>) top.get("data");
             if (quotes.size() == 0) return null;

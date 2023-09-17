@@ -25,11 +25,12 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.AnnualDividendsAlgo;
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.financial.EZActionManager;
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
@@ -330,7 +331,7 @@ public class RulesEngine {
                 // recherche les dividendes sur seekingalpha
                 Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager().getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
                 if (ezAction.isEmpty()) return false;
-                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager().searchDividends(ezAction.get());
+                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager().searchDividends(reporting, ezAction.get(), EZDate.today().minusYears(2), EZDate.today());
                 if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)

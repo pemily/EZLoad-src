@@ -55,6 +55,7 @@ public class HttpUtil {
                         .forEach(con::addRequestProperty);
 
             }
+            con.addRequestProperty("HOST", url.getHost());
             con.setRequestMethod("GET");
             InputStream input = new BufferedInputStream(con.getInputStream());
             return f.apply(input);

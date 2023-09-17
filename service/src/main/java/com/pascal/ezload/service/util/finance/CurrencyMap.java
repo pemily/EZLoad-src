@@ -17,44 +17,44 @@
  */
 package com.pascal.ezload.service.util.finance;
 
-import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZDevise;
-import com.pascal.ezload.service.model.EZSharePrice;
-import com.pascal.ezload.service.model.EZSharePrices;
+import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.service.model.Prices;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CurrencyMap {
 
-    private EZDevise from, to;
-    private EZSharePrices sharePrices;
+    private final EZDevise from, to;
+    private Prices factors;
 
 
-    public CurrencyMap(EZDevise from, EZDevise to, List<EZSharePrice> factors){
+    public CurrencyMap(EZDevise from, EZDevise to, List<PriceAtDate> factors){
         this.from = from;
         this.to = to;
-        if (!from.getCode().equals(to.getCode())) {
-            sharePrices = new EZSharePrices();
-            sharePrices.setDevise(from);
-            sharePrices.setPrices(factors);
+        if (!from.equals(to)) {
+            this.factors = new Prices();
+            this.factors.setDevise(from);
+            this.factors.setLabel(getLabel());
+            factors.forEach(p -> this.factors.addPrice(p.getDate(), p));
         }
     }
 
-    public EZSharePrice getPrice(EZSharePrice fromPrice){
-        if (from.getCode().equals(to.getCode())) {
-            EZSharePrice r = new EZSharePrice();
-            r.setPrice(fromPrice.getPrice());
-            r.setDate(fromPrice.getDate());
-            return r;
-        }
-        EZSharePrice factor = sharePrices.getPriceAt(fromPrice.getDate());
-        EZSharePrice r = new EZSharePrice();
-        r.setPrice(fromPrice.getPrice()*factor.getPrice());
-        r.setDate(fromPrice.getDate());
-        return r;
+    private String getLabel() {
+        return from.getSymbol() + " -> " + to.getSymbol();
     }
 
+    public float getTargetPrice(PriceAtDate fromPrice){
+        if (from.equals(to)) {
+            return fromPrice.getPrice();
+        }
+        PriceAtDate factor = factors.getPriceAt(fromPrice.getDate());
+        return fromPrice.getPrice()*factor.getPrice();
+    }
+
+    public Prices getFactors(){
+        return factors;
+    }
 
     public EZDevise getFrom() {
         return from;
@@ -64,14 +64,15 @@ public class CurrencyMap {
         return to;
     }
 
-    public CurrencyMap reverse(){
-        List<EZSharePrice> reversed = sharePrices.getPrices().stream().map(e -> {
-            EZSharePrice ezSharePrice = new EZSharePrice();
-            ezSharePrice.setDate(e.getDate());
-            ezSharePrice.setPrice(1f/e.getPrice());
-            return ezSharePrice;
-        }).collect(Collectors.toList());
+    public Prices convertPricesToTarget(Prices p) {
+        Prices r = new Prices();
+        r.setLabel(p.getLabel());
+        r.setDevise(to);
+        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price))));
+        return r;
+    }
 
-        return new CurrencyMap(to, from, reversed);
+    public String toString(){
+        return "From "+from+" To "+to;
     }
 }

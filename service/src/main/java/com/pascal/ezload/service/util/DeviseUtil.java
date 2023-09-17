@@ -76,4 +76,8 @@ public class DeviseUtil {
         return optDevise.orElseThrow(() -> new BRException("Devise with code: "+code+" not found"));
     }
 
+    public static EZDevise foundBySymbol(String symbol) {
+        Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getSymbol().equals(symbol)).findFirst();
+        return optDevise.orElseThrow(() -> new BRException("Devise with code: "+symbol+" not found"));
+    }
 }

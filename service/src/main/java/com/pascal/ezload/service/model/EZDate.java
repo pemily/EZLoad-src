@@ -22,9 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-public class EZDate {
+public class EZDate implements Comparable<EZDate> {
     private final int day;
     private final int month;
     private final int year;
@@ -57,13 +58,31 @@ public class EZDate {
     }
 
     public EZDate yesterday() {
-        LocalDate localDate = LocalDate.of(year, month, day).minusDays(1);
-        return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+        return toEZDate(toLocalDate().minusDays(1));
     }
 
     public EZDate tomorrow(){
-        LocalDate localDate = LocalDate.of(year, month, day).plusDays(1);
-        return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+        return toEZDate(toLocalDate().plusDays(1));
+    }
+
+    public EZDate plusDays(int d) {
+        return toEZDate(toLocalDate().plusDays(d));
+    }
+
+    public EZDate minusDays(int d) {
+        return toEZDate(toLocalDate().minusDays(d));
+    }
+
+    public EZDate minusYears(int years) {
+        return new EZDate(year-years, month, day);
+    }
+
+    public EZDate plusYears(int years) {
+        return new EZDate(year+years, month, day);
+    }
+
+    public long nbOfDaysTo(EZDate to) {
+        return toLocalDate().until(LocalDate.of(to.year, to.month, to.day), ChronoUnit.DAYS);
     }
 
     // return true if this is after dateToTest
@@ -76,6 +95,13 @@ public class EZDate {
     public boolean isBefore(EZDate dateToTest){
         if (this.equals(dateToTest)) return false;
         return this.toEpochSecond() < dateToTest.toEpochSecond();
+    }
+
+    public boolean isBeforeOrEquals(EZDate d) {
+        return toDate('/').compareTo(d.toDate('/')) <= 0;
+    }
+    public boolean isAfterOrEquals(EZDate d) {
+        return toDate('/').compareTo(d.toDate('/')) >= 0;
     }
 
 
@@ -95,18 +121,21 @@ public class EZDate {
         return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
     }
 
-    public String toYYMMDD(){
+    public String toYYYYMMDD(){
         return year+"/"+leadingZero(month)+"/"+leadingZero(day);
     }
 
+    public LocalDate toLocalDate(){
+        return LocalDate.of(year, month, day);
+    }
+    
     public String toDate(char separator){
-        return year+""+separator+leadingZero(month)+separator+leadingZero(day);
+        return year+separator+leadingZero(month)+separator+leadingZero(day);
     }
 
     // millisec since 1970/01/01
     public long toEpochSecond(){
-        LocalDate localDate = LocalDate.of(year, month, day);
-        return localDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        return toLocalDate().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public static EZDate parseFrenchDate(String date, char separator) {
@@ -164,21 +193,24 @@ public class EZDate {
         return Objects.hash(day, month, year);
     }
 
-    public boolean isBeforeOrEquals(EZDate d) {
-        return toDate('/').compareTo(d.toDate('/')) <= 0;
-    }
-
     public static String leadingZero(int i){
         return i <= 9 ? "0"+i : ""+i;
     }
 
     @Override
     public String toString() {
-        return "EZDate{" +
-                "day=" + day +
-                ", month=" + month +
-                ", year=" + year +
-                '}';
+        return toEzPortoflioDate();
     }
+
+    @Override
+    public int compareTo(EZDate date) {
+        return (int) (this.toEpochSecond() - date.toEpochSecond());
+    }
+
+
+    private EZDate toEZDate(LocalDate localDate) {
+        return new EZDate(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+    }
+
 
 }

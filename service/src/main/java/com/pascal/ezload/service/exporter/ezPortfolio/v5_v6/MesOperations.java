@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.exporter.ezPortfolio.v5;
+package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
@@ -36,18 +36,18 @@ import java.util.stream.Collectors;
 public class MesOperations  {
     private static final String BIENTOT_RENTIER_OPERATION = "EZLoad %s - %s"; // EZLoad BourseDirect v1 - ACHAT COMPTANT
 
-    private static final int DATE_COL = 0;
-    private static final int COMPTE_TYPE_COL = 1;
-    private static final int COURTIER_DISPLAY_NAME_COL = 2;
-    private static final int QUANTITE_COL = 3;
-    private static final int OPERATION_TYPE_COL = 4;
-    private static final int ACTION_NAME_COL = 5;
-    private static final int COUNTRY_COL = 6;
-    private static final int AMOUNT_COL = 7;
-    private static final int INFORMATION_COL = 8;
-    private static final int ACCOUNT_DECLARED_NUMBER_COL = 9;
-    private static final int AUTOMATIC_UPD_COL = 10;
-    private static final int SOURCE_FILE_COL = 11;
+    public static final int DATE_COL = 0;
+    public static final int COMPTE_TYPE_COL = 1;
+    public static final int COURTIER_DISPLAY_NAME_COL = 2;
+    public static final int QUANTITE_COL = 3;
+    public static final int OPERATION_TYPE_COL = 4;
+    public static final int ACTION_NAME_COL = 5;
+    public static final int COUNTRY_COL = 6;
+    public static final int AMOUNT_COL = 7;
+    public static final int INFORMATION_COL = 8;
+    public static final int ACCOUNT_DECLARED_NUMBER_COL = 9;
+    public static final int AUTOMATIC_UPD_COL = 10;
+    public static final int SOURCE_FILE_COL = 11;
 
     private final SheetValues existingOperations;
     private final List<Row> newOperations = new ArrayList<>();
@@ -59,6 +59,10 @@ public class MesOperations  {
 
     public int getNbOfExistingOperations(){
         return existingOperations.getValues().size();
+    }
+
+    public List<Row> getExistingOperations(){
+        return existingOperations.getValues();
     }
 
     public List<Row> getNewOperations(){
@@ -95,7 +99,7 @@ public class MesOperations  {
     }
 
     public void newOperation(EzData ezData, EzOperationEdition operationEdition, RuleDefinitionSummary ruleDef){
-        newOperations.add(newOperationRow(EZPorfolioProxyV5.FIRST_ROW_MES_OPERATIONS+existingOperations.getValues().size()+newOperations.size(), ezData, operationEdition, ruleDef));
+        newOperations.add(newOperationRow(EZPorfolioProxyV5_V6.FIRST_ROW_MES_OPERATIONS+existingOperations.getValues().size()+newOperations.size(), ezData, operationEdition, ruleDef));
     }
 
     public boolean isFileAlreadyLoaded(EnumEZBroker courtier, EZAccountDeclaration EZAccountDeclaration, EZDate fileDate) {

@@ -20,6 +20,7 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v4;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.*;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
@@ -100,6 +101,11 @@ public class EZPorfolioProxyV4 implements EZPortfolioProxy {
 
     @Override
     public void applyOnPerformance(EzPerformanceEdition ezPerformanceEdition) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public MesOperations getAllOperations() {
         throw new NotImplementedException();
     }
 

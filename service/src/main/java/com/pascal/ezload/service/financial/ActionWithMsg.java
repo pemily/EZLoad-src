@@ -30,14 +30,14 @@ public class ActionWithMsg {
     void addMsg(EZShare action, String error) {
         if (StringUtils.isBlank(action.getIsin())) {
             Optional<EZShare> search = actions.stream()
-                    .filter(a -> action.getGoogleCode().equals(a.getGoogleCode()))
+                    .filter(a -> Objects.equals(action.getGoogleCode(), a.getGoogleCode()))
                     .findFirst();
             if (search.isEmpty()) {
                 actions.add(action);
             }
         } else {
             Optional<EZShare> search = actions.stream()
-                    .filter(a -> action.getIsin().equals(a.getIsin()))
+                    .filter(a -> Objects.equals(action.getIsin(), a.getIsin()))
                     .findFirst();
             if (search.isEmpty()) {
                 actions.add(action);
@@ -57,5 +57,10 @@ public class ActionWithMsg {
 
     public List<EZShare> getActions() {
         return actions;
+    }
+
+    public void setShares(List<EZShare> shares) {
+        this.actions.clear();
+        this.actions.addAll(shares);
     }
 }

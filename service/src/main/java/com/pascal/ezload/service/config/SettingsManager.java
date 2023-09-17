@@ -299,6 +299,7 @@ public class SettingsManager {
         if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(getEzLoadRepoDir()+File.separator+"rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
         if (ezLoad.getShareDataFile() == null) ezLoad.setShareDataFile(ezHome+File.separator+"shareData.json");
+        if (ezLoad.getDashboardFile() == null) ezLoad.setDashboardFile(ezHome+File.separator+"dashboard.json");
         if (ezLoad.getCacheDir() == null) ezLoad.setCacheDir(ezHome+File.separator+"cache");
 
         new File(ezLoad.getLogsDir()).mkdirs();
@@ -353,7 +354,7 @@ public class SettingsManager {
             chromeSettings.setUserDataDir(ezHome + File.separator + "chrome" + File.separator + "data");
         // chromeDriver is a file that does not exists, so next time it will be downloaded
         if (chromeSettings.getDriverPath() == null)
-            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver");
+            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver.zip");
         if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(13);
 
         new File(chromeSettings.getUserDataDir()).mkdirs();

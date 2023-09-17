@@ -19,6 +19,7 @@ package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.sources.Reporting;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -27,6 +28,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -49,12 +51,13 @@ public class BaseSelenium {
             this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
 
             reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
-            if (!new File(chromeSettings.getDriverPath()).exists()) {
+/*            if (!new File(chromeSettings.getDriverPath()).exists()) {
                 // if the driver does not exists, start to download it
                 String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
                 newDriverPathSaver.accept(newChromeDriver);
             }
-            ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath());
+            ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath()); */
+            WebDriverManager.chromedriver().setup();
 
             //Creating an object of ChromeDriver
             ChromeOptions options = new ChromeOptions();
@@ -96,14 +99,15 @@ public class BaseSelenium {
             options.setExperimentalOption("prefs", prefs);
 
             try {
+
                 driver = new ChromeDriver(options);
             } catch (Exception e) {
                 reporting.info("Error when using chrome driver: " + e.getMessage());
                 reporting.info("A new version of chrome has been installed, try to download the latest driver");
-                String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
-                ChromeDriverTools.setup(reporting, newChromeDriver);
+                //String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
+                //ChromeDriverTools.setup(reporting, newChromeDriver);
                 driver = new ChromeDriver(options);
-                newDriverPathSaver.accept(newChromeDriver);
+                //newDriverPathSaver.accept(newChromeDriver);
             }
             //Specifiying pageLoadTimeout and Implicit wait
             driver.manage().timeouts().pageLoadTimeout(defaultTimeoutInSec, TimeUnit.SECONDS);
@@ -162,23 +166,29 @@ public class BaseSelenium {
 
     public void waitUrlIsNot(String url) throws TimeoutException {
         reporting.info("Waiting that url is no more: "+url);
-        new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+        new WebDriverWait(driver, Duration.ofSeconds(defaultTimeoutInSec)).until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
     public void waitUrlIs(String url) throws TimeoutException {
         reporting.info("Waiting that url is: "+url);
-        new WebDriverWait(driver, defaultTimeoutInSec).until(ExpectedConditions.urlToBe(url));
+        new WebDriverWait(driver, Duration.ofSeconds(defaultTimeoutInSec)).until(ExpectedConditions.urlToBe(url));
     }
 
     public void waitPageLoaded() throws TimeoutException {
         reporting.info("Waiting page is loaded");
-        new WebDriverWait(driver, defaultTimeoutInSec).until(
+        new WebDriverWait(driver, Duration.ofSeconds(defaultTimeoutInSec)).until(
                 webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
     }
-
+ 
     public WebElement findById(String id){
         reporting.info("Find by Id: "+id);
         return driver.findElement(By.id(id));
+    }
+
+    public WebElement findByCss(String css){
+        reporting.info("Find by css: "+css);
+        return driver.findElement(By.cssSelector(css));
+
     }
 
     public void click(WebElement element){
@@ -189,7 +199,7 @@ public class BaseSelenium {
     }
 
 
-    public <T> T retryOnError(Reporting reporting, int n,  SupplierWithException<T> fct) throws Exception {
+    public <T> T retryOnError(Reporting reporting, int n,  SupplierThatThrow<T> fct) throws Exception {
         try {
             return fct.get();
         }

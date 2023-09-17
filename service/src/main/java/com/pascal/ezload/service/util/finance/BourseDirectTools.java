@@ -21,7 +21,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.model.EZMarketPlace;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.EZSharePrices;
+import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.BRException;
@@ -40,9 +40,9 @@ public class BourseDirectTools {
     private static final Logger logger = Logger.getLogger("BourseDirectFinanceTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    static public Optional<EZShare> searchAction(HttpUtilCached cache, Reporting reporting, String isin, EnumEZBroker broker, EzData ezData) throws IOException {
+    static public Optional<EZShare> searchAction(Reporting reporting, HttpUtilCached cache, String isin, EnumEZBroker broker, EzData ezData) throws IOException {
         try{
-                Map<String, Object> actionData = getActionData(cache, reporting, isin, broker, ezData);
+                Map<String, Object> actionData = getActionData(reporting, cache, isin, broker, ezData);
                 String rawName = (String) actionData.get("name"); // WP CAREY INC
                 String ticker = (String) actionData.get("ticker"); // WPC
                 // (String) actionData.get("isin"); // US92936U1097
@@ -73,7 +73,7 @@ public class BourseDirectTools {
     }
 
 
-    public static EZSharePrices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
+    public static Prices getPrices(HttpUtilCached cache, EZShare ezShare) throws Exception {
         // getActionData()
         // Probleme ici, je n'ai plus les ezData pour appeler le getActionData
         // "https://www.boursedirect.fr/api/instrument/download/history/"+marketPlace.getMic()+"/AVGO/USD";
@@ -81,13 +81,13 @@ public class BourseDirectTools {
     }
 
 
-    private static Map<String, Object> getActionData(HttpUtilCached cache, Reporting reporting, String isin, EnumEZBroker broker, EzData ezData) throws Exception {
+    private static Map<String, Object> getActionData(Reporting reporting, HttpUtilCached cache, String isin, EnumEZBroker broker, EzData ezData) throws Exception {
         if (StringUtils.isBlank(isin) || isin.contains(" ") || isin.length() > 16)
             throw new BRException("Erreur, cette information ne semble par être une action: "+isin);
 
         String url = "https://www.boursedirect.fr/api/search/"+isin;
 
-        return cache.get("bourseDirect_share_"+isin, url, inputStream -> {
+        return cache.get(reporting, "bourseDirect_share_"+isin, url, inputStream -> {
             Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
             Map<String, Object> instruments = (Map<String, Object>) top.get("instruments");
             List<Map<String, Object>> data = (List<Map<String, Object>>) instruments.get("data");

@@ -109,13 +109,14 @@ public class MainSettings {
 
     public static class EZLoad extends Checkable<EZLoad> {
 
-        enum Field {logsDir, passPhrase, rulesDir, cacheDir, shareDataFile}
+        enum Field {logsDir, passPhrase, rulesDir, cacheDir, shareDataFile, dashboardFile}
 
         private int port;
         private String rulesDir;
         private String logsDir;
         private String cacheDir;
         private String shareDataFile;
+        private String dashboardFile;
         private String passPhrase;
         private Admin admin;
 
@@ -175,6 +176,14 @@ public class MainSettings {
             this.shareDataFile = shareDataFile;
         }
 
+        public String getDashboardFile() {
+            return dashboardFile;
+        }
+
+        public void setDashboardFile(String dashboardFile) {
+            this.dashboardFile = dashboardFile;
+        }
+
         @JsonIgnore
         public EZActionManager getEZActionManager() throws Exception {
             return new EZActionManager(getCacheDir(), getShareDataFile());
@@ -187,6 +196,7 @@ public class MainSettings {
             new FileValue(this, Field.rulesDir.name(), rulesDir).checkRequired().checkDirectory();;
             new FileValue(this, Field.cacheDir.name(), cacheDir).checkRequired().checkDirectory();;
             new FileValue(this, Field.shareDataFile.name(), shareDataFile).checkRequired().checkFile();;
+            new FileValue(this, Field.dashboardFile.name(), dashboardFile).checkRequired().checkFile();;
             admin.validate();
             return this;
         }
