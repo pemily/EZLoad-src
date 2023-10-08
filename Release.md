@@ -4,6 +4,7 @@ develop branch has a -SNAPSHOT version
 
 To create a new version:
 
+* Update the version in the main pom.xml
 * Complete the history in file exec/src/main/resources/ReadMe.md
 * mvn license:format `In case there are new files`
 * mvn versions:commit `To remove backuped pom.xml`

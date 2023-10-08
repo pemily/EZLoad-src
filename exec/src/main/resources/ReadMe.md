@@ -4,6 +4,9 @@
 
 
 ## Historique 
+### Version 2.1
+* Correction d'un problème de lancement des Graphiques (affichage impossible)
+
 ### Version 2.0
 * Correction de bugs sur les graphiques de performance & de liquidité
 * Ajout du graphique de crédit d'impôts cumulé

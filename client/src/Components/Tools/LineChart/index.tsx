@@ -20,7 +20,7 @@ import { useState, useRef } from "react";
 import { Download } from 'grommet-icons';
 import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
-import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
@@ -179,6 +179,7 @@ export function LineChart(props: LineChartProps){
         }
     }
 
+    ChartJS.register(...registerablesjs);
     ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
 //
     return (
