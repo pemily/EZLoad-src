@@ -154,7 +154,7 @@ public class SeekingAlphaTools extends ExternalSiteTools{
 
     private static PriceAtDate createPriceAtDate(Map.Entry<String, Object> entry) {
         Map<String, Number> value = (Map<String, Number>) entry.getValue();
-        String closePrice = value.get("close")+"";
+        String closePrice = value.get("open")+"";
         return new PriceAtDate(parseDate(entry), NumberUtils.str2Float(closePrice));
     }
 
