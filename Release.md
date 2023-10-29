@@ -13,6 +13,7 @@ Merge develop on main branch
 * git fetch
 * git pull
 * git merge origin/develop `Sur les conflits prendre tous les theirs (develop)`
+* git add .
 * git commit
 * mvn versions:set `fill the new version (without -SNAPSHOT)`
 * mvn versions:commit `To remove backuped pom.xml`
