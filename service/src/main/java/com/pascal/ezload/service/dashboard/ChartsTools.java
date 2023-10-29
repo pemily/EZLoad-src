@@ -46,17 +46,17 @@ public class ChartsTools {
 
     public static Chart createChart(List<EZDate> dates) {
         Chart chart = new Chart();
-        chart.setLabels(dates.stream().map(EZDate::toEpochSecond).map(l -> l*1000).collect(Collectors.toList()));
+        chart.setLabels(dates.stream().map(ChartsTools::date2Label).collect(Collectors.toList()));
         return chart;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, Prices prices){
-        return createChartLine(chart, lineStyle, lineTitle, prices.getPrices()
+    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, Prices prices){
+        return createChartLine(chart, lineStyle, axisSetting, lineTitle, prices.getPrices()
                 .stream()
                 .map(PriceAtDate::getPrice).collect(Collectors.toList()));
     }
 
-    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, List<ChartLine.ValueWithLabel> values){
+    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values){
         if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
         }
@@ -64,11 +64,12 @@ public class ChartsTools {
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValuesWithLabel(values);
+        chartLine.setAxisSetting(axisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, String lineTitle, List<Float> values){
+    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<Float> values){
         if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
         }
@@ -76,9 +77,12 @@ public class ChartsTools {
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValues(values);
+        chartLine.setAxisSetting(axisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }
 
-
+    public static long date2Label(EZDate date){
+        return date.toEpochSecond()*1000;
+    }
 }

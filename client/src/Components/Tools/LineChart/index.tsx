@@ -25,6 +25,7 @@ import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset,
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
+import { createNextState } from "@reduxjs/toolkit";
 
 export interface LineChartProps {
     chart: Chart;    
@@ -40,15 +41,17 @@ export function LineChart(props: LineChartProps){
     
     const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map(chartLine =>
         {            
-            if (chartLine.lineStyle === "BAR"){
-                return {    
+            if (chartLine.lineStyle === "BAR_STYLE"){
+                var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
                     type: 'bar',
                     label: chartLine.title,
                     data: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
                     tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
                     borderColor: chartLine.colorLine,
-                    backgroundColor: chartLine.colorLine
-                };       
+                    backgroundColor: chartLine.colorLine,
+                    yAxisID: chartLine.axisSetting,        
+                };  
+                return conf;     
             }
             return {    
              type: 'line',
@@ -58,7 +61,7 @@ export function LineChart(props: LineChartProps){
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
-             yAxisID: chartLine.lineStyle,        
+             yAxisID: chartLine.axisSetting,        
              fill: false,
              cubicInterpolationMode: 'monotone', 
              tension: 0.4, // le niveau de courbure    
@@ -77,7 +80,7 @@ export function LineChart(props: LineChartProps){
     };
     
     const options: ChartOptions ={
-        responsive: true, // pour que le canvas s'aggrandisse/diminue quand on resize la fenetre
+        responsive: true, // pour que le canvas s'agrandisse/diminue quand on resize la fenetre
         maintainAspectRatio: false,
         interaction: {
             mode: 'x', // on suit la sourie sur l'axe des X pour afficher les infos des courbes
@@ -93,8 +96,7 @@ export function LineChart(props: LineChartProps){
                 position: "nearest",
                 callbacks: {
                     label: function(context: any) {
-                        // https://www.chartjs.org/docs/latest/configuration/tooltip.html
-                        console.log(context);
+                        // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
                         if (context.dataset.tooltips){
                             return context.dataset.label+': '+context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
                         }
@@ -111,7 +113,7 @@ export function LineChart(props: LineChartProps){
             x: {
                 // https://www.chartjs.org/docs/latest/samples/scales/time-line.html
                 // https://github.com/chartjs/chartjs-adapter-date-fns
-               type: "time",                
+               type: "time",
                time: {
                     unit: "month",                                        
                },
@@ -145,36 +147,36 @@ export function LineChart(props: LineChartProps){
                     color: '#000000',                    
                }
             },
-            LINE_WITH_LEGENT_AT_LEFT: {
+            PERCENT: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.lineStyle === "LINE_WITH_LEGENT_AT_LEFT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "PERCENT").length > 0,
                 position: 'left',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['yAxisLeft']
+                  text: '%'
                 }
-              },
-            LINE_WITH_LEGENT_AT_RIGHT:{
+            },
+            AMOUNT_LEFT: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.lineStyle === "LINE_WITH_LEGENT_AT_RIGHT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_LEFT").length > 0,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: props.chart.axisId2titleY!['symbolDevise']
+                }
+            },              
+            AMOUNT_RIGHT:{
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_RIGHT").length > 0,
                 position: 'right',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['yAxisRight']
+                  text: props.chart.axisId2titleY!['symbolDevise']
                 },
                 // grid line settings
                 grid: {
                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                 },                
-            },
-            PERF_LINE: {
-                type: 'linear',
-                display: props.chart.lines.filter(l => l.lineStyle === "PERF_LINE").length > 0,
-                position: 'left',
-                title: {
-                  display: true,
-                  text: props.chart.axisId2titleY!['yAxisPerf']
-                }
             }
         }
     }

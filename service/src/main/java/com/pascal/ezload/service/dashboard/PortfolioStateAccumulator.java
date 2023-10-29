@@ -118,13 +118,18 @@ public class PortfolioStateAccumulator {
                 addCreditImpot(operation);
                 break;
             }
+            case "Courtage sur vente de titres": {
+                addLiquidityAmount = false;
+                Row negativeAmount = operation.createDeepCopy();
+                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
+                addLiquidityAmount(negativeAmount);
+            }
             case "Retenue fiscale":
             case "Droits de garde/Frais divers":
             case "Prélèvements sociaux":
             case "Prélèvements sociaux sur retrait PEA":
             case "Taxe sur les Transactions":
             case "Courtage sur achat de titres":
-            case "Courtage sur vente de titres":
             case "Divers":
                 break;
         }
