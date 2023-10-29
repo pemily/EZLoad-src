@@ -4,6 +4,10 @@
 
 
 ## Historique 
+### Version 2.2
+* Correction d'un problème de calcul sur la liquidité
+* Correction et ajout de graphiques sur les performances (en % et en valeur) 
+
 ### Version 2.1
 * Correction d'un problème de lancement des Graphiques (affichage impossible)
 

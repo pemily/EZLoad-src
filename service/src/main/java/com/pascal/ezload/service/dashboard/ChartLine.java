@@ -21,28 +21,24 @@ import java.util.List;
 
 public class ChartLine {
 
+
     public enum LineStyle {
-        LINE_WITH_LEGENT_AT_LEFT("yAxisLeft"),
-        LINE_WITH_LEGENT_AT_RIGHT("yAxisRight"),
-        PERF_LINE("yAxisPerf"),
-        BAR("bar");
+        LINE_STYLE,
+        BAR_STYLE
+    }
 
-        private String style;
-
-        LineStyle(String style) {
-            this.style = style;
-        }
-
-        String getStyleName() {
-            return style;
-        }
+    public enum AxisSetting {
+        PERCENT,
+        AMOUNT_LEFT,
+        AMOUNT_RIGHT
     }
 
     private String title;
     private List<Float> values; // if null, valuesWithLabel will be used
     private List<ValueWithLabel> valuesWithLabel;
     private String colorLine; // rgba(255,99,132,1);
-    private LineStyle lineStyle; // optionel, pour ajouter une autre echelle sur l'axe des Y (pour faire la distinction entre action/devise par exemple)
+    private LineStyle lineStyle; // optionnel, pour configurer une autre echelle sur l'axe des Y (et pour faire la distinction entre pourcentage/devise par exemple)
+    private AxisSetting axisSetting;
 
     public String getTitle() {
         return title;
@@ -82,6 +78,15 @@ public class ChartLine {
 
     public void setLineStyle(LineStyle lineStyle) {
         this.lineStyle = lineStyle;
+    }
+
+
+    public AxisSetting getAxisSetting() {
+        return axisSetting;
+    }
+
+    public void setAxisSetting(AxisSetting axisSetting) {
+        this.axisSetting = axisSetting;
     }
 
     public String toString(){

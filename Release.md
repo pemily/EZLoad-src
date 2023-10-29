@@ -4,10 +4,8 @@ develop branch has a -SNAPSHOT version
 
 To create a new version:
 
-* Update the version in the main pom.xml
 * Complete the history in file exec/src/main/resources/ReadMe.md
 * mvn license:format `In case there are new files`
-* mvn versions:commit `To remove backuped pom.xml`
 * Commit and Push on develop
 
 Merge develop on main branch
@@ -17,6 +15,7 @@ Merge develop on main branch
 * git merge origin/develop `Sur les conflits prendre tous les theirs (develop)`
 * git commit
 * mvn versions:set `fill the new version (without -SNAPSHOT)`
+* mvn versions:commit `To remove backuped pom.xml`
 * mvn clean install
 * git add . 
 * git commit -m "Set version X.Y"

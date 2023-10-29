@@ -189,13 +189,27 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 errorMsg={undefined}
                                 readOnly={false}
                                 selectedCodeValues={props.chartSettings.perfIndexSelection ? props.chartSettings.perfIndexSelection : []}                            
-                                userValues={[
-                                    'Valeur du portefeuille',
-                                    'Croissance de vos valeurs actuelles',
+                                userValues={[                                    
+                                    'Perf journalière de la valeur du portefeuille en %',
+                                    'Perf mensuelle de la valeur du portefeuille en %',
+                                    'Perf annnuelle de la valeur du portefeuille en %',                                    
+                                    'Perf journalière de la valeur du portefeuille depuis le 1er jour du graphique en %',
+                                    'Perf journalière de la valeur du portefeuille en €',
+                                    'Perf mensuelle de la valeur du portefeuille en €',
+                                    'Perf annnuelle de la valeur du portefeuille en €',
+                                    'Perf journalière de la valeur du portefeuille depuis le 1er jour du graphique en €',
+                                    'Croissance de vos valeurs actuelles depuis le 1er jour du graphique',
                                     'Rendement de vos valeurs actuelles',
                                     'Croissement + Rendement de vos valeurs actuelles']}
-                                codeValues={[
-                                    'PERF_VALEUR_PORTEFEUILLE',
+                                codeValues={[                                    
+                                    'PERF_DAILY_PORTEFEUILLE',
+                                    'PERF_MENSUEL_PORTEFEUILLE',
+                                    'PERF_ANNUEL_PORTEFEUILLE',
+                                    'PERF_TOTAL_PORTEFEUILLE',
+                                    'PERF_PLUS_MOINS_VALUE_DAILY',
+                                    'PERF_PLUS_MOINS_VALUE_MENSUEL',
+                                    'PERF_PLUS_MOINS_VALUE_ANNUEL',
+                                    'PERF_PLUS_MOINS_VALUE_TOTAL',
                                     'PERF_CROISSANCE_CURRENT_SHARES',
                                     'PERF_RENDEMENT_CURRENT_SHARES',
                                     'PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES'

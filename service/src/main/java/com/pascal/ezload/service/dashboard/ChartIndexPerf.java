@@ -18,8 +18,21 @@
 package com.pascal.ezload.service.dashboard;
 
 public enum ChartIndexPerf {
-    PERF_VALEUR_PORTEFEUILLE,
-    PERF_CROISSANCE_CURRENT_SHARES, // la croissance de l'action
-    PERF_RENDEMENT_CURRENT_SHARES, // le rendement du dividende
-    PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES // croissance + rendement du dividende
+    PERF_DAILY_PORTEFEUILLE("L'évolution en % du portefeuille jour apres jour"),
+    PERF_MENSUEL_PORTEFEUILLE("L'évolution en % du portefeuille mois apres mois"),
+    PERF_ANNUEL_PORTEFEUILLE("L'évolution en % du portefeuille année apres année"),
+    PERF_TOTAL_PORTEFEUILLE("L'évolution en % du portefeuille depuis le 1er jour du graphique"),
+    PERF_PLUS_MOINS_VALUE_DAILY("L'évolution en valeur du portefeuille jour apres jour"),
+    PERF_PLUS_MOINS_VALUE_MENSUEL("L'évolution en valeur du portefeuille mois apres mois"),
+    PERF_PLUS_MOINS_VALUE_ANNUEL("L'évolution en valeur du portefeuille année apres année"),
+    PERF_PLUS_MOINS_VALUE_TOTAL("L'évolution en valeur du portefeuille depuis le 1er jour du graphique"),
+    PERF_CROISSANCE_CURRENT_SHARES("L'évolution en % de chaque action depuis le 1er jour du graphique"), // la croissance de l'action
+    PERF_RENDEMENT_CURRENT_SHARES("a revoir"), // le rendement du dividende
+    PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES("a revoir"); // croissance + rendement du dividende
+
+    private String description;
+
+    ChartIndexPerf(String description){
+        this.description = description;
+    }
 }

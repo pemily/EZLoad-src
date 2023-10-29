@@ -125,6 +125,10 @@ public class EZDate implements Comparable<EZDate> {
         return year+"/"+leadingZero(month)+"/"+leadingZero(day);
     }
 
+    public String toYYYYMM(){
+        return year+"/"+leadingZero(month);
+    }
+
     public LocalDate toLocalDate(){
         return LocalDate.of(year, month, day);
     }
