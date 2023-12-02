@@ -181,7 +181,8 @@ public class PortfolioValuesBuilder {
                 // to get the instant_liquidité, I must use the cumulative index
                 // parce que la notion de liquidité est pour un instant T, mais elle est une valeur qui depend de toutes les valeurs precedente
                 return state.getLiquidity().getCumulative();
-            case INSTANT_VALEUR_ACTIONS:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
                 float portfolioValue = state.getShareNb()
                                         .entrySet()
                                         .stream()
@@ -195,7 +196,9 @@ public class PortfolioValuesBuilder {
                                         .reduce(Float::sum)
                                         .orElse(0f);
 
-                portfolioValue+=state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+                if (portfolioFilter == PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY) {
+                    portfolioValue += state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+                }
                 return portfolioValue;
         }
         throw new IllegalStateException("Unknown filter: "+ portfolioFilter);

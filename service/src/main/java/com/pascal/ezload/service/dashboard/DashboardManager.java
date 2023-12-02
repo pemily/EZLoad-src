@@ -219,11 +219,17 @@ public class DashboardManager {
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle,
                         result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.CUMUL_DIVIDENDES)));
                 break;
-            case INSTANT_VALEUR_ACTIONS_IN_PORTFOLIO:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
                 lineStyle = ChartLine.LineStyle.LINE_STYLE;
-                lineTitle = "Valeur du portefeuille";
+                lineTitle = "Valeur du portefeuille avec les liquidités";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle,
-                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_ACTIONS)));
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY)));
+                break;
+            case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
+                lineStyle = ChartLine.LineStyle.LINE_STYLE;
+                lineTitle = "Valeur du portefeuille sans les liquidités";
+                allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle,
+                        result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY)));
                 break;
             case INSTANT_LIQUIDITE:
                 lineStyle = ChartLine.LineStyle.LINE_STYLE;
@@ -362,7 +368,7 @@ public class DashboardManager {
                 case PERF_PLUS_MOINS_VALUE_MENSUEL:
                 case PERF_PLUS_MOINS_VALUE_DAILY:
                 case PERF_PLUS_MOINS_VALUE_TOTAL:
-                    result.add(ChartIndex.INSTANT_VALEUR_ACTIONS_IN_PORTFOLIO);
+                    result.add(ChartIndex.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY);
                     result.add(ChartIndex.INSTANT_ENTREES_SORTIES);
                     break;
                 case PERF_CROISSANCE_CURRENT_SHARES:
@@ -379,7 +385,7 @@ public class DashboardManager {
             case PERF_TOTAL_PORTEFEUILLE: {
                 String lineTitle = "Perf portefeuille";
                 List<Float> perf = new LinkedList<>();
-                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_ACTIONS);
+                Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY);
                 Prices inputs = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_ENTREES);
                 Prices outputs = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_SORTIES);
 
@@ -494,7 +500,7 @@ public class DashboardManager {
 
     private void computePerfPortefeuillePerPeriod(PortfolioValuesBuilder.Result result, List<ChartLine> allChartLines, Chart chart, String barTitle, Function<EZDate, String> groupBy, boolean isPercent) {
         List<Float> perf = new LinkedList<>();
-        Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_ACTIONS);
+        Prices totalPortefeuille = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY);
         Prices inputs = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_ENTREES);
         Prices outputs = result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_SORTIES);
 
