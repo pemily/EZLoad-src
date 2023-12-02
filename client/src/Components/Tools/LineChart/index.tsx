@@ -76,7 +76,6 @@ export function LineChart(props: LineChartProps){
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
         labels: props.chart.labels,
         datasets: lines
-
     };
     
     const options: ChartOptions ={
@@ -156,18 +155,27 @@ export function LineChart(props: LineChartProps){
                   text: '%'
                 }
             },
-            AMOUNT_LEFT: {
+            PORTFOLIO: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_LEFT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['symbolDevise']
                 }
-            },              
-            AMOUNT_RIGHT:{
+            },                  
+            SHARE: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_RIGHT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: props.chart.axisId2titleY!['symbolDevise']
+                }
+            },                      
+            DEVISE:{
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.axisSetting === "DEVISE").length > 0,
                 position: 'right',
                 title: {
                   display: true,

@@ -28,9 +28,10 @@ public class ChartLine {
     }
 
     public enum AxisSetting {
-        PERCENT,
-        AMOUNT_LEFT,
-        AMOUNT_RIGHT
+        PERCENT, // des pourcentages
+        PORTFOLIO, // des gros nombres (valeurs du portefeuille)
+        DEVISE, // la valeur des devises (des petits nombres autour de 1)
+        SHARE // des valeurs de prix d'une actions
     }
 
     private String title;

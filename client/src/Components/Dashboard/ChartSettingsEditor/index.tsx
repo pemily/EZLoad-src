@@ -153,7 +153,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Vos valeurs actuelles',
                                     'Vos 10 plus grosses valeurs actuelles',
                                     'Toutes vos valeurs',
-                                    'Valeur du portefeuille',
+                                    'Somme des valeurs d\'actions en portefeuille',
                                     'Liquidité',
                                     'Crédit d\'impots cumulés',
                                     'Entrées/Sorties',
@@ -162,12 +162,13 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Dividendes',
                                     'Devises',
                                     'Achats',
-                                    'Ventes']}
+                                    'Ventes',
+                                    'Achats & Ventes détaillés']}
                                 codeValues={[
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
                                     'ALL_SHARES',
-                                    'INSTANT_VALEUR_PORTEFEUILLE',
+                                    'INSTANT_VALEUR_ACTIONS_IN_PORTFOLIO',
                                     'INSTANT_LIQUIDITE',                                    
                                     'CUMUL_CREDIT_IMPOTS',
                                     'INSTANT_ENTREES_SORTIES',
@@ -176,7 +177,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CUMUL_DIVIDENDES',
                                     'CURRENCIES',
                                     'BUY',
-                                    'SOLD']}
+                                    'SOLD',
+                                    'BUY_SOLD_WITH_DETAILS']}
                                 description=""
                                 onChange={newValue => 
                                     props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})

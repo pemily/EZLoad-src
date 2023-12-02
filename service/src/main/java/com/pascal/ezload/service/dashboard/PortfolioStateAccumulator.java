@@ -150,11 +150,6 @@ public class PortfolioStateAccumulator {
     private void addDividend(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
         previousState.getDividends().plus(newNb);
-
-        EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
-        previousState.getShareBuy()
-                .compute(share, (sh, oldValue) -> oldValue == null ? newNb : oldValue +newNb);
-
     }
 
     private void addInputQuantity(Row operation) {

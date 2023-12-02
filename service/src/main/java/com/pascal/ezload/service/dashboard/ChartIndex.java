@@ -18,17 +18,18 @@
 package com.pascal.ezload.service.dashboard;
 
 public enum ChartIndex {
-    CURRENT_SHARES,
-    TEN_WITH_MOST_IMPACTS,
-    ALL_SHARES,
-    INSTANT_VALEUR_PORTEFEUILLE,
-    INSTANT_LIQUIDITE,
-    CUMUL_CREDIT_IMPOTS,
-    CUMUL_ENTREES_SORTIES,
-    INSTANT_ENTREES_SORTIES,
-    INSTANT_DIVIDENDES,
-    CUMUL_DIVIDENDES,
-    CURRENCIES,
-    BUY,
-    SOLD
+    CURRENT_SHARES,  // Les cours des valeurs d'actions actuelles
+    TEN_WITH_MOST_IMPACTS, // Les cours de vos 10 plus grosses actions actuelles
+    ALL_SHARES,   // Tous les cours d'actions
+    INSTANT_VALEUR_ACTIONS_IN_PORTFOLIO, // L'additions des actions dans votre portefeuilles
+    INSTANT_LIQUIDITE, // Vos liquiditées
+    CUMUL_CREDIT_IMPOTS, // Crédit d'impots cumulés
+    CUMUL_ENTREES_SORTIES, // Entrées/Sorties cumulés
+    INSTANT_ENTREES_SORTIES, // Entrées/Sorties
+    INSTANT_DIVIDENDES,  // Dividendes
+    CUMUL_DIVIDENDES,  // Dividendes Cumulés
+    CURRENCIES, // Devises
+    BUY, // Achat
+    SOLD, // Ventes
+    BUY_SOLD_WITH_DETAILS // Achat et ventes par actions
 }
