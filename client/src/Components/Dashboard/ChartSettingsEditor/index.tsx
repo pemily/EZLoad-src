@@ -163,7 +163,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Devises',
                                     'Achats',
                                     'Ventes',
-                                    'Achats & Ventes détaillés']}
+                                    'Achats & Ventes des valeurs sélectionnés']}
                                 codeValues={[
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    

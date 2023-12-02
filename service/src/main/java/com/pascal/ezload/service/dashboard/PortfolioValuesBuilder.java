@@ -145,8 +145,8 @@ public class PortfolioValuesBuilder {
                     r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
                     r.date2share2Dividend.put(state.getDate(), state.getShareDividends());
 
-                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy());
-                    state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) - value));
+                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
+                    state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
                     r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
         });
 

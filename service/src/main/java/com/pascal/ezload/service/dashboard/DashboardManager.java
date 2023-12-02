@@ -179,7 +179,7 @@ public class DashboardManager {
                                         .stream()
                                         .filter(e -> e.getKey().equals(ezShare))
                                         .forEach(e -> {
-                                            valueWithLabel.setLabel(e.getValue() < 0 ? "Vente de "+e.getKey().getEzName() : "Achat de "+e.getKey().getEzName());
+                                            valueWithLabel.setLabel((e.getValue() < 0 ? "Vente ": "Achat ")+e.getValue()); // +" Cours: "+result.getAllSharesTargetPrices().get(ezShare).getPriceAt(date).getPrice());
                                             valueWithLabel.setValue(e.getValue());
                                         });
 
