@@ -4,6 +4,10 @@
 
 
 ## Historique 
+### Version 2.3
+* Ajout de la courbe du portefeuille avec et sans les liquidités
+* Ajout de la courbe des Achats/Ventes intégrés aux valeurs sélectionnés
+
 ### Version 2.2
 * Correction d'un problème de calcul sur la liquidité
 * Correction et ajout de graphiques sur les performances (en % et en valeur) 

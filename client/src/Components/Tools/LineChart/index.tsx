@@ -20,7 +20,7 @@ import { useState, useRef } from "react";
 import { Download } from 'grommet-icons';
 import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
-import { Chart as ChartJS, ChartData,ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
+import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
@@ -54,7 +54,7 @@ export function LineChart(props: LineChartProps){
                 return conf;     
             }
             return {    
-             type: 'line',
+             type: 'line',             
              label: chartLine.title,
              data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
              tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
@@ -76,9 +76,8 @@ export function LineChart(props: LineChartProps){
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
         labels: props.chart.labels,
         datasets: lines
-
     };
-    
+
     const options: ChartOptions ={
         responsive: true, // pour que le canvas s'agrandisse/diminue quand on resize la fenetre
         maintainAspectRatio: false,
@@ -107,6 +106,41 @@ export function LineChart(props: LineChartProps){
             legend: {
                 display: true,
                 position: 'top' as const,
+                onClick: function(e: any, legendItem: LegendItem, legend: LegendElement<any>) {
+                    // https://www.chartjs.org/docs/latest/configuration/legend.html
+                    const ci = legend.chart;      
+                
+                    // https://stackoverflow.com/questions/72236230/remove-redundant-legends-on-the-chart-using-generatelabels-with-chartjs-v3
+                    // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
+                    let hidden = !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;        
+                    ci.data.datasets?.forEach((dataset: ChartDataset<any,any>, datasetIndex: number) => {
+                        if (dataset.label == legendItem.text) {
+                            ci.getDatasetMeta(datasetIndex).hidden = hidden;                
+                        }
+                    });
+                    ci.update();
+                },
+                labels: {
+                    generateLabels(chart: any){                               
+                        var result : LegendItem[] = [];                        
+                        var labelIndex: number = 0;
+                        var labelTextAlreadyUsed : string[] = [];
+                        chart?.data?.datasets.forEach((l:ChartDataset<any,any>, i:number) => {
+                            if (!labelTextAlreadyUsed.includes(l.label)){
+                                labelTextAlreadyUsed.push(l.label);
+                                result.push({
+                                    datasetIndex: i, // index des données dans le tableau de dataset
+                                    index: labelIndex++, // index de la legende dans le tableau des legendes
+                                    text: l.label,
+                                    fillStyle: l.backgroundColor,
+                                    strokeStyle: l.backgroundColor,
+                                    hidden: chart.getDatasetMeta(i).hidden
+                                });
+                            }
+                        });
+                        return result;
+                    }                    
+                }
             }
         },
         scales: {
@@ -156,18 +190,27 @@ export function LineChart(props: LineChartProps){
                   text: '%'
                 }
             },
-            AMOUNT_LEFT: {
+            PORTFOLIO: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_LEFT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['symbolDevise']
                 }
-            },              
-            AMOUNT_RIGHT:{
+            },                  
+            SHARE: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "AMOUNT_RIGHT").length > 0,
+                display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: props.chart.axisId2titleY!['symbolDevise']
+                }
+            },                      
+            DEVISE:{
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.axisSetting === "DEVISE").length > 0,
                 position: 'right',
                 title: {
                   display: true,

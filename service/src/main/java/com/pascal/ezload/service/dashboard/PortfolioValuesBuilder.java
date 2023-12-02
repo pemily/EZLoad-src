@@ -50,6 +50,7 @@ public class PortfolioValuesBuilder {
         private final Map<PortfolioFilter, Prices> portfolioFilter2TargetPrices = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2ShareNb = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2SoldAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShare, Float>> date2share2BuyOrSoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2Dividend = new HashMap<>();
 
@@ -86,6 +87,9 @@ public class PortfolioValuesBuilder {
         }
         public Map<EZDate, Map<EZShare, Float>> getDate2share2SoldAmount() {
             return date2share2SoldAmount;
+        }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyOrSoldAmount() {
+            return date2share2BuyOrSoldAmount;
         }
         public Map<EZDate, Map<EZShare, Float>> getDate2share2Dividend(){
             return date2share2Dividend;
@@ -140,6 +144,10 @@ public class PortfolioValuesBuilder {
                     r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
                     r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
                     r.date2share2Dividend.put(state.getDate(), state.getShareDividends());
+
+                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
+                    state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
+                    r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
         });
 
         portfolioFilters.stream()
@@ -173,7 +181,8 @@ public class PortfolioValuesBuilder {
                 // to get the instant_liquidité, I must use the cumulative index
                 // parce que la notion de liquidité est pour un instant T, mais elle est une valeur qui depend de toutes les valeurs precedente
                 return state.getLiquidity().getCumulative();
-            case INSTANT_VALEUR_PORTEFEUILLE:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
                 float portfolioValue = state.getShareNb()
                                         .entrySet()
                                         .stream()
@@ -187,7 +196,9 @@ public class PortfolioValuesBuilder {
                                         .reduce(Float::sum)
                                         .orElse(0f);
 
-                portfolioValue+=state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+                if (portfolioFilter == PortfolioFilter.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY) {
+                    portfolioValue += state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+                }
                 return portfolioValue;
         }
         throw new IllegalStateException("Unknown filter: "+ portfolioFilter);

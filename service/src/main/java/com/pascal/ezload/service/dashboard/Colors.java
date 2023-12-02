@@ -30,11 +30,8 @@ public class Colors {
         colors = generateRainbowPalette(numColors);
     }
 
-    public String nextColor(float transparency){
-        if (colorIndex >= colors.size()){
-            colorIndex = 0;
-        }
-        return colors.get(colorIndex++)+","+transparency+")";
+    public ColorCode nextColorCode(){
+        return new ColorCode(colors.get(colorIndex++));
     }
 
     private static List<String> generateRainbowPalette(int numColors){
@@ -106,4 +103,21 @@ public class Colors {
         return toRet;
     }
 
+
+    public class ColorCode {
+
+        private String code;
+
+        private ColorCode(String code){
+            this.code = code;
+        }
+
+        private String getCode(){
+            return code;
+        }
+
+        public String getColor(float transparency){
+            return getCode()+","+transparency+")";
+        }
+    }
 }
