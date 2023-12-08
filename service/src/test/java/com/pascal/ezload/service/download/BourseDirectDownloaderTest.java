@@ -19,6 +19,7 @@ package com.pascal.ezload.service.download;
 
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
@@ -40,6 +41,7 @@ public class BourseDirectDownloaderTest {
 
     @Test
     public void getAccountFromPdfFilePathTest(){
+        SettingsManager settingsManager = new SettingsManager("ezload.yaml");
         MainSettings mainSettings = new MainSettings();
         BourseDirectSettings bourseDircectSettings = new BourseDirectSettings();
         BourseDirectEZAccountDeclaration aaaa = new BourseDirectEZAccountDeclaration();
@@ -51,7 +53,7 @@ public class BourseDirectDownloaderTest {
         bourseDircectSettings.setAccounts(Arrays.asList(aaaa,aaa,aaaaa));
         EzProfil ezProfil = new EzProfil();
         ezProfil.setBourseDirect(bourseDircectSettings);
-        BourseDirectDownloader bdd = new BourseDirectDownloader(new LoggerReporting(), mainSettings, ezProfil);
+        BourseDirectDownloader bdd = new BourseDirectDownloader(new LoggerReporting(), settingsManager, mainSettings, ezProfil);
         Assertions.assertEquals("AAAA", bdd.getAccountFromFilePath("/AAAA/2021/boursedirect-2021-01-23.pdf").getName());
         Assertions.assertEquals("AAA", bdd.getAccountFromFilePath("/AAA/2021/boursedirect-2021-01-23.pdf").getName());
         Assertions.assertEquals("AAAAA", bdd.getAccountFromFilePath("/AAAAA/2021/boursedirect-2021-01-23.pdf").getName());

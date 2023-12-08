@@ -19,6 +19,7 @@ package com.pascal.ezload.service.config;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -38,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class SettingsManager {
     private static final Logger logger = Logger.getLogger("SettingsManager");
+    public static final String EZLOAD_CONFIG_YAML = "ezload-config.yaml";
+    public static final String GDRIVE_ACCESS_JSON_FILE = "gdrive-access.json";
 
     private final String configFile;
     private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -46,16 +49,22 @@ public class SettingsManager {
     private static final String profilesDirectory = "profiles";
     public final static String EZPORTFOLIO_GDRIVE_URL_PREFIX = "https://docs.google.com/spreadsheets/d/";
     private final static String CREDS_DIR = "creds";
+    private static final String DOWNLOAD_DIR ="courtiers";
+    private static final String COURTIER_CREDS_FILE = "ezCreds.json";
 
 
 
-    private SettingsManager(String configFile){
+    public SettingsManager(String configFile){
         this.configFile = configFile;
+    }
+
+    public String getConfigFile(){
+        return configFile;
     }
 
     private static String getDefaultProfileName(){
         if (StringUtils.isBlank(System.getProperty("user.name"))){
-            return "Defaut";
+            return "Défaut";
         }
         return System.getProperty("user.name");
     }
@@ -81,7 +90,7 @@ public class SettingsManager {
         }
     }
 
-    private EzProfil readEzProfilFile(String ezProfilName) throws Exception {
+    public EzProfil readEzProfilFile(String ezProfilName) throws Exception {
         try(Reader reader = new FileReader(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilName+"."+ezProfilFileExtension)) {
             return defaultValuesIfNotSet(ezProfilName, yamlMapper.readValue(reader, EzProfil.class), null);
         }
@@ -89,9 +98,14 @@ public class SettingsManager {
 
     public void newEzProfil(String ezProfilName) throws Exception {
         MainSettings settings = readMainSettingsFile();
-        EzProfil defaultProfil = readEzProfilFile(settings.getActiveEzProfilName());
+        String defaultProfilName = settings.getActiveEzProfilName();
         // comme le fichier de gdrive est pénible a faire, je le recupere du profil par defaut.
-        createEzProfilIfNotExists(ezProfilName, defaultProfil.getEzPortfolio().getGdriveCredsFile());
+        String defaultGDriveFile = getGDriveCredsFile(defaultProfilName);
+        createEzProfilIfNotExists(ezProfilName, defaultGDriveFile);
+    }
+
+    public String getGDriveCredsFile(String defaultProfilName) {
+        return getEzProfilDir(defaultProfilName, CREDS_DIR) + File.separator + GDRIVE_ACCESS_JSON_FILE;
     }
 
     public void saveEzProfilFile(String ezProfilName, EzProfil ezProfil) throws IOException {
@@ -121,15 +135,6 @@ public class SettingsManager {
             saveMainSettingsFile(settings);
         }
 
-        if (newEzProfil.getDownloadDir().startsWith(oldProfileDir)){
-            newEzProfil.setDownloadDir(newEzProfil.getDownloadDir().replace(oldProfileDir, newProfileDir));
-        }
-        if (newEzProfil.getCourtierCredsFile().startsWith(oldProfileDir)){
-            newEzProfil.setCourtierCredsFile(newEzProfil.getCourtierCredsFile().replace(oldProfileDir, newProfileDir));
-        }
-        if (newEzProfil.getEzPortfolio().getGdriveCredsFile().startsWith(oldProfileDir)){
-            newEzProfil.getEzPortfolio().setGdriveCredsFile(newEzProfil.getEzPortfolio().getGdriveCredsFile().replace(oldProfileDir, newProfileDir));
-        }
         saveEzProfilFile(newProfilName, newEzProfil);
     }
 
@@ -139,9 +144,12 @@ public class SettingsManager {
         new File(getEzHome()+File.separator+profilesDirectory+File.separator+ezProfilName+"."+ezProfilFileExtension).delete();
     }
 
+    public static String getActiveEzProfileName(MainSettings mainSettings){
+        return StringUtils.isBlank(mainSettings.getActiveEzProfilName()) ? defaultEzProfilName : mainSettings.getActiveEzProfilName();
+    }
+
     public EzProfil getActiveEzProfil(MainSettings mainSettings) throws Exception {
-        String ezProfilName = StringUtils.isBlank(mainSettings.getActiveEzProfilName()) ? defaultEzProfilName : mainSettings.getActiveEzProfilName();
-        return readEzProfilFile(ezProfilName);
+        return readEzProfilFile(getActiveEzProfileName(mainSettings));
     }
 
 
@@ -154,9 +162,14 @@ public class SettingsManager {
                 .collect(Collectors.toList());
     }
 
-    public static AuthManager getAuthManager(MainSettings mainSettings, EzProfil ezProfil) {
-        return new AuthManager(mainSettings.getEzLoad().getPassPhrase(), ezProfil.getCourtierCredsFile());
+    public AuthManager getAuthManager(MainSettings mainSettings) {
+        return new AuthManager(mainSettings.getEzLoad().getPassPhrase(), getCredsDir(mainSettings.getActiveEzProfilName())+ File.separator + COURTIER_CREDS_FILE);
     }
+
+    private String getCredsDir(String ezProfilName) {
+        return getEzProfilDir(ezProfilName, CREDS_DIR);
+    }
+
 
     public String getEzHome() {
         return new File(configFile).getParentFile().getAbsolutePath();
@@ -166,33 +179,36 @@ public class SettingsManager {
         return getEzHome()+File.separator+"repo";
     }
 
-    public static String searchConfigFilePath(){
+    private static String getRedirectFile(){
+        String userDir = System.getProperty("user.home");
+        return userDir + File.separator + "ezload.txt";
+    }
+
+    public void moveDone() throws IOException {
+        FileUtil.string2file(getRedirectFile(), configFile);
+    }
+
+    public static String searchConfigFilePath() throws IOException {
         String configFile = System.getProperty("ezloadConfig");
         if (configFile == null) configFile = System.getenv("ezloadConfig");
+
         if (configFile == null){
-            String userDir = System.getProperty("user.home");
-            String brDir = userDir + File.separator + "EZLoad";
-            new File(brDir).mkdirs();
-            configFile = brDir + File.separator + "ezload-config.yaml";
+            String dirRedirect = getRedirectFile();
+            if (new File(dirRedirect).exists()) {
+                configFile = FileUtil.file2String(dirRedirect);
+            }
+            else {
+                String userDir = System.getProperty("user.home");
+                configFile = userDir + File.separator + "EZLoad" + File.separator + EZLOAD_CONFIG_YAML;
+                FileUtil.string2file(dirRedirect, configFile);
+            }
         }
+
         return configFile;
     }
 
     public static SettingsManager getInstance() throws IOException {
         return new SettingsManager(searchConfigFilePath());
-    }
-
-    public Consumer<String> saveNewChromeDriver(){
-        return newChromeDriver -> {
-            try {
-                MainSettings mainSettings = this.loadProps();
-                mainSettings.getChrome().setDriverPath(newChromeDriver);
-                this.saveMainSettingsFile(mainSettings);
-            }
-            catch (Exception e){
-                throw new RuntimeException(e);
-            }
-        };
     }
 
     public EzProfil createEzProfilIfNotExists(String ezProfilName, String initGDriveCredsFile) throws Exception {
@@ -203,9 +219,9 @@ public class SettingsManager {
         return defaultValuesIfNotSet(ezProfilName, ezProfil, initGDriveCredsFile);
     }
 
-    private String getEzProfileDirectory(String ezProfilName) {
+    public String getEzProfileDirectory(String ezProfilName) {
         String ezHome = getEzHome();
-        return ezHome+File.separator+profilesDirectory+File.separator+ ezProfilName +File.separator;
+        return ezHome+File.separator+profilesDirectory+File.separator+ ezProfilName;
     }
 
     private EzProfil defaultValuesIfNotSet(String ezProfilName, EzProfil ezProfil, String initGDriveCredsFile) throws Exception {
@@ -215,19 +231,15 @@ public class SettingsManager {
         String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
         new File(ezProfilDirectory).mkdirs();
 
-        if (ezProfil.getCourtierCredsFile() == null || !new File(ezProfil.getCourtierCredsFile()).exists()) {
-            ezProfil.setCourtierCredsFile(ezProfilDirectory + CREDS_DIR + File.separator + "ezCreds.json");
-            new File(ezProfil.getCourtierCredsFile()).getParentFile().mkdirs();
-            try (FileOutputStream output = new FileOutputStream(ezProfil.getCourtierCredsFile())) {
+        String credsCourtierFile = getCredsDir(ezProfilName)+ File.separator + COURTIER_CREDS_FILE;
+        if (!new File(credsCourtierFile).exists()) {
+            new File(credsCourtierFile).getParentFile().mkdirs();
+            try (FileOutputStream output = new FileOutputStream(credsCourtierFile)) {
                 output.write("{}".getBytes(StandardCharsets.UTF_8));
             }
         }
-        new File(ezProfil.getCourtierCredsFile()).getParentFile().mkdirs();
 
-        if (ezProfil.getDownloadDir() == null){
-            ezProfil.setDownloadDir(ezProfilDirectory+"courtiers");
-        }
-        new File(ezProfil.getDownloadDir()).mkdirs();
+        new File(getEzProfilDir(ezProfilName, DOWNLOAD_DIR)).mkdirs();
 
         ezProfil.setAnnualDividend(defaultValuesIfNotSet(ezProfil.getAnnualDividend()));
         ezProfil.setDividendCalendar(defaultValuesIfNotSet(ezProfil.getDividendCalendar()));
@@ -254,20 +266,20 @@ public class SettingsManager {
         if (ezPortfolioSettings == null){
             ezPortfolioSettings = new EZPortfolioSettings();
         }
-        String ezProfilDirectory = getEzProfileDirectory(ezProfilName);
-        if (ezPortfolioSettings.getEzPortfolioUrl() == null) ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
-        if (ezPortfolioSettings.getGdriveCredsFile() == null){
-            ezPortfolioSettings.setGdriveCredsFile(ezProfilDirectory+ CREDS_DIR +File.separator+"gdrive-access.json");
-            new File(ezPortfolioSettings.getGdriveCredsFile()).getParentFile().mkdirs();
-            if (initGDriveCredsFile == null) {
-                FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), "{}");
-            }
-            else{
-                String content = FileUtil.file2String(initGDriveCredsFile);
-                FileUtil.string2file(ezPortfolioSettings.getGdriveCredsFile(), content == null ? "{}" : content);
-            }
 
+        if (ezPortfolioSettings.getEzPortfolioUrl() == null) ezPortfolioSettings.setEzPortfolioUrl(EZPORTFOLIO_GDRIVE_URL_PREFIX);
+
+        String gdriveCredsFile = getGDriveCredsFile(ezProfilName);
+        if (!new File(gdriveCredsFile).exists()) {
+            new File(gdriveCredsFile).getParentFile().mkdirs();
+            if (initGDriveCredsFile == null) {
+                FileUtil.string2file(gdriveCredsFile, "{}");
+            } else {
+                String content = FileUtil.file2String(initGDriveCredsFile);
+                FileUtil.string2file(gdriveCredsFile, content == null ? "{}" : content);
+            }
         }
+
         return ezPortfolioSettings;
     }
 
@@ -293,16 +305,17 @@ public class SettingsManager {
         if (ezLoad == null){
             ezLoad = new MainSettings.EZLoad();
         }
-        String ezHome = getEzHome();
+
         if (ezLoad.getPort() == 0) ezLoad.setPort(2180);
-        if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(ezHome+File.separator+"logs");
-        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir(getEzLoadRepoDir()+File.separator+"rules");
+        if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(Files.createTempDirectory("ezLoad").toFile().getAbsolutePath()+File.separator+"logs");
+        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir("repo"+ File.separator + "rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
-        if (ezLoad.getShareDataFile() == null) ezLoad.setShareDataFile(ezHome+File.separator+"shareData.json");
-        if (ezLoad.getDashboardFile() == null) ezLoad.setDashboardFile(ezHome+File.separator+"dashboard.json");
-        if (ezLoad.getCacheDir() == null) ezLoad.setCacheDir(ezHome+File.separator+"cache");
+        if (ezLoad.getShareDataFile() == null) ezLoad.setShareDataFile("shareData.json");
+        if (ezLoad.getDashboardFile() == null) ezLoad.setDashboardFile("dashboard.json");
+        if (ezLoad.getCacheDir() == null) ezLoad.setCacheDir(Files.createTempDirectory("ezLoad").toFile().getAbsolutePath()+File.separator+"cache");
 
         new File(ezLoad.getLogsDir()).mkdirs();
+        new File(ezLoad.getCacheDir()).mkdirs();
 
         ezLoad.setAdmin(defaultValuesIfNotSet(ezLoad.getAdmin()));
 
@@ -349,16 +362,13 @@ public class SettingsManager {
         if (chromeSettings == null) {
             chromeSettings = new MainSettings.ChromeSettings();
         }
-        String ezHome = getEzHome();
         if (chromeSettings.getUserDataDir() == null)
-            chromeSettings.setUserDataDir(ezHome + File.separator + "chrome" + File.separator + "data");
-        // chromeDriver is a file that does not exists, so next time it will be downloaded
-        if (chromeSettings.getDriverPath() == null)
-            chromeSettings.setDriverPath(ezHome + File.separator + "chrome" + File.separator + "driver" + File.separator + "chromedriver.zip");
+            chromeSettings.setUserDataDir(Files.createTempDirectory("ezload").toFile().getAbsolutePath()+File.separator+"chromeData");
+
         if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(13);
 
         new File(chromeSettings.getUserDataDir()).mkdirs();
-        new File(chromeSettings.getDriverPath()).getParentFile().mkdirs();
+
         return chromeSettings;
     }
 
@@ -378,11 +388,19 @@ public class SettingsManager {
         return properties.getProperty("version");
     }
 
-    public static String getDownloadDir(EzProfil ezProfil, EnumEZBroker brCourtier) {
-        String dirStr = ezProfil.getDownloadDir()+ File.separator+brCourtier.getDirName();
+    public String getDownloadDir(String defaultEzProfilName, EnumEZBroker brCourtier) {
+        String dirStr = getEzProfilDir(defaultEzProfilName, DOWNLOAD_DIR) + File.separator + brCourtier.getDirName();
         File dir = new File(dirStr);
         if (!dir.exists()) dir.mkdirs();
         return dirStr;
     }
 
+    public String getDir(String subdir) {
+        return getEzHome()+File.separator+subdir;
+    }
+
+
+    public String getEzProfilDir(String ezProfilName, String subdir) {
+        return getEzProfileDirectory(ezProfilName)+File.separator+subdir;
+    }
 }

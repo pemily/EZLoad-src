@@ -309,8 +309,9 @@ public class RulesEngine {
         ezPortefeuilleEdition.setQuantity(eval(ezPortefeuilleEdition, ruleName+".PortefeuilleQuantiteExpr", portefeuilleRule.getPortefeuilleQuantiteExpr(), data, functions));
 
         try {
-            EzProfil ezProfil = SettingsManager.getInstance().getActiveEzProfil(mainSettings);
-            computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition);
+            SettingsManager settingsManager = SettingsManager.getInstance();
+            EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+            computeDividendCalendarAndAnnual(settingsManager, mainSettings, ezProfil, reporting, ezPortefeuilleEdition);
         } catch (Exception e) {
             ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
             logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
@@ -324,14 +325,14 @@ public class RulesEngine {
     }
 
     // return true if update, false else
-    public static boolean computeDividendCalendarAndAnnual(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition) {
+    public static boolean computeDividendCalendarAndAnnual(SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil, Reporting reporting, EzPortefeuilleEdition ezPortefeuilleEdition) {
         boolean result = false;
         if (!ShareValue.LIQUIDITY_CODE.equals(ezPortefeuilleEdition.getTickerGoogleFinance())) {
             try{
                 // recherche les dividendes sur seekingalpha
-                Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager().getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
+                Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager(settingsManager).getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
                 if (ezAction.isEmpty()) return false;
-                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager().searchDividends(reporting, ezAction.get(), EZDate.today().minusYears(2), EZDate.today());
+                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager(settingsManager).searchDividends(reporting, ezAction.get(), EZDate.today().minusYears(2), EZDate.today());
                 if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)

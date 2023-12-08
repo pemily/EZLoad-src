@@ -40,7 +40,7 @@ export function App(){
                                                                 // le useEffect(showLog, []) dans ViewLog n'est
                                                                 // pas executé lorsque la page est affcihé
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
-    const [configFile, setConfigFile] = useState<string>("");
+    const [configDir, setConfigDir] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [ezProfil, setEzProfil] = useState<EzProfil|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
@@ -82,7 +82,7 @@ export function App(){
         return jsonCall(ezApi.home.getMainData())
         .then(r =>  {                  
             console.log("ReloadData: ",r);         
-             setConfigFile(r.configFile);
+             setConfigDir(r.configDir);
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
@@ -446,7 +446,7 @@ export function App(){
                             { processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                                                        
-                                <Config configFile={configFile} mainSettings={mainSettings} ezProfil={ezProfil}
+                                <Config configDir={configDir} mainSettings={mainSettings} ezProfil={ezProfil}
                                     mainSettingsStateSetter={setMainSettings}
                                     ezProfilStateSetter={setEzProfil}
                                     followProcess={followProcess}

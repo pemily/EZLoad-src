@@ -54,7 +54,7 @@ public class RulesHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public List<String> getAllRules() throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        return new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        return new RulesManager(settingsManager, settingsManager.loadProps())
                 .getAllRules()
                 .stream()
                 .map(RuleDefinition::getName)
@@ -69,7 +69,7 @@ public class RulesHandler {
                                   @NotNull @PathParam("brokerFileVersion") int brokerFileVersion,
                                   @NotNull @QueryParam("ruleName") String ruleName) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        return new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        return new RulesManager(settingsManager, settingsManager.loadProps())
                 .getAllRules()
                 .stream()
                 .filter(ruleDef -> ruleDef.getName().equals(ruleName)
@@ -86,7 +86,7 @@ public class RulesHandler {
                          @NotNull RuleDefinition ruleDefinition) throws Exception {
         ruleDefinition.setEzLoadVersion(EZLoad.VERSION);
         SettingsManager settingsManager = SettingsManager.getInstance();
-        String errorForName = new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        String errorForName = new RulesManager(settingsManager, settingsManager.loadProps())
                 .saveRule(oldName == null || StringUtils.isBlank(oldName) ? null : oldName, ruleDefinition);
 
         RuleDefinition result;
@@ -107,7 +107,7 @@ public class RulesHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteRule(@NotNull RuleDefinition ruleDefinition) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        new RulesManager(settingsManager, settingsManager.loadProps())
                         .delete(ruleDefinition);
     }
 
@@ -117,7 +117,7 @@ public class RulesHandler {
     public CommonFunctions getCommonFunction(@NotNull @PathParam("broker") EnumEZBroker broker,
                                              @NotNull @PathParam("brokerFileVersion") int brokerFileVersion) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        return new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        return new RulesManager(settingsManager, settingsManager.loadProps())
                 .getCommonScript(broker, brokerFileVersion);
     }
 
@@ -128,7 +128,7 @@ public class RulesHandler {
     // return the execution report, to check the syntax
     public String saveCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
-        new RulesManager(settingsManager.getEzLoadRepoDir(), settingsManager.loadProps())
+        new RulesManager(settingsManager, settingsManager.loadProps())
                 .saveCommonScript(commonFunction);
         return validateCommonFunction(commonFunction);
     }

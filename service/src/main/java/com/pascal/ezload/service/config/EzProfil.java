@@ -18,18 +18,16 @@
 package com.pascal.ezload.service.config;
 
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.FileValue;
 
 
 public class EzProfil extends Checkable<EzProfil> {
-    enum Field {downloadDir, courtierCredFile }
 
     private BourseDirectSettings bourseDirect;
     private EZPortfolioSettings ezPortfolio;
-    private String courtierCredsFile;
-    private String downloadDir;
     private MainSettings.AnnualDividendConfig annualDividend;
     private MainSettings.DividendCalendarConfig dividendCalendar;
 
@@ -49,22 +47,6 @@ public class EzProfil extends Checkable<EzProfil> {
         this.ezPortfolio = ezPortfolio;
     }
 
-    public String getCourtierCredsFile() {
-        return courtierCredsFile;
-    }
-
-    public void setCourtierCredsFile(String courtierCredsFile) {
-        this.courtierCredsFile = courtierCredsFile == null ? null : courtierCredsFile.trim();
-    }
-
-    public String getDownloadDir() {
-        return downloadDir;
-    }
-
-    public void setDownloadDir(String downloadDir) {
-        this.downloadDir = downloadDir == null ? null : downloadDir.trim();
-    }
-
     public MainSettings.AnnualDividendConfig getAnnualDividend() {
         return annualDividend;
     }
@@ -81,16 +63,14 @@ public class EzProfil extends Checkable<EzProfil> {
         this.dividendCalendar = dividendCalendar;
     }
 
-    public String getSourceRef(String filePath) {
-        String file = filePath.substring(this.getDownloadDir().length()).replace('\\', '/');
+    public String getSourceRef(SettingsManager settingsManager, String ezProfilName, String filePath) {
+        String file = filePath.substring(settingsManager.getDownloadDir(ezProfilName, EnumEZBroker.BourseDirect).length()).replace('\\', '/');
         if (file.startsWith("/")) file = file.substring(1);
         return file;
     }
 
 
     public EzProfil validate(){
-        new FileValue(this, Field.courtierCredFile.name(), courtierCredsFile).checkRequired().checkFile();
-        new FileValue(this, Field.downloadDir.name(), downloadDir).checkRequired().checkDirectory();
         bourseDirect.validate();
         ezPortfolio.validate();
         return this;

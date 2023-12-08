@@ -33,6 +33,7 @@ import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
+import com.pascal.ezload.service.util.FileProcessor;
 import com.pascal.ezload.service.util.FileUtil;
 import com.pascal.ezload.service.util.LoggerReporting;
 import jakarta.inject.Inject;
@@ -45,8 +46,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Path("home")
 public class HomeHandler {
@@ -77,23 +82,29 @@ public class HomeHandler {
         MainSettings mainSettings = settingsManager.loadProps().validate();
         new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
                 .initRepoIfNeeded();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        EzProfil ezProfil = null;
+        try {
+            ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         Reporting reporting = new LoggerReporting();
-        return new WebData(SettingsManager.searchConfigFilePath(),
+        return new WebData(new File(SettingsManager.searchConfigFilePath()).getParentFile().getAbsolutePath(),
                             mainSettings,
                             ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            mainSettings.getEzLoad().getEZActionManager().getIncompleteSharesOrNew(reporting),
+                            mainSettings.getEzLoad().getEZActionManager(settingsManager).getIncompleteSharesOrNew(reporting),
                             ezServerState.getFilesNotYetLoaded(),
-                            new RulesManager(settingsManager.getEzLoadRepoDir(), mainSettings).getAllRules()
+                            new RulesManager(settingsManager, mainSettings).getAllRules()
                                     .stream()
                                     .map(e -> (RuleDefinitionSummary)e)
                                     .collect(Collectors.toList()),
                             SettingsManager.getVersion(),
                             settingsManager.listAllEzProfiles(),
-                            mainSettings.getEzLoad().getEZActionManager().getAllEZSharesWithMessages(reporting)
+                            mainSettings.getEzLoad().getEZActionManager(settingsManager).getAllEZSharesWithMessages(reporting)
                 );
     }
 
@@ -155,8 +166,7 @@ public class HomeHandler {
     public void uploadGDriveSecurityFile( @FormDataParam("file")  InputStream file) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        FileUtil.string2file(ezProfil.getEzPortfolio().getGdriveCredsFile(), FileUtil.inputStream2String(file));
+        FileUtil.string2file(settingsManager.getGDriveCredsFile(SettingsManager.getActiveEzProfileName(mainSettings)), FileUtil.inputStream2String(file));
     }
 
     @POST
@@ -166,7 +176,7 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager().update(index, shareValue);
+        mainSettings.getEzLoad().getEZActionManager(settingsManager).update(index, shareValue);
     }
 
 
@@ -177,7 +187,7 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager().newShare();
+        mainSettings.getEzLoad().getEZActionManager(settingsManager).newShare();
     }
 
     @DELETE
@@ -187,7 +197,114 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager().deleteShare(index);
+        mainSettings.getEzLoad().getEZActionManager(settingsManager).deleteShare(index);
+    }
+
+    @PUT
+    @Path("/moveConfigDir")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess moveConfigDir(@NotNull @QueryParam("newConfigDir") String newConfigDir) throws Exception {
+        SettingsManager oldSettingsManager = SettingsManager.getInstance();
+        final MainSettings oldMainSettings = oldSettingsManager.loadProps();
+        return processManager.createNewRunningProcess(oldSettingsManager, oldMainSettings,
+                "Changement des fichiers de "+SettingsManager.searchConfigFilePath()+" vers "+newConfigDir,
+                ProcessManager.getLog(oldMainSettings, "config", "-moveConfigFile.html"),
+                (processLogger) -> {
+                    if (new File(newConfigDir).exists()) {
+                        processLogger.getReporting().error("La destination existe déjà");
+                        return;
+                    }
+                    if (new File(oldSettingsManager.getEzHome()).getAbsolutePath().contains(new File(newConfigDir).getAbsolutePath())) {
+                        processLogger.getReporting().error("La destination n'est pas correct");
+                        return;
+                    }
+
+                    MainSettings newMainSettings = new MainSettings();
+
+                    // Chrome Settings
+                    newMainSettings.setChrome(oldMainSettings.getChrome());
+                    newMainSettings.getChrome().setUserDataDir(null); // it will be automatically created lazily
+
+                    newMainSettings.setActiveEzProfilName(oldMainSettings.getActiveEzProfilName());
+
+                    newMainSettings.setEzLoad(oldMainSettings.getEzLoad());
+                    newMainSettings.getEzLoad().setRulesDir(null); // will be automatically created lazily
+                    newMainSettings.getEzLoad().setLogsDir(oldMainSettings.getEzLoad().getLogsDir());
+                    newMainSettings.getEzLoad().setCacheDir(oldMainSettings.getEzLoad().getCacheDir());
+                    newMainSettings.getEzLoad().setShareDataFile(null);
+                    newMainSettings.getEzLoad().setDashboardFile(null);
+
+                    ezServerState.clear();
+
+                    // save the new File
+                    String newConfigFilePath = newConfigDir + File.separator + SettingsManager.EZLOAD_CONFIG_YAML;
+                    new File(newConfigDir).mkdirs();
+                    SettingsManager newSettingsManager = new SettingsManager(newConfigFilePath);
+                    newSettingsManager.saveMainSettingsFile(newMainSettings);
+
+                    // reload it, this will initialize the properties that are not correctly set
+                    newMainSettings = newSettingsManager.loadProps();
+
+                    // reload the originals settings, because the mainSettings object was dirty
+                    MainSettings oldMainSettingsReloaded = oldSettingsManager.loadProps();
+
+                    try {
+                        FileUtil.copyFile(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getDashboardFile()), newSettingsManager.getDir(newMainSettings.getEzLoad().getDashboardFile()));
+                    }
+                    catch (Exception e){
+                        processLogger.getReporting().info("Erreur lors de la copie du fichier dashboard "+e.getMessage());
+                    }
+
+                    try {
+                        new RulesVersionManager(newSettingsManager.getEzLoadRepoDir(), newMainSettings).initRepoIfNeeded(); // create the git repo
+                        // then copy the rules in case there are some custom rules
+                        FileUtil.copyDir(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getRulesDir()), newSettingsManager.getDir(newMainSettings.getEzLoad().getRulesDir()));
+                    }
+                    catch (Exception e){
+                        processLogger.getReporting().error("Erreur lors de la copie des règles "+e.getMessage());
+                    }
+
+                    try {
+                        FileUtil.copyFile(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getShareDataFile()), newSettingsManager.getDir(newMainSettings.getEzLoad().getShareDataFile()));
+                    }
+                    catch (Exception e){
+                        processLogger.getReporting().error("Erreur lors de la copie du fichiers de description des actions "+e.getMessage());
+                    }
+
+                    oldSettingsManager.listAllEzProfiles()
+                            .forEach(profile -> {
+                                try {
+                                    EzProfil profil = oldSettingsManager.readEzProfilFile(profile);
+                                    newSettingsManager.saveEzProfilFile(profile, profil);
+
+                                    FileUtil.copyDir(oldSettingsManager.getEzProfileDirectory(profile), newSettingsManager.getEzProfileDirectory(profile));
+                                } catch (Exception e) {
+                                    processLogger.getReporting().error("Erreur lors de la copie du profile: "+profile);
+                                }
+                            });
+
+                    newSettingsManager.moveDone();
+
+                    // clean old config dir
+
+                    // clean old config dir
+                    try(Stream<java.nio.file.Path> stream = Files.walk(Paths.get(oldSettingsManager.getEzHome()), 1)) {
+                        stream
+                                .forEach(f -> {
+                                    if (!f.toFile().getAbsolutePath().equals(oldSettingsManager.getConfigFile()) && !f.toFile().getAbsolutePath().equals(oldSettingsManager.getEzHome())){
+                                        try {
+                                            if (f.toFile().isDirectory()){
+                                                FileUtil.rmdir(f.toFile());
+                                            }
+                                            else {
+                                                f.toFile().delete();
+                                            }
+                                        } catch (IOException e) {
+                                        }
+                                    }
+                                });
+                    }
+                });
     }
 
     @GET
@@ -202,13 +319,13 @@ public class HomeHandler {
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps();
             EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-            return processManager.createNewRunningProcess(mainSettings, ezProfil,
+            return processManager.createNewRunningProcess(settingsManager, mainSettings,
                     "Recherche de Nouveaux Comptes "+courtier.getEzPortfolioName(),
                     ProcessManager.getLog(mainSettings, courtier.getDirName(), "-searchAccount.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     List<BourseDirectEZAccountDeclaration> accountsExtracted =
-                            new BourseDirectSearchAccounts(mainSettings, ezProfil, reporting).extract(chromeVersion, settingsManager.saveNewChromeDriver());
+                            new BourseDirectSearchAccounts(settingsManager, mainSettings, ezProfil, reporting).extract(chromeVersion);
                     // copy the accounts into the main settings
 
                     List<BourseDirectEZAccountDeclaration> accountsDefined = ezProfil.getBourseDirect().getAccounts();
@@ -251,8 +368,7 @@ public class HomeHandler {
     public EzProcess checkUpdate() throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Recherche de Mise à jour",
                 ProcessManager.getLog(mainSettings, "update", "-check.html"),
                 (processLogger) -> {

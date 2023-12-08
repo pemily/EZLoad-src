@@ -18,6 +18,7 @@
 package com.pascal.ezload.service.dashboard;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
@@ -51,9 +52,9 @@ public class DashboardManager {
     private final EZActionManager ezActionManager;
     private final String dashboardFile;
 
-    public DashboardManager(MainSettings.EZLoad ezLoad) throws Exception {
-        this.dashboardFile = ezLoad.getDashboardFile();
-        this.ezActionManager = ezLoad.getEZActionManager();
+    public DashboardManager(SettingsManager settingsManager, MainSettings.EZLoad ezLoad) throws Exception {
+        this.dashboardFile = settingsManager.getDir(ezLoad.getDashboardFile());
+        this.ezActionManager = ezLoad.getEZActionManager(settingsManager);
     }
 
     public DashboardSettings loadDashboardSettings() throws IOException {

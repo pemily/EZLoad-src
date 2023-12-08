@@ -20,6 +20,7 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
+import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.StringUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -41,8 +42,8 @@ public class ExplorerHandler {
     public Response SourceFile(@NotNull @QueryParam("source") String sourceFile) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        File file = new File(ezProfil.getDownloadDir()+File.separator+sourceFile);
+        String ezProfilName = SettingsManager.getActiveEzProfileName(mainSettings);
+        File file = new File(settingsManager.getDownloadDir(ezProfilName, EnumEZBroker.BourseDirect)+File.separator+sourceFile);
         BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
         StreamingOutput output = out -> {
             int length;
@@ -67,9 +68,9 @@ public class ExplorerHandler {
     public List<Item> list(@Nullable @QueryParam("dirpath") String dir) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
+        String ezProfilName = SettingsManager.getActiveEzProfileName(mainSettings);
         String subDir = StringUtils.isBlank(dir) ? "" : (dir.startsWith(".") || dir.startsWith("..") ? "" : File.separator+dir);
-        File file = new File(ezProfil.getDownloadDir()+subDir);
+        File file = new File(settingsManager.getDownloadDir(ezProfilName, EnumEZBroker.BourseDirect));
         if (file.isDirectory()){
             return Arrays.stream(file.listFiles())
                     .map(f -> f.isDirectory() ? new Item(f.getName(), true) : new Item(f.getName(), false))

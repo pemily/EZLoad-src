@@ -40,7 +40,7 @@ public class GitHandler {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
         return new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
-                .getAllChanges(mainSettings.getEzLoad().getRulesDir());
+                .getAllChanges(settingsManager.getDir(mainSettings.getEzLoad().getRulesDir()));
 
     }
 

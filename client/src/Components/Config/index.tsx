@@ -31,7 +31,7 @@ import { ShareValues } from "../ShareValues";
 
 
 export interface ConfigProps {
-  configFile: string;
+  configDir: string;
   mainSettings: MainSettings;
   mainSettingsStateSetter: (settings: MainSettings) => void;
   ezProfil: EzProfil;
@@ -56,7 +56,7 @@ export function Config(props: ConfigProps) {
         <Tabs activeIndex={index} onActive={onActive} justify="center">
             <Tab title="Connection" icon={<Configure size='small'/>}>
                 <ConfigPortfolioConnection 
-                configFile={props.configFile}
+                configDir={props.configDir}
                 mainSettings={props.mainSettings}
                 mainSettingsStateSetter={props.mainSettingsStateSetter}
                 ezProfil={props.ezProfil}

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class WebData {
 
-    private String configFile;
+    private String configDir;
     private MainSettings mainSettings;
     private EzProfil ezProfil;
     private EzProcess latestEzProcess;
@@ -43,11 +43,11 @@ public class WebData {
     private boolean processRunning;
     private String ezLoadVersion;
 
-    public WebData(String configFile, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
+    public WebData(String configDir, MainSettings mainSettings, EzProfil ezProfil, EzProcess latestEzProcess, boolean processRunning,
                    List<EzReport> reports, ActionWithMsg newSharesOrErrors, List<String> filesNotYetLoaded,
                    List<RuleDefinitionSummary> allRules, String ezLoadVersion, List<String> allProfiles, ActionWithMsg allShares){
         this.ezProfil = ezProfil;
-        this.configFile = configFile;
+        this.configDir = configDir;
         this.mainSettings = mainSettings;
         this.latestEzProcess = latestEzProcess;
         this.processRunning = processRunning;
@@ -108,12 +108,12 @@ public class WebData {
         this.filesNotYetLoaded = filesNotYetLoaded;
     }
 
-    public String getConfigFile() {
-        return configFile;
+    public String getConfigDir() {
+        return configDir;
     }
 
-    public void setConfigFile(String configFile) {
-        this.configFile = configFile;
+    public void setConfigDir(String configDir) {
+        this.configDir = configDir;
     }
 
     public String getEzLoadVersion() {

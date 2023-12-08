@@ -35,19 +35,19 @@ import java.util.function.Consumer;
 
 public class BourseDirectSeleniumHelper extends BaseSelenium {
 
+    protected final SettingsManager settingsManager;
     protected final MainSettings mainSettings;
-    protected final EzProfil ezProfil;
     protected final BourseDirectSettings bourseDirectSettings;
 
-    public BourseDirectSeleniumHelper(Reporting reporting, MainSettings mainSettings, EzProfil ezProfil) {
+    public BourseDirectSeleniumHelper(Reporting reporting, SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil) {
         super(reporting);
         this.mainSettings = mainSettings;
-        this.ezProfil = ezProfil;
+        this.settingsManager = settingsManager;
         this.bourseDirectSettings = ezProfil.getBourseDirect();
     }
 
-    public void login(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
-        super.init(currentChromeVersion, newDriverPathSaver, mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
+    public void login(String currentChromeVersion) throws Exception {
+        super.init(currentChromeVersion, mainSettings.getChrome(), mainSettings.getChrome().getDefaultTimeout());
         try(Reporting rep = reporting.pushSection("Login")) {
             goTo("https://www.boursedirect.fr/fr/login");
 
@@ -62,7 +62,7 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
             WebElement login = findById("bd_auth_login_type_login");
             WebElement password = findById("bd_auth_login_type_password");
 
-            AuthInfo authInfo = SettingsManager.getAuthManager(mainSettings, ezProfil).getAuthInfo(EnumEZBroker.BourseDirect);
+            AuthInfo authInfo = settingsManager.getAuthManager(mainSettings).getAuthInfo(EnumEZBroker.BourseDirect);
             if (authInfo != null || StringUtils.isBlank(login.getText())) {
                 if (authInfo != null && authInfo.getUsername() != null) login.sendKeys(authInfo.getUsername());
                 if (authInfo != null && authInfo.getPassword() !=null){

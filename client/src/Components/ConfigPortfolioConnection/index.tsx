@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Anchor, Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
-import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
+import { Add, Trash, Validate, SchedulePlay, Upload, Save } from 'grommet-icons';
 import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued, saveMainSettings } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
@@ -29,7 +29,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface ConfigPortfolioConnectionProps {
-  configFile: string;
+  configDir: string;
   mainSettings: MainSettings;
   mainSettingsStateSetter: (settings: MainSettings) => void;
   ezProfil: EzProfil;
@@ -154,12 +154,25 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
     const [showStartDateForAccount, setShowStartDateForAccount] = useState<BourseDirectEZAccountDeclaration|undefined>(undefined);
     const [uploadGDriveSecFile, setUploadGDriveSecFile] = useState<File|undefined>(undefined);
     const [uploadStatus, setUploadStatus] = useState<string|undefined>(undefined);
+    const [configDir, setConfigDir] = useState<string>(props.configDir);
 
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Box direction="row" margin="small">
-                        <Text margin={{start:"small"}} size="xxsmall" alignSelf="center">{props.configFile + " - " +props.mainSettings.activeEzProfilName}</Text>
+                    <Box margin="none" pad="none" direction="row">
+                        <TextField id="ezLoadConfigDir" label="Emplacement des fichiers EzLoad" value={configDir}                          
+                                readOnly={props.readOnly}
+                                onChange={newValue => {setConfigDir(newValue)}}/>   
+                        <Button
+                            fill="vertical"
+                            alignSelf="center"                                 
+                            disabled={props.readOnly} onClick={() =>
+                                jsonCall(ezApi.home.moveConfigDir({newConfigDir: configDir}))
+                                .then(props.followProcess)
+                                .then(r => window.location.reload())
+                                .catch(e => console.error(e))
+                            }
+                            size="small" icon={<Save size='small'/>} label="Déplacer"/>                     
                     </Box>
                     <Box direction="row" justify="start">
                         <Heading level="5">Url de EZPortfolio</Heading>
