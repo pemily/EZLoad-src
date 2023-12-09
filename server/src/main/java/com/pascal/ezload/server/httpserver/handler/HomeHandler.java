@@ -27,13 +27,14 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
+import com.pascal.ezload.service.financial.ActionWithMsg;
+import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
-import com.pascal.ezload.service.util.FileProcessor;
 import com.pascal.ezload.service.util.FileUtil;
 import com.pascal.ezload.service.util.LoggerReporting;
 import jakarta.inject.Inject;
@@ -48,7 +49,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,14 +90,17 @@ public class HomeHandler {
         catch (Exception e){
             e.printStackTrace();
         }
-        Reporting reporting = new LoggerReporting();
+
+        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+        ActionWithMsg actionWithMsg = actionManager.refreshAllEZSharesWithMessages();
+        actionWithMsg.getErrors().addAll(ezServerState.getDetailedActionErrors());
         return new WebData(new File(SettingsManager.searchConfigFilePath()).getParentFile().getAbsolutePath(),
                             mainSettings,
                             ezProfil,
                             processManager.getLatestProcess(),
                             ezServerState.isProcessRunning(),
                             ezServerState.getEzReports(),
-                            mainSettings.getEzLoad().getEZActionManager(settingsManager).getIncompleteSharesOrNew(reporting),
+                            actionManager.getIncompleteSharesOrNew(),
                             ezServerState.getFilesNotYetLoaded(),
                             new RulesManager(settingsManager, mainSettings).getAllRules()
                                     .stream()
@@ -104,7 +108,7 @@ public class HomeHandler {
                                     .collect(Collectors.toList()),
                             SettingsManager.getVersion(),
                             settingsManager.listAllEzProfiles(),
-                            mainSettings.getEzLoad().getEZActionManager(settingsManager).getAllEZSharesWithMessages(reporting)
+                            actionWithMsg
                 );
     }
 
@@ -176,9 +180,11 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager(settingsManager).update(index, shareValue);
-    }
+        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+        actionManager.update(index, shareValue);
 
+        recheckAllShares(actionManager);
+    }
 
     @POST
     @Path("/createShareValue")
@@ -187,7 +193,8 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager(settingsManager).newShare();
+        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+        actionManager.newShare();
     }
 
     @DELETE
@@ -197,8 +204,25 @@ public class HomeHandler {
         ezServerState.setEzActionDirty(true);
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        mainSettings.getEzLoad().getEZActionManager(settingsManager).deleteShare(index);
+        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+        actionManager.deleteShare(index);
+
+        recheckAllShares(actionManager);
     }
+
+
+    private void recheckAllShares(EZActionManager actionManager) {
+        ezServerState.setDetailedActionErros(new LinkedList<>());
+        actionManager.getAllEZShares()
+                .forEach(ezShare ->{
+                    try {
+                        ezServerState.getDetailedActionErrors().addAll(actionManager.computeActionErrors(new LoggerReporting(), ezShare));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
 
     @PUT
     @Path("/moveConfigDir")
@@ -228,11 +252,8 @@ public class HomeHandler {
                     newMainSettings.setActiveEzProfilName(oldMainSettings.getActiveEzProfilName());
 
                     newMainSettings.setEzLoad(oldMainSettings.getEzLoad());
-                    newMainSettings.getEzLoad().setRulesDir(null); // will be automatically created lazily
                     newMainSettings.getEzLoad().setLogsDir(oldMainSettings.getEzLoad().getLogsDir());
                     newMainSettings.getEzLoad().setCacheDir(oldMainSettings.getEzLoad().getCacheDir());
-                    newMainSettings.getEzLoad().setShareDataFile(null);
-                    newMainSettings.getEzLoad().setDashboardFile(null);
 
                     ezServerState.clear();
 
@@ -249,7 +270,7 @@ public class HomeHandler {
                     MainSettings oldMainSettingsReloaded = oldSettingsManager.loadProps();
 
                     try {
-                        FileUtil.copyFile(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getDashboardFile()), newSettingsManager.getDir(newMainSettings.getEzLoad().getDashboardFile()));
+                        FileUtil.copyFile(oldSettingsManager.getDashboardFile(), newSettingsManager.getDashboardFile());
                     }
                     catch (Exception e){
                         processLogger.getReporting().info("Erreur lors de la copie du fichier dashboard "+e.getMessage());
@@ -258,14 +279,14 @@ public class HomeHandler {
                     try {
                         new RulesVersionManager(newSettingsManager.getEzLoadRepoDir(), newMainSettings).initRepoIfNeeded(); // create the git repo
                         // then copy the rules in case there are some custom rules
-                        FileUtil.copyDir(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getRulesDir()), newSettingsManager.getDir(newMainSettings.getEzLoad().getRulesDir()));
+                        FileUtil.copyDir(oldSettingsManager.getRulesDir(), newSettingsManager.getRulesDir());
                     }
                     catch (Exception e){
                         processLogger.getReporting().error("Erreur lors de la copie des règles "+e.getMessage());
                     }
 
                     try {
-                        FileUtil.copyFile(oldSettingsManager.getDir(oldMainSettingsReloaded.getEzLoad().getShareDataFile()), newSettingsManager.getDir(newMainSettings.getEzLoad().getShareDataFile()));
+                        FileUtil.copyFile(oldSettingsManager.getShareDataFile(), newSettingsManager.getShareDataFile());
                     }
                     catch (Exception e){
                         processLogger.getReporting().error("Erreur lors de la copie du fichiers de description des actions "+e.getMessage());

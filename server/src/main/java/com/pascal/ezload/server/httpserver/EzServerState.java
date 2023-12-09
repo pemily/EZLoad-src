@@ -29,6 +29,7 @@ public class EzServerState {
 
     private List<EzReport> ezReports = new LinkedList<>();
     private List<String> filesNotYetLoaded = new LinkedList<>();
+    private List<String> detailedActionErrors = new LinkedList<>();
 
     private EZPortfolioProxy ezOriginalPortfolioProxy; // cached, if null will be loaded from google drive, Do not modified it, it must kept in read only mode
     private EZPortfolioProxy ezNewPortfolioProxy; // cached, if null will be loaded from google drive, it is used to contains the updates
@@ -81,6 +82,7 @@ public class EzServerState {
         ezActionDirty = false;
         ezReports = new LinkedList<>();
         filesNotYetLoaded = new LinkedList<>();
+        detailedActionErrors = new LinkedList<>();
         dashboardData = null;
     }
 
@@ -98,5 +100,13 @@ public class EzServerState {
 
     public void setDashboardData(DashboardData dashboardData) {
         this.dashboardData = dashboardData;
+    }
+
+    public List<String> getDetailedActionErrors() {
+        return detailedActionErrors;
+    }
+
+    public void setDetailedActionErros(List<String> detailedActionErrors) {
+        this.detailedActionErrors = detailedActionErrors;
     }
 }

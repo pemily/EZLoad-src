@@ -251,7 +251,7 @@ public class SettingsManager {
         return ezProfil;
     }
 
-    private BourseDirectSettings defaultValuesIfNotSet(BourseDirectSettings bourseDirectSettings) throws Exception {
+    private BourseDirectSettings defaultValuesIfNotSet(BourseDirectSettings bourseDirectSettings) {
         if (bourseDirectSettings == null){
             bourseDirectSettings = new BourseDirectSettings();
         }
@@ -308,10 +308,7 @@ public class SettingsManager {
 
         if (ezLoad.getPort() == 0) ezLoad.setPort(2180);
         if (ezLoad.getLogsDir() == null) ezLoad.setLogsDir(Files.createTempDirectory("ezLoad").toFile().getAbsolutePath()+File.separator+"logs");
-        if (ezLoad.getRulesDir() == null) ezLoad.setRulesDir("repo"+ File.separator + "rules");
         if (ezLoad.getPassPhrase() == null) ezLoad.setPassPhrase(AuthManager.getNewRandonmEncryptionPhrase()); // genString(42));
-        if (ezLoad.getShareDataFile() == null) ezLoad.setShareDataFile("shareData.json");
-        if (ezLoad.getDashboardFile() == null) ezLoad.setDashboardFile("dashboard.json");
         if (ezLoad.getCacheDir() == null) ezLoad.setCacheDir(Files.createTempDirectory("ezLoad").toFile().getAbsolutePath()+File.separator+"cache");
 
         new File(ezLoad.getLogsDir()).mkdirs();
@@ -402,5 +399,17 @@ public class SettingsManager {
 
     public String getEzProfilDir(String ezProfilName, String subdir) {
         return getEzProfileDirectory(ezProfilName)+File.separator+subdir;
+    }
+
+    public String getShareDataFile() {
+        return getDir("shareData.json");
+    }
+
+    public String getDashboardFile() {
+        return getDir("dashboard.json");
+    }
+
+    public String getRulesDir() {
+        return getDir("repo"+ File.separator + "rules");
     }
 }

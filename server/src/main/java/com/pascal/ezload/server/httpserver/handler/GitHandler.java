@@ -40,7 +40,7 @@ public class GitHandler {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
         return new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings)
-                .getAllChanges(settingsManager.getDir(mainSettings.getEzLoad().getRulesDir()));
+                .getAllChanges(settingsManager.getRulesDir());
 
     }
 
@@ -73,7 +73,7 @@ public class GitHandler {
     @Path("/push")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public PushResult push(@NotNull @QueryParam("message")  String message) throws Exception {
+    public PushResult push(@NotNull @QueryParam("message")  String message) {
         try {
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps().validate();

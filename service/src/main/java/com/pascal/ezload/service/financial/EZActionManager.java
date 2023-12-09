@@ -93,8 +93,8 @@ public class EZActionManager {
                 });
     }
 
-    public ActionWithMsg getIncompleteSharesOrNew(Reporting reporting) throws IOException {
-        ActionWithMsg actionWithMsg = getActionWithError(reporting);
+    public ActionWithMsg getIncompleteSharesOrNew() {
+        ActionWithMsg actionWithMsg = createActionWithSimpleMsg();
         ActionWithMsg onlyNewAndErrorMsg = new ActionWithMsg();
         onlyNewAndErrorMsg.getErrors().addAll(actionWithMsg.getErrors());
         ezShareData.getShares().stream()
@@ -107,8 +107,8 @@ public class EZActionManager {
         return ezShareData.getShares();
     }
 
-    public ActionWithMsg getAllEZSharesWithMessages(Reporting reporting) throws IOException {
-        ActionWithMsg actionWithMsg = getActionWithError(reporting);
+    public ActionWithMsg refreshAllEZSharesWithMessages() {
+        ActionWithMsg actionWithMsg = createActionWithSimpleMsg();
         actionWithMsg.setShares(ezShareData.getShares());
         return actionWithMsg;
     }
@@ -145,7 +145,7 @@ public class EZActionManager {
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(shareDataFile, StandardCharsets.UTF_8), ezShareData);
     }
 
-    public ActionWithMsg getActionWithError(Reporting reporting) throws IOException {
+    public ActionWithMsg createActionWithSimpleMsg() {
         ActionWithMsg actionWithMsg = new ActionWithMsg();
         Map<String, EZShare> isinFound = new HashMap<>();
         Map<String, EZShare> gTickerFound = new HashMap<>();
@@ -154,8 +154,6 @@ public class EZActionManager {
         Map<String, EZShare> nameFound = new HashMap<>();
 
         for (EZShare ezAction : ezShareData.getShares()) {
-            actionWithMsg.addMsgs(ezAction, getError(reporting, ezAction));
-
             if (!StringUtils.isBlank(ezAction.getIsin())) {
                 EZShare old = isinFound.put(ezAction.getIsin(), ezAction);
                 if (old != null){
@@ -200,6 +198,7 @@ public class EZActionManager {
         return actionWithMsg;
     }
 
+
     public void clearNewShareDescription() throws IOException {
         ezShareData.getShares()
                 .stream()
@@ -220,7 +219,7 @@ public class EZActionManager {
     }
 
 
-    private List<String> getError(Reporting rep, EZShare ezShare) throws IOException {
+    public List<String> computeActionErrors(Reporting rep, EZShare ezShare) throws IOException {
         try(Reporting reporting = rep.pushSection("Verification de l'action: "+ezShare.getEzName())){
             List<String> errors = new LinkedList<>();
             if (StringUtils.isBlank(ezShare.getIsin())) {
@@ -309,7 +308,7 @@ public class EZActionManager {
     }
 
     public CurrencyMap getCurrencyMap(Reporting rep, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
-        try(Reporting reporting = rep.pushSection("Extraction de la conversion "+fromDevise+" vers "+toDevise)) {
+        try(Reporting reporting = rep.pushSection("Recherche de la conversion "+fromDevise+" vers "+toDevise)) {
             return YahooTools.getCurrencyMap(reporting, cache, fromDevise, toDevise, listOfDates);
         }
     }
@@ -364,12 +363,8 @@ public class EZActionManager {
     }
 
 
-    public List<EZShare> listAllShares() {
-        return ezShareData.getShares();
-    }
-
     public Prices getPrices(Reporting rep, EZShare ez, EZDate from, EZDate to) throws IOException {
-        try(Reporting reporting = rep.pushSection("Extraction du prix pour "+ez.getEzName())) {
+        try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
             Prices prices = YahooTools.getPrices(reporting, cache, ez, from, to);
             if (prices == null) {
                 prices = SeekingAlphaTools.getPrices(reporting, cache, ez, from, to);
@@ -377,12 +372,13 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
+            computeActionErrors(rep, ez);
             return prices;
         }
     }
 
     public Prices getPrices(Reporting rep, EZShare ez, List<EZDate> listOfDates) throws IOException {
-        try(Reporting reporting = rep.pushSection("Extraction du prix pour "+ez.getEzName())) {
+        try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
             Prices prices = YahooTools.getPrices(reporting, cache, ez, listOfDates);
             if (prices == null) {
                 prices = SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates);
@@ -390,6 +386,7 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
+            computeActionErrors(rep, ez);
             return prices;
         }
     }

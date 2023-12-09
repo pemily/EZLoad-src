@@ -71,7 +71,7 @@ public class MainSettings {
 
     public static class ChromeSettings extends Checkable<ChromeSettings> {
 
-        enum Field {driverPath, userDataDir}
+        enum Field {userDataDir}
         private String userDataDir;
         private int defaultTimeout;
 
@@ -100,14 +100,11 @@ public class MainSettings {
 
     public static class EZLoad extends Checkable<EZLoad> {
 
-        enum Field {logsDir, passPhrase, rulesDir, cacheDir, shareDataFile, dashboardFile}
+        enum Field {logsDir, passPhrase, cacheDir }
 
         private int port;
-        private String rulesDir;
         private String logsDir;
         private String cacheDir;
-        private String shareDataFile;
-        private String dashboardFile;
         private String passPhrase;
         private Admin admin;
 
@@ -125,14 +122,6 @@ public class MainSettings {
 
         public void setPassPhrase(String passPhrase) {
             this.passPhrase = passPhrase == null ? null : passPhrase.trim();
-        }
-
-        public String getRulesDir() {
-            return this.rulesDir;
-        }
-
-        public void setRulesDir(String rulesDir) {
-            this.rulesDir = rulesDir;
         }
 
         public Admin getAdmin(){
@@ -159,35 +148,16 @@ public class MainSettings {
             this.cacheDir = cacheDir;
         }
 
-        public String getShareDataFile() {
-            return shareDataFile;
-        }
-
-        public void setShareDataFile(String shareDataFile) {
-            this.shareDataFile = shareDataFile;
-        }
-
-        public String getDashboardFile() {
-            return dashboardFile;
-        }
-
-        public void setDashboardFile(String dashboardFile) {
-            this.dashboardFile = dashboardFile;
-        }
-
         @JsonIgnore
         public EZActionManager getEZActionManager(SettingsManager settingsManager) throws Exception {
-            return new EZActionManager(getCacheDir(), settingsManager.getDir(getShareDataFile()));
+            return new EZActionManager(getCacheDir(), settingsManager.getShareDataFile());
         }
 
         @Override
         public EZLoad validate() {
             new FileValue(this, Field.logsDir.name(), logsDir).checkRequired().checkDirectory();
             new StringValue(this, Field.passPhrase.name(), passPhrase).checkRequired();
-            new FileValue(this, Field.rulesDir.name(), rulesDir).checkRequired().checkDirectory();;
-            new FileValue(this, Field.cacheDir.name(), cacheDir).checkRequired().checkDirectory();;
-            new FileValue(this, Field.shareDataFile.name(), shareDataFile).checkRequired().checkFile();;
-            new FileValue(this, Field.dashboardFile.name(), dashboardFile).checkRequired().checkFile();;
+            new FileValue(this, Field.cacheDir.name(), cacheDir).checkRequired().checkDirectory();
             admin.validate();
             return this;
         }

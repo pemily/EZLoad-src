@@ -52,7 +52,7 @@ public class RulesManager {
     }
 
     public synchronized List<RuleDefinition> getAllRules() throws IOException {
-        return new FileProcessor(settingsManager.getDir(mainSettings.getEzLoad().getRulesDir()), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
+        return new FileProcessor(settingsManager.getRulesDir(), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
                 .mapFile(f -> {
                     try {
                         FileState state = rulesVersionManager.getState(f);
@@ -125,7 +125,7 @@ public class RulesManager {
     }
 
     public String getRulesDirectory(EnumEZBroker broker, int brokerFileVersion){
-        return settingsManager.getDir(mainSettings.getEzLoad().getRulesDir())+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
+        return settingsManager.getRulesDir()+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
     }
 
     public String getFile(String filename, EnumEZBroker broker, int brokerFileVersion){

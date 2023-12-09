@@ -39,16 +39,18 @@ public class YahooTools extends ExternalSiteTools{
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
             sharePrices.setLabel(ezShare.getEzName());
+            EZDate from = listOfDates.get(0);
+            EZDate to = listOfDates.get(listOfDates.size() - 1);
             try {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates(reporting);
                 });
                 return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
             }
             catch (Exception e){
-                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
             }
         }
         return null;
@@ -70,7 +72,7 @@ public class YahooTools extends ExternalSiteTools{
                 return checkResult(reporting, ezShare, sharePrices, nbOfDays);
             }
             catch (Exception e){
-                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
             }
         }
         return null;
@@ -195,6 +197,7 @@ public class YahooTools extends ExternalSiteTools{
                 });
             }
             catch(Exception e){
+                reporting.info("Error pendant la recherche du dividende avec: "+url+" - Erreur: "+e.getMessage()+e.getMessage());
                 logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: "+url, e);
             }
         }
