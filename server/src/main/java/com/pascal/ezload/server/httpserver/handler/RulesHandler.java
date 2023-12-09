@@ -138,11 +138,10 @@ public class RulesHandler {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/validate")
     // return the execution report, to check the syntax
-    public String validateCommonFunction(@NotNull CommonFunctions commonFunction) throws Exception {
-        MainSettings mainSettings = SettingsManager.getInstance().loadProps();
+    public String validateCommonFunction(@NotNull CommonFunctions commonFunction) {
         TextReporting reporting = new TextReporting();
         try {
-            return ExpressionEvaluator.getSingleton().evaluateAsString(reporting, Arrays.stream(commonFunction.getScript()).collect(Collectors.joining("\n")), new EzData());
+            return ExpressionEvaluator.getSingleton().evaluateAsString(reporting, String.join("\n", commonFunction.getScript()), new EzData());
         }
         catch(Exception e){
             String errorMsg = e.getMessage();

@@ -30,9 +30,6 @@ public enum ChartIndexPerf {
     PERF_RENDEMENT_CURRENT_SHARES("a revoir"), // le rendement du dividende
     PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES("a revoir"); // croissance + rendement du dividende
 
-    private String description;
-
     ChartIndexPerf(String description){
-        this.description = description;
     }
 }
