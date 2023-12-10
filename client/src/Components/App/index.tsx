@@ -322,7 +322,9 @@ export function App(){
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
                             <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
-                                <BourseDirect ezProfil={ezProfil}
+                                <BourseDirect 
+                                            profileName={mainSettings?.activeEzProfilName}
+                                            ezProfil={ezProfil}
                                             followProcess={followProcess}
                                             bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
                                             readOnly={processRunning}/>                                

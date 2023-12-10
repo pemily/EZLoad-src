@@ -25,6 +25,7 @@ import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class SeekingAlphaTools extends ExternalSiteTools{
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     // return null if the dividend cannot be downloaded for this action
-    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
+    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws IOException {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())){
             Map<String, String> props = new HashMap<>();
             props.put("Accept-Encoding", "identity");
@@ -47,45 +48,47 @@ public class SeekingAlphaTools extends ExternalSiteTools{
             //props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
             //props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
             String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
-            try {
-                return cache.get(reporting, "seekingAlpha_dividends_"+ezShare.getSeekingAlphaCode()+"_"+from.toYYYYMMDD()+"_"+to.toYYYYMMDD(), url, props, inputStream -> {
-                    Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
+            try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis "+url)) {
+                try {
+                    return cache.get(reporting, "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + to.toYYYYMMDD(), url, props, inputStream -> {
+                        Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
 
-                    if (top.containsKey("errors")) return new LinkedList<>();
-                    List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
-                    if (history.size() == 0) return new LinkedList<>();
-                    return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
-                            .filter(attributes -> attributes.get("amount") != null
-                                    && attributes.get("year") != null)
-                            .map(attributes -> {
+                        if (top.containsKey("errors")) return new LinkedList<>();
+                        List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
+                        if (history.size() == 0) return new LinkedList<>();
+                        return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
+                                .filter(attributes -> attributes.get("amount") != null
+                                        && attributes.get("year") != null)
+                                .map(attributes -> {
 
-                                String freq = attributes.get("freq") != null ? attributes.get("freq").toString() : null;
+                                    String freq = attributes.get("freq") != null ? attributes.get("freq").toString() : null;
 
-                                Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL; // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
-                                if ("MONTHLY".equals(freq))
-                                    frequency = Dividend.EnumFrequency.MENSUEL;
-                                else if ("QUARTERLY".equals(freq))
-                                    frequency = Dividend.EnumFrequency.TRIMESTRIEL;
-                                else if ("SEMIANNUAL".equals(freq))
-                                    frequency = Dividend.EnumFrequency.SEMESTRIEL;
-                                else if ("YEARLY".equals(freq))
-                                    frequency = Dividend.EnumFrequency.ANNUEL;
+                                    Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL; // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
+                                    if ("MONTHLY".equals(freq))
+                                        frequency = Dividend.EnumFrequency.MENSUEL;
+                                    else if ("QUARTERLY".equals(freq))
+                                        frequency = Dividend.EnumFrequency.TRIMESTRIEL;
+                                    else if ("SEMIANNUAL".equals(freq))
+                                        frequency = Dividend.EnumFrequency.SEMESTRIEL;
+                                    else if ("YEARLY".equals(freq))
+                                        frequency = Dividend.EnumFrequency.ANNUEL;
 
-                                return new Dividend(
-                                        NumberUtils.str2Float(attributes.get("amount").toString()),
-                                        seekingAlphaDate(attributes.get("ex_date")),
-                                        seekingAlphaDate(attributes.get("declare_date")),
-                                        seekingAlphaDate(attributes.get("pay_date")),
-                                        seekingAlphaDate(attributes.get("record_date")),
-                                        seekingAlphaDate(attributes.get("date")),
-                                        frequency,
-                                        DeviseUtil.USD);
-                            })
-                            .collect(Collectors.toList());
-                });
-            }
-            catch(Exception e){
-                logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: "+url, e);
+                                    return new Dividend(
+                                            NumberUtils.str2Float(attributes.get("amount").toString()),
+                                            seekingAlphaDate(attributes.get("ex_date")),
+                                            seekingAlphaDate(attributes.get("declare_date")),
+                                            seekingAlphaDate(attributes.get("pay_date")),
+                                            seekingAlphaDate(attributes.get("record_date")),
+                                            seekingAlphaDate(attributes.get("date")),
+                                            frequency,
+                                            DeviseUtil.USD);
+                                })
+                                .collect(Collectors.toList());
+                    });
+                } catch (Exception e) {
+                    reporting.info("Error pendant la recherche du dividende avec: " + url + " - Erreur: " + e.getMessage() + e.getMessage());
+                    logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: " + url, e);
+                }
             }
         }
 

@@ -20,17 +20,26 @@ package com.pascal.ezload.service.dashboard;
 public enum ChartIndex {
     CURRENT_SHARES,  // Les cours des valeurs d'actions actuelles
     TEN_WITH_MOST_IMPACTS, // Les cours de vos 10 plus grosses actions actuelles
-    ALL_SHARES,   // Tous les cours d'actions
+    ALL_SHARES,   // Tout les actions que j'ai eu un jour dans le portefeuille
+
+    // Sur le Portefeuille
     INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY, // L'additions des actions dans votre portefeuilles
     INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY, // L'additions des actions dans votre portefeuilles + les liquiditées
     INSTANT_LIQUIDITE, // Vos liquiditées
     CUMUL_CREDIT_IMPOTS, // Crédit d'impots cumulés
     CUMUL_ENTREES_SORTIES, // Entrées/Sorties cumulés
     INSTANT_ENTREES_SORTIES, // Entrées/Sorties
-    INSTANT_DIVIDENDES,  // Dividendes
-    CUMUL_DIVIDENDES,  // Dividendes Cumulés
+    INSTANT_PORTFOLIO_DIVIDENDES,  // Dividendes
+    CUMUL_PORTFOLIO_DIVIDENDES,  // Dividendes Cumulés
     CURRENCIES, // Devises
-    BUY, // Achat
-    SOLD, // Ventes
-    BUY_SOLD_WITH_DETAILS // Achat et ventes par actions
+    BUY, // Les achats dans le portefeuille
+    SOLD, // Les ventes dans le portefeuille
+
+    // Par actions
+    SHARE_COUNT, // Nb D'actions
+    SHARE_PRICES, // Cours des actions (des actions sélectionnées dans le graphique)
+    SHARE_BUY_SOLD_WITH_DETAILS, // Achat et ventes par actions (des actions sélectionnées dans le graphique)
+    SHARE_DIVIDEND, // Dividendes régulier pour une action (des actions sélectionnées dans le graphique)
+    SHARE_DIVIDEND_YIELD,
+    SHARE_PRU
 }

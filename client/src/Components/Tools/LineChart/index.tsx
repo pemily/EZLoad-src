@@ -96,8 +96,13 @@ export function LineChart(props: LineChartProps){
                 callbacks: {
                     label: function(context: any) {
                         // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
+                        if (context.raw === null || context.raw === undefined) 
+                            return "";
                         if (context.dataset.tooltips){
-                            return context.dataset.label+': '+context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            const valueWithLabel : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            if (valueWithLabel.indexOf(":") == -1)
+                                return context.dataset.label+': '+valueWithLabel;
+                            return context.dataset.label+' '+valueWithLabel;
                         }
                         return context.dataset.label+': '+context.raw;
                     }
@@ -196,16 +201,24 @@ export function LineChart(props: LineChartProps){
                 position: 'left',
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['symbolDevise']
+                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 }
-            },                  
+            },        
+            NB: {
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.axisSetting === "NB").length > 0,
+                position: 'left',
+                title: {
+                    display: false
+                }
+            },                         
             SHARE: {
                 type: 'linear',
                 display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
                 position: 'left',
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['symbolDevise']
+                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 }
             },                      
             DEVISE:{
@@ -214,7 +227,7 @@ export function LineChart(props: LineChartProps){
                 position: 'right',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['symbolDevise']
+                  text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 },
                 // grid line settings
                 grid: {

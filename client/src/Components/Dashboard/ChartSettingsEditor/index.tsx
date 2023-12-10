@@ -150,21 +150,31 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 readOnly={false}
                                 selectedCodeValues={props.chartSettings.indexSelection ? props.chartSettings.indexSelection : []}                            
                                 userValues={[ 
-                                    'Vos valeurs actuelles',
-                                    'Vos 10 plus grosses valeurs actuelles',
-                                    'Toutes vos valeurs',
+                                    // selection des actions
+                                    'Vos actions actuelles',
+                                    'Vos 10 plus grosses actions actuelles',
+                                    'Toutes les actions qui ont été dans votre portefeuille',
+                                    
+                                    // Sur le portefeuille
                                     'Somme des valeurs d\'actions en portefeuille + les liquidités',
                                     'Somme des valeurs d\'actions en portefeuille sans les liquidités',                                    
                                     'Liquidité',
                                     'Crédit d\'impots cumulés',
                                     'Entrées/Sorties',
                                     'Entrées/Sorties cumulés',
-                                    'Dividendes cumulés',
-                                    'Dividendes',
+                                    'Dividendes perçus cumulés',
+                                    'Dividendes perçus',
                                     'Devises',
-                                    'Achats',
-                                    'Ventes',
-                                    'Achats & Ventes des valeurs sélectionnés']}
+                                    'Achats', // achat dans le portefeuille
+                                    'Ventes', // ventes dans le portefeuille
+
+                                    // Sur les actions
+                                    'Nb Actions',
+                                    'Cours des valeurs sélectionnées',
+                                    'Achats & Ventes des valeurs sélectionnées',
+                                    'Dividende par action des valeurs sélectionnées (date de détachement)',
+                                    'Rendement du dividende au détachement (des valeurs sélectionnées)',
+                                    'Prix de reviens (PRU)']}
                                 codeValues={[
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
@@ -180,7 +190,12 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'CURRENCIES',
                                     'BUY',
                                     'SOLD',
-                                    'BUY_SOLD_WITH_DETAILS']}
+                                    'SHARE_COUNT',
+                                    'SHARE_PRICES',
+                                    'SHARE_BUY_SOLD_WITH_DETAILS',
+                                    'SHARE_DIVIDEND_PER_ACTION',
+                                    'SHARE_DIVIDEND_YIELD',
+                                    'SHARE_PRU']}
                                 description=""
                                 onChange={newValue => 
                                     props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})
@@ -202,9 +217,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Perf mensuelle de la valeur du portefeuille en €',
                                     'Perf annnuelle de la valeur du portefeuille en €',
                                     'Perf journalière de la valeur du portefeuille depuis le 1er jour du graphique en €',
-                                    'Croissance de vos valeurs actuelles depuis le 1er jour du graphique',
-                                    'Rendement de vos valeurs actuelles',
-                                    'Croissement + Rendement de vos valeurs actuelles']}
+                                    'Croissance de vos valeurs actuelles depuis le 1er jour du graphique']}
                                 codeValues={[                                    
                                     'PERF_DAILY_PORTEFEUILLE',
                                     'PERF_MENSUEL_PORTEFEUILLE',
@@ -214,9 +227,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'PERF_PLUS_MOINS_VALUE_MENSUEL',
                                     'PERF_PLUS_MOINS_VALUE_ANNUEL',
                                     'PERF_PLUS_MOINS_VALUE_TOTAL',
-                                    'PERF_CROISSANCE_CURRENT_SHARES',
-                                    'PERF_RENDEMENT_CURRENT_SHARES',
-                                    'PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES'
+                                    'PERF_CROISSANCE_CURRENT_SHARES'
                                 ]}
                                 description=""
                                 onChange={newValue => 

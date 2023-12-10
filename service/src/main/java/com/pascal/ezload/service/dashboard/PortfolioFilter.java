@@ -33,10 +33,12 @@ public enum PortfolioFilter {
         CUMUL_CREDIT_IMPOTS(true, 0),
         BUY(false, 0),
         SOLD(false, 0),
+        SHARE_COUNT(false, 0),
         ALL_SHARES(false, 0),
         CURRENT_SHARES(false, 0),
         TEN_WITH_MOST_IMPACTS(false, 0),
-        CURRENCIES(false, 0);
+        CURRENCIES(false, 0),
+        SHARE_PRU(false, 0);
 
         boolean requireBuild;
         int buildOrder;
@@ -58,21 +60,30 @@ public enum PortfolioFilter {
             Set<PortfolioFilter> r = new HashSet<>();
             selection.forEach(s -> {
                 switch (s){
+                    // Selection des actions
                     case CURRENT_SHARES: r.add(CURRENT_SHARES); break;
                     case TEN_WITH_MOST_IMPACTS: r.add(TEN_WITH_MOST_IMPACTS); break;
                     case ALL_SHARES: r.add(ALL_SHARES); break;
+                    // Graphique sur le portefeuille
                     case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY: r.add(INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY); break;
                     case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY: r.add(INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY); break;
                     case INSTANT_LIQUIDITE: r.add(INSTANT_LIQUIDITE); break;
                     case INSTANT_ENTREES_SORTIES: r.addAll(List.of(INSTANT_ENTREES, INSTANT_SORTIES)); break;
-                    case CUMUL_ENTREES_SORTIES: r.addAll(List.of(CUMUL_ENTREES_SORTIES)); break;
-                    case CUMUL_CREDIT_IMPOTS: r.addAll(List.of(CUMUL_CREDIT_IMPOTS)); break;
-                    case INSTANT_DIVIDENDES: r.add(INSTANT_DIVIDENDES); break;
-                    case CUMUL_DIVIDENDES: r.add(CUMUL_DIVIDENDES); break;
+                    case CUMUL_ENTREES_SORTIES: r.add(CUMUL_ENTREES_SORTIES); break;
+                    case CUMUL_CREDIT_IMPOTS: r.add(CUMUL_CREDIT_IMPOTS); break;
+                    case INSTANT_PORTFOLIO_DIVIDENDES: r.add(INSTANT_DIVIDENDES); break;
+                    case CUMUL_PORTFOLIO_DIVIDENDES: r.add(CUMUL_DIVIDENDES); break;
                     case CURRENCIES: r.add(CURRENCIES); break;
                     case BUY: r.add(BUY); break;
                     case SOLD: r.add(SOLD); break;
-                    case BUY_SOLD_WITH_DETAILS: r.add(BUY); r.add(SOLD); break;
+                    // Graphique sur les actions
+                    case SHARE_BUY_SOLD_WITH_DETAILS: r.add(BUY); r.add(SOLD); break;
+                    case SHARE_PRU: r.add(SHARE_PRU); break;
+                    case SHARE_COUNT:
+                    case SHARE_PRICES:
+                    case SHARE_DIVIDEND:
+                    case SHARE_DIVIDEND_YIELD:
+                        break;
                     default: throw new RuntimeException("Developer error, you forget: "+s);
                 }
             });

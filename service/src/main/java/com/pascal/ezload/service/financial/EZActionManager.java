@@ -212,6 +212,7 @@ public class EZActionManager {
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
             List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from, to);
             if (dividends == null){
+                reporting.info("Tentative avec YahooFinance");
                 return YahooTools.searchDividends(reporting, cache, ezShare, from, to);
             }
         }

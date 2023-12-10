@@ -23,6 +23,7 @@ import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
 import { FileBrowser } from '../../Tools/FileBrowser';
 
 export interface BourseDirectProps {
+    profileName: string|undefined;
     ezProfil: EzProfil;
     bourseDirectAuthInfo: AuthInfo|undefined;
     readOnly: boolean;
@@ -41,9 +42,9 @@ export function BourseDirect(props: BourseDirectProps){
             <FileBrowser visible={browserFileVisible} close={closeBrowser}/>
             <Box direction="row">
                 <Anchor margin="medium" target="BourseDirect" href="http://www.boursedirect.com" label="BourseDirect" />
-                { props.ezProfil.downloadDir
+                { props.profileName
                     && (<Anchor alignSelf="center" onClick={e => setBrowserFileVisible(true)}
-                             color="brand" href={props.ezProfil.downloadDir} label="Voir les relevés téléchargés"/>)}
+                             color="brand" href={props.profileName} label="Voir les relevés téléchargés"/>)}
             </Box>
             
           <Button alignSelf="start" margin="medium"
