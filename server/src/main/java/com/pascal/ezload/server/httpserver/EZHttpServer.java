@@ -99,10 +99,10 @@ public class EZHttpServer {
     }
 
 
-    public FileLinkCreator fileLinkCreator(MainSettings mainSettings, EzProfil ezProfil){
+    public FileLinkCreator fileLinkCreator(SettingsManager settingsManager, MainSettings mainSettings){
         return (reporting, sourceFile) -> {
-            if (sourceFile.startsWith(SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect))){
-                String file = sourceFile.substring(SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect).length());
+            if (sourceFile.startsWith(settingsManager.getDownloadDir(mainSettings.getActiveEzProfilName(), EnumEZBroker.BourseDirect))){
+                String file = sourceFile.substring(settingsManager.getDownloadDir(mainSettings.getActiveEzProfilName(), EnumEZBroker.BourseDirect).length());
                 file = file.replace('\\', '/'); // pour windows
                 return "<a target='"+PDF_BOURSE_DIRECT_TARGET+"' href='"+PDF_BOURSE_DIRECT_CONTEXT+"?file="+file+"'>"+ reporting.escape(file)+"</a>";
             }

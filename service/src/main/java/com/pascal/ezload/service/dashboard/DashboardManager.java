@@ -18,17 +18,20 @@
 package com.pascal.ezload.service.dashboard;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
+import com.pascal.ezload.service.util.finance.CurrencyMap;
 import com.pascal.ezload.service.util.finance.Dividend;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -37,6 +40,9 @@ import static com.pascal.ezload.service.dashboard.ChartIndexPerf.PERF_TOTAL_PORT
 
 public class DashboardManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");
+
+    private static final String NO_LABEL = "";
+    private static final Float NO_VALUE = null;
 
     public enum StartDateSelection {
         ONE_YEAR,
@@ -51,12 +57,12 @@ public class DashboardManager {
     private final EZActionManager ezActionManager;
     private final String dashboardFile;
 
-    public DashboardManager(MainSettings.EZLoad ezLoad) throws Exception {
-        this.dashboardFile = ezLoad.getDashboardFile();
-        this.ezActionManager = ezLoad.getEZActionManager();
+    public DashboardManager(SettingsManager settingsManager, MainSettings.EZLoad ezLoad) throws Exception {
+        this.dashboardFile = settingsManager.getDashboardFile();
+        this.ezActionManager = ezLoad.getEZActionManager(settingsManager);
     }
 
-    public DashboardSettings loadDashboardSettings() throws IOException {
+    public DashboardSettings loadDashboardSettings() {
         if (new File(dashboardFile).exists()){
             try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
                 DashboardSettings dashboardSettings = JsonUtil.createDefaultMapper().readValue(reader, DashboardSettings.class);
@@ -71,14 +77,20 @@ public class DashboardManager {
         return new DashboardSettings();
     }
 
-    public List<Chart> loadDashboard(Reporting reporting, DashboardSettings dashboardSettings, EZPortfolioProxy ezPortfolioProxy) throws IOException {
+    public List<Chart> loadDashboard(Reporting reporting, DashboardSettings dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
         List<Chart> charts = new LinkedList<>();
             if (ezPortfolioProxy != null) {
                 charts = dashboardSettings.getChartSettings().stream()
-                        .map(prefs -> createChart(reporting,
-                                ezPortfolioProxy,
-                                prefs
-                        ))
+                        .map(prefs -> {
+                            try {
+                                return createChart(reporting,
+                                        ezPortfolioProxy,
+                                        prefs
+                                );
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                         .collect(Collectors.toList());
             }
         return charts;
@@ -90,130 +102,307 @@ public class DashboardManager {
     }
 
 
-    public Chart createChart(Reporting reporting, EZPortfolioProxy portfolio,
-                             ChartSettings chartSettings) {
-        reporting.info("Génération du graphique: '"+chartSettings.getTitle()+"'");
-        EZDate today = EZDate.today();
-        EZDate startDate;
-        switch (chartSettings.getSelectedStartDateSelection()){
-            case ONE_YEAR:
-                startDate = today.minusYears(1);
-                break;
-            case TWO_YEAR:
-                startDate = today.minusYears(2);
-                break;
-            case THREE_YEAR:
-                startDate = today.minusYears(3);
-                break;
-            case FIVE_YEAR:
-                startDate = today.minusYears(5);
-                break;
-            case TEN_YEAR:
-                startDate = today.minusYears(10);
-                break;
-            case FROM_MY_FIRST_OPERATION:
-                if (portfolio.getAllOperations().getExistingOperations().size() >= 1){
-                    startDate = portfolio.getAllOperations().getExistingOperations().get(1).getValueDate(MesOperations.DATE_COL);
-                }
-                else{
+    public Chart createChart(Reporting rep, EZPortfolioProxy portfolio,
+                             ChartSettings chartSettings) throws IOException {
+        try(Reporting reporting = rep.pushSection("Génération du graphique: '"+chartSettings.getTitle()+"'")) {
+
+            EZDate today = EZDate.today();
+            EZDate startDate;
+            switch (chartSettings.getSelectedStartDateSelection()) {
+                case ONE_YEAR:
                     startDate = today.minusYears(1);
-                }
-                break;
-            default:
-                throw new IllegalStateException("Unknown selected value: "+ chartSettings.getSelectedStartDateSelection());
-        }
+                    break;
+                case TWO_YEAR:
+                    startDate = today.minusYears(2);
+                    break;
+                case THREE_YEAR:
+                    startDate = today.minusYears(3);
+                    break;
+                case FIVE_YEAR:
+                    startDate = today.minusYears(5);
+                    break;
+                case TEN_YEAR:
+                    startDate = today.minusYears(10);
+                    break;
+                case FROM_MY_FIRST_OPERATION:
+                    if (portfolio.getAllOperations().getExistingOperations().size() >= 1) {
+                        startDate = portfolio.getAllOperations().getExistingOperations().get(1).getValueDate(MesOperations.DATE_COL);
+                    } else {
+                        startDate = today.minusYears(1);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown selected value: " + chartSettings.getSelectedStartDateSelection());
+            }
 
-        List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, chartSettings.getNbOfPoints());
-        EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
+            List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, chartSettings.getNbOfPoints());
+            EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
-        PortfolioValuesBuilder portfolioValuesBuilder = new PortfolioValuesBuilder(ezActionManager,
-                portfolio
-                        .getAllOperations()
-                        .getExistingOperations());
-        Set<ChartIndex> allIndexes = new HashSet<>();
-        allIndexes.addAll(chartSettings.getIndexSelection());
-        allIndexes.addAll(getUsedIndexFromIndexPerf(chartSettings.getPerfIndexSelection()));
-        PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
-                                                    allIndexes);
+            PortfolioValuesBuilder portfolioValuesBuilder = new PortfolioValuesBuilder(ezActionManager,
+                    portfolio
+                            .getAllOperations()
+                            .getExistingOperations());
+            Set<ChartIndex> allIndexes = new HashSet<>();
+            allIndexes.addAll(chartSettings.getIndexSelection());
+            allIndexes.addAll(getUsedIndexFromIndexPerf(chartSettings.getPerfIndexSelection()));
+            PortfolioValuesBuilder.Result result = portfolioValuesBuilder.build(reporting, targetDevise, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
+                    allIndexes);
 
-        final Set<EZShare> selectedShares = chartSettings.getAdditionalShareNames()
-                .stream()
-                .flatMap(shareName ->
-                        ezActionManager.getAllEZShares()
-                                .stream()
-                                .filter(s -> s.getEzName().equals(shareName)))
-                .collect(Collectors.toSet());
+            final Set<EZShare> selectedShares = chartSettings.getAdditionalShareNames()
+                    .stream()
+                    .flatMap(shareName ->
+                            ezActionManager.getAllEZShares()
+                                    .stream()
+                                    .filter(s -> s.getEzName().equals(shareName)))
+                    .collect(Collectors.toSet());
 
-        List<ChartLine> allChartLines = new LinkedList<>();
+            List<ChartLine> allChartLines = new LinkedList<>();
 
-        Chart chart = ChartsTools.createChart(dates);
-        chart.setMainTitle(chartSettings.getTitle());
-        chartSettings.getIndexSelection().forEach(chartIndex ->
-            addChartIndex(today, result, selectedShares, allChartLines, chart, chartIndex)
-        );
-        chartSettings.getPerfIndexSelection().forEach(chartIndex ->
-            addChartPerfIndex(reporting, startDate, today, result, allChartLines, chart, chartIndex)
-        );
+            Chart chart = ChartsTools.createChart(dates);
+            chart.setMainTitle(chartSettings.getTitle());
+            chartSettings.getIndexSelection().forEach(chartIndex ->
+                    addChartIndex(reporting, today, result, selectedShares, allChartLines, chart, chartIndex)
+            );
+            chartSettings.getPerfIndexSelection().forEach(chartIndex ->
+                    addChartPerfIndex(reporting, startDate, today, result, allChartLines, chart, chartIndex)
+            );
 
-        int nbOfShare = (int) selectedShares.stream().filter(ezShare -> result.getAllSharesTargetPrices().get(ezShare) != null).count();
-        Colors colors = new Colors(nbOfShare + allChartLines.size());
+            int nbOfShare = (int) selectedShares.stream().filter(ezShare -> result.getTargetPrices(reporting, ezShare) != null).count();
+            Colors colors = new Colors(nbOfShare + allChartLines.size());
 
-        selectedShares
+
+
+            selectedShares
                 .forEach(ezShare -> {
-                    Prices p = result.getAllSharesTargetPrices().get(ezShare);
-                    if (p != null) {
-                        ChartLine chartLine = ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, p.getLabel(), p);
-                        Colors.ColorCode colorCode = colors.nextColorCode();
-                        chartLine.setColorLine(colorCode.getColor(1f));
+                    Colors.ColorCode colorCode = colors.nextColorCode();
+                    float transparencyReducer = 0.10f; // Nb de graphique possible pour cette action (compter le nombre de if ci dessous)
+                    float transparency = 0.7f;
 
-                        if (chartSettings.getIndexSelection().contains(ChartIndex.BUY_SOLD_WITH_DETAILS)) {
-                            List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
-                            for (EZDate date : result.getDates()) {
-                                Map<EZShare, Float> share2buySold = result.getDate2share2BuyOrSoldAmount().get(date);
-                                ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
-                                valueWithLabel.setValue(0f);
-                                valueWithLabel.setLabel("");
-                                valuesWithLabel.add(valueWithLabel);
-                                share2buySold
-                                        .entrySet()
-                                        .stream()
-                                        .filter(e -> e.getKey().equals(ezShare))
-                                        .forEach(e -> {
-                                            valueWithLabel.setLabel((e.getValue() < 0 ? "Vente ": "Achat ")+e.getValue()); // +" Cours: "+result.getAllSharesTargetPrices().get(ezShare).getPriceAt(date).getPrice());
-                                            valueWithLabel.setValue(e.getValue());
-                                        });
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_PRICES)) {
+                        Prices prices = result.getTargetPrices(reporting, ezShare);
+                        if (prices != null) {
+                            List<ChartLine.ValueWithLabel> valuesWithLabel = prices.getPrices().stream().map(price -> {
+                                                                                                    ChartLine.ValueWithLabel v = new ChartLine.ValueWithLabel();
+                                                                                                    v.setLabel(NO_LABEL);
+                                                                                                    v.setValue(NO_VALUE); // can be 0 when the company didn't exists in the past
+                                                                                                    if (price.getPrice() != 0) {
+                                                                                                        v.setLabel("Cours: " + price.getPrice());
+                                                                                                        v.setValue(price.getPrice());
+                                                                                                    }
+                                                                                                    return v;
+                                                                                                }).collect(Collectors.toList());
+                            ChartLine chartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, prices.getLabel(), valuesWithLabel);
+                            chartLine.setColorLine(colorCode.getColor(1f));
 
-                            }
-                            ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PORTFOLIO, ezShare.getEzName(), valuesWithLabel);
-                            buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
-                            allChartLines.add(buyAndSoldChartLine);
+                            allChartLines.add(chartLine);
                         }
+                    }
 
-                        allChartLines.add(chartLine);
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_COUNT)) {
+                        List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                        for (EZDate date : result.getDates()) {
+                            Map<EZShare, Float> action2Counter = result.getDate2share2ShareNb().get(date);
+                            ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                            valueWithLabel.setValue(NO_VALUE);
+                            valueWithLabel.setLabel(NO_LABEL);
+                            valuesWithLabel.add(valueWithLabel);
+                            if (action2Counter != null){
+                                Float numberOfAction = action2Counter.get(ezShare);
+                                if (numberOfAction != null){
+                                    valueWithLabel.setValue(numberOfAction == 0 ? NO_VALUE : numberOfAction);
+                                    valueWithLabel.setLabel(numberOfAction == 0 ? NO_LABEL : "Nbr d'action: "+ NumberUtils.float2Str(numberOfAction));
+                                }
+                            }
+                        }
+                        ChartLine numberOfSharesChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.NB, ezShare.getEzName(), valuesWithLabel);
+                        transparency = transparency-transparencyReducer;
+                        numberOfSharesChartLine.setColorLine(colorCode.getColor(transparency));
+                        allChartLines.add(numberOfSharesChartLine);
+                    }
+
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_BUY_SOLD_WITH_DETAILS)) {
+                        List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                        for (EZDate date : result.getDates()) {
+                            Map<EZShare, Float> share2buySold = result.getDate2share2BuyOrSoldAmount().get(date);
+                            ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                            valueWithLabel.setValue(NO_VALUE);
+                            valueWithLabel.setLabel(NO_LABEL);
+                            valuesWithLabel.add(valueWithLabel);
+                            Float amount = share2buySold.get(ezShare);
+                            if (amount != null && amount != 0) {
+                                String label = "";
+                                if (amount < 0) label = "Vente: " + amount;
+                                if (amount > 0) label = "Achat: " + amount;
+                                valueWithLabel.setLabel(label);
+                                valueWithLabel.setValue(amount);
+                            }
+                        }
+                        ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PORTFOLIO, ezShare.getEzName(), valuesWithLabel);
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
+                        allChartLines.add(buyAndSoldChartLine);
+                    }
+
+
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_PRU)) {
+                        List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                        for (EZDate date : result.getDates()) {
+                            Map<EZShare, Float> share2buySold = result.getDate2share2PRU().get(date);
+                            ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                            valueWithLabel.setValue(NO_VALUE);
+                            valueWithLabel.setLabel(NO_LABEL);
+                            valuesWithLabel.add(valueWithLabel);
+                            share2buySold
+                                    .entrySet()
+                                    .stream()
+                                    .filter(e -> e.getKey().equals(ezShare))
+                                    .forEach(e -> {
+                                        valueWithLabel.setLabel(e.getValue() == 0 ? NO_LABEL : "PRU: " + e.getValue());
+                                        valueWithLabel.setValue(e.getValue() == 0 ? NO_VALUE : e.getValue());
+                                    });
+
+                        }
+                        ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
+                        allChartLines.add(buyAndSoldChartLine);
+                    }
+
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_PRU_WITH_DIVIDEND)) {
+                        List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                        for (EZDate date : result.getDates()) {
+                            Map<EZShare, Float> share2buySold = result.getDate2share2PRUDividend().get(date);
+                            ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                            valueWithLabel.setValue(NO_VALUE);
+                            valueWithLabel.setLabel(NO_LABEL);
+                            valuesWithLabel.add(valueWithLabel);
+                            share2buySold
+                                    .entrySet()
+                                    .stream()
+                                    .filter(e -> e.getKey().equals(ezShare))
+                                    .forEach(e -> {
+                                        valueWithLabel.setLabel(e.getValue() == 0 ? NO_LABEL : "PRU(-dividende): " + e.getValue());
+                                        valueWithLabel.setValue(e.getValue() == 0 ? NO_VALUE : e.getValue());
+                                    });
+
+                        }
+                        ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
+                        allChartLines.add(buyAndSoldChartLine);
+                    }
+
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_DIVIDEND)) {
+                        try {
+                            List<Dividend> dividends = ezActionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size()-1));
+                            if (dividends != null){
+                                Optional<EZDevise> devise = dividends.stream().map(Dividend::getDevise).findFirst();
+
+                                if(devise.isPresent()) {
+                                    CurrencyMap currencyMap = ezActionManager.getCurrencyMap(reporting, devise.get(), targetDevise, dates);
+                                    EZDate previousDate = result.getDates().get(0);
+                                    List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                                    for (EZDate currentDate : result.getDates()){
+                                        ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                                        valueWithLabel.setValue(NO_VALUE);
+                                        valueWithLabel.setLabel(NO_LABEL);
+                                        valuesWithLabel.add(valueWithLabel);
+
+                                        EZDate finalPreviousDate = previousDate;
+                                        float totalDividendInOriginalDevise = (float) dividends.stream()
+                                                                    .filter(div -> div.getDetachementDate().isAfterOrEquals(finalPreviousDate) && div.getDetachementDate().isBefore(currentDate))
+                                                                    .mapToDouble(Dividend::getAmount)
+                                                                    .sum();
+
+                                        if (totalDividendInOriginalDevise > 0) {
+                                            float totalDividende = currencyMap.getTargetPrice(new PriceAtDate(currentDate, totalDividendInOriginalDevise));
+                                            valueWithLabel.setValue(totalDividende);
+                                            valueWithLabel.setLabel("Dividende: "+NumberUtils.float2Str(totalDividende));
+                                        }
+                                        previousDate = currentDate;
+                                    }
+                                    ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
+                                    transparency = transparency-transparencyReducer;
+                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
+                                    allChartLines.add(buyAndSoldChartLine);
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            reporting.error("Erreur lors de la récupération du dividende de l'action: "+ezShare.getEzName(), e);
+                        }
+                    }
+
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_DIVIDEND_YIELD)) {
+                        // Le rendement du dividend
+                        try {
+                            List<Dividend> dividends = ezActionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size()-1));
+                            if (dividends != null){
+                                Optional<EZDevise> devise = dividends.stream().map(Dividend::getDevise).findFirst();
+
+                                if(devise.isPresent()) {
+                                    CurrencyMap currencyMap = ezActionManager.getCurrencyMap(reporting, devise.get(), targetDevise, dates);
+                                    EZDate previousDate = result.getDates().get(0);
+                                    List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                                    for (EZDate currentDate : result.getDates()){
+                                        ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                                        valueWithLabel.setValue(NO_VALUE);
+                                        valueWithLabel.setLabel(NO_LABEL);
+                                        valuesWithLabel.add(valueWithLabel);
+
+                                        EZDate finalPreviousDate = previousDate;
+                                        float totalDividendInOriginalDevise = (float) dividends.stream()
+                                                .filter(div -> div.getDetachementDate().isAfterOrEquals(finalPreviousDate) && div.getDetachementDate().isBefore(currentDate))
+                                                .mapToDouble(Dividend::getAmount)
+                                                .sum();
+
+                                        if (totalDividendInOriginalDevise > 0) {
+                                            Prices p = result.getTargetPrices(reporting, ezShare);
+                                            if (p != null) {
+                                                float dividend = currencyMap.getTargetPrice(new PriceAtDate(currentDate, totalDividendInOriginalDevise));
+                                                float price = p.getPriceAt(currentDate).getPrice();
+                                                float rendement = (dividend*100f)/price;
+                                                valueWithLabel.setValue(rendement);
+                                                valueWithLabel.setLabel("Rendement: " + NumberUtils.float2Str(rendement)+ "%");
+                                            }
+                                        }
+                                        previousDate = currentDate;
+                                    }
+                                    ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PERCENT, ezShare.getEzName(), valuesWithLabel);
+                                    transparency = transparency-transparencyReducer;
+                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
+                                    allChartLines.add(buyAndSoldChartLine);
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            reporting.error("Erreur lors de la récupération du dividende de l'action: "+ezShare.getEzName(), e);
+                        }
                     }
                 });
 
-        chart.setLines(allChartLines);
-        allChartLines.stream()
-                .filter(chartLine -> chartLine.getColorLine() == null)
-                .forEach(chartLine -> chartLine.setColorLine(colors.nextColorCode().getColor(chartLine.getLineStyle() == ChartLine.LineStyle.BAR_STYLE ? 0.5f : 1f)));
-        Map<String, String> yAxisTitles = new HashMap<>();
-        yAxisTitles.put("symbolDevise", targetDevise.getSymbol());
-        chart.setAxisId2titleY(yAxisTitles);
-        return chart;
+            chart.setLines(allChartLines);
+            allChartLines.stream()
+                    .filter(chartLine -> chartLine.getColorLine() == null)
+                    .forEach(chartLine -> chartLine.setColorLine(colors.nextColorCode().getColor(chartLine.getLineStyle() == ChartLine.LineStyle.BAR_STYLE ? 0.5f : 1f)));
+            Map<String, String> yAxisTitles = new HashMap<>();
+            yAxisTitles.put("Y_AXIS_TITLE", targetDevise.getSymbol());
+            chart.setAxisId2titleY(yAxisTitles);
+            return chart;
+        }
     }
 
-    private void addChartIndex(EZDate today, PortfolioValuesBuilder.Result result, Set<EZShare> selectedShares, List<ChartLine> allChartLines, Chart chart, ChartIndex p) {
+    private void addChartIndex(Reporting reporting, EZDate today, PortfolioValuesBuilder.Result result, Set<EZShare> selectedShares, List<ChartLine> allChartLines, Chart chart, ChartIndex p) {
         String lineTitle = null;
         ChartLine.LineStyle lineStyle = null;
         switch(p){
-            case INSTANT_DIVIDENDES:
+            case INSTANT_PORTFOLIO_DIVIDENDES:
                 lineStyle = ChartLine.LineStyle.BAR_STYLE;
                 lineTitle ="Dividendes";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle,
                         result.getPortfolioFilter2TargetPrices().get(PortfolioFilter.INSTANT_DIVIDENDES)));
                 break;
-            case CUMUL_DIVIDENDES:
+            case CUMUL_PORTFOLIO_DIVIDENDES:
                 lineStyle = ChartLine.LineStyle.LINE_STYLE;
                 lineTitle = "Dividendes Cumulés";
                 allChartLines.add(ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle,
@@ -285,7 +474,7 @@ public class DashboardManager {
                                 .filter(e -> e.getValue() > 0)
                                 .sorted(Comparator.comparingDouble(e -> {
                                     float nbOfAction = e.getValue();
-                                    Prices prices = result.getAllSharesTargetPrices().get(e.getKey());
+                                    Prices prices = result.getTargetPrices(reporting, e.getKey());
                                     if (prices == null) return 0;
                                     float targetPrice = prices.getPriceAt(today).getPrice();
                                     String fPrice = NumberUtils.float2Str(nbOfAction * targetPrice * -1); // * -1 to have the most valuable first
@@ -336,9 +525,18 @@ public class DashboardManager {
                 allChartLines.add(ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PORTFOLIO, lineTitle, valuesWithLabel));
                 break;
             }
-            case BUY_SOLD_WITH_DETAILS: {
+            case SHARE_PRU:
+            case SHARE_PRU_WITH_DIVIDEND:
+            case SHARE_COUNT:
+            case SHARE_BUY_SOLD_WITH_DETAILS:
+            case SHARE_DIVIDEND:
+            case SHARE_PRICES:
+            case SHARE_DIVIDEND_YIELD: {
                 // doit etre mixé avec la selection d'une action
                 break;
+            }
+            default: {
+                throw new RuntimeException("Developper error, Unknown value: "+p.name());
             }
         }
     }
@@ -456,43 +654,13 @@ public class DashboardManager {
 
             case PERF_CROISSANCE_CURRENT_SHARES: {
                 for (EZShare share : getSharesAtDate(today, result)){
-                    Prices prices = result.getAllSharesTargetPrices().get(share);
+                    Prices prices = result.getTargetPrices(reporting, share);
                     PriceAtDate firstPrice = prices.getPriceAt(startDate);
                     String lineTitle = "Croissance "+prices.getLabel();
                     allChartLines.add(ChartsTools.createChartLine(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.PERCENT, lineTitle,
                             prices.getPrices().stream()
                                     .map(priceAtDate -> (priceAtDate.getPrice() - firstPrice.getPrice())*100f/firstPrice.getPrice()).collect(Collectors.toList())));
                 }
-                break;
-            }
-            case PERF_RENDEMENT_CURRENT_SHARES: {
-               /* String lineTitle = "Rendement";
-                List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
-
-                for (EZShare share : getSharesAtDate(today, result)) {
-                    // compute the total dividend for all the years
-                  /*  Map<Integer, Float> year2DividendTotal = computeDividendPerYer(reporting, startDate.getYear(), today.getYear(), share);
-                    float currentYearValue = year2DividendTotal.get(EZDate.today().getYear());
-                    float lastYearValue = year2DividendTotal.get(EZDate.today().minusYears(1).getYear());
-                    if (lastYearValue > currentYearValue){
-                        // because in EZPortfolio selection, we select only dividend in expansion
-                        // so to compare the correct thing put the same value than the last year
-                        year2DividendTotal.put(EZDate.today().getYear(), lastYearValue);
-                    }
-                    Prices prices = result.getAllSharesTargetPrices().get(share);
-
-                    for (EZDate date : result.getDates()) {
-                        PriceAtDate priceAtDate = prices.getPriceAt(date);
-                        ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
-                       // float yearDividend = year2DividendTotal.get(date.getYear());
-                        valueWithLabel.setValue(-1f); // I don't know what to do
-                        valueWithLabel.setLabel(share.getEzName());
-                    }
-                    allChartLines.add(ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.PERF_LINE, lineTitle, valuesWithLabel));
-                }*/
-                break;
-            }
-            case PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES: {
                 break;
             }
         }

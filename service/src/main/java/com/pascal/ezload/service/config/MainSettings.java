@@ -24,6 +24,7 @@ import com.pascal.ezload.service.util.FileValue;
 import com.pascal.ezload.service.util.StringValue;
 
 public class MainSettings {
+
     public enum EnumAlgoYearSelector { DISABLED, ANNEE_PRECEDENTE, ANNEE_EN_COURS}
     public enum EnumAlgoDateSelector {DATE_DE_PAIEMENT, DATE_DE_DETACHEMENT }
     public enum EnumPercentSelector { ADAPTATIF, STABLE }
@@ -50,14 +51,14 @@ public class MainSettings {
 
 
     public MainSettings validate(){
-        chrome.validate();
-        ezLoad.validate();
+        if (chrome != null) chrome.validate();
+        if (ezLoad != null) ezLoad.validate();
         return this;
     }
 
     public void clearErrors(){
-        chrome.clearErrors();
-        ezLoad.clearErrors();
+        if (chrome != null) chrome.clearErrors();
+        if (ezLoad != null) ezLoad.clearErrors();
     }
 
     public String getActiveEzProfilName() {
@@ -70,8 +71,7 @@ public class MainSettings {
 
     public static class ChromeSettings extends Checkable<ChromeSettings> {
 
-        enum Field {driverPath, userDataDir}
-        private String driverPath;
+        enum Field {userDataDir}
         private String userDataDir;
         private int defaultTimeout;
 
@@ -90,17 +90,8 @@ public class MainSettings {
             this.userDataDir = userDataDir == null ? null : userDataDir.trim();
         }
 
-        public String getDriverPath() {
-            return driverPath;
-        }
-
-        public void setDriverPath(String driverPath) {
-            this.driverPath = driverPath == null ? null : driverPath.trim();
-        }
-
         @Override
         public ChromeSettings validate() {
-            new FileValue(this, Field.driverPath.name(), driverPath).checkRequired().checkFile();
             new FileValue(this, Field.userDataDir.name(), userDataDir).checkRequired().checkDirectory();
             return this;
         }
@@ -109,14 +100,11 @@ public class MainSettings {
 
     public static class EZLoad extends Checkable<EZLoad> {
 
-        enum Field {logsDir, passPhrase, rulesDir, cacheDir, shareDataFile, dashboardFile}
+        enum Field {logsDir, passPhrase, cacheDir }
 
         private int port;
-        private String rulesDir;
         private String logsDir;
         private String cacheDir;
-        private String shareDataFile;
-        private String dashboardFile;
         private String passPhrase;
         private Admin admin;
 
@@ -134,14 +122,6 @@ public class MainSettings {
 
         public void setPassPhrase(String passPhrase) {
             this.passPhrase = passPhrase == null ? null : passPhrase.trim();
-        }
-
-        public String getRulesDir() {
-            return rulesDir;
-        }
-
-        public void setRulesDir(String rulesDir) {
-            this.rulesDir = rulesDir;
         }
 
         public Admin getAdmin(){
@@ -168,35 +148,16 @@ public class MainSettings {
             this.cacheDir = cacheDir;
         }
 
-        public String getShareDataFile() {
-            return shareDataFile;
-        }
-
-        public void setShareDataFile(String shareDataFile) {
-            this.shareDataFile = shareDataFile;
-        }
-
-        public String getDashboardFile() {
-            return dashboardFile;
-        }
-
-        public void setDashboardFile(String dashboardFile) {
-            this.dashboardFile = dashboardFile;
-        }
-
         @JsonIgnore
-        public EZActionManager getEZActionManager() throws Exception {
-            return new EZActionManager(getCacheDir(), getShareDataFile());
+        public EZActionManager getEZActionManager(SettingsManager settingsManager) throws Exception {
+            return new EZActionManager(getCacheDir(), settingsManager.getShareDataFile());
         }
 
         @Override
         public EZLoad validate() {
             new FileValue(this, Field.logsDir.name(), logsDir).checkRequired().checkDirectory();
             new StringValue(this, Field.passPhrase.name(), passPhrase).checkRequired();
-            new FileValue(this, Field.rulesDir.name(), rulesDir).checkRequired().checkDirectory();;
-            new FileValue(this, Field.cacheDir.name(), cacheDir).checkRequired().checkDirectory();;
-            new FileValue(this, Field.shareDataFile.name(), shareDataFile).checkRequired().checkFile();;
-            new FileValue(this, Field.dashboardFile.name(), dashboardFile).checkRequired().checkFile();;
+            new FileValue(this, Field.cacheDir.name(), cacheDir).checkRequired().checkDirectory();
             admin.validate();
             return this;
         }

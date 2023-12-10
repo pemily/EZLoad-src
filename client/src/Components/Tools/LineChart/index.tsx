@@ -33,28 +33,38 @@ export interface LineChartProps {
 
 
 export function LineChart(props: LineChartProps){
+    const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
+    const lineIsVisible : boolean[] = [];
     const [browserFileVisible, setBrowserFileVisible] = useState<boolean>(false);
+
+    if (props.chart.lines) {
+        for (var i = 0; i < props.chart.lines?.length ; i++){
+            lineIsVisible[i] = props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
+        }
+    }
 
     if (!props.chart.lines){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
     
-    const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map(chartLine =>
+    const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            
             if (chartLine.lineStyle === "BAR_STYLE"){
                 var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
-                    type: 'bar',
+                    type: 'bar',             
+                    hidden: !lineIsVisible[index],
                     label: chartLine.title,
                     data: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
                     tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
                     borderColor: chartLine.colorLine,
                     backgroundColor: chartLine.colorLine,
-                    yAxisID: chartLine.axisSetting,        
+                    yAxisID: chartLine.axisSetting              
                 };  
                 return conf;     
             }
             return {    
-             type: 'line',             
+             type: 'line',          
+             hidden: !lineIsVisible[index],    
              label: chartLine.title,
              data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
              tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
@@ -92,35 +102,43 @@ export function LineChart(props: LineChartProps){
             },
             tooltip: {
                 enabled: true,
-                position: "nearest",
+                position: "nearest",                
                 callbacks: {
                     label: function(context: any) {
                         // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
+                        if (context.raw === null || context.raw === undefined) 
+                            return "";
                         if (context.dataset.tooltips){
-                            return context.dataset.label+': '+context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            const valueWithLabel : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            if (valueWithLabel.indexOf(":") == -1)
+                                return context.dataset.label+': '+valueWithLabel;
+                            return context.dataset.label+' '+valueWithLabel;
                         }
                         return context.dataset.label+': '+context.raw;
                     }
                 }
             },
             legend: {
-                display: true,
-                position: 'top' as const,
+                display: true,                
+                position: 'top' as const,               
                 onClick: function(e: any, legendItem: LegendItem, legend: LegendElement<any>) {
+                    // Afffiche/Cache toutes les courbes qui on le meme nom de legend d'un seul coup
+
                     // https://www.chartjs.org/docs/latest/configuration/legend.html
                     const ci = legend.chart;      
-                
+                    
                     // https://stackoverflow.com/questions/72236230/remove-redundant-legends-on-the-chart-using-generatelabels-with-chartjs-v3
                     // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
-                    let hidden = !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;        
+                    let hidden = lineIsVisible[legendItem.datasetIndex!]; //  !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;                            
                     ci.data.datasets?.forEach((dataset: ChartDataset<any,any>, datasetIndex: number) => {
                         if (dataset.label == legendItem.text) {
                             ci.getDatasetMeta(datasetIndex).hidden = hidden;                
+                            lineIsVisible[datasetIndex] =  !hidden;
                         }
                     });
                     ci.update();
                 },
-                labels: {
+                labels: {                
                     generateLabels(chart: any){                               
                         var result : LegendItem[] = [];                        
                         var labelIndex: number = 0;
@@ -134,13 +152,13 @@ export function LineChart(props: LineChartProps){
                                     text: l.label,
                                     fillStyle: l.backgroundColor,
                                     strokeStyle: l.backgroundColor,
-                                    hidden: chart.getDatasetMeta(i).hidden
+                                    hidden: !lineIsVisible[i] // chart.getDatasetMeta(i).hidden
                                 });
                             }
                         });
                         return result;
                     }                    
-                }
+                },                
             }
         },
         scales: {
@@ -196,16 +214,24 @@ export function LineChart(props: LineChartProps){
                 position: 'left',
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['symbolDevise']
+                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 }
-            },                  
+            },        
+            NB: {
+                type: 'linear',
+                display: props.chart.lines.filter(l => l.axisSetting === "NB").length > 0,
+                position: 'left',
+                title: {
+                    display: false
+                }
+            },                         
             SHARE: {
                 type: 'linear',
                 display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
                 position: 'left',
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['symbolDevise']
+                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 }
             },                      
             DEVISE:{
@@ -214,7 +240,7 @@ export function LineChart(props: LineChartProps){
                 position: 'right',
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['symbolDevise']
+                  text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
                 },
                 // grid line settings
                 grid: {
@@ -226,7 +252,7 @@ export function LineChart(props: LineChartProps){
 
     ChartJS.register(...registerablesjs);
     ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
-//
+
     return (
         <ReactChartJS type="line" data={config}  options={options} />           
     ); 

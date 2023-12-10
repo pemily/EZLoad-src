@@ -56,7 +56,6 @@ public class RulesVersionManager {
 
     private final String ezRepoDir;
     private final MainSettings mainSettings;
-    private Git git;
 
     public RulesVersionManager(String ezRepoDir, MainSettings mainSettings){
         this.mainSettings = mainSettings;
@@ -82,37 +81,38 @@ public class RulesVersionManager {
 
 
     public boolean mergeOrigin() throws IOException, GitAPIException {
-        initIfNeeded();
-        // fetch the updates of the server
-        git.fetch()
-                .setForceUpdate(true)
-                .call();
-
-        try {
-            MergeResult mergeResult = git.merge()
-                    .setContentMergeStrategy(ContentMergeStrategy.CONFLICT)
-                    .setStrategy(MergeStrategy.SIMPLE_TWO_WAY_IN_CORE)
-                    .setFastForward(MergeCommand.FastForwardMode.FF)
-                    .include(git.getRepository().findRef("refs/remotes/origin/" + originBranch))
+        try (Git git = git()) {
+            // fetch the updates of the server
+            git.fetch()
+                    .setForceUpdate(true)
                     .call();
 
-            return mergeResult.getMergeStatus() != MergeResult.MergeStatus.ABORTED
-                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.FAILED
-                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.CHECKOUT_CONFLICT
-                    && mergeResult.getMergeStatus() != MergeResult.MergeStatus.NOT_SUPPORTED;
-        }
-        catch(NullPointerException | JGitInternalException e){
-            return false;
+            try {
+                MergeResult mergeResult = git.merge()
+                        .setContentMergeStrategy(ContentMergeStrategy.CONFLICT)
+                        .setStrategy(MergeStrategy.SIMPLE_TWO_WAY_IN_CORE)
+                        .setFastForward(MergeCommand.FastForwardMode.FF)
+                        .include(git.getRepository().findRef("refs/remotes/origin/" + originBranch))
+                        .call();
+
+                return mergeResult.getMergeStatus() != MergeResult.MergeStatus.ABORTED
+                        && mergeResult.getMergeStatus() != MergeResult.MergeStatus.FAILED
+                        && mergeResult.getMergeStatus() != MergeResult.MergeStatus.CHECKOUT_CONFLICT
+                        && mergeResult.getMergeStatus() != MergeResult.MergeStatus.NOT_SUPPORTED;
+            } catch (NullPointerException | JGitInternalException e) {
+                return false;
+            }
         }
     }
 
     public List<RemoteBranch> getAllRemoteBranches() throws IOException, GitAPIException {
-        initIfNeeded();
-        return git.branchList()
-                .setListMode(ListBranchCommand.ListMode.REMOTE)
-                .call()
-                .stream().map(b -> new RemoteBranch(b.getName().substring("refs/remotes/origin/".length())))
-                .collect(Collectors.toList());
+        try (Git git = git()) {
+            return git.branchList()
+                    .setListMode(ListBranchCommand.ListMode.REMOTE)
+                    .call()
+                    .stream().map(b -> new RemoteBranch(b.getName().substring("refs/remotes/origin/".length())))
+                    .collect(Collectors.toList());
+        }
     }
 
     private void createLocalRepoIfNotExists(String localBranch) throws GitAPIException, IOException {
@@ -136,74 +136,76 @@ public class RulesVersionManager {
                     .setStartPoint(Constants.HEAD)
                     .call();
 
-            initIfNeeded();
-
-            git.checkout()
-                    .setName(localBranch)
-                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-                    .setForced(true)
-                    .call();
-        }
-        else{
-            initIfNeeded();
+            try (Git git = git()) {
+                git.checkout()
+                        .setName(localBranch)
+                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                        .setForced(true)
+                        .call();
+            }
         }
     }
 
-    private void renameLocalGitBranch(String localBranch) throws GitAPIException {
+    private void renameLocalGitBranch(Git git, String localBranch) throws GitAPIException {
         // renomme la branche courrante si elle a changer dans la configuration
         git.branchRename().setNewName(localBranch).call();
     }
 
-    private void initIfNeeded() throws IOException {
+    private Git git() throws IOException {
         if (new File(ezRepoDir+File.separator+".git").exists()) {
-            if (this.git == null)
-                this.git = Git.open(new File(ezRepoDir));
+            return Git.open(new File(ezRepoDir));
         }
         else
             throw new IOException("Git directory not created: "+ezRepoDir+File.separator+".git");
     }
 
+
     // if success true, false if nothing to commit
     public boolean commitAndPush(String authorEmail, String localBranch, String commitMessage) throws IOException, GitAPIException {
-        initIfNeeded();
-        renameLocalGitBranch(localBranch);
+        try (Git git = git()) {
+            renameLocalGitBranch(git, localBranch);
 
-        git.add()
-                .addFilepattern(".")
-                .setUpdate(false) // take also the new files
-                .call();
-        try {
-            git.commit()
-                    .setAuthor(authorEmail, authorEmail)
-                    .setAllowEmpty(false)
-                    .setMessage(commitMessage)
+            git.add()
+                    .addFilepattern(".")
+                    .setUpdate(false) // take also the new files
                     .call();
+            try {
+                git.commit()
+                        .setAuthor(authorEmail, authorEmail)
+                        .setAllowEmpty(false)
+                        .setMessage(commitMessage)
+                        .call();
 
-            // extracted from https://github.com/settings/tokens
-            // Le token ne doit avoir que l'access: public_repo
-            git.push()
-                    // ici dans authorName, on peut mettre n'importe quoi, sauf "", ce n'est pas pris en compte, c'est le token qui compte
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorEmail, mainSettings.getEzLoad().getAdmin().getAccessToken()))
-                    .setForce(true)
-                    .call();
+                // extracted from https://github.com/settings/tokens
+                // Le token ne doit avoir que l'access: public_repo
+                git.push()
+                        // ici dans authorName, on peut mettre n'importe quoi, sauf "", ce n'est pas pris en compte, c'est le token qui compte
+                        .setCredentialsProvider(new UsernamePasswordCredentialsProvider(authorEmail, mainSettings.getEzLoad().getAdmin().getAccessToken()))
+                        .setForce(true)
+                        .call();
+            } catch (EmptyCommitException e) {
+                return false;
+            }
+            return true;
         }
-        catch(EmptyCommitException e){
-            return false;
-        }
-        return true;
     }
 
     public void revert(String absoluteFilePath) throws GitAPIException, IOException {
-        initIfNeeded();
-        git.checkout()
-                .addPath(getGitFilePath(absoluteFilePath))
-                .setStartPoint(Constants.HEAD)
-                .call();
+        try (Git git = git()) {
+            git.checkout()
+                    .addPath(getGitFilePath(absoluteFilePath))
+                    .setStartPoint(Constants.HEAD)
+                    .call();
+        }
     }
 
-
     public FileState getState(String absoluteFilePath) throws IOException, GitAPIException {
-        initIfNeeded();
+        try (Git git = git()) {
+            return getState(git, absoluteFilePath);
+        }
+    }
+
+    public FileState getState(Git git, String absoluteFilePath) throws IOException, GitAPIException {
         Status result = git.status()
                 .call();
 
@@ -230,37 +232,39 @@ public class RulesVersionManager {
     }
 
     public List<FileStatus> getAllChanges(String fromDirectory) throws IOException {
-        initIfNeeded();
-        return new FileProcessor(fromDirectory, f -> true, f -> true)
-                .mapFile(filePath ->
-                        {
-                            try {
-                                return new FileStatus(getGitFilePath(filePath), getState(filePath));
-                            } catch (IOException | GitAPIException e) {
-                                throw new RuntimeException(e);
+        try (Git git = git()) {
+            return new FileProcessor(fromDirectory, f -> true, f -> true)
+                    .mapFile(filePath ->
+                            {
+                                try {
+                                    return new FileStatus(getGitFilePath(filePath), getState(git, filePath));
+                                } catch (IOException | GitAPIException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                        }
-                )
-                .stream()
-                .filter(f -> f.getFileState() != FileState.NO_CHANGE)
-                .collect(Collectors.toList());
+                    )
+                    .stream()
+                    .filter(f -> f.getFileState() != FileState.NO_CHANGE)
+                    .collect(Collectors.toList());
+        }
     }
 
     public String getChange(String absolutePath) throws Exception {
-        initIfNeeded();
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        DiffFormatter df = new DiffFormatter(result);
-        df.setRepository(git.getRepository());
-        DirCacheIterator oldTree = new DirCacheIterator(git.getRepository().readDirCache()); // the base user branch
-        FileTreeIterator newTree = new FileTreeIterator(git.getRepository());
-        df.setPathFilter(PathFilter.create(getGitFilePath(absolutePath)));
-        df.format(oldTree, newTree);
-        df.flush();
-        df.close();
+        try (Git git = git()) {
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            DiffFormatter df = new DiffFormatter(result);
+            df.setRepository(git.getRepository());
+            DirCacheIterator oldTree = new DirCacheIterator(git.getRepository().readDirCache()); // the base user branch
+            FileTreeIterator newTree = new FileTreeIterator(git.getRepository());
+            df.setPathFilter(PathFilter.create(getGitFilePath(absolutePath)));
+            df.format(oldTree, newTree);
+            df.flush();
+            df.close();
 
-        String[] div = StringUtils.divide(result.toString(),"@@"); // remove the header
-        if (div == null) return "";
-        return "@@"+div[1];
+            String[] div = StringUtils.divide(result.toString(), "@@"); // remove the header
+            if (div == null) return "";
+            return "@@" + div[1];
+        }
     }
 
     private static AbstractTreeIterator prepareTreeParser(Repository repository, String ref) throws Exception {

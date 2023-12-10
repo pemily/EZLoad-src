@@ -17,7 +17,6 @@
  */
 package com.pascal.ezload.service.exporter.ezEdition;
 
-import com.pascal.ezload.service.model.EZCountry;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +24,7 @@ import java.util.Objects;
 
 public class ShareValue {
     public static final String LIQUIDITY_CODE = "LIQUIDITE";
+    private static final String LIQUIDITY_NAME = "Liquidité ";
 
     private String tickerCode; // Correspond a la colonne Ticker Google Finance dans MonPortefeuille
     private String userShareName; // can be null if it is not yet filled
@@ -42,7 +42,7 @@ public class ShareValue {
         this.ezAccountType = ezAccountType;
         this.countryName = countryName;
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
-            this.userShareName = "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
+            this.userShareName = LIQUIDITY_NAME+ezAccountType+" "+broker.getEzPortfolioName();
         }
     }
 
@@ -97,11 +97,15 @@ public class ShareValue {
 
     private String hash(){
         if (tickerCode.equals(LIQUIDITY_CODE) && StringUtils.isBlank(userShareName)){
-            return "Liquidité "+ezAccountType+" "+broker.getEzPortfolioName();
+            return LIQUIDITY_NAME+ezAccountType+" "+broker.getEzPortfolioName();
         }
         else{
             return tickerCode;
         }
     }
 
+
+    public static boolean isLiquidity(String name){
+        return name.startsWith(LIQUIDITY_NAME);
+    }
 }

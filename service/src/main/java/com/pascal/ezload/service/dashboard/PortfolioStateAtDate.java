@@ -36,7 +36,7 @@ public class PortfolioStateAtDate {
     // entrees sorties cumulées
     private final StateValue inputOutput;  // input output ensemble pour avoir une ligne cumulée dans la UI
 
-    // dividends
+    // dividends percu
     private final StateValue dividends;
 
     // float because with some broker, you have some part of actions
@@ -48,8 +48,17 @@ public class PortfolioStateAtDate {
     // le montant d'action vendu
     private final Map<EZShare, Float> shareSold;
 
-    // le montant du dividende percu
-    private final Map<EZShare, Float> shareDividend;
+    //
+    private final Map<EZShare, Float> sharePR; // Prix de revient d'une valeur. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+
+    // le PRU de l'action
+    private final Map<EZShare, Float> sharePRU; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
+
+    private final Map<EZShare, Float> sharePRDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+
+    // le PRU de l'action
+    private final Map<EZShare, Float> sharePRUDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+
 
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
     private final StateValue liquidity;
@@ -66,7 +75,10 @@ public class PortfolioStateAtDate {
         shareNb = new HashMap<>();
         shareBuy = new HashMap<>();
         shareSold = new HashMap<>();
-        shareDividend = new HashMap<>();
+        sharePR = new HashMap<>();
+        sharePRU = new HashMap<>();
+        sharePRDividend = new HashMap<>();
+        sharePRUDividend = new HashMap<>();
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
@@ -80,7 +92,14 @@ public class PortfolioStateAtDate {
         this.shareNb.putAll(previousState.shareNb);
         this.shareSold = new HashMap<>();
         this.shareBuy = new HashMap<>();
-        this.shareDividend = new HashMap<>();
+        this.sharePR = new HashMap<>();
+        this.sharePR.putAll(previousState.sharePR);
+        this.sharePRU = new HashMap<>();
+        this.sharePRU.putAll(previousState.sharePRU);
+        this.sharePRDividend = new HashMap<>();
+        this.sharePRDividend.putAll(previousState.sharePRDividend);
+        this.sharePRUDividend = new HashMap<>();
+        this.sharePRUDividend.putAll(previousState.sharePRUDividend);
     }
 
     public EZDate getDate() {
@@ -115,9 +134,10 @@ public class PortfolioStateAtDate {
     public Map<EZShare, Float> getShareSold() {
         return shareSold;
     }
-    public Map<EZShare, Float> getShareDividends(){
-        return shareDividend;
-    }
+    public Map<EZShare, Float> getSharePR() { return sharePR; }
+    public Map<EZShare, Float> getSharePRU() { return sharePRU; }
+    public Map<EZShare, Float> getSharePRDividend() { return sharePRDividend; }
+    public Map<EZShare, Float> getSharePRUDividend() { return sharePRUDividend; }
 
     public StateValue getLiquidity() {
         return liquidity;

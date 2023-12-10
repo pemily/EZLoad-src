@@ -17,10 +17,12 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -94,6 +96,7 @@ public class PortfolioStateAccumulator {
             case "Dividende brut NON soumis à abattement":
             case "Dividende brut soumis à abattement":
                 addDividend(operation);
+                dividendEventOnShare(operation);
                 break;
             case "Retrait fonds": {
                 addOutputQuantity(operation);
@@ -123,17 +126,21 @@ public class PortfolioStateAccumulator {
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
                 addLiquidityAmount(negativeAmount);
+                eventOnShare(negativeAmount);
+                break;
             }
-            case "Retenue fiscale":
+            case "Taxe sur les Transactions":
             case "Droits de garde/Frais divers":
+            case "Courtage sur achat de titres":
+            case "Retenue fiscale":
             case "Prélèvements sociaux":
             case "Prélèvements sociaux sur retrait PEA":
-            case "Taxe sur les Transactions":
-            case "Courtage sur achat de titres":
             case "Divers":
+                eventOnShare(operation);
                 break;
         }
         if (addLiquidityAmount) addLiquidityAmount(operation);
+        computePRU();
     }
 
 
@@ -166,24 +173,80 @@ public class PortfolioStateAccumulator {
 
     private void soldShare(Row operation) {
         EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);         // AMOUNT_COL is positive when sold
+
         // nbOfSoldShare negative in EZPortfolio
         float nbOfSoldShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfSoldShare : oldValue + nbOfSoldShare);
 
-        // AMOUNT_COL is positive when sold
         previousState.getShareSold()
-                .compute(share, (sh, oldValue) -> oldValue == null ? -operation.getValueFloat(MesOperations.AMOUNT_COL) : oldValue - operation.getValueFloat(MesOperations.AMOUNT_COL));
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes)
+        previousState.getSharePR()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes)
+        previousState.getSharePRDividend()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
     }
 
     private void buyShare(Row operation) {
         EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
+        float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);        // AMOUNT_COL is negative when buy
+
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfBuyShare : oldValue + nbOfBuyShare);
 
-        // AMOUNT_COL is negative when buy
+
         previousState.getShareBuy()
-                .compute(share, (sh, oldValue) -> oldValue == null ? -operation.getValueFloat(MesOperations.AMOUNT_COL) : oldValue - operation.getValueFloat(MesOperations.AMOUNT_COL));
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes)
+        previousState.getSharePR()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes)
+        previousState.getSharePRDividend()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+    }
+
+    private void eventOnShare(Row operation){
+        String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
+        if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
+            float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
+
+            EZShare share = getShare(shareName);
+            previousState.getSharePR()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
+
+            previousState.getSharePRDividend()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
+        }
+    }
+
+    private void dividendEventOnShare(Row operation){
+        String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
+        if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
+            float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
+
+            EZShare share = getShare(shareName);
+
+            previousState.getSharePRDividend()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
+        }
+    }
+
+    private void computePRU(){
+        // PRU  = PR / nb d'action
+        previousState.getSharePR()
+                .forEach((key, value) -> previousState.getSharePRU().put(key, previousState.getShareNb().get(key) == 0 ? 0 : value / previousState.getShareNb().get(key)));
+
+        previousState.getSharePRDividend()
+                .forEach((key, value) -> previousState.getSharePRUDividend().put(key, previousState.getShareNb().get(key) == 0 ? 0 : value / previousState.getShareNb().get(key)));
+
     }
 }

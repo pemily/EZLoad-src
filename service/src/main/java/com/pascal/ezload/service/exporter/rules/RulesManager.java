@@ -18,6 +18,7 @@
 package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.FileState;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
@@ -41,15 +42,17 @@ public class RulesManager {
 
     private final RulesVersionManager rulesVersionManager;
     private final MainSettings mainSettings;
+    private final SettingsManager settingsManager;
     private final Map<String, CommonFunctions> brokerAndFileVersion2CommonFunctionsCache = new HashMap<>();
 
-    public RulesManager(String ezRepoDir, MainSettings mainSettings) {
+    public RulesManager(SettingsManager settingsManager, MainSettings mainSettings) {
         this.mainSettings = mainSettings;
-        this.rulesVersionManager = new RulesVersionManager(ezRepoDir, mainSettings);
+        this.settingsManager = settingsManager;
+        this.rulesVersionManager = new RulesVersionManager(settingsManager.getEzLoadRepoDir(), mainSettings);
     }
 
     public synchronized List<RuleDefinition> getAllRules() throws IOException {
-        return new FileProcessor(mainSettings.getEzLoad().getRulesDir(), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
+        return new FileProcessor(settingsManager.getRulesDir(), d -> true, f -> f.getName().endsWith(RULE_FILE_EXTENSION))
                 .mapFile(f -> {
                     try {
                         FileState state = rulesVersionManager.getState(f);
@@ -122,7 +125,7 @@ public class RulesManager {
     }
 
     public String getRulesDirectory(EnumEZBroker broker, int brokerFileVersion){
-        return mainSettings.getEzLoad().getRulesDir()+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
+        return settingsManager.getRulesDir()+File.separator+broker.getDirName()+"_v"+brokerFileVersion;
     }
 
     public String getFile(String filename, EnumEZBroker broker, int brokerFileVersion){

@@ -19,6 +19,7 @@ package com.pascal.ezload.service.bourseDirect;
 
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
@@ -75,9 +76,10 @@ public class BourseDirectParserTest {
         MainSettings.EZLoad ezLoad = new MainSettings.EZLoad();
         mainSettings.setEzLoad(ezLoad);
 
+        SettingsManager settingsManager = new SettingsManager("ezload.yaml");
+
         EzProfil ezProfil = new EzProfil();
-        ezProfil.setDownloadDir(new File(getFilePath(file +".pdf").getFile()).getParent());
-        EZModel brModel = new BourseDirectAnalyser(mainSettings, ezProfil).start(reporting, bracc, getFilePath(file +".pdf").getFile());
+        EZModel brModel = new BourseDirectAnalyser(settingsManager, mainSettings, ezProfil).start(reporting, bracc, getFilePath(file +".pdf").getFile());
         String jsonBrModel = ModelUtils.toJson(brModel);
         String report = reporting.getReport();
 

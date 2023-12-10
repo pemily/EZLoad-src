@@ -58,7 +58,7 @@ public class GDriveSheets {
 
     public SheetValues getCells(Reporting reporting, final String range) throws Exception {
         reporting.info("Google Drive lecture des données: "+range);
-        List<List<Object>> r = retryOnTimeout(reporting, RETRY_NB, () -> {
+        List<List<Object>> r = failOnTimeout(reporting, () -> {
             ValueRange response = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .execute();
@@ -160,6 +160,18 @@ public class GDriveSheets {
                 Sleep.waitSeconds(30);
                 reporting.info("Relance n°: "+n);
                 return retryOnTimeout(reporting, n - 1, fct);
+            }
+            throw e;
+        }
+    }
+
+    private <T> T failOnTimeout(Reporting reporting,  SupplierThatThrow<T> fct) throws Exception {
+        try {
+            return fct.get();
+        }
+        catch(java.net.SocketTimeoutException e) {
+            if ("Read timed out".equals(e.getMessage())) {
+                throw new Exception("EZPortfolio sur Google Drive est en cours de re-calcul, Veuillez recommencer l'opération plus tard");
             }
             throw e;
         }

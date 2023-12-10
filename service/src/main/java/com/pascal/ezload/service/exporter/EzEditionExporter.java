@@ -18,6 +18,7 @@
 package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzEdition;
 import com.pascal.ezload.service.exporter.ezEdition.EzReport;
@@ -40,9 +41,9 @@ public class EzEditionExporter {
     private final Reporting reporting;
     private final RulesEngine rulesEngine;
 
-    public EzEditionExporter(String ezRepoDir, MainSettings mainSettings, Reporting reporting) throws Exception {
+    public EzEditionExporter(SettingsManager settingsManager, MainSettings mainSettings, Reporting reporting) throws Exception {
         this.reporting = reporting;
-        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(ezRepoDir, mainSettings), mainSettings.getEzLoad().getEZActionManager());
+        this.rulesEngine = new RulesEngine(reporting, mainSettings, new RulesManager(settingsManager, mainSettings), mainSettings.getEzLoad().getEZActionManager(settingsManager));
     }
 
     /**

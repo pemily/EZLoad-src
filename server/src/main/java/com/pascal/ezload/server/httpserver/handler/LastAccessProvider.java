@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Provider
 public class LastAccessProvider implements ContainerRequestFilter {
 
-    private static AtomicLong lastAccess = new AtomicLong(System.currentTimeMillis());
+    private static final AtomicLong lastAccess = new AtomicLong(System.currentTimeMillis());
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {

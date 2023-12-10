@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Anchor, Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
-import { Add, Trash, Validate, SchedulePlay, Upload } from 'grommet-icons';
+import { Add, Trash, Validate, SchedulePlay, Upload, Save } from 'grommet-icons';
 import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued, saveMainSettings } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
@@ -29,7 +29,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface ConfigPortfolioConnectionProps {
-  configFile: string;
+  configDir: string;
   mainSettings: MainSettings;
   mainSettingsStateSetter: (settings: MainSettings) => void;
   ezProfil: EzProfil;
@@ -75,7 +75,7 @@ Si vous ne les spécifiez pas, il faudra les saisir **à chaque execution**.
 
 _Les mots de passe sont encryptés à l'aide d'une clé qui est généré à l'installation de EZLoad_`;
 
-const genSecurityFile = (gdriveAccessPath: string|undefined|null) : String =>  `
+const genSecurityFile = () : String =>  `
 ### Ne doit être fait qu'une fois
 - Si vous avez déjà fait cette procédure et que vous souhaitez re-télécharger le fichier de sécurité, sur la ligne de EZLoad_Client (à coté de la poubelle) il y a un boutton pour  <a href="https://console.cloud.google.com/apis/credentials?project=ezload" target="intstall">**télécharger le client oauth**</a>.
 
@@ -154,18 +154,31 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
     const [showStartDateForAccount, setShowStartDateForAccount] = useState<BourseDirectEZAccountDeclaration|undefined>(undefined);
     const [uploadGDriveSecFile, setUploadGDriveSecFile] = useState<File|undefined>(undefined);
     const [uploadStatus, setUploadStatus] = useState<string|undefined>(undefined);
+    const [configDir, setConfigDir] = useState<string>(props.configDir);
 
     return (
             <Box  margin="none" pad="xsmall">
                 <Form validate="change">           
-                    <Box direction="row" margin="small">
-                        <Text margin={{start:"small"}} size="xxsmall" alignSelf="center">{props.configFile + " - " +props.mainSettings.activeEzProfilName}</Text>
+                    <Box margin="none" pad="none" direction="row">
+                        <TextField id="ezLoadConfigDir" label="Emplacement des fichiers EzLoad" value={configDir}                          
+                                readOnly={props.readOnly}
+                                onChange={newValue => {setConfigDir(newValue)}}/>   
+                        <Button
+                            fill="vertical"
+                            alignSelf="center"                                 
+                            disabled={props.readOnly} onClick={() =>
+                                jsonCall(ezApi.home.moveConfigDir({newConfigDir: configDir}))
+                                .then(props.followProcess)
+                                .then(r => window.location.reload())
+                                .catch(e => console.error(e))
+                            }
+                            size="small" icon={<Save size='small'/>} label="Déplacer"/>                     
                     </Box>
                     <Box direction="row" justify="start">
                         <Heading level="5">Url de EZPortfolio</Heading>
                         <Help title="Créer le fichier d'accès Google Drive" isInfo={true}>
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
-                                <Markdown>{genSecurityFile(props.ezProfil?.ezPortfolio?.gdriveCredsFile)}</Markdown>
+                                <Markdown>{genSecurityFile()}</Markdown>
                                 <FileInput  name="gdriveSec" id="gdriveSec" messages={{dropPrompt: "Glisser le fichier téléchargé içi", browse: "Parcourir" }} 
                                         onChange={(e) => setUploadGDriveSecFile(e.target.files?.[0])}/>
                                 <Markdown>- Cliquez sur le boutton 'Envoyer' ci-dessous</Markdown>    
@@ -186,12 +199,9 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
                                 <Markdown>{gdriveAccessStep6()}</Markdown>
                                 {valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === "" &&
                                     (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner l'url de EZPortfolio</span>"}</Markdown>)}
-                                {valued(props.ezProfil?.ezPortfolio?.gdriveCredsFile) === "" &&
-                                    (<Markdown>{"<span style='background-color:orange'>Pour valider la connection, vous devez d'abord renseigner le fichier de sécurité</span>"}</Markdown>)}
                                 <Button 
                                     disabled={ props.readOnly 
-                                        || valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === ""
-                                        || valued(props.ezProfil?.ezPortfolio?.gdriveCredsFile) === ""}
+                                        || valued(props.ezProfil?.ezPortfolio?.ezPortfolioUrl) === ""}
                                         onClick={() =>
                                             jsonCall(ezApi.security.gDriveCheck())
                                             .then(props.followProcess)

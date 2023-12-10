@@ -42,6 +42,8 @@ public class PortfolioValuesBuilder {
     }
 
     public static class Result{
+
+        private final EZActionManager actionManager;
         private List<EZDate> dates;
         private EZDevise targetDevise;
         private final Map<EZShare, Prices> allSharesTargetPrices = new HashMap<>();
@@ -52,36 +54,43 @@ public class PortfolioValuesBuilder {
         private final Map<EZDate, Map<EZShare, Float>> date2share2SoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2BuyOrSoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2Dividend = new HashMap<>();
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PR = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'action totale)
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PRU = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PRDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'action totale)
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PRUDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
 
-        public EZDevise getTargetDevise() {
-            return targetDevise;
+        private Result(EZActionManager actionManager){
+            this.actionManager = actionManager;
         }
+
 
         public List<EZDate> getDates() {
             return dates;
         }
 
-        public Map<EZShare, Prices> getAllSharesTargetPrices() {
-            return allSharesTargetPrices;
-        }
-
-        public Map<EZDevise, CurrencyMap> getDevise2CurrencyMap() {
-            return devise2CurrencyMap;
+        public Prices getTargetPrices(Reporting reporting, EZShare share) {
+            return allSharesTargetPrices.computeIfAbsent(share, ezShare -> {
+                try {
+                    Prices prices = actionManager.getPrices(reporting, ezShare, dates);
+                    if (prices != null)
+                        return convertPricesToTargetDevise(reporting, prices);
+                    reporting.error("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
+                    throw new RuntimeException("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         public Map<EZDevise, Prices> getDevisesFound2TargetPrices() {
             return devisesFound2TargetPrices;
         }
-
         public Map<PortfolioFilter, Prices> getPortfolioFilter2TargetPrices() {
             return portfolioFilter2TargetPrices;
         }
-
         public Map<EZDate, Map<EZShare, Float>> getDate2share2ShareNb() {
             return date2share2ShareNb;
         }
-
         public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyAmount() {
             return date2share2BuyAmount;
         }
@@ -91,33 +100,37 @@ public class PortfolioValuesBuilder {
         public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyOrSoldAmount() {
             return date2share2BuyOrSoldAmount;
         }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2Dividend(){
-            return date2share2Dividend;
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PR() { return date2share2PR; }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRU() { return date2share2PRU; }
+
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRDividend() { return date2share2PRDividend; }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRUDividend() { return date2share2PRUDividend; }
+
+
+        Prices convertPricesToTargetDevise(Reporting reporting, Prices p) {
+            if (p != null) {
+                CurrencyMap currencyMap = devise2CurrencyMap.computeIfAbsent(p.getDevise(),
+                        d -> {
+                            try {
+                                return actionManager.getCurrencyMap(reporting, d, targetDevise, dates);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                return currencyMap.convertPricesToTarget(p);
+            }
+            return null;
         }
     }
 
     public Result build(Reporting reporting, EZDevise targetDevise, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, Set<ChartIndex> chartSelection){
-        Result r = new Result();
+        Result r = new Result(actionManager);
         r.targetDevise = targetDevise;
         r.dates = dates;
-        buildPricesForShares(reporting, r);
         buildPricesDevisesFound(r);
         if (operations != null)
             buildPricesFor(reporting, brokersFilter, accountTypeFilter, PortfolioFilter.toPortfolioFilter(chartSelection), r);
         return r;
-    }
-
-    // this method will fill r.allSharesPrices & r.devise2TargetDevise
-    private void buildPricesForShares(Reporting reporting, Result r) {
-        actionManager.getAllEZShares().forEach(ezShare -> {
-            try {
-                Prices prices = actionManager.getPrices(reporting, ezShare, r.dates);
-                if (prices != null)
-                    r.allSharesTargetPrices.put(ezShare, convertPricesToTargetDevise(reporting, prices, r));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     // this method will fill r.allDevisesFound and use r.devise2TargetDevises
@@ -143,7 +156,10 @@ public class PortfolioValuesBuilder {
                     r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
                     r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
                     r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
-                    r.date2share2Dividend.put(state.getDate(), state.getShareDividends());
+                    r.date2share2PR.put(state.getDate(), state.getSharePR());
+                    r.date2share2PRU.put(state.getDate(), state.getSharePRU());
+                    r.date2share2PRDividend.put(state.getDate(), state.getSharePRDividend());
+                    r.date2share2PRUDividend.put(state.getDate(), state.getSharePRUDividend());
 
                     Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
                     state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
@@ -159,11 +175,11 @@ public class PortfolioValuesBuilder {
         Prices prices = new Prices();
         prices.setDevise(r.targetDevise);
         prices.setLabel(portfolioFilter.name());
-        states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(portfolioFilter, state, r))));
-        return convertPricesToTargetDevise(reporting, prices, r);
+        states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioFilter, state, r))));
+        return r.convertPricesToTargetDevise(reporting, prices);
     }
 
-    private float getTargetPrice(PortfolioFilter portfolioFilter, PortfolioStateAtDate state, Result r) {
+    private float getTargetPrice(Reporting reporting, PortfolioFilter portfolioFilter, PortfolioStateAtDate state, Result r) {
         switch (portfolioFilter){
             case INSTANT_DIVIDENDES:
                 return state.getDividends().getInstant();
@@ -189,7 +205,7 @@ public class PortfolioValuesBuilder {
                                         .map(e -> {
                                             float nbOfShare = e.getValue();
                                             if (nbOfShare == 0) return 0f;
-                                            Prices prices = r.getAllSharesTargetPrices().get(e.getKey());
+                                            Prices prices = r.getTargetPrices(reporting, e.getKey());
                                             float price = prices == null ? 0 : prices.getPriceAt(state.getDate()).getPrice();
                                             return nbOfShare*price;
                                         })
@@ -227,19 +243,5 @@ public class PortfolioValuesBuilder {
     }
 
 
-    private Prices convertPricesToTargetDevise(Reporting reporting, Prices p, Result r) {
-        if (p != null) {
-            CurrencyMap currencyMap = r.devise2CurrencyMap.computeIfAbsent(p.getDevise(),
-                    d -> {
-                        try {
-                            return actionManager.getCurrencyMap(reporting, d, r.targetDevise, r.dates);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-            return currencyMap.convertPricesToTarget(p);
-        }
-        return null;
-    }
 
 }

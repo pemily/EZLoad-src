@@ -19,6 +19,7 @@ package com.pascal.ezload.service.sources.jsonSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pascal.ezload.service.config.EzProfil;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.sources.Reporting;
@@ -31,10 +32,10 @@ import java.nio.charset.StandardCharsets;
 
 public class JsonSource {
 
-    public static EZModel genModelFromJson(Reporting reporting, EzProfil ezProfil, EZAccountDeclaration ezAccountDeclaration, String jsonFilePath) throws IOException {
+    public static EZModel genModelFromJson(Reporting reporting, SettingsManager settingsManager, String profilName, EzProfil ezProfil, EZAccountDeclaration ezAccountDeclaration, String jsonFilePath) throws IOException {
         EZModel model = genModelFromJson(jsonFilePath);
         model.setAccountDeclaration(ezAccountDeclaration);
-        model.setSourceFile(ezProfil.getSourceRef(jsonFilePath));
+        model.setSourceFile(ezProfil.getSourceRef(settingsManager, profilName, jsonFilePath));
         model.getOperations().forEach(op -> {
             op.setEzAccountDeclaration(ezAccountDeclaration);
             op.setAccount(model.getAccount());

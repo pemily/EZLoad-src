@@ -19,6 +19,7 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.util.StringUtils;
@@ -31,14 +32,14 @@ import java.util.stream.Collectors;
 
 public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {
 
-    public BourseDirectSearchAccounts(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting) {
-        super(reporting, mainSettings, ezProfil);
+    public BourseDirectSearchAccounts(SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil, Reporting reporting) {
+        super(reporting, settingsManager, mainSettings, ezProfil);
     }
 
     // the devise and owner address will not be filled
-    public List<BourseDirectEZAccountDeclaration> extract(String currentChromeVersion, Consumer<String> newDriverPathSaver) throws Exception {
+    public List<BourseDirectEZAccountDeclaration> extract(String currentChromeVersion) throws Exception {
         try {
-            login(currentChromeVersion, newDriverPathSaver);
+            login(currentChromeVersion);
             goToAvisOperes();
             WebElement label = findByContainsText("label", "Sélectionnez votre compte :");
             WebElement parent = getParent(label);

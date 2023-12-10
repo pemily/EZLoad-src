@@ -4,6 +4,11 @@
 
 
 ## Historique 
+### Version 2.4
+* Ajout des courbes avec les dividendes
+* Ajout des courbes avec le PRU
+* Correction de bugs
+
 ### Version 2.3
 * Ajout de la courbe du portefeuille avec et sans les liquidités
 * Ajout de la courbe des Achats/Ventes intégrés aux valeurs sélectionnés

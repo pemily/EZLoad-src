@@ -49,8 +49,7 @@ public class SecurityHandler {
             @NotNull AuthInfo authParam) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
+        AuthManager authManager = settingsManager.getAuthManager(mainSettings);
         AuthInfo authInfo = authManager.getAuthInfo(courtier);
         if (authInfo == null){
             authManager.saveAuthInfo(courtier, authParam);
@@ -71,8 +70,7 @@ public class SecurityHandler {
     public AuthInfo getAuthWithoutPassword(@NotNull @QueryParam("courtier") EnumEZBroker courtier) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        AuthManager authManager = SettingsManager.getAuthManager(mainSettings, ezProfil);
+        AuthManager authManager = settingsManager.getAuthManager(mainSettings);
         AuthInfo result = authManager.getAuthInfo(courtier);
         if (result == null){
             result = new AuthInfo();
@@ -90,14 +88,13 @@ public class SecurityHandler {
     public EzProcess gDriveCheck() throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Validation du fichier de sécurité Google Drive",
                 ProcessManager.getLog(mainSettings, "gDriveValidationSecretFile", ".html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try{
-                        GDriveConnection.getService(reporting, SettingsManager.getInstance().getActiveEzProfil(mainSettings).getEzPortfolio().getGdriveCredsFile());
+                        GDriveConnection.getService(reporting, settingsManager.getGDriveCredsFile(mainSettings.getActiveEzProfilName()));
                         // si pas d'exception
                         reporting.info("La connection est validé, vous pouvez utiliser EZLoad");
                     }

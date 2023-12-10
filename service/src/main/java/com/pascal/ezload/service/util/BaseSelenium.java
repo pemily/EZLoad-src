@@ -45,18 +45,11 @@ public class BaseSelenium {
         this.reporting = reporting;
     }
 
-    public void init(String currentChromeVersion, Consumer<String> newDriverPathSaver, MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
+    public void init(String currentChromeVersion, MainSettings.ChromeSettings chromeSettings, int defaultTimeoutInSec) throws Exception {
         try(Reporting rep = reporting.pushSection("Initialization")) {
             this.defaultTimeoutInSec = defaultTimeoutInSec;
-            this.chromeDownloadDir = Files.createTempDirectory("EZLoad-Tmp").toFile().getAbsolutePath();
+            this.chromeDownloadDir = Files.createTempDirectory("ezload").toFile().getAbsolutePath()+File.separator+"chromeDownloadDir";
 
-            reporting.info("Chrome driver path: " + chromeSettings.getDriverPath());
-/*            if (!new File(chromeSettings.getDriverPath()).exists()) {
-                // if the driver does not exists, start to download it
-                String newChromeDriver = ChromeDriverTools.downloadChromeDriver(reporting, currentChromeVersion, chromeSettings.getDriverPath());
-                newDriverPathSaver.accept(newChromeDriver);
-            }
-            ChromeDriverTools.setup(reporting, chromeSettings.getDriverPath()); */
             WebDriverManager.chromedriver().setup();
 
             //Creating an object of ChromeDriver
@@ -224,6 +217,7 @@ public class BaseSelenium {
 
     public void download(String downloadUrl, String outputFile) {
         File downloadDir = new File(chromeDownloadDir);
+        downloadDir.mkdirs();
         Set<String> oldFiles = new HashSet<>(Arrays.asList(downloadDir.list()));
         getDriver().get(downloadUrl);
 

@@ -70,21 +70,21 @@ public class EngineHandler {
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps();
             EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
-            return processManager.createNewRunningProcess(mainSettings, ezProfil,
+            return processManager.createNewRunningProcess(settingsManager, mainSettings,
                     "Téléchargement des nouvelles opérations de " + courtier.getEzPortfolioName() + " et Analyse",
                     ProcessManager.getLog(mainSettings, courtier.getDirName(), "-downloadAndAnalyze.html"),
                     (processLogger) -> {
                         Reporting reporting = processLogger.getReporting();
 
-                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
+                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, settingsManager, mainSettings, ezProfil, reporting);
 
-                        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings, ezProfil);
+                        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, settingsManager, mainSettings, ezProfil);
                         // Donwload the files, according to the last date retrieved from ezPortfolio
-                        bourseDirectDownloader.start(chromeVersion, settingsManager.saveNewChromeDriver(), ezPortfolioProxy);
+                        bourseDirectDownloader.start(chromeVersion, ezPortfolioProxy);
 
 
                         // get the new version, and update the list of file not yet loaded
-                        updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+                        updateNotYetLoaded(settingsManager, mainSettings, ezProfil, reporting, ezPortfolioProxy);
                     });
         }
     }
@@ -98,27 +98,27 @@ public class EngineHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Analyse des nouvelles opérations de " + courtier.getEzPortfolioName(),
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-analyze.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
                     try (Reporting mainRepoIgnored = reporting.pushSection("Analyse des nouvelles opérations")) {
-                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
+                        EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, settingsManager, mainSettings, ezProfil, reporting);
 
                         List<EZModel> allEZModels;
                         try (Reporting ignored = reporting.pushSection("BourseDirect Analyse")) {
                             // get the new version, and update the list of file not yet loaded
-                            updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+                            updateNotYetLoaded(settingsManager, mainSettings, ezProfil, reporting, ezPortfolioProxy);
 
-                            allEZModels = new BourseDirectAnalyser(mainSettings, ezProfil).start(reporting, ezPortfolioProxy);
+                            allEZModels = new BourseDirectAnalyser(settingsManager, mainSettings, ezProfil).start(reporting, ezPortfolioProxy);
                         }
 
                         try (Reporting ignored = reporting.pushSection("Vérification des Opérations")) {
                             new EZModelChecker(reporting).validateModels(allEZModels);
                         }
 
-                        List<EzReport> allEzReports = new EzEditionExporter(settingsManager.getEzLoadRepoDir(), mainSettings, reporting)
+                        List<EzReport> allEzReports = new EzEditionExporter(settingsManager, mainSettings, reporting)
                                 .exportModels(allEZModels, ezPortfolioProxy);
 
                         // mettre a jour le calendrier de dividendes et le dividende annuel, des actions qui n'ont pas été présente dans des fichiers
@@ -141,7 +141,7 @@ public class EngineHandler {
                                 .filter(Optional::isPresent)
                                 .map(Optional::get)
                                 .map(ezPortefeuilleEdition ->
-                                        Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(mainSettings, ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
+                                        Optional.ofNullable(RulesEngine.computeDividendCalendarAndAnnual(settingsManager, mainSettings, ezProfil, reporting, ezPortefeuilleEdition) ? ezPortefeuilleEdition : null))
                                 .filter(Optional::isPresent)
                                 .map(Optional::get)
                                 .collect(Collectors.toList());
@@ -176,14 +176,14 @@ public class EngineHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Mise à jour d'EZPortfolio avec les opérations validé",
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-upload.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
             try (Reporting rep = reporting.pushSection("Mise à jour de EZPortfolio")) {
                 // check if all shares are correct before
-                Set<String> invalidShare = mainSettings.getEzLoad().getEZActionManager().getActionWithError(reporting).getErrors();
+                Set<String> invalidShare = mainSettings.getEzLoad().getEZActionManager(settingsManager).createActionWithSimpleMsg().getErrors();
                 if (!invalidShare.isEmpty()){
                     // if from the previous analysis the newShares are not correctly filled => stop the process
                     invalidShare.forEach(reporting::error);
@@ -194,8 +194,8 @@ public class EngineHandler {
                         reporting.error("Une valeur a changé de nom, vous devez relancer la génération des opérations avant de mettre à jour EzPortfolio");
                     }
                     else {
-                        EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-                        EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(mainSettings);
+                        EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, settingsManager, mainSettings, ezProfil);
+                        EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(settingsManager, mainSettings);
 
                         serverState.setOriginalEzPortfolioProxy(null); // don't use the cache version when uploading
                         serverState.setEzNewPortfolioProxy(null); // will be also reloaded later
@@ -205,9 +205,9 @@ public class EngineHandler {
                         serverState.setEzReports(result);
 
                         // get the new version, and update the list of file not yet loaded
-                        updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+                        updateNotYetLoaded(settingsManager, mainSettings, ezProfil, reporting, ezPortfolioProxy);
 
-                        mainSettings.getEzLoad().getEZActionManager().clearNewShareDescription();
+                        mainSettings.getEzLoad().getEZActionManager(settingsManager).clearNewShareDescription();
                     }
                 }
             }
@@ -222,19 +222,19 @@ public class EngineHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
         EnumEZBroker courtier = EnumEZBroker.BourseDirect;
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Chargement des fichiers non traité",
                 ProcessManager.getLog(mainSettings, courtier.getDirName(), "-notLoaded.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
-                    EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, ezProfil);
-                    EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(mainSettings);
-                    updateNotYetLoaded(mainSettings, ezProfil, reporting, ezPortfolioProxy);
+                    EZPortfolioManager ezPortfolioManager = new EZPortfolioManager(reporting, settingsManager, mainSettings, ezProfil);
+                    EZPortfolioProxy ezPortfolioProxy = ezPortfolioManager.load(settingsManager, mainSettings);
+                    updateNotYetLoaded(settingsManager, mainSettings, ezProfil, reporting, ezPortfolioProxy);
                 });
     }
 
-    private void updateNotYetLoaded(MainSettings mainSettings, EzProfil ezProfil, Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
-        List<String> notYetLoaded = new BourseDirectAnalyser(mainSettings, ezProfil).getFilesNotYetLoaded(reporting, ezPortfolioProxy);
+    private void updateNotYetLoaded(SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil, Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
+        List<String> notYetLoaded = new BourseDirectAnalyser(settingsManager, mainSettings, ezProfil).getFilesNotYetLoaded(reporting, ezPortfolioProxy);
         serverState.setFilesNotYetLoaded(notYetLoaded);
     }
 
@@ -268,13 +268,13 @@ public class EngineHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
 
-        return processManager.createNewRunningProcess(mainSettings, ezProfil,
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
                 "Sauvegarde de la date de démarrage: "+ezStartDate.toEzPortoflioDate()+" pour le compte: "+account.getName()+" "+account.getNumber(),
                 ProcessManager.getLog(mainSettings, account.getNumber(), "-setStartDate.html"),
                 (processLogger) -> {
                     Reporting reporting = processLogger.getReporting();
 
-                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, mainSettings, ezProfil, reporting);
+                    EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(serverState, settingsManager, mainSettings, ezProfil, reporting);
                     EzReport ezReport = new EzReport();
                     EzEdition ezEdition = new EzEdition();
                     RuleDefinitionSummary createStartDateRule = new RuleDefinitionSummary();

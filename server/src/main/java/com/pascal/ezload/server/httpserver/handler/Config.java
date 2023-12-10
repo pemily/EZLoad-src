@@ -29,28 +29,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 @Path("config")
 public class Config {
-//   properties.load(About.class.getResourceAsStream("about.properties"));
-    /*
-     <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <includes>
-                    <include>** /about.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-    <directory>${project.basedir}/src/main/resources</directory>
-                <excludes>
-                    <exclude>** /about.properties</exclude>
-                </excludes>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
 
-        about.properties
-            version=${about.version}
-     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public MainSettings show() throws Exception {

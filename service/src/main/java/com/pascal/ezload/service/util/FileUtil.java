@@ -92,4 +92,11 @@ public class FileUtil {
         return DigestUtils.md5Hex(FileUtils.readFileToByteArray(file));
     }
 
+    public static void copyDir(String srcDir, String destDir) throws IOException {
+        FileUtils.copyDirectory(new File(srcDir), new File(destDir));
+    }
+
+    public static void copyFile(String srcFile, String destFile) throws IOException {
+        FileUtils.copyFile(new File(srcFile), new File(destFile));
+    }
 }

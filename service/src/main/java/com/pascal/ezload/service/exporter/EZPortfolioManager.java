@@ -21,6 +21,7 @@ import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.EZPorfolioProxyV5_V6;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
@@ -36,14 +37,18 @@ public class EZPortfolioManager {
     private Reporting reporting;
     private GDriveSheets sheets;
     private EzProfil ezProfil;
+    private SettingsManager settingsManager;
+    private MainSettings mainSettings;
 
-    public EZPortfolioManager(Reporting reporting, EzProfil ezProfil) {
+    public EZPortfolioManager(Reporting reporting, SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil) {
         this.ezProfil = ezProfil;
+        this.settingsManager = settingsManager;
+        this.mainSettings = mainSettings;
         this.reporting = reporting;
     }
 
 
-    public EZPortfolioProxy load(MainSettings mainSettings) throws Exception {
+    public EZPortfolioProxy load(SettingsManager settingsManager, MainSettings mainSettings) throws Exception {
         try(Reporting rep = reporting.pushSection("Connection EZPortfolio...")){
             EZPortfolioProxy ezPortfolioProxy = load(1);
             Set<String> allShareNames = new HashSet<>();
@@ -51,7 +56,7 @@ public class EZPortfolioManager {
                     .forEach(sv -> {
                         try {
                             allShareNames.add(sv.getUserShareName());
-                            mainSettings.getEzLoad().getEZActionManager().createIfNeeded(sv);
+                            mainSettings.getEzLoad().getEZActionManager(settingsManager).createIfNeeded(sv);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -68,7 +73,7 @@ public class EZPortfolioManager {
                             ShareValue sv = new ShareValue();
                             sv.setUserShareName(op.getValueStr(MesOperations.ACTION_NAME_COL));
                             try {
-                                mainSettings.getEzLoad().getEZActionManager().createIfNeeded(sv);
+                                mainSettings.getEzLoad().getEZActionManager(settingsManager).createIfNeeded(sv);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -104,7 +109,7 @@ public class EZPortfolioManager {
         catch(TokenResponseException e){
             // Token expired
             reporting.info("Le token de connection est expiré, renouvellement du token.");
-            GDriveConnection.deleteOldToken(ezProfil.getEzPortfolio().getGdriveCredsFile());
+            GDriveConnection.deleteOldToken(this.settingsManager.getGDriveCredsFile(mainSettings.getActiveEzProfilName()));
             if (retry-- > 0) {
                return load(retry);
             }
@@ -118,7 +123,7 @@ public class EZPortfolioManager {
         try {
             EZPortfolioSettings ezPortfolioSettings = ezProfil.getEzPortfolio();
             reporting.info("Connection à votre EZPortfolio: "+ ezPortfolioSettings.getEzPortfolioUrl());
-            service = GDriveConnection.getService(reporting, ezPortfolioSettings.getGdriveCredsFile());
+            service = GDriveConnection.getService(reporting, this.settingsManager.getGDriveCredsFile(mainSettings.getActiveEzProfilName()));
             sheets = new GDriveSheets(service, ezPortfolioSettings.getEzPortfolioUrl());
             sheets.init(reporting);
         }

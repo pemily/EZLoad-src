@@ -22,6 +22,7 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,16 +40,18 @@ public class YahooTools extends ExternalSiteTools{
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
             sharePrices.setLabel(ezShare.getEzName());
+            EZDate from = listOfDates.get(0);
+            EZDate to = listOfDates.get(listOfDates.size() - 1);
             try {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates(reporting);
                 });
                 return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
             }
             catch (Exception e){
-                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
             }
         }
         return null;
@@ -70,7 +73,7 @@ public class YahooTools extends ExternalSiteTools{
                 return checkResult(reporting, ezShare, sharePrices, nbOfDays);
             }
             catch (Exception e){
-                logger.log(Level.WARNING, "Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName());
+                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
             }
         }
         return null;
@@ -168,34 +171,36 @@ public class YahooTools extends ExternalSiteTools{
     }
 
 
-    static public List<Dividend> searchDividends(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
+    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws IOException {
         if (!StringUtils.isBlank(ezShare.getYahooCode())){
             //            https://query1.finance.yahoo.com/v8/finance/chart/4AB.F?formatted=true&crumb=9bPXKt3sPBQ&lang=en-US&region=US&includeAdjustedClose=true&interval=1d&period1=1356912000&period2=1671494400&events=capitalGain%7Cdiv%7Csplit&useYfid=true&corsDomain=finance.yahoo.com
 
             String url = "https://query1.finance.yahoo.com/v7/finance/download/" + ezShare.getYahooCode() + "?period1="+ from.toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=div";
-            try {
-                return cache.get(reporting, "yahoo_dividends_"+ ezShare.getYahooCode()+"_"+from.toYYYYMMDD()+"_"+to.toYYYYMMDD(), url, inputStream -> {
-                    List<CsvRow> rows = CsvUtil.load(inputStream, ",", 1)
-                            .collect(Collectors.toList());
+            try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis "+url)) {
+                try {
+                    return cache.get(reporting, "yahoo_dividends_" + ezShare.getYahooCode() + "_" + from.toYYYYMMDD() + "_" + to.toYYYYMMDD(), url, inputStream -> {
+                        List<CsvRow> rows = CsvUtil.load(inputStream, ",", 1)
+                                .collect(Collectors.toList());
 
-                    EZDevise devise = getDevise(reporting, cache, ezShare);
-                /* example:
-                2019-11-15,0.370000
-                2020-11-13,0.230000
-                2021-02-05,0.250000
-                2021-11-12,3.050000
-                2022-02-04,0.500000 */
-                    return rows.stream().map(r -> {
-                        float value = NumberUtils.str2Float(r.get(1));
-                        EZDate date = EZDate.parseYYYMMDDDate(r.get(0), '-'); // date de detachement
-                        return new Dividend(value, date, date, date, date, date, null, devise);
-                    })
-                    .sorted(Comparator.comparing(Dividend::getDate))
-                    .collect(Collectors.toList());
-                });
-            }
-            catch(Exception e){
-                logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: "+url, e);
+                        EZDevise devise = getDevise(reporting, cache, ezShare);
+                    /* example:
+                    2019-11-15,0.370000
+                    2020-11-13,0.230000
+                    2021-02-05,0.250000
+                    2021-11-12,3.050000
+                    2022-02-04,0.500000 */
+                        return rows.stream().map(r -> {
+                                    float value = NumberUtils.str2Float(r.get(1));
+                                    EZDate date = EZDate.parseYYYMMDDDate(r.get(0), '-'); // date de detachement
+                                    return new Dividend(value, date, date, date, date, date, null, devise);
+                                })
+                                .sorted(Comparator.comparing(Dividend::getDate))
+                                .collect(Collectors.toList());
+                    });
+                } catch (Exception e) {
+                    reporting.info("Error pendant la recherche du dividende avec: " + url + " - Erreur: " + e.getMessage() + e.getMessage());
+                    logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: " + url, e);
+                }
             }
         }
 

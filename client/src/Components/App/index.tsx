@@ -40,7 +40,7 @@ export function App(){
                                                                 // le useEffect(showLog, []) dans ViewLog n'est
                                                                 // pas executé lorsque la page est affcihé
     const [processLaunchFail, setProcessLaunchFail] = useState<boolean>(false);
-    const [configFile, setConfigFile] = useState<string>("");
+    const [configDir, setConfigDir] = useState<string>("");
     const [mainSettings, setMainSettings] = useState<MainSettings|undefined>(undefined);
     const [ezProfil, setEzProfil] = useState<EzProfil|undefined>(undefined);
     const [reports, setReports] = useState<EzReport[]>([]);
@@ -82,7 +82,7 @@ export function App(){
         return jsonCall(ezApi.home.getMainData())
         .then(r =>  {                  
             console.log("ReloadData: ",r);         
-             setConfigFile(r.configFile);
+             setConfigDir(r.configDir);
              setProcessRunning(r.processRunning);
              setReports(r.reports);
              setRules(r.rules);
@@ -283,14 +283,15 @@ export function App(){
                 <Text size="large" >{"EZLoad v"+version}</Text>
                 <Box>
                     <Anchor margin="xxsmall" color="brand" onClick={() => { setExited(true); ezApi.home.exit() }} label="Quitter"/>
-    {/*                    <html>
+                    {
+                    <html>
                         <form action="https://www.paypal.com/donate" method="post" target="_top">
                             <input type="hidden" name="hosted_button_id" value="JK6H9Y7V9XDFW" />
                             <input type="image" src="https://www.paypalobjects.com/fr_FR/FR/i/btn/btn_donate_SM.gif" name="submit" title="Pour me soutenir, merci" alt="Bouton Faites un don avec PayPal" />
                             <img alt="" src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
                         </form>
                     </html>
-                    */}
+                    }
                 </Box>
             </Header>
             <Message visible={processLaunchFail} msg="Une tâche est déjà en train de s'éxecuter. Reessayez plus tard" status="warning"/>
@@ -322,7 +323,9 @@ export function App(){
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution. Vous pouvez suivre son avancé dans le panneau Exécution...</Text></Box>)}                                    
                             <Box fill margin="none" pad="xsmall" border={{ side: "bottom", size: "small"}}>
-                                <BourseDirect ezProfil={ezProfil}
+                                <BourseDirect 
+                                            profileName={mainSettings?.activeEzProfilName}
+                                            ezProfil={ezProfil}
                                             followProcess={followProcess}
                                             bourseDirectAuthInfo={bourseDirectAuthInfo}                                        
                                             readOnly={processRunning}/>                                
@@ -446,7 +449,7 @@ export function App(){
                             { processRunning && 
                                 (<Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                                     Une tâche est en cours d'execution, vous ne pouvez pas modifier la configuration en même temps</Text></Box>)}                                                                                        
-                                <Config configFile={configFile} mainSettings={mainSettings} ezProfil={ezProfil}
+                                <Config configDir={configDir} mainSettings={mainSettings} ezProfil={ezProfil}
                                     mainSettingsStateSetter={setMainSettings}
                                     ezProfilStateSetter={setEzProfil}
                                     followProcess={followProcess}

@@ -26,13 +26,9 @@ public enum ChartIndexPerf {
     PERF_PLUS_MOINS_VALUE_MENSUEL("L'évolution en valeur du portefeuille mois apres mois"),
     PERF_PLUS_MOINS_VALUE_ANNUEL("L'évolution en valeur du portefeuille année apres année"),
     PERF_PLUS_MOINS_VALUE_TOTAL("L'évolution en valeur du portefeuille depuis le 1er jour du graphique"),
-    PERF_CROISSANCE_CURRENT_SHARES("L'évolution en % de chaque action depuis le 1er jour du graphique"), // la croissance de l'action
-    PERF_RENDEMENT_CURRENT_SHARES("a revoir"), // le rendement du dividende
-    PERF_CROISSANCE_RENDEMENT_CURRENT_SHARES("a revoir"); // croissance + rendement du dividende
-
-    private String description;
+    PERF_CROISSANCE_CURRENT_SHARES("L'évolution en % de chaque action depuis le 1er jour du graphique") // la croissance de l'action
+    ;
 
     ChartIndexPerf(String description){
-        this.description = description;
     }
 }

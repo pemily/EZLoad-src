@@ -47,12 +47,14 @@ import java.util.List;
 
 public class BourseDirectAnalyser {
 
+    private final SettingsManager settingsManager;
     private final MainSettings mainSettings;
     private final EzProfil ezProfil;
     private final static int UNKNOWN_VERSION = -1;
 
-    public BourseDirectAnalyser(MainSettings mainSettings, EzProfil ezProfil) {
+    public BourseDirectAnalyser(SettingsManager settingsManager, MainSettings mainSettings, EzProfil ezProfil) {
         this.mainSettings = mainSettings;
+        this.settingsManager = settingsManager;
         this.ezProfil = ezProfil;
     }
 
@@ -61,7 +63,7 @@ public class BourseDirectAnalyser {
     }
 
     public List<String> getFilesNotYetLoaded(Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
-        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> ezProfil.getSourceRef(pdfFilePath)));
+        return startProcess(reporting, ezPortfolioProxy, ((account, pdfFilePath) -> ezProfil.getSourceRef(settingsManager, mainSettings.getActiveEzProfilName(), pdfFilePath)));
     }
 
     public List<EZModel> start(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy) throws Exception {
@@ -69,10 +71,10 @@ public class BourseDirectAnalyser {
     }
 
     private <R> List<R> startProcess(final Reporting reporting, EZPortfolioProxy ezPortfolioProxy, IProcess<R> process) throws Exception {
-        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, mainSettings, ezProfil);
+        BourseDirectDownloader bourseDirectDownloader = new BourseDirectDownloader(reporting, settingsManager, mainSettings, ezProfil);
 
         try(Reporting ignored = reporting.pushSection("Analyse des fichiers téléchargés...")) {
-            String downloadDir = SettingsManager.getDownloadDir(ezProfil, EnumEZBroker.BourseDirect);
+            String downloadDir = settingsManager.getDownloadDir(mainSettings.getActiveEzProfilName(), EnumEZBroker.BourseDirect);
             reporting.info("Répertoire des fichiers à analyser: "+downloadDir);
               return new FileProcessor(downloadDir,
                                         BourseDirectDownloader.dirFilter(ezProfil), BourseDirectDownloader.fileFilter())
@@ -107,19 +109,19 @@ public class BourseDirectAnalyser {
                     errors = new BourseDirectModelChecker(reporting, model).searchErrors();
 
                     if (errors.size() == 0) {
-                        return new BourseDirect2EZModel(ezProfil, reporting).create(filePath, ezAccountDeclaration, model);
+                        return new BourseDirect2EZModel(settingsManager, mainSettings.getActiveEzProfilName(), ezProfil, reporting).create(filePath, ezAccountDeclaration, model);
                     }
                 } catch (Exception e) {
                     reporting.error("Erreur pendant l'analyze", e);
                     errors.add("Erreur pendant l'analyze: " + e.getMessage());
                 }
-                EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, ezProfil.getSourceRef(filePath));
+                EZModel ezModel = new EZModel(EnumEZBroker.BourseDirect, UNKNOWN_VERSION, ezProfil.getSourceRef(settingsManager, mainSettings.getActiveEzProfilName(), filePath));
                 ezModel.setErrors(errors);
                 return ezModel;
 
             }
             else {
-                return JsonSource.genModelFromJson(reporting, ezProfil, ezAccountDeclaration, filePath);
+                return JsonSource.genModelFromJson(reporting, settingsManager, mainSettings.getActiveEzProfilName(), ezProfil, ezAccountDeclaration, filePath);
             }
         }
     }

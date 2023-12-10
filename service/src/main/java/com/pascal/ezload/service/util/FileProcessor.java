@@ -34,10 +34,10 @@ public class FileProcessor {
     private final String rootDirectory;
     private final Predicate<File> dirFilter, fileFiter;
 
-    public FileProcessor(String rootDirectory, Predicate<File> dirFilter, Predicate<File> fileFiter){
+    public FileProcessor(String rootDirectory, Predicate<File> dirFilter, Predicate<File> fileFilter){
         this.rootDirectory = rootDirectory;
         this.dirFilter = dirFilter;
-        this.fileFiter = fileFiter;
+        this.fileFiter = fileFilter;
     }
 
     public <FileResult> List<FileResult> mapFile(Function<String, FileResult> processFile) throws IOException {
