@@ -213,10 +213,10 @@ public class EZActionManager {
             List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from, to);
             if (dividends == null){
                 reporting.info("Tentative avec YahooFinance");
-                return YahooTools.searchDividends(reporting, cache, ezShare, from, to);
+                dividends = YahooTools.searchDividends(reporting, cache, ezShare, from, to);
             }
+            return dividends;
         }
-        return null;
     }
 
 
