@@ -31,6 +31,7 @@ import com.pascal.ezload.service.util.finance.Dividend;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -170,9 +171,13 @@ public class DashboardManager {
             Colors colors = new Colors(nbOfShare + allChartLines.size());
 
 
+
             selectedShares
                 .forEach(ezShare -> {
                     Colors.ColorCode colorCode = colors.nextColorCode();
+                    float transparencyReducer = 0.10f; // Nb de graphique possible pour cette action (compter le nombre de if ci dessous)
+                    float transparency = 0.7f;
+
                     if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_PRICES)) {
                         Prices prices = result.getTargetPrices(reporting, ezShare);
                         if (prices != null) {
@@ -210,7 +215,8 @@ public class DashboardManager {
                             }
                         }
                         ChartLine numberOfSharesChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.NB, ezShare.getEzName(), valuesWithLabel);
-                        numberOfSharesChartLine.setColorLine(colorCode.getColor(0.5f));
+                        transparency = transparency-transparencyReducer;
+                        numberOfSharesChartLine.setColorLine(colorCode.getColor(transparency));
                         allChartLines.add(numberOfSharesChartLine);
                     }
 
@@ -232,7 +238,8 @@ public class DashboardManager {
                             }
                         }
                         ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PORTFOLIO, ezShare.getEzName(), valuesWithLabel);
-                        buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
                         allChartLines.add(buyAndSoldChartLine);
                     }
 
@@ -256,7 +263,8 @@ public class DashboardManager {
 
                         }
                         ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
-                        buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
                         allChartLines.add(buyAndSoldChartLine);
                     }
 
@@ -273,13 +281,14 @@ public class DashboardManager {
                                     .stream()
                                     .filter(e -> e.getKey().equals(ezShare))
                                     .forEach(e -> {
-                                        valueWithLabel.setLabel(e.getValue() == 0 ? NO_LABEL : "PRU(+dividende): " + e.getValue());
+                                        valueWithLabel.setLabel(e.getValue() == 0 ? NO_LABEL : "PRU(-dividende): " + e.getValue());
                                         valueWithLabel.setValue(e.getValue() == 0 ? NO_VALUE : e.getValue());
                                     });
 
                         }
                         ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
-                        buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                        transparency = transparency-transparencyReducer;
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
                         allChartLines.add(buyAndSoldChartLine);
                     }
 
@@ -313,7 +322,8 @@ public class DashboardManager {
                                         previousDate = currentDate;
                                     }
                                     ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
-                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                                    transparency = transparency-transparencyReducer;
+                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
                                     allChartLines.add(buyAndSoldChartLine);
                                 }
                             }
@@ -359,7 +369,8 @@ public class DashboardManager {
                                         previousDate = currentDate;
                                     }
                                     ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.BAR_STYLE, ChartLine.AxisSetting.PERCENT, ezShare.getEzName(), valuesWithLabel);
-                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                                    transparency = transparency-transparencyReducer;
+                                    buyAndSoldChartLine.setColorLine(colorCode.getColor(transparency));
                                     allChartLines.add(buyAndSoldChartLine);
                                 }
                             }

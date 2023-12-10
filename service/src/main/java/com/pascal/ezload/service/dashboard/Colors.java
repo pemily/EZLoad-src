@@ -22,7 +22,7 @@ import java.util.List;
 
 public class Colors {
 
-    private List<String> colors;
+    private final List<int[]> colors;
     private int colorIndex = 0;
 
 
@@ -34,8 +34,8 @@ public class Colors {
         return new ColorCode(colors.get(colorIndex++));
     }
 
-    private static List<String> generateRainbowPalette(int numColors){
-        var toRet = new ArrayList<String>();
+    private static List<int[]> generateRainbowPalette(int numColors){
+        var toRet = new ArrayList<int[]>();
         var phase = 0;
         var center = 128;
         var width = 127;
@@ -51,7 +51,7 @@ public class Colors {
             var greenHex = Integer.toHexString(green);
             var blueHex = Integer.toHexString(blue);
             */
-            toRet.add("rgba("+red+","+green+","+blue);
+            toRet.add(new int[]{red,green,blue});
         }
         return toRet;
     }
@@ -104,20 +104,18 @@ public class Colors {
     }
 
 
-    public class ColorCode {
+    public static class ColorCode {
 
-        private String code;
+        private final int[] rgb;
 
-        private ColorCode(String code){
-            this.code = code;
+        private ColorCode(int[] rgb){
+            this.rgb = rgb;
         }
 
-        private String getCode(){
-            return code;
-        }
 
         public String getColor(float transparency){
-            return getCode()+","+transparency+")";
+            return "rgba("+rgb[0]+","+rgb[1]+","+rgb[2]+","+transparency+")";
         }
+
     }
 }
