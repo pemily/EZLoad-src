@@ -174,7 +174,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'Achats & Ventes des valeurs sélectionnées',
                                     'Dividende par action des valeurs sélectionnées (date de détachement)',
                                     'Rendement du dividende au détachement (des valeurs sélectionnées)',
-                                    'Prix de reviens (PRU)']}
+                                    'Prix de reviens (PRU)',
+                                    'Prix de reviens incluant les dividendes (PRUD)']}
                                 codeValues={[
                                     'CURRENT_SHARES',
                                     'TEN_WITH_MOST_IMPACTS',                                    
@@ -195,7 +196,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     'SHARE_BUY_SOLD_WITH_DETAILS',
                                     'SHARE_DIVIDEND_PER_ACTION',
                                     'SHARE_DIVIDEND_YIELD',
-                                    'SHARE_PRU']}
+                                    'SHARE_PRU',
+                                    'SHARE_PRU_WITH_DIVIDEND']}
                                 description=""
                                 onChange={newValue => 
                                     props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})

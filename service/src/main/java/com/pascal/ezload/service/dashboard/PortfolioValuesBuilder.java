@@ -56,6 +56,8 @@ public class PortfolioValuesBuilder {
         private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2PR = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'action totale)
         private final Map<EZDate, Map<EZShare, Float>> date2share2PRU = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PRDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'action totale)
+        private final Map<EZDate, Map<EZShare, Float>> date2share2PRUDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
 
         private Result(EZActionManager actionManager){
             this.actionManager = actionManager;
@@ -100,6 +102,9 @@ public class PortfolioValuesBuilder {
         }
         public Map<EZDate, Map<EZShare, Float>> getDate2share2PR() { return date2share2PR; }
         public Map<EZDate, Map<EZShare, Float>> getDate2share2PRU() { return date2share2PRU; }
+
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRDividend() { return date2share2PRDividend; }
+        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRUDividend() { return date2share2PRUDividend; }
 
 
         Prices convertPricesToTargetDevise(Reporting reporting, Prices p) {
@@ -151,7 +156,10 @@ public class PortfolioValuesBuilder {
                     r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
                     r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
                     r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
+                    r.date2share2PR.put(state.getDate(), state.getSharePR());
                     r.date2share2PRU.put(state.getDate(), state.getSharePRU());
+                    r.date2share2PRDividend.put(state.getDate(), state.getSharePRDividend());
+                    r.date2share2PRUDividend.put(state.getDate(), state.getSharePRUDividend());
 
                     Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
                     state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes

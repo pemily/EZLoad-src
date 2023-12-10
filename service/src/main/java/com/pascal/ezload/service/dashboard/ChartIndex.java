@@ -41,5 +41,6 @@ public enum ChartIndex {
     SHARE_BUY_SOLD_WITH_DETAILS, // Achat et ventes par actions (des actions sélectionnées dans le graphique)
     SHARE_DIVIDEND, // Dividendes régulier pour une action (des actions sélectionnées dans le graphique)
     SHARE_DIVIDEND_YIELD,
-    SHARE_PRU
+    SHARE_PRU,
+    SHARE_PRU_WITH_DIVIDEND // le PRU en incluant les dividendes
 }

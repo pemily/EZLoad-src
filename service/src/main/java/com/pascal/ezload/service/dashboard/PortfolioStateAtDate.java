@@ -54,6 +54,12 @@ public class PortfolioStateAtDate {
     // le PRU de l'action
     private final Map<EZShare, Float> sharePRU; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
 
+    private final Map<EZShare, Float> sharePRDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+
+    // le PRU de l'action
+    private final Map<EZShare, Float> sharePRUDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+
+
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
     private final StateValue liquidity;
 
@@ -71,6 +77,8 @@ public class PortfolioStateAtDate {
         shareSold = new HashMap<>();
         sharePR = new HashMap<>();
         sharePRU = new HashMap<>();
+        sharePRDividend = new HashMap<>();
+        sharePRUDividend = new HashMap<>();
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
@@ -88,6 +96,10 @@ public class PortfolioStateAtDate {
         this.sharePR.putAll(previousState.sharePR);
         this.sharePRU = new HashMap<>();
         this.sharePRU.putAll(previousState.sharePRU);
+        this.sharePRDividend = new HashMap<>();
+        this.sharePRDividend.putAll(previousState.sharePRDividend);
+        this.sharePRUDividend = new HashMap<>();
+        this.sharePRUDividend.putAll(previousState.sharePRUDividend);
     }
 
     public EZDate getDate() {
@@ -124,6 +136,8 @@ public class PortfolioStateAtDate {
     }
     public Map<EZShare, Float> getSharePR() { return sharePR; }
     public Map<EZShare, Float> getSharePRU() { return sharePRU; }
+    public Map<EZShare, Float> getSharePRDividend() { return sharePRDividend; }
+    public Map<EZShare, Float> getSharePRUDividend() { return sharePRUDividend; }
 
     public StateValue getLiquidity() {
         return liquidity;

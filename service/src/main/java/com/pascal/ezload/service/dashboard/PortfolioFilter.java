@@ -38,7 +38,8 @@ public enum PortfolioFilter {
         CURRENT_SHARES(false, 0),
         TEN_WITH_MOST_IMPACTS(false, 0),
         CURRENCIES(false, 0),
-        SHARE_PRU(false, 0);
+        SHARE_PRU(false, 0),
+        SHARE_PRU_WITH_DIVIDEND(false, 0);;
 
         boolean requireBuild;
         int buildOrder;
@@ -79,6 +80,7 @@ public enum PortfolioFilter {
                     // Graphique sur les actions
                     case SHARE_BUY_SOLD_WITH_DETAILS: r.add(BUY); r.add(SOLD); break;
                     case SHARE_PRU: r.add(SHARE_PRU); break;
+                    case SHARE_PRU_WITH_DIVIDEND: r.add(SHARE_PRU_WITH_DIVIDEND); break;
                     case SHARE_COUNT:
                     case SHARE_PRICES:
                     case SHARE_DIVIDEND:

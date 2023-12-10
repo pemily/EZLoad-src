@@ -260,6 +260,29 @@ public class DashboardManager {
                         allChartLines.add(buyAndSoldChartLine);
                     }
 
+                    if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_PRU_WITH_DIVIDEND)) {
+                        List<ChartLine.ValueWithLabel> valuesWithLabel = new LinkedList<>();
+                        for (EZDate date : result.getDates()) {
+                            Map<EZShare, Float> share2buySold = result.getDate2share2PRUDividend().get(date);
+                            ChartLine.ValueWithLabel valueWithLabel = new ChartLine.ValueWithLabel();
+                            valueWithLabel.setValue(NO_VALUE);
+                            valueWithLabel.setLabel(NO_LABEL);
+                            valuesWithLabel.add(valueWithLabel);
+                            share2buySold
+                                    .entrySet()
+                                    .stream()
+                                    .filter(e -> e.getKey().equals(ezShare))
+                                    .forEach(e -> {
+                                        valueWithLabel.setLabel(e.getValue() == 0 ? NO_LABEL : "PRU(+dividende): " + e.getValue());
+                                        valueWithLabel.setValue(e.getValue() == 0 ? NO_VALUE : e.getValue());
+                                    });
+
+                        }
+                        ChartLine buyAndSoldChartLine = ChartsTools.createChartLineWithLabels(chart, ChartLine.LineStyle.LINE_STYLE, ChartLine.AxisSetting.SHARE, ezShare.getEzName(), valuesWithLabel);
+                        buyAndSoldChartLine.setColorLine(colorCode.getColor(0.5f));
+                        allChartLines.add(buyAndSoldChartLine);
+                    }
+
                     if (chartSettings.getIndexSelection().contains(ChartIndex.SHARE_DIVIDEND)) {
                         try {
                             List<Dividend> dividends = ezActionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size()-1));
@@ -492,6 +515,7 @@ public class DashboardManager {
                 break;
             }
             case SHARE_PRU:
+            case SHARE_PRU_WITH_DIVIDEND:
             case SHARE_COUNT:
             case SHARE_BUY_SOLD_WITH_DETAILS:
             case SHARE_DIVIDEND:

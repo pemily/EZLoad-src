@@ -54,7 +54,7 @@ export function LineChart(props: LineChartProps){
                 return conf;     
             }
             return {    
-             type: 'line',             
+             type: 'line',      
              label: chartLine.title,
              data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
              tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
@@ -112,9 +112,11 @@ export function LineChart(props: LineChartProps){
                 display: true,
                 position: 'top' as const,
                 onClick: function(e: any, legendItem: LegendItem, legend: LegendElement<any>) {
+                    // Afffiche/Cache toutes les courbes qui on le meme nom de legend d'un seul coup
+
                     // https://www.chartjs.org/docs/latest/configuration/legend.html
                     const ci = legend.chart;      
-                
+                    
                     // https://stackoverflow.com/questions/72236230/remove-redundant-legends-on-the-chart-using-generatelabels-with-chartjs-v3
                     // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
                     let hidden = !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;        

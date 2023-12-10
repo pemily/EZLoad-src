@@ -96,6 +96,7 @@ public class PortfolioStateAccumulator {
             case "Dividende brut NON soumis à abattement":
             case "Dividende brut soumis à abattement":
                 addDividend(operation);
+                dividendEventOnShare(operation);
                 break;
             case "Retrait fonds": {
                 addOutputQuantity(operation);
@@ -186,6 +187,9 @@ public class PortfolioStateAccumulator {
         previousState.getSharePR()
                 .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
 
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes)
+        previousState.getSharePRDividend()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
     }
 
     private void buyShare(Row operation) {
@@ -203,6 +207,11 @@ public class PortfolioStateAccumulator {
         // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes)
         previousState.getSharePR()
                 .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
+        // PR  (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes)
+        previousState.getSharePRDividend()
+                .compute(share, (sh, oldValue) -> oldValue == null ? -amount : oldValue - amount);
+
     }
 
     private void eventOnShare(Row operation){
@@ -213,6 +222,21 @@ public class PortfolioStateAccumulator {
             EZShare share = getShare(shareName);
             previousState.getSharePR()
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
+
+            previousState.getSharePRDividend()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
+        }
+    }
+
+    private void dividendEventOnShare(Row operation){
+        String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
+        if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
+            float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
+
+            EZShare share = getShare(shareName);
+
+            previousState.getSharePRDividend()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
         }
     }
 
@@ -220,5 +244,9 @@ public class PortfolioStateAccumulator {
         // PRU  = PR / nb d'action
         previousState.getSharePR()
                 .forEach((key, value) -> previousState.getSharePRU().put(key, previousState.getShareNb().get(key) == 0 ? 0 : value / previousState.getShareNb().get(key)));
+
+        previousState.getSharePRDividend()
+                .forEach((key, value) -> previousState.getSharePRUDividend().put(key, previousState.getShareNb().get(key) == 0 ? 0 : value / previousState.getShareNb().get(key)));
+
     }
 }
