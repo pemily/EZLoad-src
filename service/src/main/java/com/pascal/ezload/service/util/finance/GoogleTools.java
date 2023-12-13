@@ -46,11 +46,16 @@ public class GoogleTools {
                 if (data != null && data.length == 2) {
                     data = StringUtils.divide(data[1], "</div>");
                     if (data != null) {
-                        String priceDevise = data[0].charAt(0)+"";
+                        String deviseStr = data[0].charAt(0)+"";  // data[0] can be $1354 or GBX 46854
+                        int firstSeparator = data[0].indexOf(160);
+                        if (firstSeparator != -1){
+                            deviseStr = data[0].substring(0, firstSeparator);
+                        }
+                        EZDevise devise = DeviseUtil.foundBySymbolOrCode(deviseStr);
                         Prices prices = new Prices();
                         EZDate today = EZDate.today();
                         prices.setLabel(ezShare.getEzName()+" (Prix du jour uniquement)");
-                        prices.setDevise(DeviseUtil.foundBySymbol(priceDevise));
+                        prices.setDevise(devise);
                         prices.addPrice(today, new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(1))));
                         return prices;
                     }

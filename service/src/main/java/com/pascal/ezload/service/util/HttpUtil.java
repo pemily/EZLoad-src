@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -26,13 +28,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class HttpUtil {
 
@@ -63,4 +59,20 @@ public class HttpUtil {
             con.disconnect();
         }
     }
+
+
+    public static HtmlPage getFromUrl(String url) throws IOException {
+        try (final WebClient webClient = new WebClient()) {
+            // Ignorer les avertissements et les erreurs JavaScript, si nécessaire
+            webClient.getOptions().setJavaScriptEnabled(false);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.getCookieManager().setCookiesEnabled(true);
+            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
+            // Récupérer la page HTML
+            HtmlPage page = webClient.getPage(url);
+            return page;
+        }
+    }
+
 }

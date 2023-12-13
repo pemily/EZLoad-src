@@ -72,12 +72,21 @@ public class DeviseUtil {
 
 
     public static EZDevise foundByCode(String code) throws BRException {
-        Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getCode().equals(code)).findFirst();
+        Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getCode().equalsIgnoreCase(code)).findFirst();
         return optDevise.orElseThrow(() -> new BRException("Devise with code: "+code+" not found"));
     }
 
     public static EZDevise foundBySymbol(String symbol) {
-        Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getSymbol().equals(symbol)).findFirst();
+        Optional<EZDevise> optDevise = devises.stream().filter(d -> d.getSymbol().equalsIgnoreCase(symbol)).findFirst();
         return optDevise.orElseThrow(() -> new BRException("Devise with code: "+symbol+" not found"));
+    }
+
+    public static EZDevise foundBySymbolOrCode(String symbolOrCode) {
+        try {
+            return foundBySymbol(symbolOrCode);
+        }
+        catch (BRException e){
+            return foundByCode(symbolOrCode);
+        }
     }
 }

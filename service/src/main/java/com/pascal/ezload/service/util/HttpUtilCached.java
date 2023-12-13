@@ -21,6 +21,7 @@ import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -63,8 +64,18 @@ public class HttpUtilCached {
         return cache.exists();
     }
 
+    public void createCache(String cacheName, String content) throws IOException {
+        FileUtil.string2file(cacheDir+File.separator+format(cacheName)+".json", content);
+
+    }
+
     public InputStream getInputStream(String cacheName) throws FileNotFoundException {
         File cache = new File(cacheDir+File.separator+format(cacheName)+".json");
         return FileUtil.read(cache);
+    }
+
+
+    public String getContent(String cacheName) throws IOException {
+        return FileUtil.file2String(cacheDir+File.separator+format(cacheName)+".json");
     }
 }
