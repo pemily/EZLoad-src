@@ -186,7 +186,7 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
                                             if (uploadGDriveSecFile) 
                                                 ezApi.home.uploadGDriveSecurityFile({file: uploadGDriveSecFile})
                                                 .then(() => {
-                                                    setUploadStatus("Ok");
+                                                    setUploadStatus("Ok. le fichier a été traité, vous pouvez le supprimer");
                                                 })
                                                 .catch((e: any) => {
                                                     setUploadStatus("Erreur "+e);

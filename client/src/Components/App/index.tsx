@@ -189,12 +189,14 @@ export function App(){
         }
     }
 
-    function saveShareValue(index: number, newValue: EZShare){        
+    function saveShareValue(index: number, newValue: EZShare){     
+        setProcessRunning(true);
         ezApi.home.saveShareValue({index}, newValue)
             .then(r => {
                 // mettre a jour le modele des newShareValues
                 reloadAllData();
                 setNewShareValuesDirty(true);
+                setProcessRunning(false);
             })
             .catch(e => console.error(e));
     }
@@ -378,6 +380,8 @@ export function App(){
                                 { reports.length === 0 && reportGenerated && ( <Text margin="large">Pas de nouvelles opérations</Text>)}
                                 <ShareValues actionWithMsg={actionWithMsg} 
                                             processRunning={processRunning} 
+                                            readOnly={processRunning}
+                                            followProcess={followProcess}
                                             saveShareValue={saveShareValue}
                                             showNewSharesDetectedWarning={true}                                            
                                             />

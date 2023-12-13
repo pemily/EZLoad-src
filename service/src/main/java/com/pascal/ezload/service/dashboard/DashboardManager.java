@@ -27,11 +27,11 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
 import com.pascal.ezload.service.util.finance.Dividend;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -63,17 +63,23 @@ public class DashboardManager {
     }
 
     public DashboardSettings loadDashboardSettings() {
-        if (new File(dashboardFile).exists()){
+        try {
+            if (!new File(dashboardFile).exists()) {
+                try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
+                    FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
+                }
+            }
+
             try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
                 DashboardSettings dashboardSettings = JsonUtil.createDefaultMapper().readValue(reader, DashboardSettings.class);
                 dashboardSettings.validate();
                 return dashboardSettings;
             }
-            catch (Exception e){
-                System.out.println(e);
-                e.printStackTrace();
-            }
         }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
         return new DashboardSettings();
     }
 

@@ -67,10 +67,12 @@ export function Config(props: ConfigProps) {
                 followProcess={props.followProcess}
                 saveStartDate={props.saveStartDate}/>
             </Tab>
-            <Tab title="Vos actions" icon={<LineChart size='small'/>}>
+            <Tab title="Liste d'actions" icon={<LineChart size='small'/>}>
                 <Box>
                     <ShareValues actionWithMsg={props.allShares} 
                                 processRunning={props.readOnly}
+                                readOnly={props.readOnly}      
+                                followProcess={props.followProcess}                          
                                 saveShareValue={props.saveShareValue}
                                 showNewSharesDetectedWarning={false}
                                 deleteShareValue={props.deleteShareValue}/>

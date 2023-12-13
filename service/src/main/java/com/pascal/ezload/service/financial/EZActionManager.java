@@ -136,6 +136,9 @@ public class EZActionManager {
             try (Reader reader = new FileReader(shareDataFile, StandardCharsets.UTF_8)) {
                 ezShareData = JsonUtil.createDefaultMapper().readValue(reader, ShareDataFileContent.class);
             }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -373,7 +376,6 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
-            computeActionErrors(rep, ez);
             return prices;
         }
     }
@@ -387,7 +389,6 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
-            computeActionErrors(rep, ez);
             return prices;
         }
     }
