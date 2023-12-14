@@ -4,6 +4,12 @@
 
 
 ## Historique 
+### Version 2.5
+* Amélioration de la détection des devises
+* Pré-initialisation des graphiques du dashboard
+* Pré-initialisation des actions
+* Correction de bugs
+
 ### Version 2.4
 * Ajout des courbes avec les dividendes
 * Ajout des courbes avec le PRU

@@ -182,8 +182,6 @@ public class HomeHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
         actionManager.update(index, shareValue);
-
-        recheckAllShares(actionManager);
     }
 
     @POST
@@ -206,19 +204,40 @@ public class HomeHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
         actionManager.deleteShare(index);
-
-        recheckAllShares(actionManager);
     }
 
 
-    private void recheckAllShares(EZActionManager actionManager) {
-        ezServerState.setDetailedActionErros(new LinkedList<>());
-        actionManager.getAllEZShares()
-                .forEach(ezShare ->{
-                    try {
-                        ezServerState.getDetailedActionErrors().addAll(actionManager.computeActionErrors(new LoggerReporting(), ezShare));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+    @GET
+    @Path("checkAllShares")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EzProcess checkAllShares() throws Exception {
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        final MainSettings mainSettings = settingsManager.loadProps();
+        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+        return processManager.createNewRunningProcess(settingsManager, mainSettings,
+                "Vérification des actions",
+                ProcessManager.getLog(mainSettings, "checkShares", ".html"),
+                (processLogger) -> {
+                    ezServerState.setDetailedActionErros(new LinkedList<>());
+                    try (Reporting reporting = processLogger.getReporting().pushSection("Vérification des "+actionManager.getAllEZShares().size()+" actions")) {
+                        actionManager.getAllEZShares()
+                                .forEach(ezShare -> {
+                                    try {
+                                        ezServerState.getDetailedActionErrors().addAll(actionManager.computeActionErrors(reporting, ezShare));
+                                    } catch (IOException e) {
+                                        processLogger.getReporting().error(e);
+                                    }
+                                });
+                    }
+                    ActionWithMsg actionWithMsg = actionManager.refreshAllEZSharesWithMessages();
+                    if (actionWithMsg.getErrors().size() == 0 && ezServerState.getDetailedActionErrors().size() == 0) {
+                        processLogger.getReporting().info("Pas de problème détecté");
+                    }
+                    else {
+                        actionWithMsg.getErrors()
+                                .forEach(processLogger.getReporting()::error);
+                        ezServerState.getDetailedActionErrors()
+                                .forEach(processLogger.getReporting()::error);
                     }
                 });
     }

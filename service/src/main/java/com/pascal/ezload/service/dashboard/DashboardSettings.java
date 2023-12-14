@@ -44,4 +44,5 @@ public class DashboardSettings extends Checkable<DashboardSettings> {
     public void clearErrors(){
         chartSettings.forEach(ChartSettings::clearErrors);
     }
+
 }

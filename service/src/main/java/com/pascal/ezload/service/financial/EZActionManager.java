@@ -17,12 +17,14 @@
  */
 package com.pascal.ezload.service.financial;
 
+import com.pascal.ezload.service.dashboard.DashboardManager;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 import com.pascal.ezload.service.util.finance.*;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -128,15 +130,25 @@ public class EZActionManager {
         return ezShareData.getShares().stream().filter(a -> a.getEzName() != null && a.getEzName().equals(shareName)).findFirst();
     }
 
-    private void loadEZActions() throws IOException {
-        if (!new File(shareDataFile).exists()){
-            ezShareData = new ShareDataFileContent();
-        }
-        else {
-            try (Reader reader = new FileReader(shareDataFile, StandardCharsets.UTF_8)) {
-                ezShareData = JsonUtil.createDefaultMapper().readValue(reader, ShareDataFileContent.class);
+    private void loadEZActions() {
+        if (!new File(shareDataFile).exists()) {
+            try (InputStream in = EZActionManager.class.getResourceAsStream("/defaultShareData.json")) {
+                FileUtil.string2file(shareDataFile, IOUtils.toString(in, StandardCharsets.UTF_8));
+            }
+            catch (Exception e){
+                e.printStackTrace();
             }
         }
+
+        try (Reader reader = new FileReader(shareDataFile, StandardCharsets.UTF_8)) {
+            ezShareData = JsonUtil.createDefaultMapper().readValue(reader, ShareDataFileContent.class);
+            return;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        ezShareData = new ShareDataFileContent();
     }
 
     private void saveEZActions() throws IOException {
@@ -373,7 +385,6 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
-            computeActionErrors(rep, ez);
             return prices;
         }
     }
@@ -387,7 +398,6 @@ public class EZActionManager {
             if (prices == null) {
                 reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
             }
-            computeActionErrors(rep, ez);
             return prices;
         }
     }

@@ -16,10 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box, List, Text, Anchor, Button } from "grommet";
-import { FormSearch, Trash } from 'grommet-icons';
+import { FormSearch, Trash, Target } from 'grommet-icons';
 import { TextField } from '../Tools/TextField';
 import { useState, useRef, useEffect } from "react";
-import { EZShare, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
+import { ezApi, jsonCall } from '../../ez-api/tools';
+import { EZShare, ActionWithMsg, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
@@ -28,6 +29,8 @@ export interface NewShareValuesProps {
     showNewSharesDetectedWarning: boolean,
     actionWithMsg: ActionWithMsg|undefined;
     processRunning: boolean;
+    followProcess: (process: EzProcess|undefined) => void;
+    readOnly: boolean;
     saveShareValue: (index: number, newVal: EZShare) => void;
     deleteShareValue?: (index: number) => void;
 }      
@@ -41,13 +44,10 @@ function shareSearchUrl(field: string|undefined, share: EZShare) : string | unde
 function googleCodeReversed(share: EZShare) : string|undefined {    
     // googleCodeFromEzPortfolio EPA:FDJ => return FDJ:EPA 
     var googleCodeFromEzPortfolio = share.googleCode;
-    if (googleCodeFromEzPortfolio === undefined) return undefined;
-    console.log("PASCAL: ", googleCodeFromEzPortfolio);
-    var code = googleCodeFromEzPortfolio?.split(":")
-    console.log("PASCAL: ", code);
+    if (googleCodeFromEzPortfolio === undefined) return undefined;    
+    var code = googleCodeFromEzPortfolio?.split(":")    
     if (code === undefined ||code?.length <= 1) return googleCodeFromEzPortfolio;    
-    var r = code[1]+":"+code[0];
-    console.log("PASCAL: ", r);
+    var r = code[1]+":"+code[0];    
     return r;
 }
 
@@ -60,7 +60,16 @@ export function ShareValues(props: NewShareValuesProps){
     }, [ props.processRunning, props.actionWithMsg ]);
 
     return (
-        <Box margin="medium" >            
+        <Box margin="medium" >   
+         { !props.showNewSharesDetectedWarning && (<Button
+            fill="vertical"
+            alignSelf="end"                    
+            disabled={props.readOnly} onClick={() =>
+                jsonCall(ezApi.home.checkAllShares())
+                .then(props.followProcess)               
+                .catch(e => console.error(e))
+            }
+            size="small" icon={<Target size='small'/>} label="Rechercher les erreurs"/> ) }
             {props.showNewSharesDetectedWarning && props.actionWithMsg?.actions && props.actionWithMsg.actions.length > 0 
                 && (<><Text>Nouvelle(s) valeur(s) detectée(s)!</Text>
                 <Text>Vous pouvez le(s) renommer maintenant (il sera plus difficile de le faire dans EZPortfolio)</Text>
@@ -95,7 +104,7 @@ export function ShareValues(props: NewShareValuesProps){
                         isRequired={true}                  
                         readOnly={readOnly}
                         />                         
-                        <Anchor alignSelf="center" target={"boursedirect"+shareValue.isin} color="brand" href={"https://www.boursedirect.fr/fr/marches/recherche?q="+shareSearchUrl(shareValue.isin, shareValue)} icon={<FormSearch size="medium"/>}/>
+                        <Anchor alignSelf="center" target={"boursedirect"+shareValue.isin} color="brand" href={"https://www.google.fr/search?q=ISIN+%22"+shareSearchUrl(shareValue.isin, shareValue)+"%22 "+shareValue.googleCode} icon={<FormSearch size="medium"/>}/>
 
                         <TextField
                         label="Google Code"

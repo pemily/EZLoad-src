@@ -77,7 +77,7 @@ export function DashboardMain(props: DashboardMainProps){
         <Box>
         { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (            
                 <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                    Aller dans Configuration/Vos actions pour renseigner les paramètres de vos actions</Text></Box> 
+                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box> 
             )
         }  
         { !readOnly && (!dashCharts || dashCharts.length === 0) && (            
