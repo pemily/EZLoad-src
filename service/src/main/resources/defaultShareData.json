@@ -1,0 +1,925 @@
+{
+  "shares" : [
+    {
+      "ezName" : "A. O. Smith Corporation",
+      "googleCode" : "NYSE:AOS",
+      "yahooCode" : "AOS",
+      "isin" : "US8318652091",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "AOS"
+    },
+    {
+      "ezName" : "AbbVie",
+      "googleCode" : "NYSE:ABBV",
+      "yahooCode" : "ABBV",
+      "isin" : "US00287Y1091",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "ABBV",
+      "industry" : "Drug Manufacturers—General",
+      "sector" : "Healthcare"
+    },
+    {
+      "ezName" : "Accenture",
+      "googleCode" : "NYSE:ACN",
+      "yahooCode" : "ACN",
+      "isin" : "IE00B4BNMY34",
+      "countryCode" : "IE",
+      "seekingAlphaCode" : "ACN"
+    },
+    {
+      "ezName" : "Aflac",
+      "googleCode" : "NYSE:AFL",
+      "yahooCode" : "AFL",
+      "isin" : "US0010551028",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "AFL"
+    },
+    {
+      "ezName" : "Air Liquide",
+      "googleCode" : "EPA:AI",
+      "yahooCode" : "AI",
+      "isin" : "FR0000120073",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "AI"
+    },
+    {
+      "ezName" : "Air Products",
+      "googleCode" : "NYSE:APD",
+      "yahooCode" : "APD",
+      "isin" : "US0091581068",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "APD"
+    },
+    {
+      "ezName" : "Alimentation Couche-Tard",
+      "googleCode" : "TSE:ATD",
+      "yahooCode" : "ATD.TO",
+      "isin" : "CA01626P1484",
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "ATD:CA"
+    },
+    {
+      "ezName" : "American Tower",
+      "googleCode" : "NYSE:AMT",
+      "yahooCode" : "AMT",
+      "isin" : "US03027X1000",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "AMT"
+    },
+    {
+      "ezName" : "Ameriprise Financial",
+      "googleCode" : "NYSE:AMP",
+      "yahooCode" : "AMP",
+      "isin" : "US03076C1062",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "AMP"
+    },
+    {
+      "ezName" : "Amgen",
+      "googleCode" : "NASDAQ:AMGN",
+      "yahooCode" : "AMGN",
+      "isin" : "US0311621009",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "AMGN"
+    },
+    {
+      "ezName" : "Apple",
+      "googleCode" : "NASDAQ:AAPL",
+      "yahooCode" : "AAPL",
+      "isin" : "US0378331005",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "AAPL"
+    },
+    {
+      "ezName" : "Archer Daniels Midland",
+      "googleCode" : "NYSE:ADM",
+      "yahooCode" : "ADM",
+      "isin" : "US0394831020",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ADM"
+    },
+    {
+      "ezName" : "Argan",
+      "googleCode" : "EPA:ARG",
+      "yahooCode" : "ARG.PA",
+      "isin" : "FR0010481960",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "Aubay",
+      "googleCode" : "EPA:AUB",
+      "yahooCode" : "AUB.PA",
+      "isin" : "FR0000063737",
+      "countryCode" : "FR",
+      "type" : "stock"
+    },
+    {
+      "ezName" : "Automatic Data Processing",
+      "googleCode" : "NASDAQ:ADP",
+      "yahooCode" : "ADP",
+      "isin" : "US0530151036",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ADP"
+    },
+    {
+      "ezName" : "BAE Systems",
+      "googleCode" : "LON:BA",
+      "yahooCode" : "BA",
+      "isin" : "GB0002634946",
+      "countryCode" : "UK",
+      "seekingAlphaCode" : "BA"
+    },
+    {
+      "ezName" : "Bank Ozk",
+      "googleCode" : "NASDAQ:OZK",
+      "yahooCode" : "OZK",
+      "isin" : "US33736Q1040",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "OZK"
+    },
+    {
+      "ezName" : "Bank of Nova Scotia",
+      "googleCode" : "TSE:BNS",
+      "yahooCode" : "BNS",
+      "isin" : "CA0641491075",
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "BNS"
+    },
+    {
+      "ezName" : "Best Buy",
+      "googleCode" : "NYSE:BBY",
+      "yahooCode" : "BBY",
+      "isin" : "DE000MD1T7X8",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "BBY"
+    },
+    {
+      "ezName" : "Blackrock",
+      "googleCode" : "NYSE:BLK",
+      "yahooCode" : "BLK",
+      "isin" : "US09290C3016",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "BLK"
+    },
+    {
+      "ezName" : "Booz Allen Hamilton",
+      "googleCode" : "NYSE:BAH",
+      "yahooCode" : "BAH",
+      "isin" : "US0995021062",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "BAH"
+    },
+    {
+      "ezName" : "Bouygues",
+      "googleCode" : "EPA:EN",
+      "yahooCode" : "EN.PA",
+      "isin" : "FR0000120503",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "BOUYF"
+    },
+    {
+      "ezName" : "British American Tobaccos",
+      "googleCode" : "LON:BATS",
+      "yahooCode" : "BTAFF",
+      "isin" : "US1104481072",
+      "countryCode" : "UK",
+      "seekingAlphaCode" : "BTAFF"
+    },
+    {
+      "ezName" : "Broadcom",
+      "googleCode" : "NASDAQ:AVGO",
+      "yahooCode" : "AVGO",
+      "isin" : "US11135F1012",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "AVGO",
+      "industry" : "Semiconductors",
+      "sector" : "Technology"
+    },
+    {
+      "ezName" : "C.H. Robinson Worldwide",
+      "googleCode" : "NASDAQ:CHRW",
+      "yahooCode" : "CHRW",
+      "isin" : "US12541W2098",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CHRW"
+    },
+    {
+      "ezName" : "CBO TERRITORIA",
+      "googleCode" : "EPA:CBOT",
+      "yahooCode" : "CBOT.PA",
+      "isin" : "FR0010193979",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "CVS Health Corporation",
+      "googleCode" : "NYSE:CVS",
+      "yahooCode" : "CVS",
+      "isin" : "US1266501006",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CVS"
+    },
+    {
+      "ezName" : "Canadian Natural Resources",
+      "googleCode" : "TSE:CNQ",
+      "yahooCode" : "CNQ",
+      "isin" : "CA1363851017",
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "CNQ"
+    },
+    {
+      "ezName" : "Cardinal Health",
+      "googleCode" : "NYSE:CAH",
+      "yahooCode" : "CAH",
+      "isin" : "US14149Y1082",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CAH"
+    },
+    {
+      "ezName" : "Caterpillar",
+      "googleCode" : "NYSE:CAT",
+      "yahooCode" : "CAT",
+      "isin" : "US1491231015",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CAT"
+    },
+    {
+      "ezName" : "Chevron",
+      "googleCode" : "NYSE:CVX",
+      "yahooCode" : "CVX",
+      "isin" : "US1667641005",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CVX"
+    },
+    {
+      "ezName" : "Cincinnati Financial Corporation",
+      "googleCode" : "NASDAQ:CINF",
+      "yahooCode" : "CINF",
+      "isin" : "US1720621010",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CINF"
+    },
+    {
+      "ezName" : "Cintas Corporation",
+      "googleCode" : "NASDAQ:CTAS",
+      "yahooCode" : "CTAS",
+      "isin" : "US1729081059",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CTAS"
+    },
+    {
+      "ezName" : "Clorox",
+      "googleCode" : "NYSE:CLX",
+      "yahooCode" : "CLX",
+      "isin" : "US1890541097",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CLX"
+    },
+    {
+      "ezName" : "Coca Cola",
+      "googleCode" : "NYSE:KO",
+      "yahooCode" : "KO",
+      "isin" : "US1912161007",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "KO"
+    },
+    {
+      "ezName" : "Colgate-Palmolive",
+      "googleCode" : "NYSE:CL",
+      "yahooCode" : "CL",
+      "isin" : "US1941621039",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "CL"
+    },
+    {
+      "ezName" : "Consolidated Edison",
+      "googleCode" : "NYSE:ED",
+      "yahooCode" : "ED",
+      "isin" : "US2091151041",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ED"
+    },
+    {
+      "ezName" : "Diageo",
+      "googleCode" : "LON:DGE",
+      "yahooCode" : "DGE.L",
+      "isin" : "GB0002374006",
+      "countryCode" : "UK"
+    },
+    {
+      "ezName" : "Digital Realty Trust",
+      "googleCode" : "NYSE:DLR",
+      "yahooCode" : "DLR",
+      "isin" : "US2538681030",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "DLR"
+    },
+    {
+      "ezName" : "Dover",
+      "googleCode" : "NYSE:DOV",
+      "yahooCode" : "DOV",
+      "isin" : "US2600031080",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "DOV"
+    },
+    {
+      "ezName" : "Duke Energy",
+      "googleCode" : "NYSE:DUK",
+      "yahooCode" : "DUK",
+      "isin" : "US26441C2044",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "DUK"
+    },
+    {
+      "ezName" : "Dynagas LNG - A",
+      "googleCode" : "NYSE:DLNG-A",
+      "yahooCode" : "DLNG-PA",
+      "isin" : "MHY2188B1083",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "DLNG.PR.A"
+    },
+    {
+      "ezName" : "EOG Resources",
+      "googleCode" : "NYSE:EOG",
+      "yahooCode" : "EOG",
+      "isin" : "US26875P1012",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "EOG"
+    },
+    {
+      "ezName" : "Eaton Corporation",
+      "googleCode" : "NYSE:ETN",
+      "yahooCode" : "ETN",
+      "isin" : "IE00B8KQN827",
+      "countryCode" : "IE",
+      "seekingAlphaCode" : "ETN"
+    },
+    {
+      "ezName" : "Emerson Electric",
+      "googleCode" : "NYSE:EMR",
+      "yahooCode" : "EMR",
+      "isin" : "US2910111044",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "EMR"
+    },
+    {
+      "ezName" : "Enagas",
+      "googleCode" : "BME:ENG",
+      "yahooCode" : "ENG.MC",
+      "isin" : "ES0130960018",
+      "countryCode" : "ES",
+      "type" : "stock",
+      "industry" : "Utilities—Regulated Gas",
+      "sector" : "Utilities"
+    },
+    {
+      "ezName" : "Enbridge",
+      "googleCode" : "NYSE:ENB",
+      "yahooCode" : "ENB",
+      "isin" : "CA29250N1050",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ENB"
+    },
+    {
+      "ezName" : "Equasens",
+      "googleCode" : "EPA:EQS",
+      "yahooCode" : "EQS",
+      "isin" : "FR0012882389",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "EQS"
+    },
+    {
+      "ezName" : "Essex Property Trust",
+      "googleCode" : "NYSE:ESS",
+      "yahooCode" : "ESS",
+      "isin" : "US2971781057",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ESS"
+    },
+    {
+      "ezName" : "Expeditors International of Washingto",
+      "googleCode" : "NYSE:EXPD",
+      "yahooCode" : "EXPD",
+      "isin" : "US3021301094",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "EXPD"
+    },
+    {
+      "ezName" : "Federal Realty Investment",
+      "googleCode" : "NYSE:FRT",
+      "yahooCode" : "FRT",
+      "isin" : "US3137472060",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "FRT"
+    },
+    {
+      "ezName" : "Foncière Inea",
+      "googleCode" : "EPA:INEA",
+      "yahooCode" : "INEA.PA",
+      "isin" : "FR0010341032",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "General Dynamics",
+      "googleCode" : "NYSE:GD",
+      "yahooCode" : "GD",
+      "isin" : "US3695501086",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "GD"
+    },
+    {
+      "ezName" : "Genuine Parts Company",
+      "googleCode" : "NYSE:GPC",
+      "yahooCode" : "GPC",
+      "isin" : "US3724601055",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "GPC"
+    },
+    {
+      "ezName" : "Henkel",
+      "googleCode" : "ETR:HEN3",
+      "yahooCode" : "HEN3.DE",
+      "isin" : "DE0006048432",
+      "countryCode" : "DE"
+    },
+    {
+      "ezName" : "Hermès International",
+      "googleCode" : "EPA:RMS",
+      "yahooCode" : "HESAF",
+      "isin" : "FR0000052292",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "HESAF"
+    },
+    {
+      "ezName" : "Hormel Foods Corporation",
+      "googleCode" : "NYSE:HRL",
+      "yahooCode" : "HRL",
+      "isin" : "US4404521001",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "HRL"
+    },
+    {
+      "ezName" : "Illinois Tool Works",
+      "googleCode" : "NYSE:ITW",
+      "yahooCode" : "ITW",
+      "isin" : "US4523081093",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ITW"
+    },
+    {
+      "ezName" : "International Business Machines Corporation",
+      "googleCode" : "NYSE:IBM",
+      "yahooCode" : "IBM",
+      "isin" : "US4592001014",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "IBM",
+      "industry" : "Information Technology Services",
+      "sector" : "Technology"
+    },
+    {
+      "ezName" : "Ipsen",
+      "googleCode" : "EPA:IPN",
+      "yahooCode" : "IPSEF",
+      "isin" : "FR0010259150",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "IPSEF"
+    },
+    {
+      "ezName" : "Johnson&Johnson",
+      "googleCode" : "NYSE:JNJ",
+      "yahooCode" : "JNJ",
+      "isin" : "US4781601046",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "JNJ"
+    },
+    {
+      "ezName" : "Kimberley Clark",
+      "googleCode" : "NYSE:KMB",
+      "yahooCode" : "KMB",
+      "isin" : "US4943681035",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "KMB"
+    },
+    {
+      "ezName" : "L'Oréal",
+      "googleCode" : "EPA:OR",
+      "yahooCode" : "OR",
+      "isin" : "FR0000120321",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "OR"
+    },
+    {
+      "ezName" : "L3 Harris Technologies",
+      "googleCode" : "NYSE:LHX",
+      "yahooCode" : "LHX",
+      "isin" : "US5024311095",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "LHX"
+    },
+    {
+      "ezName" : "La Française des Jeux",
+      "googleCode" : "EPA:FDJ",
+      "yahooCode" : "FDJ.PA",
+      "isin" : "FR0013451333",
+      "countryCode" : "FR",
+      "type" : "stock"
+    },
+    {
+      "ezName" : "Legal & General",
+      "googleCode" : "LON:LGEN",
+      "yahooCode" : "LGGNF",
+      "isin" : "GB0005603997",
+      "countryCode" : "UK",
+      "seekingAlphaCode" : "LGGNF"
+    },
+    {
+      "ezName" : "Legrand",
+      "googleCode" : "EPA:LR",
+      "yahooCode" : "LR.PA",
+      "isin" : "FR0010307819",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "LGRVF"
+    },
+    {
+      "ezName" : "Lockheed Martin Corporation",
+      "googleCode" : "NYSE:LMT",
+      "yahooCode" : "LMT",
+      "isin" : "US5398301094",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "LMT"
+    },
+    {
+      "ezName" : "Lowe's Companies",
+      "googleCode" : "NYSE:LOW",
+      "yahooCode" : "LOW",
+      "isin" : "US5486611073",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "LOW"
+    },
+    {
+      "ezName" : "Lyxor International Asset Mgmt",
+      "googleCode" : "EPA:PSP5",
+      "yahooCode" : "PSP5.PA",
+      "isin" : "FR0011871128",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "Main Street Capital",
+      "googleCode" : "NYSE:MAIN",
+      "yahooCode" : "MAIN",
+      "isin" : "US56035L1044",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "MAIN"
+    },
+    {
+      "ezName" : "MasterCard",
+      "googleCode" : "NYSE:MA",
+      "yahooCode" : "MA",
+      "isin" : "US57636Q1040",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "MA"
+    },
+    {
+      "ezName" : "McCormick & Company",
+      "googleCode" : "NYSE:MKC",
+      "yahooCode" : "MKC",
+      "isin" : "US5797802064",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "MKC"
+    },
+    {
+      "ezName" : "McDonald's",
+      "googleCode" : "NYSE:MCD",
+      "yahooCode" : "MCD",
+      "isin" : "US5801351017",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "MCD"
+    },
+    {
+      "ezName" : "Medtronic",
+      "googleCode" : "NYSE:MDT",
+      "yahooCode" : "MDT",
+      "isin" : "IE00BTN1Y115",
+      "countryCode" : "IE",
+      "seekingAlphaCode" : "MDT"
+    },
+    {
+      "ezName" : "Metro Inc.",
+      "googleCode" : "TSE:MRU",
+      "yahooCode" : "MRU.TO",
+      "isin" : "CA59162N1096",
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "MRU:CA"
+    },
+    {
+      "ezName" : "Microsoft",
+      "googleCode" : "NASDAQ:MSFT",
+      "yahooCode" : "MSFT",
+      "isin" : "US594918104",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "MSFT"
+    },
+    {
+      "ezName" : "NET LEASE OFFICE PROPERTIES",
+      "googleCode" : "NYSE:NLOP",
+      "isin" : "US64110Y1082",
+      "countryCode" : "US",
+      "type" : "stock",
+      "seekingAlphaCode" : "NLOP",
+      "industry" : "REIT—Office",
+      "sector" : "Real Estate"
+    },
+    {
+      "ezName" : "Nucor",
+      "googleCode" : "NYSE:NUE",
+      "yahooCode" : "NUE",
+      "isin" : "US6703461052",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "NUE"
+    },
+    {
+      "ezName" : "OneOk",
+      "googleCode" : "NYSE:OKE",
+      "yahooCode" : "OKE",
+      "isin" : "US6826801036",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "OKE"
+    },
+    {
+      "ezName" : "Oracle",
+      "googleCode" : "NYSE:ORCL",
+      "yahooCode" : "ORCL",
+      "isin" : "US68389X1054",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ORCL"
+    },
+    {
+      "ezName" : "PPG Industries",
+      "googleCode" : "NYSE:PPG",
+      "yahooCode" : "PPG",
+      "isin" : "US6935061076",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "PPG"
+    },
+    {
+      "ezName" : "Parker-Hannifin",
+      "googleCode" : "NYSE:PH",
+      "yahooCode" : "PH",
+      "isin" : "US7010941042",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "PH"
+    },
+    {
+      "ezName" : "Patrimoine et Commerce",
+      "googleCode" : "EPA:PAT",
+      "yahooCode" : "PAT.PA",
+      "isin" : "FR0011027135",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "Pepsi Co",
+      "googleCode" : "NASDAQ:PEP",
+      "yahooCode" : "PEP",
+      "isin" : "US7134481081",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "PEP"
+    },
+    {
+      "ezName" : "Philips Morris International",
+      "googleCode" : "NYSE:PM",
+      "yahooCode" : "PM",
+      "isin" : "US7181721090",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "PM"
+    },
+    {
+      "ezName" : "Procter & Gamble",
+      "googleCode" : "NYSE:PG",
+      "yahooCode" : "PG",
+      "isin" : "US7427181091",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "PG"
+    },
+    {
+      "ezName" : "Realty Income Corp",
+      "googleCode" : "NYSE:O",
+      "yahooCode" : "O",
+      "isin" : "US7561091049",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "O"
+    },
+    {
+      "ezName" : "Robert Half",
+      "googleCode" : "NYSE:RHI",
+      "yahooCode" : "RHI",
+      "isin" : "US7703231032",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "RHI"
+    },
+    {
+      "ezName" : "Roper Technologies",
+      "googleCode" : "NASDAQ:ROP",
+      "yahooCode" : "ROP",
+      "isin" : "US7766961061",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "ROP"
+    },
+    {
+      "ezName" : "Rubis",
+      "googleCode" : "EPA:RUI",
+      "yahooCode" : "RUI.PA",
+      "isin" : "FR0013269123",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "S&P Global",
+      "googleCode" : "NYSE:SPGI",
+      "yahooCode" : "SPGI",
+      "isin" : "US78409V1044",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "SPGI"
+    },
+    {
+      "ezName" : "Safe Bulkers C",
+      "googleCode" : "NYSE:SB-C",
+      "yahooCode" : "SB-PC",
+      "isin" : "MHY7388L1039",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "SB.PR.C"
+    },
+    {
+      "ezName" : "Sanofi",
+      "googleCode" : "EPA:SAN",
+      "yahooCode" : "SAN.PA",
+      "isin" : "FR0000120578",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "SNYNF"
+    },
+    {
+      "ezName" : "Snap-on",
+      "googleCode" : "NYSE:SNA",
+      "yahooCode" : "SNA",
+      "isin" : "US8330341012",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "SNA"
+    },
+    {
+      "ezName" : "Southern Company",
+      "googleCode" : "NYSE:SO",
+      "yahooCode" : "SO",
+      "isin" : "US8425871071",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "SO"
+    },
+    {
+      "ezName" : "Stanley Black & Decker",
+      "googleCode" : "NYSE:SWK",
+      "yahooCode" : "SWK",
+      "isin" : "US8545021011",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "SWK"
+    },
+    {
+      "ezName" : "Steris",
+      "googleCode" : "NYSE:STE",
+      "yahooCode" : "STE",
+      "isin" : "IE00BFY8C754",
+      "countryCode" : "IE",
+      "seekingAlphaCode" : "STE"
+    },
+    {
+      "ezName" : "T. Rowe Price Group",
+      "googleCode" : "NASDAQ:TROW",
+      "yahooCode" : "TROW",
+      "isin" : "US74144T1088",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "TROW"
+    },
+    {
+      "ezName" : "Target Corp",
+      "googleCode" : "NYSE:TGT",
+      "yahooCode" : "TGT",
+      "isin" : "US87612E1064",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "TGT"
+    },
+    {
+      "ezName" : "Teleperformance SE",
+      "googleCode" : "EPA:TEP",
+      "yahooCode" : "TEP.PA",
+      "isin" : "FR0000051807",
+      "countryCode" : "FR",
+      "type" : "stock",
+      "seekingAlphaCode" : "TLPFF",
+      "industry" : "Specialty Business Services",
+      "sector" : "Industrials"
+    },
+    {
+      "ezName" : "Tesla",
+      "googleCode" : "NASDAQ:TSLA",
+      "yahooCode" : "TSLA",
+      "isin" : "US88160R1014",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "TSLA"
+    },
+    {
+      "ezName" : "Texas Instruments",
+      "googleCode" : "NASDAQ:TXN",
+      "yahooCode" : "TXN",
+      "isin" : "US8825081040",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "TXN"
+    },
+    {
+      "ezName" : "The Home Depot",
+      "googleCode" : "NYSE:HD",
+      "yahooCode" : "HD",
+      "isin" : "US4370761029",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "HD"
+    },
+    {
+      "ezName" : "Thermador Groupe",
+      "googleCode" : "EPA:THEP",
+      "yahooCode" : "THEP.PA",
+      "isin" : "FR0013333432",
+      "countryCode" : "FR"
+    },
+    {
+      "ezName" : "Total",
+      "googleCode" : "EPA:TTE",
+      "yahooCode" : "TTE",
+      "isin" : "FR0000120271",
+      "countryCode" : "FR",
+      "seekingAlphaCode" : "TTE"
+    },
+    {
+      "ezName" : "Tractor Supply Company",
+      "googleCode" : "NASDAQ:TSCO",
+      "yahooCode" : "TSCO",
+      "isin" : "US8923561067",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "TSCO"
+    },
+    {
+      "ezName" : "UnitedHealth Group",
+      "googleCode" : "NYSE:UNH",
+      "yahooCode" : "UNH",
+      "isin" : "US91324P1021",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "UNH"
+    },
+    {
+      "ezName" : "Universal Health Realty",
+      "googleCode" : "NYSE:UHT",
+      "yahooCode" : "UHT",
+      "isin" : "US91359E1055",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "UHT"
+    },
+    {
+      "ezName" : "Verizon Communications",
+      "googleCode" : "NYSE:VZ",
+      "yahooCode" : "VZ",
+      "isin" : "US92343V1044",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "VZ"
+    },
+    {
+      "ezName" : "Visa",
+      "googleCode" : "NYSE:V",
+      "yahooCode" : "V",
+      "isin" : "US92826C8394",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "V"
+    },
+    {
+      "ezName" : "WP Carey",
+      "googleCode" : "NYSE:WPC",
+      "yahooCode" : "WPC",
+      "isin" : "US92936U1097",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "WPC"
+    },
+    {
+      "ezName" : "Walgreens Boots Alliance",
+      "googleCode" : "NASDAQ:WBA",
+      "yahooCode" : "WBA",
+      "isin" : "US9314271084",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "WBA"
+    },
+    {
+      "ezName" : "Walmart",
+      "googleCode" : "NYSE:WMT",
+      "yahooCode" : "WMT",
+      "isin" : "US9311421039",
+      "countryCode" : "US",
+      "seekingAlphaCode" : "WMT"
+    }
+  ]
+}

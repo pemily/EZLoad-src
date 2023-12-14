@@ -63,18 +63,19 @@ public class DashboardManager {
     }
 
     public DashboardSettings loadDashboardSettings() {
-        try {
-            if (!new File(dashboardFile).exists()) {
-                try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
-                    FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
-                }
+        if (!new File(dashboardFile).exists()) {
+            try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
+                FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
             }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
-            try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
-                DashboardSettings dashboardSettings = JsonUtil.createDefaultMapper().readValue(reader, DashboardSettings.class);
-                dashboardSettings.validate();
-                return dashboardSettings;
-            }
+        try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
+            DashboardSettings dashboardSettings = JsonUtil.createDefaultMapper().readValue(reader, DashboardSettings.class);
+            dashboardSettings.validate();
+            return dashboardSettings;
         }
         catch (Exception e){
             e.printStackTrace();

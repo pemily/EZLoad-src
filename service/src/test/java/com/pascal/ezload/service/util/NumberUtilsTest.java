@@ -34,6 +34,7 @@ public class NumberUtilsTest {
 
     @Test
     public void str2Float(){
+        Assertions.assertEquals(2871.50f, NumberUtils.str2Float(" 2,871.50"));
         Assertions.assertEquals(0f, NumberUtils.str2Float(null));
         Assertions.assertEquals(2400f, NumberUtils.str2Float("2400,00"));
         Assertions.assertEquals(-2400f, NumberUtils.str2Float("-2400,00"));

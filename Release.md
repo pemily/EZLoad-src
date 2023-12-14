@@ -10,7 +10,6 @@ To create a new version:
 
 Merge develop on main branch
 * git checkout main
-* git fetch
 * git pull
 * git merge origin/develop `Sur les conflits prendre tous les theirs (develop)`
 * git add .

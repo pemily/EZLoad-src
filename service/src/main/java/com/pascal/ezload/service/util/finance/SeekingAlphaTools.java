@@ -178,7 +178,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
 
     static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
-        if (!StringUtils.isBlank(ezShare.getYahooCode())) {
+        if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String cacheName = "seekingalpha_devise_" + ezShare.getSeekingAlphaCode();
             String devise = null;
             if (!cache.exists(cacheName)) {

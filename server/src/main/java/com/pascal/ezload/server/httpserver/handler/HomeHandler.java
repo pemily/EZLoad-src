@@ -229,6 +229,16 @@ public class HomeHandler {
                                     }
                                 });
                     }
+                    ActionWithMsg actionWithMsg = actionManager.refreshAllEZSharesWithMessages();
+                    if (actionWithMsg.getErrors().size() == 0 && ezServerState.getDetailedActionErrors().size() == 0) {
+                        processLogger.getReporting().info("Pas de problème détecté");
+                    }
+                    else {
+                        actionWithMsg.getErrors()
+                                .forEach(processLogger.getReporting()::error);
+                        ezServerState.getDetailedActionErrors()
+                                .forEach(processLogger.getReporting()::error);
+                    }
                 });
     }
 

@@ -59,24 +59,32 @@ public class NumberUtils {
         return Integer.parseInt(quantite);
     }
 
+    private static String clean(String v) {
+        String f = v.replace(',','.')
+                    .replace(' ', ' ') // google drive add some NNBSP as a thousand separator
+                    .replace(' ', ' '); // google drive add some NBSP as a thousand separator
+        while(f.indexOf(".") != f.lastIndexOf(".")) {
+            char[] c = f.toCharArray();
+            c[f.indexOf(".")] = ' ';
+            f = new String(c);
+        }
+        f = f.replace(" ","");
+        return f;
+    }
+
     public static float str2Float(String v) {
         if (v == null) return 0;
-        return Float.parseFloat(v.replace(',','.')
-                .replace(' ', ' ') // google drive add some NNBSP as a thousand separator
-                .replace(" ",""));
+        return Float.parseFloat(clean(v));
     }
 
     public static double str2Double(String v){
         if (v == null) return 0;
-        return Double.parseDouble(v.replace(',','.')
-                .replace(' ', ' ') // google drive add some NNBSP as a thousand separator
-                .replace(" ",""));
+        return Double.parseDouble(clean(v));
     }
 
     public static int str2Int(String v) {
         if (v == null) return 0;
-        return Integer.parseInt(v.replace(' ', ' ') // google drive add some NNBSP as a thousand separator
-                .replace(" ",""));
+        return Integer.parseInt(clean(v));
     }
 
 

@@ -61,15 +61,15 @@ export function ShareValues(props: NewShareValuesProps){
 
     return (
         <Box margin="medium" >   
-         <Button
+         { !props.showNewSharesDetectedWarning && (<Button
             fill="vertical"
-            alignSelf="end"                                 
+            alignSelf="end"                    
             disabled={props.readOnly} onClick={() =>
                 jsonCall(ezApi.home.checkAllShares())
                 .then(props.followProcess)               
                 .catch(e => console.error(e))
             }
-            size="small" icon={<Target size='small'/>} label="Vérifier"/>
+            size="small" icon={<Target size='small'/>} label="Rechercher les erreurs"/> ) }
             {props.showNewSharesDetectedWarning && props.actionWithMsg?.actions && props.actionWithMsg.actions.length > 0 
                 && (<><Text>Nouvelle(s) valeur(s) detectée(s)!</Text>
                 <Text>Vous pouvez le(s) renommer maintenant (il sera plus difficile de le faire dans EZPortfolio)</Text>

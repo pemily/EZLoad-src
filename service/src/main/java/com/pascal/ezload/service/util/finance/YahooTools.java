@@ -113,10 +113,14 @@ public class YahooTools extends ExternalSiteTools{
             return cache.get(reporting, "yahoo_devise_"+ezShare.getYahooCode(), url, inputStream -> {
                 Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
                 Map<String, Object> optionChain = (Map<String, Object>) top.get("optionChain");
-                if (optionChain == null) return null;
+                if (optionChain == null) {
+                    return null;
+                }
 
                 List<Map<String, Object>> result = (List<Map<String, Object>>) optionChain.get("result");
-                if (result == null || result.size() == 0) return null;
+                if (result == null || result.size() == 0){
+                    return null;
+                }
 
                 Map<String, String> quote = (Map<String, String>) result.get(0).get("quote");
                 String currency = quote.get("currency");
