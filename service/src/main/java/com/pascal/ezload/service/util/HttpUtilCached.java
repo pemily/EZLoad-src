@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.function.Function;
 
 public class HttpUtilCached {
 
@@ -45,7 +46,7 @@ public class HttpUtilCached {
                 return toObjMapper.apply(FileUtil.read(cache));
             }
             rep.info("Fichier de cache non trouvé, téléchargement des données");
-            HttpUtil.download(url, requestProperties, inputStream -> {
+            HttpUtil.downloadV2(url, requestProperties, inputStream -> {
                 FileUtil.write(cache, inputStream);
                 return cache;
             });

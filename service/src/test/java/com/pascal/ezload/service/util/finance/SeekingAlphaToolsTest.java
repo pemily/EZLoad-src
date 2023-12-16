@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,5 +53,26 @@ public class SeekingAlphaToolsTest {
         Assertions.assertTrue(dividends.size() > 12);
     }
 
+
+    @Test
+    public void testSearchDividendeHistory2() throws IOException {
+        EZShare action = new EZShare();
+        List<String> l = new LinkedList<>();
+        List.of("AOS", "WSR", "WPC", "IBM", "HP", "ABBV", "ABBV", "ABBV","ABBV","WBA", "WBA", "VZ", "UHT", "HP", "ABBV", "IBM", "UHT")
+                .forEach(sh -> {
+                action.setSeekingAlphaCode(sh);
+                List<Dividend> dividends = null;
+                try {
+                    dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2), EZDate.today());
+                    if (dividends == null){
+                        l.add(sh+"   ERROR 1 \n");
+                    }
+                    else l.add(sh+"   OK\n");
+                } catch (IOException e) {
+                    l.add(sh+"   ERROR 2\n");
+                }
+        });
+        System.out.println(l);
+    }
 
 }

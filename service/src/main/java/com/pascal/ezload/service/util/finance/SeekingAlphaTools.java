@@ -17,17 +17,19 @@
  */
 package com.pascal.ezload.service.util.finance;
 
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSpan;
+import com.gargoylesoftware.htmlunit.html.*;
 import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Node;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -46,18 +48,21 @@ public class SeekingAlphaTools extends ExternalSiteTools {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             Map<String, String> props = new HashMap<>();
             props.put("Accept-Encoding", "identity");
-            props.put("User-Agent", getUserAgent());
-            //props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
-            //props.put("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36");
+            props.put("User-Agent", HttpUtil.getUserAgent());
+            props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
             String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
-                try {
+                // wait(2);
+                    try {
                     return cache.get(reporting, "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + to.toYYYYMMDD(), url, props, inputStream -> {
+                        String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                        inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
                         Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
 
                         if (top.containsKey("errors")) return new LinkedList<>();
                         List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
-                        if (history.size() == 0) return new LinkedList<>();
+                        if (history == null || history.size() == 0) return null;
+                        EZDevise devise = getDevise(reporting, cache, ezShare);
                         return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
                                 .filter(attributes -> attributes.get("amount") != null
                                         && attributes.get("year") != null)
@@ -83,7 +88,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                             seekingAlphaDate(attributes.get("record_date")),
                                             seekingAlphaDate(attributes.get("date")),
                                             frequency,
-                                            DeviseUtil.USD);
+                                            devise);
                                 })
                                 .collect(Collectors.toList());
                     });
@@ -97,6 +102,14 @@ public class SeekingAlphaTools extends ExternalSiteTools {
         return null;
     }
 
+    private static void wait(int nbSec){
+        try {
+            Thread.sleep(nbSec*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
     public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
@@ -106,7 +119,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 sharePrices.setLabel(ezShare.getEzName());
                 // remove 7 days to the from date because seeking alpha have only 1 data per week, this is to be sure to have a data for the from date (and avoid a 0)
-                processRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
+                downloadPricesAndProcessRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
                                 return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
@@ -129,7 +142,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 Prices sharePrices = new Prices();
                 sharePrices.setLabel(ezShare.getEzName());
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                processRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                downloadPricesAndProcessRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
                     new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates(reporting);
                 });
@@ -142,7 +155,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
-    private static void processRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
+    private static void downloadPricesAndProcessRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
             cache.get(reporting, "seekingAlpha_history_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "-" + to.toYYYYMMDD(), url, inputStream -> {
@@ -182,7 +195,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
             String cacheName = "seekingalpha_devise_" + ezShare.getSeekingAlphaCode();
             String devise = null;
             if (!cache.exists(cacheName)) {
-                HtmlPage result = HttpUtil.getFromUrl("https://seekingalpha.com/symbol/" + ezShare.getSeekingAlphaCode());
+                HtmlPage result = HttpUtil.getFromUrl("https://seekingalpha.com/symbol/" + ezShare.getSeekingAlphaCode(), false);
                 for (DomElement iter : result.getDomElementDescendants()) {
                     String att = iter.getAttribute("data-test-id");
                     if (att.equals("symbol-description")) {
@@ -211,39 +224,4 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
-    private static int userAgentIndex = 0;
-    private static String getUserAgent(){
-        String[] list = new String []{
-                // https://deviceatlas.com/blog/list-of-user-agent-strings
-                "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36,gzip(gfe)",
-                "Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; SM-S908U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 12; moto g pure) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (Linux; Android 12; Redmi Note 9 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
-                "Mozilla/5.0 (iPhone14,3; U; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/19A346 Safari/602.1",
-                "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/69.0.3497.105 Mobile/15E148 Safari/605.1",
-                "Mozilla/5.0 (Windows Phone 10.0; Android 6.0.1; Microsoft; RM-1152) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Mobile Safari/537.36 Edge/15.15254",
-                "Mozilla/5.0 (Linux; Android 12; SM-X906C Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
-                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36",
-                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9",
-                "Mozilla/5.0 (PlayStation; PlayStation 5/2.26) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15",
-        };
-
-        if (++userAgentIndex == list.length) userAgentIndex = 0;
-        return list[userAgentIndex];
-    }
 }
