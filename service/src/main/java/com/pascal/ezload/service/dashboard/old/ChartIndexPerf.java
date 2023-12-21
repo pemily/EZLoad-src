@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.old;
 
+@Deprecated
 public enum ChartIndexPerf {
     PERF_DAILY_PORTEFEUILLE("L'évolution en % du portefeuille jour apres jour"),
     PERF_MENSUEL_PORTEFEUILLE("L'évolution en % du portefeuille mois apres mois"),

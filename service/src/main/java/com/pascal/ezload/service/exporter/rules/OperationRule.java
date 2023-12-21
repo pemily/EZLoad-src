@@ -17,10 +17,13 @@
  */
 package com.pascal.ezload.service.exporter.rules;
 
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.OperationTitle;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class OperationRule extends Checkable<OperationRule> {
 
@@ -127,25 +130,7 @@ public class OperationRule extends Checkable<OperationRule> {
         new StringValue(this, Field.operationBrokerExpr.name(), operationBrokerExpr).checkRequired();
         new StringValue(this, Field.operationQuantityExpr.name(), operationQuantityExpr).checkRequired();
         new StringValue(this, Field.operationTypeExpr.name(), operationTypeExpr).checkRequired()
-                .validateWithLimitedValues(
-                        "\"Achat titres\"",
-                        "\"Acompte Impôt sur le Revenu\"",
-                        "\"Courtage sur achat de titres\"",
-                        "\"Courtage sur vente de titres\"",
-                        "\"Divers\"",
-                        "\"Dividende brut\"",
-                        "\"Dividende brut NON soumis à abattement\"",
-                        "\"Dividende brut soumis à abattement\"",
-                        "\"Dividende versé\"",
-                        "\"Droits de garde/Frais divers\"",
-                        "\"Prélèvements sociaux\"",
-                        "\"Prélèvements sociaux sur retrait PEA\"",
-                        "\"Retenue fiscale\"",
-                        "\"Retrait fonds\"",
-                        "\"Taxe sur les Transactions\"",
-                        "\"Vente titres\"",
-                        "\"Versement fonds\""
-                );
+                .validateWithLimitedValues(Arrays.stream(OperationTitle.values()).map(OperationTitle::getTitle).collect(Collectors.toList()).toArray(new String[]{}));
         new StringValue(this, Field.operationActionNameExpr.name(), operationActionNameExpr).checkRequired();
         new StringValue(this, Field.operationCountryExpr.name(), operationCountryExpr).checkRequired();
         new StringValue(this, Field.operationAmountExpr.name(), operationAmountExpr).checkRequired();

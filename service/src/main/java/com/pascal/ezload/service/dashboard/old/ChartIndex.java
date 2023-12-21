@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.old;
 
+
+@Deprecated
 public enum ChartIndex {
     CURRENT_SHARES,  // Les cours des valeurs d'actions actuelles
     TEN_WITH_MOST_IMPACTS, // Les cours de vos 10 plus grosses actions actuelles

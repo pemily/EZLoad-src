@@ -25,9 +25,9 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.Chart;
-import com.pascal.ezload.service.dashboard.DashboardSettings;
+import com.pascal.ezload.service.dashboard.config.DashboardSettings;
 import com.pascal.ezload.service.dashboard.DashboardData;
-import com.pascal.ezload.service.dashboard.DashboardManager;
+import com.pascal.ezload.service.dashboard.old.DashboardManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.sources.Reporting;
 import jakarta.inject.Inject;
@@ -36,7 +36,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
-import java.util.LinkedList;
 import java.util.List;
 
 

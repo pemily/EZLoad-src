@@ -55,20 +55,16 @@ public class HttpUtil {
     }
 
     public static <R> R downloadV2(String urlStr, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
-        try {
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                    .version(HttpClient.Version.HTTP_2) // Spécifie la version HTTP
-                    .GET()
-                    .uri(URI.create(urlStr));
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_2) // Spécifie la version HTTP
+                .GET()
+                .uri(URI.create(urlStr));
 
-            requestProperties.forEach(requestBuilder::header);
+        if (requestProperties != null) requestProperties.forEach(requestBuilder::header);
 
-            HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
-            try(InputStream in =response.body()) {
-                return f.apply(in);
-            }
-        } catch (IOException | InterruptedException e) {
-            throw e;
+        HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
+        try(InputStream in =response.body()) {
+            return f.apply(in);
         }
     }
 

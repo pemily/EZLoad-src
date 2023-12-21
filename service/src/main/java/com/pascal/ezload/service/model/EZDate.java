@@ -45,6 +45,15 @@ public class EZDate implements Comparable<EZDate> {
         year = d.getYear();
     }
 
+    public static EZDate yearPeriod(int year){
+        return new EZDate(year, -1, -1);
+    }
+
+    public static EZDate monthPeriod(int year, int month){
+        return new EZDate(year, month, -1);
+    }
+
+
     // month => between 1 - 12
     // day => between 1 - 31
     public EZDate(int year, int month, int day){
@@ -217,4 +226,15 @@ public class EZDate implements Comparable<EZDate> {
     }
 
 
+    public boolean contains(EZDate date) {
+        if (this.day != -1) throw new IllegalStateException("This date does not represent a Period");
+        return this.month == -1 ? date.getYear() == this.year : date.getYear() == this.year && date.getMonth() == this.month;
+    }
+
+    public EZDate createNextPeriod() {
+        if (this.day != -1) throw new IllegalStateException("This date does not represent a Period");
+        if (this.month == -1) return new EZDate(this.year+1, -1, -1);
+        if (this.month == 12) return new EZDate(this.year+1, 1, -1);
+        return new EZDate(this.year, this.month+1, -1);
+    }
 }

@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.service.dashboard.old.ChartIndex;
+import com.pascal.ezload.service.dashboard.old.ChartIndexPerf;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class ChartSettings extends Checkable<ChartSettings> {
@@ -31,11 +35,16 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private String title;
     private Set<String> brokers = new HashSet<>();
     private Set<String> accountTypes = new HashSet<>();
-    private DashboardManager.StartDateSelection selectedStartDateSelection;
+    private StartDateSelection selectedStartDateSelection;
 
+    @Deprecated
     private Set<ChartIndex> indexSelection = new HashSet<>();
+    @Deprecated
     private Set<ChartIndexPerf> perfIndexSelection = new HashSet<>();
+    @Deprecated
     private Set<String> additionalShareNames = new HashSet<>(); // ezName
+
+    private List<ChartIndexV2> indexV2Selection = new LinkedList<>();
 
     private int height = 50;
     private int nbOfPoints = 200;
@@ -88,12 +97,20 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.perfIndexSelection = perfIndexSelection;
     }
 
+    public List<ChartIndexV2> getIndexV2Selection() {
+        return indexV2Selection;
+    }
 
-    public DashboardManager.StartDateSelection getSelectedStartDateSelection() {
+    public void setIndexV2Selection(List<ChartIndexV2> indexV2Selection) {
+        this.indexV2Selection = indexV2Selection;
+    }
+
+
+    public StartDateSelection getSelectedStartDateSelection() {
         return selectedStartDateSelection;
     }
 
-    public void setSelectedStartDateSelection(DashboardManager.StartDateSelection selectedStartDateSelection) {
+    public void setSelectedStartDateSelection(StartDateSelection selectedStartDateSelection) {
         this.selectedStartDateSelection = selectedStartDateSelection;
     }
 

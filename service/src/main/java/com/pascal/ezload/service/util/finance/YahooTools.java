@@ -44,7 +44,7 @@ public class YahooTools extends ExternalSiteTools{
             EZDate to = listOfDates.get(listOfDates.size() - 1);
             try {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
+                downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates(reporting);
                 });
@@ -63,7 +63,7 @@ public class YahooTools extends ExternalSiteTools{
             sharePrices.setLabel(ezShare.getEzName());
             try {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                processSharePriceCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
+                downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     rows.map(YahooTools::createPriceAtDate)
                             .filter(p -> p.getDate().isAfterOrEquals(from) && p.getDate().isBeforeOrEquals(to))
                             .forEach(p -> sharePrices.addPrice(p.getDate(), p));
@@ -91,7 +91,7 @@ public class YahooTools extends ExternalSiteTools{
         return sharePrice;
     }
 
-    private static void processSharePriceCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
+    private static void downloadPricesThenProcessCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(yahooCode)) {
             //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/AMT?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
             // remove 3 days to the from date because of the WE, to be sure to have a data for the from date (and avoid a 0)
@@ -219,7 +219,7 @@ public class YahooTools extends ExternalSiteTools{
 
         Prices devisePrices = new Prices();
         devisePrices.setLabel(fromDevise.getSymbol()+" => "+toDevise.getSymbol());
-        processSharePriceCvsRows(reporting, cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+        downloadPricesThenProcessCvsRows(reporting, cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
             new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, devisePrices)
                     .fillPricesForAListOfDates(reporting);
         });

@@ -67,12 +67,11 @@ public class SeekingAlphaToolsTest {
                     if (dividends == null){
                         l.add(sh+"   ERROR 1 \n");
                     }
-                    else l.add(sh+"   OK\n");
                 } catch (IOException e) {
                     l.add(sh+"   ERROR 2\n");
                 }
         });
-        System.out.println(l);
+        assertEquals(List.of(), l);
     }
 
 }

@@ -22,8 +22,8 @@ import java.util.*;
 public class Prices {
 
     private String label;
-    private Map<EZDate, PriceAtDate> pricesMap = new HashMap<>(); // must be ordered
-    private List<PriceAtDate> pricesList = new ArrayList<>();
+    private final Map<EZDate, PriceAtDate> pricesMap = new HashMap<>(); // must be ordered
+    private final List<PriceAtDate> pricesList = new ArrayList<>();
     private EZDevise devise;
 
     public EZDevise getDevise() {
@@ -50,7 +50,7 @@ public class Prices {
     public PriceAtDate getPriceAt(EZDate date){
         PriceAtDate p = pricesMap.get(date);
         if (p == null) {
-            // test jusqu'a 20 jours de moins
+            // test jusqu'à 20 jours de moins
             EZDate test = date.yesterday();
             for (int i = 0; i < 20; i++) {
                 p = pricesMap.get(test);

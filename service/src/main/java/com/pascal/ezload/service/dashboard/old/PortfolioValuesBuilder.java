@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.old;
 
 
+import com.pascal.ezload.service.dashboard.engine.builder.PortfolioStateAccumulator;
+import com.pascal.ezload.service.dashboard.engine.builder.PortfolioStateAtDate;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.gdrive.Row;
@@ -75,7 +77,7 @@ public class PortfolioValuesBuilder {
                     if (prices != null)
                         return convertPricesToTargetDevise(reporting, prices);
                     reporting.error("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
-                    throw new RuntimeException("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
+                    throw new RuntimeException("Les cours de l'action "+share.getEzName()+" "+share.getGoogleCode()+" n'ont pas été trouvé");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

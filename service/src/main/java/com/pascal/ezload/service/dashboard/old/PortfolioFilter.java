@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.old;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Deprecated
 public enum PortfolioFilter {
         INSTANT_DIVIDENDES(true, 0),
         CUMUL_DIVIDENDES(true, 0),

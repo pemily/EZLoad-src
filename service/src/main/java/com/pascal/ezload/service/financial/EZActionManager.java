@@ -17,7 +17,6 @@
  */
 package com.pascal.ezload.service.financial;
 
-import com.pascal.ezload.service.dashboard.DashboardManager;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.model.*;

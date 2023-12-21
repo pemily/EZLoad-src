@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.DashboardSettings;
+
 import java.util.List;
 
 public class DashboardData {

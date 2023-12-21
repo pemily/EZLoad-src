@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.ChartLine;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

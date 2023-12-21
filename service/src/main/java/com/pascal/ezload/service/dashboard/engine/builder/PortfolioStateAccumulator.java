@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard;
+package com.pascal.ezload.service.dashboard.engine.builder;
 
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
+import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.OperationTitle;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
@@ -36,11 +37,11 @@ public class PortfolioStateAccumulator {
     private EZDate selectedDate;
     private final List<EZDate> dates;
     private final List<PortfolioStateAtDate> result;
-    private final List<EZShare> allShares;
+    private final SharePriceBuilder.Result sharePrice;
 
-    public PortfolioStateAccumulator(List<EZDate> dates, List<EZShare> allShares){
-        this.allShares = allShares;
+    public PortfolioStateAccumulator(List<EZDate> dates, SharePriceBuilder.Result sharePrice){
         this.dates = dates;
+        this.sharePrice = sharePrice;
         result = new ArrayList<>(dates.size());
     }
 
@@ -77,28 +78,22 @@ public class PortfolioStateAccumulator {
         else selectedDate = null;
     }
 
-    private EZShare getShare(String name){
-        return allShares.stream()
-                .filter(s -> s.getEzName().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("L'action "+name+" n'a pas été trouvé dans votre liste d'actions. Vous devez la rajouter"));
-    }
 
     private void process(Row operation) {
-        String operationType = operation.getValueStr(MesOperations.OPERATION_TYPE_COL);
+        OperationTitle operationType = OperationTitle.build(operation.getValueStr(MesOperations.OPERATION_TYPE_COL));
         boolean addLiquidityAmount = true;
         switch (operationType){
-            case "Achat titres":
+            case AchatTitres:
                 buyShare(operation);
                 break;
-            case "Dividende versé":
-            case "Dividende brut":
-            case "Dividende brut NON soumis à abattement":
-            case "Dividende brut soumis à abattement":
+            case DividendeVerse:
+            case DividendeBrut:
+            case DividendeBrutNonSoumisAAbattement:
+            case DividendeBrutSoumisAAbattement:
                 addDividend(operation);
                 dividendEventOnShare(operation);
                 break;
-            case "Retrait fonds": {
+            case RetraitFonds:{
                 addOutputQuantity(operation);
                 // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en valeur négative dans EZPortfolio :( dommage
                 addLiquidityAmount = false;
@@ -107,13 +102,13 @@ public class PortfolioStateAccumulator {
                 addLiquidityAmount(negativeAmount);
                 break;
             }
-            case "Vente titres":
+            case VenteTitres:
                 soldShare(operation);
                 break;
-            case "Versement fonds":
+            case VersementFond:
                 addInputQuantity(operation);
                 break;
-            case "Acompte Impôt sur le Revenu": {
+            case AcompteImpotSurRevenu:{
                 addLiquidityAmount = false;
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
@@ -121,7 +116,7 @@ public class PortfolioStateAccumulator {
                 addCreditImpot(operation);
                 break;
             }
-            case "Courtage sur vente de titres": {
+            case CourtageSurVenteDeTitres:{
                 addLiquidityAmount = false;
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
@@ -129,15 +124,17 @@ public class PortfolioStateAccumulator {
                 eventOnShare(negativeAmount);
                 break;
             }
-            case "Taxe sur les Transactions":
-            case "Droits de garde/Frais divers":
-            case "Courtage sur achat de titres":
-            case "Retenue fiscale":
-            case "Prélèvements sociaux":
-            case "Prélèvements sociaux sur retrait PEA":
-            case "Divers":
+            case TaxeSurLesTransactions:
+            case DroitsDeGardeFraisDivers:
+            case CourtageSurAchatDeTitres:
+            case RetenueFiscale:
+            case PrelevementsSociaux:
+            case PrelevementsSociauxSurRetraitPEA:
+            case Divers:
                 eventOnShare(operation);
                 break;
+            default:
+                throw new IllegalStateException("Missing case");
         }
         if (addLiquidityAmount) addLiquidityAmount(operation);
         computePRU();
@@ -172,7 +169,7 @@ public class PortfolioStateAccumulator {
     }
 
     private void soldShare(Row operation) {
-        EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        EZShare share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);         // AMOUNT_COL is positive when sold
 
         // nbOfSoldShare negative in EZPortfolio
@@ -193,7 +190,7 @@ public class PortfolioStateAccumulator {
     }
 
     private void buyShare(Row operation) {
-        EZShare share = getShare(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        EZShare share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL);
         float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);        // AMOUNT_COL is negative when buy
 
@@ -219,7 +216,7 @@ public class PortfolioStateAccumulator {
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
             float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
 
-            EZShare share = getShare(shareName);
+            EZShare share = sharePrice.getShareFromName(shareName);
             previousState.getSharePR()
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
 
@@ -233,7 +230,7 @@ public class PortfolioStateAccumulator {
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
             float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
 
-            EZShare share = getShare(shareName);
+            EZShare share = sharePrice.getShareFromName(shareName);
 
             previousState.getSharePRDividend()
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);

@@ -23,13 +23,11 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -119,7 +117,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 sharePrices.setLabel(ezShare.getEzName());
                 // remove 7 days to the from date because seeking alpha have only 1 data per week, this is to be sure to have a data for the from date (and avoid a 0)
-                downloadPricesAndProcessRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
+                downloadPricesThenProcessRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
                                 return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
@@ -142,7 +140,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 Prices sharePrices = new Prices();
                 sharePrices.setLabel(ezShare.getEzName());
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                downloadPricesAndProcessRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                downloadPricesThenProcessRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
                     new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates(reporting);
                 });
@@ -155,7 +153,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
-    private static void downloadPricesAndProcessRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
+    private static void downloadPricesThenProcessRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
             cache.get(reporting, "seekingAlpha_history_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "-" + to.toYYYYMMDD(), url, inputStream -> {
