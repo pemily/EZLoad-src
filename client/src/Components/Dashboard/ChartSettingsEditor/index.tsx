@@ -20,7 +20,7 @@ import { ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
-import { ComboMultiple } from '../../Tools/ComboMultiple';
+import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;
@@ -56,7 +56,7 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
 
-
+console.log('PASCAL1', props.chartSettings);
     function organizeIndexes(newValue: any[]): any[]{    
         if (newValue.indexOf('CURRENT_SHARES') !== -1
              && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('CURRENT_SHARES') === -1)){
@@ -90,7 +90,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
     }
     
     return (            
-        <Box direction="column" margin="small" pad="none" alignSelf="start" width="95%">
+        <Box direction="column" margin="none"  alignSelf="start" width="95%">
             <TextField id="title" label="Titre"
                     value={props.chartSettings.title}
                     isRequired={true}                     
@@ -116,30 +116,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 values={[ "EUR", "USD", "AUD", "CAD", "CHF"]}
                                 description=""
                                 onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue})}/>
-
-
-            <ComboMultiple id="accountType"
-                                label="Type de compte"
-                                selectedCodeValues={props.chartSettings.accountTypes ? props.chartSettings.accountTypes : accountTypes}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                userValues={accountTypes}                                
-                                codeValues={accountTypes}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue})}/>
-
-            <ComboMultiple id="brokers"
-                                label="Courtiers"
-                                selectedCodeValues={props.chartSettings.brokers ? props.chartSettings.brokers : brokers}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                codeValues={brokers}
-                                userValues={brokers}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, brokers: newValue})}/>
             
 
-            <ComboMultiple id="PortfolioValues"
+            <ComboMultipleWithCheckbox id="PortfolioValues"
                                 label="Indexes"
                                 errorMsg={undefined}
                                 readOnly={false}
@@ -200,7 +179,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
 
 
 
-            <ComboMultiple id="PortfolioValues"
+            <ComboMultipleWithCheckbox id="PortfolioValues"
                                 label="Indexes de Performance"
                                 errorMsg={undefined}
                                 readOnly={false}
@@ -233,7 +212,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
 
 
 
-            <ComboMultiple id="shareNames"
+            <ComboMultipleWithCheckbox id="shareNames"
                                 label="Valeur d'Actions"
                                 selectedCodeValues={props.chartSettings.additionalShareNames ? props.chartSettings.additionalShareNames : []}                            
                                 errorMsg={undefined}
@@ -245,6 +224,25 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
 
             
 
+            <ComboMultipleWithCheckbox id="accountType"
+                                label="Type de compte"
+                                selectedCodeValues={props.chartSettings.accountTypes ? props.chartSettings.accountTypes : accountTypes}                            
+                                errorMsg={undefined}
+                                readOnly={false}
+                                userValues={accountTypes}                                
+                                codeValues={accountTypes}
+                                description=""
+                                onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue})}/>
+
+            <ComboMultipleWithCheckbox id="brokers"
+                                label="Courtiers"
+                                selectedCodeValues={props.chartSettings.brokers ? props.chartSettings.brokers : brokers}                            
+                                errorMsg={undefined}
+                                readOnly={false}
+                                codeValues={brokers}
+                                userValues={brokers}
+                                description=""
+                                onChange={newValue  => props.save({...props.chartSettings, brokers: newValue})}/>
 
         </Box>
 

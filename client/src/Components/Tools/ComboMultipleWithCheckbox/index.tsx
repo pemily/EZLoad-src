@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { useState, useEffect } from "react";
-import { Box, Select, FormField } from "grommet";
+import { Box, SelectMultiple, FormField } from "grommet";
 
 
 export interface ComboMultipleWithCheckboxProps {
@@ -34,7 +34,7 @@ export interface ComboMultipleWithCheckboxProps {
 
 export function ComboMultipleWithCheckbox(props: ComboMultipleWithCheckboxProps) {
     const [currentCodeValues, setCurrentValues] = useState<string[]>(props.selectedCodeValues);
-
+    const [options, setOptions] = useState(props.userValues);
 
     useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property
       setCurrentValues(props.selectedCodeValues); // https://learnwithparam.com/blog/how-to-pass-props-to-state-properly-in-react-hooks/
@@ -50,11 +50,22 @@ export function ComboMultipleWithCheckbox(props: ComboMultipleWithCheckboxProps)
         <Box direction="column" pad="none" margin="xsmall" fill>
             <FormField key={"ComboForm"+props.id} name={props.id} htmlFor={props.id} label={props.label} help={props.description} 
                 margin="none" error={props.errorMsg}>
-            <Select id={props.id}
+            <SelectMultiple id={props.id}       
+                showSelectedInline         
+                onSearch={(text) => {
+                    // The line below escapes regular expression special characters:
+                    // [ \ ^ $ . | ? * + ( )
+                    const escapedText = text.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');          
+                    // Create the regular expression with modified value which
+                    // handles escaping special characters. Without escaping special
+                    // characters, errors will appear in the console
+                    const exp = new RegExp(escapedText, 'i');
+                    setOptions(props.userValues.filter((o) => exp.test(o)));
+                  }}
                 name={props.id}
                 disabled={props.readOnly}                
-                options={props.userValues}
-                closeOnChange={false}
+                options={options}
+                onClose={() => setOptions(props.userValues)}
                 messages={{multiple: currentCodeValues.map(code => props.userValues[props.codeValues.indexOf(code)]).sort().toString().replaceAll(',',' ; ')}}
                 value={currentCodeValues.map(code => props.userValues[props.codeValues.indexOf(code)])}
                 onChange={ ({ value: newUserValues }) => {
