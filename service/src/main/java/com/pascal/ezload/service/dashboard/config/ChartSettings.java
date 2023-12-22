@@ -81,18 +81,22 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.accountTypes = accountTypes;
     }
 
+    @Deprecated
     public Set<ChartIndex> getIndexSelection() {
         return indexSelection;
     }
 
+    @Deprecated
     public void setIndexSelection(Set<ChartIndex> indexSelection) {
         this.indexSelection = indexSelection;
     }
 
+    @Deprecated
     public Set<ChartIndexPerf> getPerfIndexSelection() {
         return perfIndexSelection;
     }
 
+    @Deprecated
     public void setPerfIndexSelection(Set<ChartIndexPerf> perfIndexSelection) {
         this.perfIndexSelection = perfIndexSelection;
     }
@@ -114,10 +118,12 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.selectedStartDateSelection = selectedStartDateSelection;
     }
 
+    @Deprecated
     public Set<String> getAdditionalShareNames() {
         return additionalShareNames;
     }
 
+    @Deprecated
     public void setAdditionalShareNames(Set<String> additionalShareNames) {
         this.additionalShareNames = additionalShareNames;
     }

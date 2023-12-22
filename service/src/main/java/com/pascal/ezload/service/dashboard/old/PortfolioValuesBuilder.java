@@ -224,7 +224,7 @@ public class PortfolioValuesBuilder {
 
     // ezPortfolio operation contains all operations in Euro
     private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter){
-        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, actionManager.getAllEZShares());
+        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, null);//actionManager.getAllEZShares());
 
         return acc.process(operations
                             .stream()
