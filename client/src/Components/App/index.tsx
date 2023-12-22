@@ -28,7 +28,7 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg, DashboardData } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
 import { DashboardMain } from "../Dashboard/Main";
 

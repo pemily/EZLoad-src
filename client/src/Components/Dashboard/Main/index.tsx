@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea, Grid, Layer } from "grommet";
-import { useState, useRef, useEffect } from "react";
-import { Add, Download, Refresh, Menu, Trash, Configure, Expand, Contract, ZoomIn, ZoomOut } from 'grommet-icons';
-import { AuthInfo, Chart, EzProcess, ChartSettings, DashboardData, DashboardSettings, EZShare, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
+import { Box, Button, Text, Layer } from "grommet";
+import { useState, useEffect } from "react";
+import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut } from 'grommet-icons';
+import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
+import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -64,7 +64,7 @@ export function DashboardMain(props: DashboardMainProps){
         // will be executed when props.enable will become true 
         setReadOnly(props.processRunning && props.enabled);
         if (!readOnly) reloadDashboard();
-    }, [ props.enabled, props.processRunning ]);
+    }, [ readOnly, props.enabled, props.processRunning ]);
 
     if (!props.enabled){
         return (            
@@ -85,7 +85,7 @@ export function DashboardMain(props: DashboardMainProps){
                     Cliquez sur "Rafraichir" pour charger vos données</Text></Box> 
             )
         }    
-        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) == 0 && (            
+        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) === 0 && (            
                 <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
                     Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box> 
             )
@@ -93,7 +93,7 @@ export function DashboardMain(props: DashboardMainProps){
         
         <Box alignSelf="end" margin="small" direction="row">
             <Button size="small" icon={<Refresh size='small' />}
-                disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length == 0}
+                disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length === 0}
                 label="Rafraichir" onClick={() => refresh()} />   
 
             <Button size="small" icon={<Add size='small' />}
@@ -173,7 +173,7 @@ export function DashboardMain(props: DashboardMainProps){
         </Box>
    
 
-        { configIndexEdited != -1 && dashConfig.chartSettings  && configIndexEdited < dashConfig.chartSettings.length && (
+        { configIndexEdited !== -1 && dashConfig.chartSettings  && configIndexEdited < dashConfig.chartSettings.length && (
             <Layer full position="center" margin="large" onClickOutside={() => setConfigIndexEdit(-1)}  onEsc={() => setConfigIndexEdit(-1)} >
                 <Box margin="medium" height="large" align="center" alignContent="stretch" overflow="auto">
                     <ChartSettingsEditor

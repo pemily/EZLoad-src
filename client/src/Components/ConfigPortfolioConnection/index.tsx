@@ -180,7 +180,7 @@ export function ConfigPortfolioConnection(props: ConfigPortfolioConnectionProps)
                                <Box border={{ color: 'brand', size: 'large' }} pad="medium" overflow="auto">
                                 <Markdown>{genSecurityFile()}</Markdown>
                                 <FileInput  name="gdriveSec" id="gdriveSec" messages={{dropPrompt: "Glisser le fichier téléchargé içi", browse: "Parcourir" }} 
-                                        onChange={(e) => setUploadGDriveSecFile(e.target.files?.[0])}/>
+                                        onChange={(e) => setUploadGDriveSecFile(e?.target.files?.[0])}/>
                                 <Markdown>- Cliquez sur le boutton 'Envoyer' ci-dessous</Markdown>    
                                 <Button size="small"  icon={<Upload size="small"/>} label="Envoyer" onClick={( ) => {
                                             if (uploadGDriveSecFile) 

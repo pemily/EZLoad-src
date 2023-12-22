@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Select } from "grommet";
-import { History } from 'grommet-icons';
+import { Box, Select } from "grommet";
 import { ruleTitle, SelectedRule } from '../../../ez-api/tools';
 import { EzData, RuleDefinitionSummary, RuleDefinition } from '../../../ez-api/gen-api/EZLoadApi';
 import { Rule } from '../../Rules/Rule';

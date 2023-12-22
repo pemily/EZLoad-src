@@ -15,17 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea } from "grommet";
-import { useState, useRef } from "react";
-import { Download } from 'grommet-icons';
-import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
+import { Box } from "grommet";
+import { Chart } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
-import { createNextState } from "@reduxjs/toolkit";
 
 export interface LineChartProps {
     chart: Chart;    
@@ -34,8 +30,7 @@ export interface LineChartProps {
 
 export function LineChart(props: LineChartProps){
     const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
-    const lineIsVisible : boolean[] = [];
-    const [browserFileVisible, setBrowserFileVisible] = useState<boolean>(false);
+    const lineIsVisible : boolean[] = [];    
 
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
@@ -110,7 +105,7 @@ export function LineChart(props: LineChartProps){
                             return "";
                         if (context.dataset.tooltips){
                             const valueWithLabel : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
-                            if (valueWithLabel.indexOf(":") == -1)
+                            if (valueWithLabel.indexOf(":") === -1)
                                 return context.dataset.label+': '+valueWithLabel;
                             return context.dataset.label+' '+valueWithLabel;
                         }
@@ -131,7 +126,7 @@ export function LineChart(props: LineChartProps){
                     // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
                     let hidden = lineIsVisible[legendItem.datasetIndex!]; //  !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;                            
                     ci.data.datasets?.forEach((dataset: ChartDataset<any,any>, datasetIndex: number) => {
-                        if (dataset.label == legendItem.text) {
+                        if (dataset.label === legendItem.text) {
                             ci.getDatasetMeta(datasetIndex).hidden = hidden;                
                             lineIsVisible[datasetIndex] =  !hidden;
                         }

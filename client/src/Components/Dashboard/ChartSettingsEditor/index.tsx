@@ -15,17 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea, Grid, Layer, Calendar, CheckBox, Heading } from "grommet";
-import { useState, useRef, useEffect } from "react";
-import { Add, Download, SchedulePlay } from 'grommet-icons';
-import { AuthInfo, Chart, EzProcess, EzProfil, DashboardData, ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
+import { Box } from "grommet";
+import { ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
 import { TextField } from '../../Tools/TextField';
-import { CheckBoxField } from '../../Tools/CheckBoxField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultiple } from '../../Tools/ComboMultiple';
-import { LineChart } from '../../Tools/LineChart';
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;

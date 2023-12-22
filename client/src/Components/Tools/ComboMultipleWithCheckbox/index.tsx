@@ -19,7 +19,7 @@ import { useState, useEffect } from "react";
 import { Box, Select, FormField } from "grommet";
 
 
-export interface ComboMultipleProps {
+export interface ComboMultipleWithCheckboxProps {
     onChange: (newValue: any[]) => void;
     selectedCodeValues: string[];    
     userValues: string[];
@@ -32,7 +32,7 @@ export interface ComboMultipleProps {
 }
 
 
-export function ComboMultiple(props: ComboMultipleProps) {
+export function ComboMultipleWithCheckbox(props: ComboMultipleWithCheckboxProps) {
     const [currentCodeValues, setCurrentValues] = useState<string[]>(props.selectedCodeValues);
 
 

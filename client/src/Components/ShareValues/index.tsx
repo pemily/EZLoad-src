@@ -18,7 +18,7 @@
 import { Box, List, Text, Anchor, Button } from "grommet";
 import { FormSearch, Trash, Target } from 'grommet-icons';
 import { TextField } from '../Tools/TextField';
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ezApi, jsonCall } from '../../ez-api/tools';
 import { EZShare, ActionWithMsg, EzProcess } from '../../ez-api/gen-api/EZLoadApi';
 import { confirmAlert } from 'react-confirm-alert'; // Import

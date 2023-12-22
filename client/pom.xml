@@ -76,9 +76,9 @@
                 </executions>
 
                 <configuration>
-                    <nodeVersion>v16.8.0</nodeVersion>
+                    <nodeVersion>v21.5.0</nodeVersion>
                     <workingDirectory>${project.basedir}</workingDirectory>
-                    <installDirectory>${project.build.directory}/node-16.8.0</installDirectory>
+                    <installDirectory>${project.build.directory}/node-21.5.0</installDirectory>
                 </configuration>
             </plugin>
 

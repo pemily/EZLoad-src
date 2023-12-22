@@ -58,11 +58,12 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/i18next-xhr-backend": "^1.4.2",
     "i18next-json-sync": "^2.3.1",
     "i18next-parser": "^0.13.0",
     "redux-devtools-extension": "^2.13.9",
-    "swagger-typescript-api": "^9.2.0"
+    "swagger-typescript-api": "^13.0.3"
   },
   "eslintConfig": {
     "extends": "react-app"
