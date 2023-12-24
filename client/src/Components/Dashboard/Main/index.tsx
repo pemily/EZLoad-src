@@ -25,6 +25,7 @@ import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
+import { red } from "grommet-controls/dist/components/basicColors";
 
 
 export interface DashboardMainProps {
@@ -110,7 +111,16 @@ export function DashboardMain(props: DashboardMainProps){
                                         title: 'Titre à changer',
                                         selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                         targetDevise: 'EUR',
-                                        indexV2Selection: []
+                                        indexV2Selection: [{
+                                            portfolioIndexConfig: {
+                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
+                                            },
+                                            label: "Valeur du portefeuille",
+                                            description: "La valeur globale de mon portefeuille en incluant les liquiditées",
+                                            perfSettings: undefined,
+                                            currencyIndexConfig: undefined, 
+                                            shareIndexConfig: undefined,
+                                        }],                                        
                                     };
                                     
                                     saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
@@ -146,7 +156,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                                                                                                 : c ) }
                                                                                                                         , r => setDashConfig(r)) }/>                                        <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                                             plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
-                                                    <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' />} gap="xxsmall" margin="xxsmall"
+                                                    <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color={red}/>} gap="xxsmall" margin="xxsmall"
                                                             plain={true} label="" onClick={() =>{
                                                                 confirmAlert({
                                                                     title: 'Etes vous sûr de vouloir supprimer ce graphique?',                                                        

@@ -205,9 +205,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                 )
             }    
 
-{
-    console.log("PASCAL: ",props.chartIndexV2.shareIndexConfig)
-}
+
             {
                  indexTypeChoice === 'SHARE' && (
                     <>

@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
+import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
 import { useState } from "react";
 import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { TextField } from '../../Tools/TextField';
@@ -24,6 +25,9 @@ import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
 import { ChartIndexMainEditor } from "../ChartIndexMainEditor";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { red } from "grommet-controls/dist/components/basicColors";
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;
@@ -151,18 +155,42 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                         return (
                             <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
                                 <Box pad={{ vertical: 'none', horizontal: 'small' }}>
-                                    <TextField id="ezChartIndexLabel" value={chartIndex.label}                                                                
-                                        isRequired={true}     
-                                        description="Titre"
-                                        readOnly={props.readOnly}
-                                        onChange={newValue => 
-                                            props.save({...props.chartSettings, 
-                                                indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
-                                                    {...chartIndex, label: newValue},
-                                                    ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
-                                                ]
-                                            }, () => {})
-                                    }/> 
+                                    <Box direction="row">
+                                        <TextField id="ezChartIndexLabel" value={chartIndex.label}                                                                
+                                            isRequired={true}     
+                                            description="Titre"
+                                            readOnly={props.readOnly}
+                                            onChange={newValue => 
+                                                props.save({...props.chartSettings, 
+                                                    indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
+                                                        {...chartIndex, label: newValue},
+                                                        ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
+                                                    ]
+                                                }, () => {})
+                                        }/> 
+                                        {
+                                            console.log("PASCAL5234", props.chartSettings.indexV2Selection?.length)
+                                        }
+                                        <Button fill={false} alignSelf="center" icon={<Trash color={red}/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
+                                                plain={true} label="" onClick={() =>{
+                                                    confirmAlert({
+                                                        title: 'Etes vous sûr de vouloir supprimer cet Indice?',                                                        
+                                                        buttons: [
+                                                        {
+                                                            label: 'Oui',
+                                                            onClick: () => {
+                                                                props.save({...props.chartSettings, 
+                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, () => {})
+                                                            }
+                                                        },
+                                                        {
+                                                            label: 'Non',
+                                                            onClick: () => {}
+                                                        }
+                                                        ]
+                                                    });
+                                                }}/>                                        
+                                    </Box>
                                     <TextAreaField id="ezChartIndexDescription" value={chartIndex.description}                                                                
                                         readOnly={props.readOnly}
                                         description="Description"
