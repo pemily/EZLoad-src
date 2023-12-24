@@ -85,6 +85,9 @@ public class SettingsManager {
 
     public void saveMainSettingsFile(MainSettings mainSettings) throws IOException {
         mainSettings.clearErrors();
+        if (!new File(configFile).exists()) {
+            new File(configFile).getParentFile().mkdirs();
+        }
         try(Writer writer = new FileWriter(configFile)) {
             yamlMapper.writeValue(writer, mainSettings);
         }

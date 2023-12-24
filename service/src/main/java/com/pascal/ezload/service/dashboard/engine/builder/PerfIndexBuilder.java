@@ -16,29 +16,32 @@ public class PerfIndexBuilder {
         Result result = new Result();
         indexSelection
             .forEach(index -> {
-                if (index.getShareIndexConfig() != null && index.getShareIndexConfig().getPerfSettings() != null){
-                    buildShareIndexes(shareIndexResult, index.getShareIndexConfig(), result);
+                if (index.getShareIndexConfig() != null && index.getPerfSettings() != null){
+                    buildShareIndexes(shareIndexResult, index, result);
                 }
-                if (index.getPortfolioIndexConfig() != null && index.getPortfolioIndexConfig().getPerfSettings() != null){
-                    buildPortfolioIndex(portfolioResult, index.getPortfolioIndexConfig(), result);
+                if (index.getPortfolioIndexConfig() != null && index.getPerfSettings() != null){
+                    buildPortfolioIndex(portfolioResult, index, result);
                 }
-                if (index.getCurrencyIndexConfig() != null && index.getCurrencyIndexConfig().getPerfSettings() != null){
-                    buildCurrencyIndex(reporting,  currenciesResult, index.getCurrencyIndexConfig(), result);
+                if (index.getCurrencyIndexConfig() != null && index.getPerfSettings() != null){
+                    buildCurrencyIndex(reporting,  currenciesResult, index, result);
                 }
             });
 
         return result;
     }
 
-    private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, CurrencyIndexConfig currencyIndexConfig, Result result) {
+    private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, ChartIndexV2 index, Result result) {
+        ChartPerfSettings perfSettings = index.getPerfSettings();
         currenciesResult.getAllDevises()
                 .forEach(devise -> {
-                    Prices pricesPerf = createPeriodicData(currenciesResult.getDevisePrices(reporting, devise), currencyIndexConfig.getPerfSettings(), init(), keepLast());
+                    Prices pricesPerf = createPeriodicData(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
                     result.put(devise, pricesPerf);
                 });
     }
 
-    private void buildPortfolioIndex(PortfolioIndexBuilderV2.Result portfolioResult, ChartPortfolioIndexConfig indexConfig, Result result) {
+    private void buildPortfolioIndex(PortfolioIndexBuilderV2.Result portfolioResult, ChartIndexV2 index, Result result) {
+        ChartPortfolioIndexConfig indexConfig = index.getPortfolioIndexConfig();
+        ChartPerfSettings perfSettings = index.getPerfSettings();
         Prices pricesPeriodResult;
         switch (indexConfig.getPortfolioIndex()){
             case CUMUL_CREDIT_IMPOTS:
@@ -46,7 +49,7 @@ public class PerfIndexBuilder {
             case CUMUL_ENTREES_SORTIES:
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
-                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), indexConfig.getPerfSettings(), init(), keepLast()); // we always take the most recent data
+                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
                 break;
             case BUY:
             case SOLD:
@@ -55,7 +58,7 @@ public class PerfIndexBuilder {
             case INSTANT_LIQUIDITE:
             case INSTANT_ENTREES_SORTIES:
             case INSTANT_PORTFOLIO_DIVIDENDES:
-                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), indexConfig.getPerfSettings(), init(), sum()); // we always take the most recent data
+                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we always take the most recent data
                 break;
             default:
                 throw new IllegalStateException("Missing case: "+indexConfig.getPortfolioIndex());
@@ -63,7 +66,9 @@ public class PerfIndexBuilder {
         result.put(indexConfig.getPortfolioIndex(), pricesPeriodResult);
     }
 
-    private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartShareIndexConfig indexConfig, Result result) {
+    private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartIndexV2 index, Result result) {
+        ChartShareIndexConfig indexConfig = index.getShareIndexConfig();
+        ChartPerfSettings perfSettings = index.getPerfSettings();
         Map<EZShare, Prices> share2Prices = shareIndexResult.getShareIndex2TargetPrices().get(indexConfig.getShareIndex());
 
         share2Prices.forEach((key, value) -> {
@@ -73,12 +78,12 @@ public class PerfIndexBuilder {
                 case SHARE_PRU_WITH_DIVIDEND:
                 case SHARE_PRICES:
                 case SHARE_COUNT:
-                    pricesPeriodResult = createPeriodicData(value, indexConfig.getPerfSettings(), init(), keepLast()); // we always take the most recent data
+                    pricesPeriodResult = createPeriodicData(value, perfSettings, init(), keepLast()); // we always take the most recent data
                     break;
                 case SHARE_DIVIDEND:
                 case SHARE_DIVIDEND_YIELD:
                 case SHARE_BUY_SOLD_WITH_DETAILS:
-                    pricesPeriodResult = createPeriodicData(value, indexConfig.getPerfSettings(), init(), sum()); // we sum all the data inside the same period
+                    pricesPeriodResult = createPeriodicData(value, perfSettings, init(), sum()); // we sum all the data inside the same period
                     break;
                 default:
                     throw new IllegalStateException("Missing case: "+indexConfig.getShareIndex());

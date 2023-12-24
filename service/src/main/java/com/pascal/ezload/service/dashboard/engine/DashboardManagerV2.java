@@ -163,9 +163,9 @@ public class DashboardManagerV2 {
             Colors colors = new Colors(chartSettings.getIndexV2Selection().size());
             chartSettings.getIndexV2Selection()
                     .forEach(chartIndex -> {
-                        createCurrencyCharts(reporting, currenciesResult, perfIndexResult, allChartLines, chart, colors, chartIndex.getCurrencyIndexConfig());
-                        createShareCharts(shareIndexResult, perfIndexResult, allChartLines, chart, colors, chartIndex.getShareIndexConfig());
-                        createPortfolioCharts(portfolioResult, perfIndexResult, allChartLines, chart, colors, chartIndex.getPortfolioIndexConfig());
+                        createCurrencyCharts(reporting, currenciesResult, perfIndexResult, allChartLines, chart, colors, chartIndex);
+                        createShareCharts(shareIndexResult, perfIndexResult, allChartLines, chart, colors, chartIndex);
+                        createPortfolioCharts(portfolioResult, perfIndexResult, allChartLines, chart, colors, chartIndex);
                     }
             );
 
@@ -177,20 +177,22 @@ public class DashboardManagerV2 {
         }
     }
 
-    private void createPortfolioCharts(PortfolioIndexBuilderV2.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, ChartPortfolioIndexConfig portfolioIndexConfig) {
+    private void createPortfolioCharts(PortfolioIndexBuilderV2.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, ChartIndexV2 chartIndexV2) {
+        ChartPortfolioIndexConfig portfolioIndexConfig = chartIndexV2.getPortfolioIndexConfig();
+        ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (portfolioIndexConfig != null){
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
-            ChartPerfSettings perfSettings = portfolioIndexConfig.getPerfSettings();
             Prices prices = perfSettings == null ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs().get(index);
             allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), perfSettings, chart));
         }
     }
 
-    private void createShareCharts(ShareIndexBuilder.Result shareIndexResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, ChartShareIndexConfig shareIndexConfig) {
+    private void createShareCharts(ShareIndexBuilder.Result shareIndexResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, ChartIndexV2 chartIndexV2) {
+        ChartShareIndexConfig shareIndexConfig = chartIndexV2.getShareIndexConfig();
+        ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (shareIndexConfig != null){
             ShareIndex index = shareIndexConfig.getShareIndex();
-            ChartPerfSettings perfSettings = shareIndexConfig.getPerfSettings();
             Map<EZShare, Prices> share2Price = perfSettings == null ? shareIndexResult.getShareIndex2TargetPrices().get(index)
                                                                     : perfIndexResult.getSharePerfs().get(index);
             share2Price.forEach((share, prices) ->
@@ -198,9 +200,10 @@ public class DashboardManagerV2 {
         }
     }
 
-    private void createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, CurrencyIndexConfig currencyIndexConfig) {
+    private void createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Chart chart, Colors colors, ChartIndexV2 chartIndexV2) {
+        CurrencyIndexConfig currencyIndexConfig = chartIndexV2.getCurrencyIndexConfig();
+        ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (currencyIndexConfig != null){
-            ChartPerfSettings perfSettings = currencyIndexConfig.getPerfSettings();
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
                 allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), perfSettings, chart));

@@ -76,10 +76,10 @@ const customTheme = deepMerge(grommet, {
           background: 'dark-1',
           extend: `padding: 10px; box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.50);`
         },
-
     },
     global: { font: {  family: '-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI",system-ui,ui-sans-serif,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"', size: 'small' } },
 });
+
 
 const GrommetApp = () => (
   <Grommet full theme={customTheme}>

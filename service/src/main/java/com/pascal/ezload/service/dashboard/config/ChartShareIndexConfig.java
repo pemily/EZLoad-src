@@ -11,9 +11,6 @@ public class ChartShareIndexConfig {
     private ShareSelection shareSelection;
     private Set<String> additionalShareList;
 
-    // Quel settings ? peux etre null
-    private ChartPerfSettings perfSettings;
-
     public ShareIndex getShareIndex() {
         return shareIndex;
     }
@@ -38,11 +35,4 @@ public class ChartShareIndexConfig {
         this.additionalShareList = additionalShareList;
     }
 
-    public ChartPerfSettings getPerfSettings() {
-        return perfSettings;
-    }
-
-    public void setPerfSettings(ChartPerfSettings perfSettings) {
-        this.perfSettings = perfSettings;
-    }
 }

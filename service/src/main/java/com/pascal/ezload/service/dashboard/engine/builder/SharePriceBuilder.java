@@ -1,15 +1,14 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.dashboard.ChartLine;
-import com.pascal.ezload.service.dashboard.ChartsTools;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.NumberUtils;
-import com.pascal.ezload.service.util.finance.CurrencyMap;
 import com.pascal.ezload.service.util.finance.Dividend;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class SharePriceBuilder {
 

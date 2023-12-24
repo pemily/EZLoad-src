@@ -1,17 +1,13 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.dashboard.ChartLine;
-import com.pascal.ezload.service.dashboard.ChartsTools;
-import com.pascal.ezload.service.dashboard.Colors;
 import com.pascal.ezload.service.dashboard.config.ChartIndexV2;
 import com.pascal.ezload.service.dashboard.config.ChartShareIndexConfig;
 import com.pascal.ezload.service.dashboard.config.ShareIndex;
-import com.pascal.ezload.service.dashboard.old.ChartIndex;
-import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.EZShare;
+import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.NumberUtils;
-import com.pascal.ezload.service.util.finance.CurrencyMap;
-import com.pascal.ezload.service.util.finance.Dividend;
 
 import java.util.*;
 import java.util.stream.Collectors;

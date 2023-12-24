@@ -17,8 +17,6 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
-import com.pascal.ezload.service.dashboard.old.ChartIndex;
-import com.pascal.ezload.service.dashboard.old.ChartIndexPerf;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
@@ -37,12 +35,6 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private Set<String> accountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
 
-    @Deprecated
-    private Set<ChartIndex> indexSelection = new HashSet<>();
-    @Deprecated
-    private Set<ChartIndexPerf> perfIndexSelection = new HashSet<>();
-    @Deprecated
-    private Set<String> additionalShareNames = new HashSet<>(); // ezName
 
     private List<ChartIndexV2> indexV2Selection = new LinkedList<>();
 
@@ -81,26 +73,6 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.accountTypes = accountTypes;
     }
 
-    @Deprecated
-    public Set<ChartIndex> getIndexSelection() {
-        return indexSelection;
-    }
-
-    @Deprecated
-    public void setIndexSelection(Set<ChartIndex> indexSelection) {
-        this.indexSelection = indexSelection;
-    }
-
-    @Deprecated
-    public Set<ChartIndexPerf> getPerfIndexSelection() {
-        return perfIndexSelection;
-    }
-
-    @Deprecated
-    public void setPerfIndexSelection(Set<ChartIndexPerf> perfIndexSelection) {
-        this.perfIndexSelection = perfIndexSelection;
-    }
-
     public List<ChartIndexV2> getIndexV2Selection() {
         return indexV2Selection;
     }
@@ -116,16 +88,6 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public void setSelectedStartDateSelection(StartDateSelection selectedStartDateSelection) {
         this.selectedStartDateSelection = selectedStartDateSelection;
-    }
-
-    @Deprecated
-    public Set<String> getAdditionalShareNames() {
-        return additionalShareNames;
-    }
-
-    @Deprecated
-    public void setAdditionalShareNames(Set<String> additionalShareNames) {
-        this.additionalShareNames = additionalShareNames;
     }
 
     public int getHeight() {

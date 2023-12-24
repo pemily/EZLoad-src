@@ -106,10 +106,9 @@ export function DashboardMain(props: DashboardMainProps){
                                         accountTypes: accountTypes,
                                         brokers: brokers,
                                         title: 'Titre à changer',
-                                        additionalShareNames: [],
                                         selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                         targetDevise: 'EUR',
-                                        indexSelection: ['TEN_WITH_MOST_IMPACTS']
+                                        indexV2Selection: []
                                     };
                                     
                                     saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
@@ -193,10 +192,12 @@ export function DashboardMain(props: DashboardMainProps){
                                 {
                                     configIndexEdited !== -1 && (
                                         <ChartSettingsEditor
+                                            readOnly={readOnly}
                                             allShares={props.actionWithMsg?.actions ? props.actionWithMsg.actions : []}
                                             chartSettings={dashConfig.chartSettings![configIndexEdited]}
-                                            save={newChartSettsValue => 
-                                                saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)}, setDashConfig)}
+                                            save={(newChartSettsValue, afterSave) => 
+                                                saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)},
+                                                                 (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}
                                         />
                                     )
                                 }

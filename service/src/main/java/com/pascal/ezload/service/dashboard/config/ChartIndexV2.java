@@ -2,10 +2,22 @@ package com.pascal.ezload.service.dashboard.config;
 
 public class ChartIndexV2 {
 
+    private String label;
+    private String description;
+
     // It's a oneOf (only one of those value below are set, others are null)
     private ChartPortfolioIndexConfig portfolioIndexConfig;
     private ChartShareIndexConfig shareIndexConfig;
     private CurrencyIndexConfig currencyIndexConfig; // all currencies found will be shown
+    private ChartPerfSettings perfSettings; // peux etre null
+
+    public ChartPerfSettings getPerfSettings() {
+        return perfSettings;
+    }
+
+    public void setPerfSettings(ChartPerfSettings perfSettings) {
+        this.perfSettings = perfSettings;
+    }
 
     public ChartPortfolioIndexConfig getPortfolioIndexConfig() {
         return portfolioIndexConfig;
@@ -29,5 +41,21 @@ public class ChartIndexV2 {
 
     public void setCurrencyIndexConfig(CurrencyIndexConfig currencyIndexConfig) {
         this.currencyIndexConfig = currencyIndexConfig;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
