@@ -25,6 +25,7 @@ public class DashboardData {
 
     private List<Chart> charts;
     private DashboardSettings dashboardSettings;
+    private List<EzShareData> shareGoogleCodeAndNames;
 
     public List<Chart> getCharts() {
         return charts;
@@ -40,5 +41,40 @@ public class DashboardData {
 
     public void setDashboardSettings(DashboardSettings dashboardSettings) {
         this.dashboardSettings = dashboardSettings;
+    }
+
+    public List<EzShareData> getShareGoogleCodeAndNames() {
+        return shareGoogleCodeAndNames;
+    }
+
+    public void setShareGoogleCodeAndNames(List<EzShareData> shareGoogleCodeAndNames) {
+        this.shareGoogleCodeAndNames = shareGoogleCodeAndNames;
+    }
+
+    public static class EzShareData {
+        private String googleCode, shareName;
+
+        public EzShareData(String googleCode, String shareName){
+            this.googleCode = googleCode;
+            this.shareName = shareName;
+        }
+
+        public EzShareData(){}
+
+        public String getShareName() {
+            return shareName;
+        }
+
+        public void setShareName(String shareName) {
+            this.shareName = shareName;
+        }
+
+        public String getGoogleCode() {
+            return googleCode;
+        }
+
+        public void setGoogleCode(String googleCode) {
+            this.googleCode = googleCode;
+        }
     }
 }

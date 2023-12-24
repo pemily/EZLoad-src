@@ -47,9 +47,9 @@ public class DashboardManagerV2 {
     private final EZActionManager ezActionManager;
     private final String dashboardFile;
 
-    public DashboardManagerV2(SettingsManager settingsManager, MainSettings.EZLoad ezLoad) throws Exception {
+    public DashboardManagerV2(SettingsManager settingsManager, EZActionManager ezActionManager) throws Exception {
         this.dashboardFile = settingsManager.getDashboardFile();
-        this.ezActionManager = ezLoad.getEZActionManager(settingsManager);
+        this.ezActionManager = ezActionManager;
     }
 
     public DashboardSettings loadDashboardSettings() {

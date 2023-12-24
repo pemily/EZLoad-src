@@ -17,7 +17,7 @@
  */
 import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
 import { useState } from "react";
-import { ChartIndexV2, ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
@@ -27,7 +27,7 @@ import { ChartIndexMainEditor } from "../ChartIndexMainEditor";
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;
-    allShares: EZShare[];
+    allEzShares: EzShareData[];    
     readOnly: boolean;
     save: (chartSettings: ChartSettings, afterSave: () => void) => void;
 }      
@@ -147,7 +147,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                     </Box>
                 </Tab>    
                 {
-                    props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => (
+                    props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => {                        
+                        return (
                             <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
                                 <Box pad={{ vertical: 'none', horizontal: 'small' }}>
                                     <TextField id="ezChartIndexLabel" value={chartIndex.label}                                                                
@@ -175,6 +176,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     }/>
 
                                     <ChartIndexMainEditor                                        
+                                        allEzShares={props.allEzShares}
                                         chartIndexV2={chartIndex}
                                         readOnly={props.readOnly}                                        
                                         save={newChartIndex  => 
@@ -187,7 +189,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                           
                                 </Box>
                             </Tab>
-                        )                        
+                        )}               
                     )
                 }
                 <Tab title="+">

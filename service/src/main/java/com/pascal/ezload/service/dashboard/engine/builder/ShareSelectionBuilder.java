@@ -24,7 +24,7 @@ public class ShareSelectionBuilder {
                         .stream()
                         .map(ChartIndexV2::getShareIndexConfig)
                         .filter(Objects::nonNull)
-                        .flatMap(index -> index.getAdditionalShareList().stream())
+                        .flatMap(index -> index.getAdditionalShareGoogleCodeList().stream())
                         // ici rajouter les shares des operations... (ou alors elles se feront en lazy)
                         .map(ezActionManager::getFromName)
                         .filter(Optional::isPresent)

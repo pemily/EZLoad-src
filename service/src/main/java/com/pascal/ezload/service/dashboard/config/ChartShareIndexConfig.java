@@ -9,7 +9,7 @@ public class ChartShareIndexConfig {
 
     // Sur quelles actions ?
     private ShareSelection shareSelection;
-    private Set<String> additionalShareList;
+    private Set<String> additionalShareGoogleCodeList;
 
     public ShareIndex getShareIndex() {
         return shareIndex;
@@ -27,12 +27,12 @@ public class ChartShareIndexConfig {
         this.shareSelection = shareSelection;
     }
 
-    public Set<String> getAdditionalShareList() {
-        return additionalShareList;
+    public Set<String> getAdditionalShareGoogleCodeList() {
+        return additionalShareGoogleCodeList;
     }
 
-    public void setAdditionalShareList(Set<String> additionalShareList) {
-        this.additionalShareList = additionalShareList;
+    public void setAdditionalShareGoogleCodeList(Set<String> additionalShareGoogleCodeList) {
+        this.additionalShareGoogleCodeList = additionalShareGoogleCodeList;
     }
 
 }

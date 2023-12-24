@@ -30,6 +30,9 @@ export function valued(v: string|undefined|null) : string {
   return v ? v : "";
 }
 
+export function isDefined(v: any) : boolean {
+  return v !== undefined && v !== null;
+}
 
 export function jsonCall(promise: Promise<HttpResponse<any, any>>):  Promise<any> {
     return promise.then(httpResponse => {

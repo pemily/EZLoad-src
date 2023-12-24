@@ -18,7 +18,7 @@
 import { Box, Button, Text, Carousel } from "grommet";
 import { useState, useEffect } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -39,12 +39,14 @@ export function DashboardMain(props: DashboardMainProps){
     const [dashCharts, setDashCharts] = useState<Chart[]|undefined>([]);
     const [configIndexEdited, setConfigIndexEdit] = useState<number>(-1);    
     const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);
+    const [allEzShares, setEZShares] = useState<EzShareData[]>([]);
 
     function reloadDashboard(): void | PromiseLike<void> {        
         return jsonCall(ezApi.dashboard.getDashboardData())
             .then(r => {
                 setDashConfig(r.dashboardSettings);
                 setDashCharts(r.charts);
+                setEZShares(r.shareGoogleCodeAndNames);
             })
             .catch((error) => {
                 console.error("Error while loading DashboardData", error);
@@ -193,7 +195,7 @@ export function DashboardMain(props: DashboardMainProps){
                                     configIndexEdited !== -1 && (
                                         <ChartSettingsEditor
                                             readOnly={readOnly}
-                                            allShares={props.actionWithMsg?.actions ? props.actionWithMsg.actions : []}
+                                            allEzShares={allEzShares}
                                             chartSettings={dashConfig.chartSettings![configIndexEdited]}
                                             save={(newChartSettsValue, afterSave) => 
                                                 saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)},
