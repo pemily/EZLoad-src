@@ -56,7 +56,7 @@ export function DashboardMain(props: DashboardMainProps){
      
     return (        
                 <Carousel width="100%" controls={false} activeChild={configIndexEdited === -1 ? 0 : 1}>
-                    <Box width="100%">
+                    <Box width="100%" height="5000px">
 
                         { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
                                 <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
@@ -111,7 +111,7 @@ export function DashboardMain(props: DashboardMainProps){
                         </Box>
                         <Box>
                         {
-                            configIndexEdited === -1 && dashCharts?.map((chart, index) => {
+                            dashCharts?.map((chart, index) => {
                                 return (
                                     <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
                                                     pad="small" border="all" margin="xxsmall" background="white" flex="grow" key={"chart"+index}>
@@ -164,7 +164,7 @@ export function DashboardMain(props: DashboardMainProps){
                         </Box>
                     </Box>
 
-                    <Box width="100%">
+                    <Box width="100%" >
                             {
                                 (configIndexEdited === -1 || dashConfig.chartSettings === undefined || configIndexEdited >= dashConfig.chartSettings.length) && (
                                     <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
