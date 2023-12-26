@@ -17,7 +17,7 @@
  */
 import { Box, Button, Text, Tab, Tabs, ThemeContext } from "grommet";
 import { useState } from "react";
-import { ChartIndexV2, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, ChartPerfSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndexV2, ChartSettings, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, ChartPerfSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
@@ -28,36 +28,40 @@ import { ComboMultiple } from "../../Tools/ComboMultiple";
 import { ca } from "date-fns/locale";
 
 export interface ChartIndexMainEditorProps {    
+    chartSettings: ChartSettings;
     chartIndexV2: ChartIndexV2;
-    save: (chartIndex:ChartIndexV2) => void;
-    targetDevise: string;
+    save: (chartIndex:ChartIndexV2) => void;    
     readOnly: boolean;    
     allEzShares: EzShareData[];
 }      
 
 
-export function getChartIndexDescription(chartIndexV2: ChartIndexV2, targetDevise: string){
+export function getChartIndexDescription(chartSettings: ChartSettings, chartIndexV2: ChartIndexV2){
     var result : string = "Affiche ";
-
-    var signOfDevise: string = targetDevise;
-    switch(targetDevise){
+console.log("PASCAL 000", chartSettings, chartIndexV2);
+    var signOfDevise: string = "";
+    switch(chartSettings.targetDevise!){
         case "EUR": signOfDevise = "€"; break;
         case "USD": signOfDevise = "$"; break;
         case "AUD": signOfDevise = "A$"; break;
         case "CAD": signOfDevise = "C$"; break;        
         case "CHF": signOfDevise = "CHF"; break;
+        default:  signOfDevise = chartSettings.targetDevise!;
     }
 
     if (isDefined(chartIndexV2.perfSettings)){
         result += "la performance ";
-        if (chartIndexV2.perfSettings?.perfGroupedBy == "MONTHLY"){
+        if (chartIndexV2.perfSettings?.perfGroupedBy === "FROM_START"){
+            result += chartSettings.selectedStartDateSelection!;            
+        }
+        else if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
             result += " mensuelle ";
         }
         else {
             result += " annuelle ";
         }
         result+="en ";
-        if (chartIndexV2.perfSettings?.perfFilter == "VALUE"){
+        if (chartIndexV2.perfSettings?.perfFilter === "VALUE"){
             result+=signOfDevise+" ";
         }
         else {
@@ -141,16 +145,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                             portfolioIndexConfig: {
                                                     ...props.chartIndexV2.portfolioIndexConfig,
                                                     portfolioIndex: 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' // valeur par defaut
-                                                    },
-                                                    description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                                getChartIndexDescription({...props.chartIndexV2, 
-                                                                    currencyIndexConfig: undefined,
-                                                                    shareIndexConfig: undefined,
-                                                                    portfolioIndexConfig: {
-                                                                                ...props.chartIndexV2.portfolioIndexConfig,
-                                                                                portfolioIndex: 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY'
-                                                                            }}, props.targetDevise): props.chartIndexV2.description,
-                                                        })
+                                                    }})
                                 }
                                 else if (newValue === 'SHARE'){
                                     props.save({...props.chartIndexV2,
@@ -159,17 +154,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         shareIndexConfig: {
                                                 ...props.chartIndexV2.shareIndexConfig,
                                                 shareIndex: 'SHARE_PRICES'
-                                                },
-                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                            getChartIndexDescription({...props.chartIndexV2, 
-                                                                portfolioIndexConfig: undefined,
-                                                                currencyIndexConfig: undefined,
-                                                                shareIndexConfig: {
-                                                                    ...props.chartIndexV2.shareIndexConfig,
-                                                                    shareIndex: 'SHARE_PRICES',
-                                                                    shareSelection: 'CURRENT_SHARES',
-                                                                }}, props.targetDevise): props.chartIndexV2.description,
-                                                    })                                    
+                                                }})                                    
                                 }
                                 else if (newValue === 'DEVISE'){
                                     props.save({...props.chartIndexV2,
@@ -177,16 +162,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         shareIndexConfig: undefined,
                                         currencyIndexConfig: {
                                             active: true
-                                        },
-                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                            getChartIndexDescription({...props.chartIndexV2, 
-                                                                portfolioIndexConfig: undefined,
-                                                                shareIndexConfig: undefined,
-                                                                currencyIndexConfig: {
-                                                                    active: true
-                                                                }
-                                                            }, props.targetDevise): props.chartIndexV2.description,
-                                                    })                                    
+                                        }})                                    
                                 }
                             }}/>    
         
@@ -231,13 +207,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                 portfolioIndexConfig: {
                                                             ...props.chartIndexV2.portfolioIndexConfig,
                                                             portfolioIndex: newValue
-                                                            },
-                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                                        getChartIndexDescription({...props.chartIndexV2, portfolioIndexConfig: {
-                                                                            ...props.chartIndexV2.portfolioIndexConfig,
-                                                                            portfolioIndex: newValue
-                                                                        }}, props.targetDevise): props.chartIndexV2.description,
-                                            })
+                                                            }})
                         }/>
                 )              
                 }            
@@ -271,13 +241,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                  shareIndexConfig: {
                                                         ...props.chartIndexV2.shareIndexConfig,
                                                             shareIndex: newValue
-                                                },
-                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                                        getChartIndexDescription({...props.chartIndexV2, shareIndexConfig: {
-                                                                            ...props.chartIndexV2.shareIndexConfig,
-                                                                            shareIndex: newValue
-                                                                        }}, props.targetDevise): props.chartIndexV2.description,
-                                })
+                                                }})
                         }/>
                 )
                 }
@@ -299,19 +263,13 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     currencyIndexConfig: {
                                     ...props.chartIndexV2.currencyIndexConfig,
                                     active: true,
-                                    },
-                                    description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
-                                                                            getChartIndexDescription({...props.chartIndexV2, currencyIndexConfig: {
-                                                                                ...props.chartIndexV2.currencyIndexConfig, 
-                                                                                active: true,                                                                                                                       
-                                                                            }}, props.targetDevise): props.chartIndexV2.description,
-                            })
+                                    }})
                         }/>
                 )            
                 }
             </Box>
             {
-                (<Text margin={{ vertical: 'none', horizontal: 'xsmall' }} size="xsmall" alignSelf="end">{getChartIndexDescription(props.chartIndexV2, props.targetDevise)}</Text>)
+                (<Text margin={{ vertical: 'none', horizontal: 'xsmall' }} size="xsmall" alignSelf="end">{getChartIndexDescription(props.chartSettings, props.chartIndexV2)}</Text>)
             }
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
@@ -350,7 +308,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                         selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
                         userValues={[   
                             'En %',                          
-                            'En '+props.targetDevise,                        
+                            'En '+props.chartSettings.targetDevise,                        
                         ]}
                         codeValues={[
                             'PERCENT',

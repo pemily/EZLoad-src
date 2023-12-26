@@ -209,7 +209,9 @@ export function DashboardMain(props: DashboardMainProps){
                                             allEzShares={allEzShares}
                                             chartSettings={dashConfig.chartSettings![configIndexEdited]}
                                             save={(newChartSettsValue, afterSave) => {
-                                                saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)},
+                                                saveDashboardConfig({...dashConfig, 
+                                                                        chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)
+                                                                    },
                                                                  (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}}
                                         />
                                     )

@@ -19,7 +19,7 @@ import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
 import { useState } from "react";
 import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
-import { updateEZLoadTextWithSignature} from '../../../ez-api/tools';
+import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
@@ -72,11 +72,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
         console.log("PASCAL 1111");
         return {
                  label: 'Nouvel Indice',
-                 description: getChartIndexDescription({                
-                    portfolioIndexConfig: {
-                        portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
-                    }
-                 }, targetDevise),
                  portfolioIndexConfig: {
                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
                  }
@@ -190,7 +185,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                             label: 'Oui',
                                                             onClick: () => {
                                                                 props.save({...props.chartSettings, 
-                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, () => {})
+                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, () => {
+                                                                        setPageIndex(pageIndex === props.chartSettings.indexV2Selection!.length ? pageIndex -1 : pageIndex)
+                                                                    })
                                                             }
                                                         },
                                                         {
@@ -214,14 +211,18 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     }/>
 
                                     <ChartIndexMainEditor                        
-                                        targetDevise={props.chartSettings.targetDevise!}                
+                                        chartSettings={props.chartSettings}                
                                         allEzShares={props.allEzShares}
                                         chartIndexV2={chartIndex}
                                         readOnly={props.readOnly}                                        
                                         save={newChartIndex  => 
                                             props.save({...props.chartSettings, 
                                                 indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
-                                                    newChartIndex,
+                                                    {
+                                                        ...newChartIndex,
+                                                        description: isTextContainsEZLoadSignature(newChartIndex.description) ? 
+                                                                        getChartIndexDescription(props.chartSettings, newChartIndex) : newChartIndex.description
+                                                    },     
                                                     ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                 ]
                                             }, () => {})}/>           

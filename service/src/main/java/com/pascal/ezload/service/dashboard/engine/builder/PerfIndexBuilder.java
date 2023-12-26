@@ -34,7 +34,7 @@ public class PerfIndexBuilder {
         ChartPerfSettings perfSettings = index.getPerfSettings();
         currenciesResult.getAllDevises()
                 .forEach(devise -> {
-                    Prices pricesPerf = createPeriodicData(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
+                    Prices pricesPerf = buildPerfPrices(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
                     result.put(devise, pricesPerf);
                 });
     }
@@ -49,7 +49,7 @@ public class PerfIndexBuilder {
             case CUMUL_ENTREES_SORTIES:
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
-                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
+                pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
                 break;
             case BUY:
             case SOLD:
@@ -58,7 +58,7 @@ public class PerfIndexBuilder {
             case INSTANT_LIQUIDITE:
             case INSTANT_ENTREES_SORTIES:
             case INSTANT_PORTFOLIO_DIVIDENDES:
-                pricesPeriodResult = createPeriodicData(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we always take the most recent data
+                pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we sum the data inside the period
                 break;
             default:
                 throw new IllegalStateException("Missing case: "+indexConfig.getPortfolioIndex());
@@ -78,12 +78,12 @@ public class PerfIndexBuilder {
                 case SHARE_PRU_WITH_DIVIDEND:
                 case SHARE_PRICES:
                 case SHARE_COUNT:
-                    pricesPeriodResult = createPeriodicData(value, perfSettings, init(), keepLast()); // we always take the most recent data
+                    pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
                     break;
                 case SHARE_DIVIDEND:
                 case SHARE_DIVIDEND_YIELD:
                 case SHARE_BUY_SOLD_WITH_DETAILS:
-                    pricesPeriodResult = createPeriodicData(value, perfSettings, init(), sum()); // we sum all the data inside the same period
+                    pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), sum()); // we sum all the data inside the same period
                     break;
                 default:
                     throw new IllegalStateException("Missing case: "+indexConfig.getShareIndex());
@@ -105,10 +105,19 @@ public class PerfIndexBuilder {
         return (v1, v2) -> v1 != null ? v1 + v2 : v2;
     }
 
-    private Prices createPeriodicData(Prices prices, ChartPerfSettings perfSettings,
-                                      Supplier<Float> groupByFirstValueFct,
-                                      BiFunction<Float, Float, Float> groupByFct){
+    private Prices buildPerfPrices(Prices prices, ChartPerfSettings perfSettings,
+                                   Supplier<Float> groupByFirstValueFct,
+                                   BiFunction<Float, Float, Float> groupByFct){
 
+        Prices pricesGrouped = prices;
+        if (perfSettings.getPerfGroupedBy() != ChartPerfGroupedBy.FROM_START) { // Pas de regroupement pour le cas du FROM_START
+            pricesGrouped = createGroupedPrices(prices, perfSettings, groupByFirstValueFct, groupByFct);
+        }
+
+        return computePerf(prices, perfSettings, pricesGrouped);
+    }
+
+    private Prices createGroupedPrices(Prices prices, ChartPerfSettings perfSettings, Supplier<Float> groupByFirstValueFct, BiFunction<Float, Float, Float> groupByFct) {
         PriceAtDate firstDate = prices.getPrices().get(0);
 
         EZDate currentPeriod = createPeriod(perfSettings.getPerfGroupedBy(), firstDate.getDate()); // the first period to start
@@ -128,7 +137,10 @@ public class PerfIndexBuilder {
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (currentPeriod != todayPeriod);
+        return pricesGrouped;
+    }
 
+    private Prices computePerf(Prices prices, ChartPerfSettings perfSettings, Prices pricesGrouped) {
         // calcul de la perf en valeur ou en %
         Prices result = new Prices();
         result.setDevise(prices.getDevise());
@@ -146,13 +158,12 @@ public class PerfIndexBuilder {
                     if (previousValue != null && previousValue != 0)
                         newPrice = priceAtDate.getPrice() * 100.0f / previousValue;
                     break;
-                default: throw new IllegalStateException("Missing case: "+perfSettings.getPerfFilter());
+                default: throw new IllegalStateException("Missing case: "+ perfSettings.getPerfFilter());
             }
             result.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate(), newPrice == null ? 0 : newPrice));
             previousValue = priceAtDate.getPrice();
         }
-
-        return pricesGrouped;
+        return result;
     }
 
 
