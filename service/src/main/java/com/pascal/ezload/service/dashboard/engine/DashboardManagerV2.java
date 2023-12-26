@@ -75,21 +75,20 @@ public class DashboardManagerV2 {
     }
 
     public List<Chart> loadDashboard(Reporting reporting, DashboardSettings dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
+        // if ezPortfolioProxy est null => dry run with no data extraction
         List<Chart> charts = new LinkedList<>();
-            if (ezPortfolioProxy != null) {
-                charts = dashboardSettings.getChartSettings().stream()
-                        .map(prefs -> {
-                            try {
-                                return createChart(reporting,
-                                        ezPortfolioProxy,
-                                        prefs
-                                );
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .collect(Collectors.toList());
-            }
+        charts = dashboardSettings.getChartSettings().stream()
+                .map(prefs -> {
+                    try {
+                        return createChart(reporting,
+                                ezPortfolioProxy,
+                                prefs
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
         return charts;
     }
 
@@ -122,7 +121,7 @@ public class DashboardManagerV2 {
                     startDate = today.minusYears(10);
                     break;
                 case FROM_MY_FIRST_OPERATION:
-                    if (portfolio.getAllOperations().getExistingOperations().size() >= 1) {
+                    if (portfolio != null && portfolio.getAllOperations().getExistingOperations().size() >= 1) {
                         startDate = portfolio.getAllOperations().getExistingOperations().get(1).getValueDate(MesOperations.DATE_COL);
                     } else {
                         startDate = today.minusYears(1);
@@ -144,7 +143,7 @@ public class DashboardManagerV2 {
             SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, shareSelectionResult, currenciesResult);
             SharePriceBuilder.Result sharePriceResult = sharePriceBuilder.build(reporting, dates);
 
-            PortfolioIndexBuilderV2 portfolioIndexValuesBuilder = new PortfolioIndexBuilderV2(portfolio.getAllOperations().getExistingOperations(), currenciesResult, sharePriceResult);
+            PortfolioIndexBuilderV2 portfolioIndexValuesBuilder = new PortfolioIndexBuilderV2(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesResult, sharePriceResult);
             PortfolioIndexBuilderV2.Result portfolioResult = portfolioIndexValuesBuilder.build(reporting, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
                     chartSettings.getIndexV2Selection());
 

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="EZLoad" type="Application" factoryName="Application" nameIsGenerated="true">
     <envs>
-      <env name="ezloadConfig" value="C:\dev\sources\EZLoad-src\target\ezload.yaml" />
+      <env name="ezloadConfig" value="C:\dev\sources\EZLoad-src\sandbox\ezload.yaml" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.pascal.ezload.server.EZLoad" />
     <module name="ezServer" />

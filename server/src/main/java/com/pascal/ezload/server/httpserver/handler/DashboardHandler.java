@@ -31,6 +31,7 @@ import com.pascal.ezload.service.dashboard.engine.DashboardManagerV2;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.TextReporting;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;
@@ -68,12 +69,21 @@ public class DashboardHandler {
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
             DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
             DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
+            List<Chart> charts = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, null);
             dashboardData = new DashboardData();
             dashboardData.setDashboardSettings(dashboardSettings);
-            dashboardData.setShareGoogleCodeAndNames(actionManager.getAllEZShares().stream().map(s -> new DashboardData.EzShareData(s.getGoogleCode(), s.getEzName())).collect(Collectors.toList()));
+            dashboardData.setCharts(charts);
             ezServerState.setDashboardData(dashboardData);
+            dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
         }
         return dashboardData;
+    }
+
+    private static List<DashboardData.EzShareData> loadAllEZShares(EzServerState ezServerState, EZActionManager actionManager) {
+        if (ezServerState.getDashboardData().getShareGoogleCodeAndNames() == null) {
+            ezServerState.getDashboardData().setShareGoogleCodeAndNames(actionManager.getAllEZShares().stream().map(s -> new DashboardData.EzShareData(s.getGoogleCode(), s.getEzName())).collect(Collectors.toList()));
+        }
+        return ezServerState.getDashboardData().getShareGoogleCodeAndNames();
     }
 
     @GET
@@ -89,14 +99,15 @@ public class DashboardHandler {
                 (processLogger) -> {
                     try(Reporting reporting = processLogger.getReporting().pushSection("Génération des Graphiques")) {
                         EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, settingsManager, mainSettings, ezProfil, reporting);
-                        DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
+                        EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+                        DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
                         DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
                         List<Chart> charts = dashboardManager.loadDashboard(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
                         dashboardData.setDashboardSettings(dashboardSettings);
                         dashboardData.setCharts(charts);
-                        dashboardData.setShareGoogleCodeAndNames(ezServerState.getDashboardData().getShareGoogleCodeAndNames() == null ? new LinkedList<>(): ezServerState.getDashboardData().getShareGoogleCodeAndNames());
                         ezServerState.setDashboardData(dashboardData);
+                        dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
                     }
                 });
     }

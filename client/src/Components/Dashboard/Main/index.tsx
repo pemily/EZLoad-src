@@ -42,9 +42,11 @@ export function DashboardMain(props: DashboardMainProps){
     const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);
     const [allEzShares, setEZShares] = useState<EzShareData[]>([]);
 
-    function reloadDashboard(): void | PromiseLike<void> {        
+    function getDashboard(): void | PromiseLike<void> {      
+        console.log("PASCAL CALL RELOAD DASHBOARD");  
         return jsonCall(ezApi.dashboard.getDashboardData())
             .then(r => {
+                console.log("PASCAL GET RESULT", r);
                 setDashConfig(r.dashboardSettings);
                 setDashCharts(r.charts);
                 setEZShares(r.shareGoogleCodeAndNames);
@@ -55,10 +57,14 @@ export function DashboardMain(props: DashboardMainProps){
     }
 
     function refresh(): void {
+        console.log("PASCAL CALL REFRESH");
         setReadOnly(true);
         jsonCall(ezApi.dashboard.refreshDashboardData())
                 .then(props.followProcess)
-                .then(r => reloadDashboard)
+                .then(r => {
+                    console.log('PASCAL GET DASHBOARD AFTER REFRESH');
+                    getDashboard();
+                })
                 .catch((error) => {
                     console.error("Error while loading DashboardData", error);
                 });                
@@ -66,9 +72,8 @@ export function DashboardMain(props: DashboardMainProps){
 
     useEffect(() => {
         // will be executed when props.enable will become true 
-        setReadOnly(props.processRunning && props.enabled);
-        if (!readOnly) reloadDashboard();
-    }, [ readOnly, props.enabled, props.processRunning ]);
+        setReadOnly(props.processRunning && props.enabled);                
+    }, [ props.enabled, props.processRunning ]);
 
     if (!props.enabled){
         return (            
@@ -99,7 +104,7 @@ export function DashboardMain(props: DashboardMainProps){
                     
                         <Box alignSelf="end" margin="small" direction="row" >
                             <Button size="small" icon={<Refresh size='small' />}
-                                disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length === 0}
+                                disabled={readOnly /*|| !dashConfig.chartSettings || dashConfig.chartSettings?.length === 0*/}
                                 label="Rafraichir" onClick={() => refresh()} />
 
                                 <Button size="small" icon={<Add size='small' />}
@@ -116,7 +121,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                 portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",                                                                                                
                                             },
                                             label: "Valeur du portefeuille",
-                                            description: undefined,
+                                            description: "",
                                             perfSettings: undefined,
                                             currencyIndexConfig: undefined, 
                                             shareIndexConfig: undefined,
@@ -137,47 +142,47 @@ export function DashboardMain(props: DashboardMainProps){
                             configIndexEdited === -1 && dashCharts?.map((chart, index) => {                    
                                 return (                        
                                     <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
-                                                    pad="small" border="all" margin="xxsmall" background="white" flex="grow">
+                                                    pad="small" border="all" margin="xxsmall" background="white" flex="grow" key={"chart"+index}>
                                         <Box direction="row" margin="small">
                                             <Box flex="grow" direction="column" alignSelf="center">
                                                 <Text alignSelf="center"  margin="0">{chart.mainTitle}</Text>
                                             </Box>
-                                                <Box  direction="row" alignSelf="end"  margin="0" pad="0">
-                                                    <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                                            plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                            chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
-                                                                                                                                { ...c, height: c.height!+10 }
-                                                                                                                                : c ) }
-                                                                                                                        , r => setDashConfig(r)) }/>
-                                                    <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                                            plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                            chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
-                                                                                                                                { ...c, height: c.height!-10 }
-                                                                                                                                : c ) }
-                                                                                                                        , r => setDashConfig(r)) }/>     
-                                                    <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
-                                                            plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
-                                                    <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color={red}/>} gap="xxsmall" margin="xxsmall"
-                                                            plain={true} label="" onClick={() =>{
-                                                                confirmAlert({
-                                                                    title: 'Etes vous sûr de vouloir supprimer ce graphique?',                                                        
-                                                                    buttons: [
-                                                                    {
-                                                                        label: 'Oui',
-                                                                        onClick: () => {
-                                                                            setDashCharts(dashCharts.filter((c,i) => i !== index));
-                                                                            saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }
-                                                                                                , r => setDashConfig(r));                                                     
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        label: 'Non',
-                                                                        onClick: () => {}
+                                            <Box  direction="row" alignSelf="end"  margin="0" pad="0">
+                                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
+                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
+                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                                                                                            { ...c, height: c.height!+10 }
+                                                                                                                            : c ) }
+                                                                                                                    , r => setDashConfig(r)) }/>
+                                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
+                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
+                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                                                                                            { ...c, height: c.height!-10 }
+                                                                                                                            : c ) }
+                                                                                                                    , r => setDashConfig(r)) }/>     
+                                                <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
+                                                        plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
+                                                <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color={red}/>} gap="xxsmall" margin="xxsmall"
+                                                        plain={true} label="" onClick={() =>{
+                                                            confirmAlert({
+                                                                title: 'Etes vous sûr de vouloir supprimer ce graphique?',                                                        
+                                                                buttons: [
+                                                                {
+                                                                    label: 'Oui',
+                                                                    onClick: () => {
+                                                                        setDashCharts(dashCharts.filter((c,i) => i !== index));
+                                                                        saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }
+                                                                                            , r => setDashConfig(r));                                                     
                                                                     }
-                                                                    ]
-                                                                });
-                                                            }}/>
-                                                </Box>
+                                                                },
+                                                                {
+                                                                    label: 'Non',
+                                                                    onClick: () => {}
+                                                                }
+                                                                ]
+                                                            });
+                                                        }}/>
+                                            </Box>
                                         </Box>
                                         <LineChart chart={chart}/>
                                     </Box>

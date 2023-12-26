@@ -19,18 +19,17 @@ public class ShareSelectionBuilder {
     }
 
     public Result build(Reporting reporting, List<ChartIndexV2> indexV2Selection){
-        Result result = new Result(
+        return new Result(
                 indexV2Selection
                         .stream()
                         .map(ChartIndexV2::getShareIndexConfig)
                         .filter(Objects::nonNull)
                         .flatMap(index -> index.getAdditionalShareGoogleCodeList().stream())
                         // ici rajouter les shares des operations... (ou alors elles se feront en lazy)
-                        .map(ezActionManager::getFromName)
+                        .map(ezActionManager::getFromGoogleTicker)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toList()));
-        return result;
     }
 
     public class Result {

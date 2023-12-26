@@ -44,11 +44,11 @@ public class CurrenciesIndexBuilder {
         }
 
         public Prices convertPricesToTargetDevise(Reporting reporting, Prices p) {
-            if (p != null) {
+            if (p != null && p.getDevise() != null) {
                 CurrencyMap currencyMap = getCurrencyMap(reporting, p.getDevise());
                 return currencyMap.convertPricesToTarget(p);
             }
-            return null;
+            return p;
         }
 
         public Prices getDevisePrices(Reporting reporting, EZDevise from) {

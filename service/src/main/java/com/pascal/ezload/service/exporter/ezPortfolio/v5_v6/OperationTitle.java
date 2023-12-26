@@ -21,7 +21,7 @@ public enum OperationTitle {
     RetraitFonds("Retrait fonds"),
     TaxeSurLesTransactions("Taxe sur les Transactions"),
     VenteTitres("Vente titres"),
-    VersementFond("Versement fond");
+    VersementFonds("Versement fonds");
 
     private String title;
 
@@ -31,7 +31,7 @@ public enum OperationTitle {
 
     public static OperationTitle build(String title) {
         Optional<OperationTitle> found = Arrays.stream(values()).filter(op -> op.getTitle().equals(title)).findFirst();
-        return found.orElse(null);
+        return found.orElseThrow(() -> new IllegalStateException("L'opération avec le type: "+title+" n'est pas conforme a EzPortfolio"));
     }
 
     public String getTitle() {

@@ -105,7 +105,7 @@ public class PortfolioStateAccumulator {
             case VenteTitres:
                 soldShare(operation);
                 break;
-            case VersementFond:
+            case VersementFonds:
                 addInputQuantity(operation);
                 break;
             case AcompteImpotSurRevenu:{
