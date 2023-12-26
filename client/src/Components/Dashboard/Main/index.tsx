@@ -15,65 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Carousel } from "grommet";
-import { useState, useEffect } from "react";
+import { Box, Button, Text, Carousel, Card, Collapsible } from "grommet";
+import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg, EzShareData, DashboardData } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
-import { red } from "grommet-controls/dist/components/basicColors";
 
 
 export interface DashboardMainProps {
     enabled: boolean;
     processRunning: boolean;
+    dashboardData: DashboardData|undefined;
     actionWithMsg: ActionWithMsg|undefined;
-    followProcess: (process: EzProcess|undefined) => void;
+    refreshDashboard: () => void;
 }      
 
 export function DashboardMain(props: DashboardMainProps){    
-    const [dashConfig, setDashConfig] = useState<DashboardSettings>({});
-    const [dashCharts, setDashCharts] = useState<Chart[]|undefined>([]);
-    const [configIndexEdited, setConfigIndexEdit] = useState<number>(-1);    
-    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);
-    const [allEzShares, setEZShares] = useState<EzShareData[]>([]);
-
-    function getDashboard(): void | PromiseLike<void> {      
-        console.log("PASCAL CALL RELOAD DASHBOARD");  
-        return jsonCall(ezApi.dashboard.getDashboardData())
-            .then(r => {
-                console.log("PASCAL GET RESULT", r);
-                setDashConfig(r.dashboardSettings);
-                setDashCharts(r.charts);
-                setEZShares(r.shareGoogleCodeAndNames);
-            })
-            .catch((error) => {
-                console.error("Error while loading DashboardData", error);
-            });
-    }
-
-    function refresh(): void {
-        console.log("PASCAL CALL REFRESH");
-        setReadOnly(true);
-        jsonCall(ezApi.dashboard.refreshDashboardData())
-                .then(props.followProcess)
-                .then(r => {
-                    console.log('PASCAL GET DASHBOARD AFTER REFRESH');
-                    getDashboard();
-                })
-                .catch((error) => {
-                    console.error("Error while loading DashboardData", error);
-                });                
-    }
+    const [dashConfig, setDashConfig] = useState<DashboardSettings>(props.dashboardData?.dashboardSettings === undefined ? {} : props.dashboardData.dashboardSettings);
+    const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
+    const [dashCharts, setDashCharts] = useState<Chart[]>(props.dashboardData?.charts === undefined ? [] : props.dashboardData.charts);    
+    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);        
+    const [configIndexEdited, setConfigIndexEdit] = useState<number>(-1);
 
     useEffect(() => {
         // will be executed when props.enable will become true 
-        setReadOnly(props.processRunning && props.enabled);                
-    }, [ props.enabled, props.processRunning ]);
+        setReadOnly(props.processRunning && props.enabled);              
+    }, [ props.enabled, props.processRunning]);
 
     if (!props.enabled){
         return (            
@@ -83,29 +55,29 @@ export function DashboardMain(props: DashboardMainProps){
     }
      
     return (        
-                <Carousel width="100%" controls={false} activeChild={configIndexEdited === -1 ? 0 : 1}>        
+                <Carousel width="100%" controls={false} activeChild={configIndexEdited === -1 ? 0 : 1}>
                     <Box width="100%">
-                        
-                        { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (            
+
+                        { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
                                 <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box> 
+                                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box>
                             )
-                        }  
-                        { !readOnly && (!dashCharts || dashCharts.length === 0)  && (            
+                        }
+                        { !readOnly && (!dashCharts || dashCharts.length === 0)  && (
                                 <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Cliquez sur "Rafraichir" pour charger vos données</Text></Box> 
+                                    Cliquez sur "Rafraichir" pour charger vos données</Text></Box>
                             )
-                        }    
-                        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) === 0 && (            
+                        }
+                        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) === 0 && (
                                 <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box> 
+                                    Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box>
                             )
-                        }    
-                    
+                        }
+
                         <Box alignSelf="end" margin="small" direction="row" >
                             <Button size="small" icon={<Refresh size='small' />}
                                 disabled={readOnly /*|| !dashConfig.chartSettings || dashConfig.chartSettings?.length === 0*/}
-                                label="Rafraichir" onClick={() => refresh()} />
+                                label="Rafraichir" onClick={() => props.refreshDashboard()} />
 
                                 <Button size="small" icon={<Add size='small' />}
                                 label="Nouveau" onClick={() => {
@@ -118,29 +90,29 @@ export function DashboardMain(props: DashboardMainProps){
                                         targetDevise: 'EUR',
                                         indexV2Selection: [{
                                             portfolioIndexConfig: {
-                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",                                                                                                
+                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
                                             },
                                             label: "Valeur du portefeuille",
                                             description: "",
                                             perfSettings: undefined,
-                                            currencyIndexConfig: undefined, 
+                                            currencyIndexConfig: undefined,
                                             shareIndexConfig: undefined,
-                                        }],                                        
+                                        }],
                                     };
-                                    
-                                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
+
+                                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]}
                                                                                 : {...dashConfig, chartSettings: [newChart]}
-                                                        , r => {                                                
-                                                            setDashConfig(r); 
-                                                            setConfigIndexEdit(dashConfig.chartSettings!.length);                                                            
-                                                        });                    
+                                                        , r => {
+                                                            setDashConfig(r);
+                                                            setConfigIndexEdit(dashConfig.chartSettings!.length);
+                                                        });
                                 }}
-                            />    
-                        </Box>  
-                        <Box overflow="auto" pad="100%">
+                            />
+                        </Box>
+                        <Box>
                         {
-                            configIndexEdited === -1 && dashCharts?.map((chart, index) => {                    
-                                return (                        
+                            configIndexEdited === -1 && dashCharts?.map((chart, index) => {
+                                return (
                                     <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
                                                     pad="small" border="all" margin="xxsmall" background="white" flex="grow" key={"chart"+index}>
                                         <Box direction="row" margin="small">
@@ -149,30 +121,30 @@ export function DashboardMain(props: DashboardMainProps){
                                             </Box>
                                             <Box  direction="row" alignSelf="end"  margin="0" pad="0">
                                                 <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig,
+                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ?
                                                                                                                             { ...c, height: c.height!+10 }
                                                                                                                             : c ) }
                                                                                                                     , r => setDashConfig(r)) }/>
                                                 <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
+                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig,
+                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ?
                                                                                                                             { ...c, height: c.height!-10 }
                                                                                                                             : c ) }
-                                                                                                                    , r => setDashConfig(r)) }/>     
+                                                                                                                    , r => setDashConfig(r)) }/>
                                                 <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                                         plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
-                                                <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color={red}/>} gap="xxsmall" margin="xxsmall"
+                                                <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color="status-critical"/>} gap="xxsmall" margin="xxsmall"
                                                         plain={true} label="" onClick={() =>{
                                                             confirmAlert({
-                                                                title: 'Etes vous sûr de vouloir supprimer ce graphique?',                                                        
+                                                                title: 'Etes vous sûr de vouloir supprimer ce graphique?',
                                                                 buttons: [
                                                                 {
                                                                     label: 'Oui',
                                                                     onClick: () => {
                                                                         setDashCharts(dashCharts.filter((c,i) => i !== index));
                                                                         saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }
-                                                                                            , r => setDashConfig(r));                                                     
+                                                                                            , r => setDashConfig(r));
                                                                     }
                                                                 },
                                                                 {
@@ -186,7 +158,7 @@ export function DashboardMain(props: DashboardMainProps){
                                         </Box>
                                         <LineChart chart={chart}/>
                                     </Box>
-                                );                             
+                                );
                             })
                         }
                         </Box>
@@ -196,17 +168,17 @@ export function DashboardMain(props: DashboardMainProps){
                             {
                                 (configIndexEdited === -1 || dashConfig.chartSettings === undefined || configIndexEdited >= dashConfig.chartSettings.length) && (
                                     <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                                    Il y a un problème dans la configuration de vos graphique. Essayez de rafraichir la page</Text></Box> 
+                                    Il y a un problème dans la configuration de vos graphique. Essayez de rafraichir la page</Text></Box>
                                 )
                             }
 
                             <Box alignSelf="start" direction="row" margin="medium" >
-                                { <Button size="small" icon={<Previous size='small'/>} 
+                                { <Button size="small" icon={<Previous size='small'/>}
                                             disabled={readOnly}
                                             label="Retour" onClick={() => { setConfigIndexEdit(-1); /*refresh() */ } } />  }
                             </Box>
 
-                            <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="row">
+                            <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
                                 {
                                     configIndexEdited !== -1 && (
                                         <ChartSettingsEditor
@@ -214,15 +186,15 @@ export function DashboardMain(props: DashboardMainProps){
                                             allEzShares={allEzShares}
                                             chartSettings={dashConfig.chartSettings![configIndexEdited]}
                                             save={(newChartSettsValue, afterSave) => {
-                                                saveDashboardConfig({...dashConfig, 
+                                                saveDashboardConfig({...dashConfig,
                                                                         chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)
                                                                     },
                                                                  (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}}
                                         />
                                     )
-                                }
+                                }                                
                             </Box>
-                    </Box>                 
+                    </Box>
                 </Carousel>
     );
          

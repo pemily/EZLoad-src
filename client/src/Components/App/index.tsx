@@ -28,7 +28,7 @@ import { Message } from '../Tools/Message';
 import { SourceFileLink } from '../Tools/SourceFileLink';
 import { RulesTab } from '../Rules/RulesTab';
 import { ezApi, jsonCall, SelectedRule, strToBroker } from '../../ez-api/tools';
-import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg } from '../../ez-api/gen-api/EZLoadApi';
+import { MainSettings, EzProfil, AuthInfo, EzProcess, EzEdition, EzReport, RuleDefinitionSummary, RuleDefinition, EZShare, BourseDirectEZAccountDeclaration, ActionWithMsg, DashboardData } from '../../ez-api/gen-api/EZLoadApi';
 import { ViewLog } from "../Tools/ViewLog";
 import { DashboardMain } from "../Dashboard/Main";
 
@@ -59,6 +59,8 @@ export function App(){
     const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
     const [allProfiles, setAllProfiles] = useState<string[]>([]);
     const [allShares, setAllShares] = useState<ActionWithMsg|undefined>(undefined); 
+    const [dashboardData, setDashboardData] = useState<DashboardData|undefined>(undefined);
+    const [dashboardChartIndex, setDashboardChartIndex] = useState<number>(-1); // -1 == on voit les graphiques, n on edit le graphe n
 
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
@@ -221,6 +223,32 @@ export function App(){
             .catch(e => console.error(e));
     }
 
+    function getDashboard(): void | PromiseLike<void> {      
+        console.log("PASCAL CALL RELOAD DASHBOARD");  
+        return jsonCall(ezApi.dashboard.getDashboardData())
+            .then(r => {
+                console.log("PASCAL GET DASHBOARD DATA RESULT", r);
+                setDashboardData(r);
+            })
+            .catch((error) => {
+                console.error("Error while loading DashboardData", error);
+            });
+    }
+
+    function refreshDashboardData(): void {
+        console.log("PASCAL CALL REFRESH");        
+        jsonCall(ezApi.dashboard.refreshDashboardData())
+                .then(followProcess)
+                .then(r => {
+                    console.log('PASCAL GET DASHBOARD AFTER REFRESH');
+                    getDashboard();
+                })
+                .catch((error) => {
+                    console.error("Error while loading DashboardData", error);
+                });                
+    }
+
+
 
     useEffect(() => {
         setInterval(() => ezApi.home.ping(), 20000);    // every 20 seconds call the ping
@@ -313,10 +341,11 @@ export function App(){
             }        
             { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
-                <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
+                <Tabs justify="center" activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
                         <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
-                                        followProcess={followProcess}
+                                        dashboardData={dashboardData}
+                                        refreshDashboard={refreshDashboardData}
                                         actionWithMsg={actionWithMsg}/>
                     </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>

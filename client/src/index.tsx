@@ -77,6 +77,9 @@ const customTheme = deepMerge(grommet, {
           extend: `padding: 10px; box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.50);`
         },
     },
+    collapsible: {
+      minSpeed: 1000
+    },
     global: { font: {  family: '-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI",system-ui,ui-sans-serif,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"', size: 'small' } },
 });
 

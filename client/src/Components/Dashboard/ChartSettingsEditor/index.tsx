@@ -28,7 +28,6 @@ import { TextAreaField } from "../../Tools/TextAreaField";
 import { ChartIndexMainEditor, getChartIndexDescription } from "../ChartIndexMainEditor";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { red } from "grommet-controls/dist/components/basicColors";
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;
@@ -159,7 +158,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                     </Box>
                 </Tab>    
                 {
-                    props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => {                        
+                    props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => {     
+                        console.log("PASCAL indexLoop", chartIndex);
                         return (
                             <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
                                 <Box pad={{ vertical: 'none', horizontal: 'small' }}>
@@ -176,7 +176,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     ]
                                                 }, () => {})
                                         }/> 
-                                        <Button fill={false} alignSelf="center" icon={<Trash color={red}/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
+                                        <Button fill={false} alignSelf="center" icon={<Trash color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
                                                     confirmAlert({
                                                         title: 'Etes vous sûr de vouloir supprimer cet Indice?',                                                        
