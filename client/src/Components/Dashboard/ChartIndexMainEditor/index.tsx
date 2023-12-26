@@ -17,26 +17,111 @@
  */
 import { Box, Button, Text, Tab, Tabs, ThemeContext } from "grommet";
 import { useState } from "react";
-import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
-import { stream, ezApi, valued, isDefined } from '../../../ez-api/tools';
+import { ChartIndexV2, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, ChartPerfSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
 import { ComboMultiple } from "../../Tools/ComboMultiple";
+import { ca } from "date-fns/locale";
 
 export interface ChartIndexMainEditorProps {    
     chartIndexV2: ChartIndexV2;
     save: (chartIndex:ChartIndexV2) => void;
+    targetDevise: string;
     readOnly: boolean;    
     allEzShares: EzShareData[];
 }      
 
 
-export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){        
-    const [indexTypeChoice, setIndexTypeChoice] = useState<string>(isDefined(props.chartIndexV2.currencyIndexConfig) ? 'DEVISE' : isDefined(props.chartIndexV2.shareIndexConfig) ? 'SHARE' : 'PORTEFEUILLE');         
-    
+export function getChartIndexDescription(chartIndexV2: ChartIndexV2, targetDevise: string){
+    var result : string = "Affiche ";
+
+    var signOfDevise: string = targetDevise;
+    switch(targetDevise){
+        case "EUR": signOfDevise = "€"; break;
+        case "USD": signOfDevise = "$"; break;
+        case "AUD": signOfDevise = "A$"; break;
+        case "CAD": signOfDevise = "C$"; break;        
+        case "CHF": signOfDevise = "CHF"; break;
+    }
+
+    if (isDefined(chartIndexV2.perfSettings)){
+        result += "la performance ";
+        if (chartIndexV2.perfSettings?.perfGroupedBy == "MONTHLY"){
+            result += " mensuelle ";
+        }
+        else {
+            result += " annuelle ";
+        }
+        result+="en ";
+        if (chartIndexV2.perfSettings?.perfFilter == "VALUE"){
+            result+=signOfDevise+" ";
+        }
+        else {
+            result+= "% ";
+        }
+    }
+    else {
+        result += "la valeur en "+signOfDevise+" ";
+    }
+    console.log("PASCAL 4444  chartIndexV2.shareIndexConfig: ", chartIndexV2);
+    if (isDefined(chartIndexV2.shareIndexConfig)){
+        switch (chartIndexV2.shareIndexConfig?.shareIndex){
+            case "SHARE_BUY_SOLD_WITH_DETAILS":
+                result += "des achats et les ventes de l'action"; break;
+            case "SHARE_COUNT":
+                result += "de nombre d'action possédé"; break;
+            case "SHARE_DIVIDEND":
+                result += "des dividendes"; break;
+            case "SHARE_DIVIDEND_YIELD":
+                result += "du rendement du dividende"; break;
+            case "SHARE_PRICES": 
+                result += "du cours de l'action"; break;
+            case "SHARE_PRU":
+                result += "du Prix de Revient Unitaire, les dividendes ne sont pas inclusent dans le calcul"; break;
+            case "SHARE_PRU_WITH_DIVIDEND":
+                result += "du Prix de Revient Unitaire incluant les dividendes"; break;
+        }        
+    }
+    if (isDefined(chartIndexV2.currencyIndexConfig)){
+        result += "des devises qui ont été utilisées pour le graphe";
+    }
+    if (isDefined(chartIndexV2.portfolioIndexConfig)){
+        switch(chartIndexV2.portfolioIndexConfig?.portfolioIndex){
+            case "SOLD":
+                result += "de la vente d'action"; break;
+            case "BUY":
+                result += "de l'achat d'action"; break;
+            case "CUMUL_CREDIT_IMPOTS":
+                result += "de la somme des crédit d'impôts depuis la date du début du graphique"; break;
+            case "CUMUL_ENTREES_SORTIES":
+                result += "de la somme des entrées/retraits de liquidités depuis la date du début du graphique"; break;
+            case "CUMUL_PORTFOLIO_DIVIDENDES":
+                result += "de la somme des dividendes reçu depuis la date du début du graphique"; break;
+            case "INSTANT_ENTREES":
+                result += "des ajouts de liquidités"; break;
+            case "INSTANT_ENTREES_SORTIES":
+                result += "de l'ajouts et des retraits des liquidités"; break;
+            case "INSTANT_LIQUIDITE": 
+                result += "des liquidités disponibles"; break;
+            case "INSTANT_PORTFOLIO_DIVIDENDES":
+                result += "des dividendes reçu"; break;
+            case "INSTANT_SORTIES":
+                result += "des retraits de liquidités"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
+                result += "de votre portefeuilles sans prendre en compte les liquidités"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
+                result += "de votre portefeuilles en incluant les liquidités"; break;
+        }        
+    }
+    console.log("PASCAL 55555", chartIndexV2, result);
+    return applyEZLoadTextSignature(result);
+  }
+  
+export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){                
     return (  
         <>
         <Box direction="row">
@@ -44,33 +129,88 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             label="Groupe d'indices"                                  
                             errorMsg={undefined}
                             readOnly={false}
-                            selectedCodeValue={indexTypeChoice}
+                            selectedCodeValue={isDefined(props.chartIndexV2.currencyIndexConfig) ? 'DEVISE' : isDefined(props.chartIndexV2.shareIndexConfig) ? 'SHARE' : 'PORTEFEUILLE'}
                             codeValues={['PORTEFEUILLE', 'SHARE', 'DEVISE']}                            
                             userValues={["Portefeuille global", "Actions", "Devises"]}
                             description=""
-                            onChange={newValue  => {setIndexTypeChoice(newValue)}}/>    
+                            onChange={newValue  => {
+                                if (newValue === 'PORTEFEUILLE') {
+                                    props.save({...props.chartIndexV2,
+                                            currencyIndexConfig: undefined,
+                                            shareIndexConfig: undefined,
+                                            portfolioIndexConfig: {
+                                                    ...props.chartIndexV2.portfolioIndexConfig,
+                                                    portfolioIndex: 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' // valeur par defaut
+                                                    },
+                                                    description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                                getChartIndexDescription({...props.chartIndexV2, 
+                                                                    currencyIndexConfig: undefined,
+                                                                    shareIndexConfig: undefined,
+                                                                    portfolioIndexConfig: {
+                                                                                ...props.chartIndexV2.portfolioIndexConfig,
+                                                                                portfolioIndex: 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY'
+                                                                            }}, props.targetDevise): props.chartIndexV2.description,
+                                                        })
+                                }
+                                else if (newValue === 'SHARE'){
+                                    props.save({...props.chartIndexV2,
+                                        portfolioIndexConfig: undefined,
+                                        currencyIndexConfig: undefined,
+                                        shareIndexConfig: {
+                                                ...props.chartIndexV2.shareIndexConfig,
+                                                shareIndex: 'SHARE_PRICES'
+                                                },
+                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                            getChartIndexDescription({...props.chartIndexV2, 
+                                                                portfolioIndexConfig: undefined,
+                                                                currencyIndexConfig: undefined,
+                                                                shareIndexConfig: {
+                                                                    ...props.chartIndexV2.shareIndexConfig,
+                                                                    shareIndex: 'SHARE_PRICES',
+                                                                    shareSelection: 'CURRENT_SHARES',
+                                                                }}, props.targetDevise): props.chartIndexV2.description,
+                                                    })                                    
+                                }
+                                else if (newValue === 'DEVISE'){
+                                    props.save({...props.chartIndexV2,
+                                        portfolioIndexConfig: undefined,
+                                        shareIndexConfig: undefined,
+                                        currencyIndexConfig: {
+                                            active: true
+                                        },
+                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                            getChartIndexDescription({...props.chartIndexV2, 
+                                                                portfolioIndexConfig: undefined,
+                                                                shareIndexConfig: undefined,
+                                                                currencyIndexConfig: {
+                                                                    active: true
+                                                                }
+                                                            }, props.targetDevise): props.chartIndexV2.description,
+                                                    })                                    
+                                }
+                            }}/>    
         
             
 
-                { indexTypeChoice === 'PORTEFEUILLE' && (
+                { isDefined(props.chartIndexV2.portfolioIndexConfig) && (
                         <ComboFieldWithCode id="PortfolioIndexes"
                             label="Indice"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
                             selectedCodeValue={ !isDefined(props.chartIndexV2.portfolioIndexConfig?.portfolioIndex) ? 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' : props.chartIndexV2.portfolioIndexConfig?.portfolioIndex! }                            
                             userValues={[                             
-                                'Valeurs de votre portefeuilles avec les liquiditées',
-                                'Valeurs de votre portefeuilles sans les liquiditées',
-                                'Liquiditées disponibles',                            
-                                'Sommes des entrées/retraits de liquiditées',
-                                'Ajouts de liquiditées',
-                                'Retraits de liquiditées',
-                                'Ajouts/Retraits de liquiditées',
-                                'Somme des crédit d\'impôts',
-                                'Dividendes reçu',
-                                'Somme des dividendes reçu',
-                                'Achat d\'action',
-                                'Vente d\'action'
+                                "Valeurs de votre portefeuilles avec les liquidités",
+                                "Valeurs de votre portefeuilles sans les liquidités",
+                                "Liquidités disponibles", 
+                                "Sommes des entrées/retraits de liquidités",
+                                "Ajouts de liquidités",
+                                "Retraits de liquidités",
+                                "Ajouts/Retraits de liquidités",
+                                "Somme des crédit d'impôts",
+                                "Dividendes reçu",
+                                "Somme des dividendes reçu",
+                                "Achat d'action",
+                                "Vente d'action"
                             ]}
                             codeValues={[
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
@@ -87,27 +227,34 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'SOLD']}
                             description=""
                             onChange={newValue => 
-                                props.save({...props.chartIndexV2, portfolioIndexConfig: {
-                                    ...props.chartIndexV2.portfolioIndexConfig,
-                                    portfolioIndex: newValue
-                                }})
+                                props.save({...props.chartIndexV2,
+                                                portfolioIndexConfig: {
+                                                            ...props.chartIndexV2.portfolioIndexConfig,
+                                                            portfolioIndex: newValue
+                                                            },
+                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                                        getChartIndexDescription({...props.chartIndexV2, portfolioIndexConfig: {
+                                                                            ...props.chartIndexV2.portfolioIndexConfig,
+                                                                            portfolioIndex: newValue
+                                                                        }}, props.targetDevise): props.chartIndexV2.description,
+                                            })
                         }/>
                 )              
                 }            
-                { indexTypeChoice === 'SHARE' && (
+                { isDefined(props.chartIndexV2.shareIndexConfig) && (
                         <ComboFieldWithCode id="ShareIndexes"
                             label="Indice"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
                             selectedCodeValue={!isDefined(props.chartIndexV2.shareIndexConfig?.shareIndex) ? 'SHARE_PRICES' : props.chartIndexV2.shareIndexConfig?.shareIndex! }                            
                             userValues={[                             
-                                'Cours de l\'action',
-                                'Nombre d\'action',
-                                'Achats/Ventes',                            
-                                'Dividendes',
-                                'Rendement du dividende',
-                                'Prix de Revient Unitaire',
-                                'Prix de Revient Unitaire incluant les dividendes',
+                                "Cours de l'action",
+                                "Nombre d'action",
+                                "Achats/Ventes",
+                                "Dividendes",
+                                "Rendement du dividende",
+                                "Prix de Revient Unitaire",
+                                "Prix de Revient Unitaire incluant les dividendes"
                             ]}
                             codeValues={[
                                 'SHARE_PRICES',
@@ -120,14 +267,21 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             ]}
                             description=""
                             onChange={newValue => 
-                                props.save({...props.chartIndexV2, shareIndexConfig: {
-                                    ...props.chartIndexV2.shareIndexConfig,
-                                    shareIndex: newValue
-                                }})
+                                props.save({...props.chartIndexV2,
+                                                 shareIndexConfig: {
+                                                        ...props.chartIndexV2.shareIndexConfig,
+                                                            shareIndex: newValue
+                                                },
+                                                description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                                        getChartIndexDescription({...props.chartIndexV2, shareIndexConfig: {
+                                                                            ...props.chartIndexV2.shareIndexConfig,
+                                                                            shareIndex: newValue
+                                                                        }}, props.targetDevise): props.chartIndexV2.description,
+                                })
                         }/>
                 )
                 }
-                { indexTypeChoice === 'DEVISE' && (
+                { isDefined(props.chartIndexV2.currencyIndexConfig) && (
                         <ComboFieldWithCode id="DeviseIndex"
                             label="Indice"
                             errorMsg={undefined}
@@ -141,16 +295,23 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             ]}
                             description=""
                             onChange={newValue => 
-                                props.save({...props.chartIndexV2, shareIndexConfig: {
-                                    ...props.chartIndexV2.shareIndexConfig,
-                                    shareIndex: newValue
-                                }})
+                                props.save({...props.chartIndexV2, 
+                                    currencyIndexConfig: {
+                                    ...props.chartIndexV2.currencyIndexConfig,
+                                    active: true,
+                                    },
+                                    description: isTextContainsEZLoadSignature(props.chartIndexV2.description) ? 
+                                                                            getChartIndexDescription({...props.chartIndexV2, currencyIndexConfig: {
+                                                                                ...props.chartIndexV2.currencyIndexConfig, 
+                                                                                active: true,                                                                                                                       
+                                                                            }}, props.targetDevise): props.chartIndexV2.description,
+                            })
                         }/>
                 )            
                 }
             </Box>
             {
-                (<Text margin={{ vertical: 'none', horizontal: 'large' }} size="xsmall" alignSelf="end">La description de l'indice choisie</Text>)
+                (<Text margin={{ vertical: 'none', horizontal: 'xsmall' }} size="xsmall" alignSelf="end">{getChartIndexDescription(props.chartIndexV2, props.targetDevise)}</Text>)
             }
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
@@ -189,7 +350,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                         selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
                         userValues={[   
                             'En %',                          
-                            'En valeur',                        
+                            'En '+props.targetDevise,                        
                         ]}
                         codeValues={[
                             'PERCENT',
@@ -207,25 +368,22 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
 
 
             {
-                 indexTypeChoice === 'SHARE' && (
+                isDefined(props.chartIndexV2.shareIndexConfig) && (
                     <>
-                    <ComboFieldWithCode id="Perf"
+                    <ComboFieldWithCode id="shareGroupSelection"
                         label="Choix de groupe d'actions"
                         errorMsg={undefined}
                         readOnly={props.readOnly}
                         selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
-                                                                            'CURRENT_SHARE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
+                                                                            'CURRENT_SHARES': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
                         userValues={[                             
-                            'Les actions courrante du portefeuille',
-                            'Toutes les actions qui ont été présentent dans le portefeuille',
-                            'Les 10 actions avec le plus d\'impact sur le portefeuille',
-                            'Aucune'
+                            "Les actions courrante du portefeuille",
+                            "Toutes les actions qui ont été présentent dans le portefeuille",
+                            "Les 10 actions avec le plus d'impact sur le portefeuille",
+                            "Aucun"
                         ]}
                         codeValues={[                            
-                            'CURRENT_SHARE',                                    
-                            'TEN_WITH_MOST_IMPACTS',
-                            'ALL_SHARES',
-                            'ADDITIONAL_SHARES_ONLY'
+                            "ADDITIONAL_SHARES_ONLY" , "CURRENT_SHARES" , "TEN_WITH_MOST_IMPACTS" , "ALL_SHARES"
                         ]}
                         description=""
                         onChange={newValue => 

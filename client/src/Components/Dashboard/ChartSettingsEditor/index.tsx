@@ -19,12 +19,13 @@ import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
 import { useState } from "react";
 import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
-import { ChartIndexMainEditor } from "../ChartIndexMainEditor";
+import { ChartIndexMainEditor, getChartIndexDescription } from "../ChartIndexMainEditor";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { red } from "grommet-controls/dist/components/basicColors";
@@ -67,8 +68,19 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
     const [pageIndex, setPageIndex] = useState<number>(0);     
     
-    function nouvelIndex() : ChartIndexV2 {
-        return { label: 'Nouvel Indice'}
+    function nouvelIndex(targetDevise: string) : ChartIndexV2 {
+        console.log("PASCAL 1111");
+        return {
+                 label: 'Nouvel Indice',
+                 description: getChartIndexDescription({                
+                    portfolioIndexConfig: {
+                        portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+                    }
+                 }, targetDevise),
+                 portfolioIndexConfig: {
+                    portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+                 }
+               }
     }
 
     return (            
@@ -86,12 +98,13 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
         <Box direction="column" alignSelf="start" width="95%" >
             <Tabs activeIndex={pageIndex} justify="start"
                             onActive={(nextIndex) => {                                    
+                                console.log("PASCAL 2222", nextIndex, props.chartSettings.indexV2Selection?.length);
                                     if (nextIndex > props.chartSettings.indexV2Selection!.length) {
                                         // on clique sur +
                                         props.save(
                                             {...props.chartSettings,
                                                 indexV2Selection: props.chartSettings.indexV2Selection === undefined ?
-                                                                [nouvelIndex()] : [...props.chartSettings.indexV2Selection, nouvelIndex()]
+                                                                [nouvelIndex(props.chartSettings.targetDevise!)] : [...props.chartSettings.indexV2Selection, nouvelIndex(props.chartSettings.targetDevise!)]
                                             }, () => { setPageIndex(nextIndex); }
                                         )
                                     }
@@ -168,9 +181,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     ]
                                                 }, () => {})
                                         }/> 
-                                        {
-                                            console.log("PASCAL5234", props.chartSettings.indexV2Selection?.length)
-                                        }
                                         <Button fill={false} alignSelf="center" icon={<Trash color={red}/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
                                                     confirmAlert({
@@ -197,13 +207,14 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         onChange={newValue => 
                                             props.save({...props.chartSettings, 
                                                 indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
-                                                    {...chartIndex, description: newValue},
+                                                    {...chartIndex, description: updateEZLoadTextWithSignature(chartIndex.description, newValue) },
                                                     ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                 ]
                                             }, () => {})
                                     }/>
 
-                                    <ChartIndexMainEditor                                        
+                                    <ChartIndexMainEditor                        
+                                        targetDevise={props.chartSettings.targetDevise!}                
                                         allEzShares={props.allEzShares}
                                         chartIndexV2={chartIndex}
                                         readOnly={props.readOnly}                                        

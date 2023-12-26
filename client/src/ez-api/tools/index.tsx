@@ -50,6 +50,30 @@ export function textCall(promise: Promise<HttpResponse<any, any>>):  Promise<str
 }
 
 
+// return true if the text contains the EZLoad signature => the user did not touch it
+export function isTextContainsEZLoadSignature(text: string | undefined | null) : boolean{
+  if (text === undefined || text === null || text.trim().length === 0){
+      return true;
+  }
+  return text.startsWith(" ") && text.endsWith(".\t ");
+}
+
+export function applyEZLoadTextSignature(text: string) : string {
+  var result = text;
+  if (!text.startsWith(" ")){
+      result = " "+result;
+  }
+  if (!text.endsWith(".\t ")){
+      result = result  + ".\t ";
+  }
+  return result;
+}
+
+
+// Pour ne pas risquer de supprimer la signature, si il y en a une
+export function updateEZLoadTextWithSignature(oldValue: string | undefined | null, newValue: string) : string {
+  return newValue.trim() === oldValue?.trim() ? oldValue : newValue
+}
  
 // onText return true if it wants to stop the streaming
 export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void): Promise<any>{    

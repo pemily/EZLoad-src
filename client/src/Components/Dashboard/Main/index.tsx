@@ -113,10 +113,10 @@ export function DashboardMain(props: DashboardMainProps){
                                         targetDevise: 'EUR',
                                         indexV2Selection: [{
                                             portfolioIndexConfig: {
-                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
+                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",                                                                                                
                                             },
                                             label: "Valeur du portefeuille",
-                                            description: "La valeur globale de mon portefeuille en incluant les liquiditées",
+                                            description: undefined,
                                             perfSettings: undefined,
                                             currencyIndexConfig: undefined, 
                                             shareIndexConfig: undefined,
@@ -154,7 +154,8 @@ export function DashboardMain(props: DashboardMainProps){
                                                                                                                             chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
                                                                                                                                 { ...c, height: c.height!-10 }
                                                                                                                                 : c ) }
-                                                                                                                        , r => setDashConfig(r)) }/>                                        <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
+                                                                                                                        , r => setDashConfig(r)) }/>     
+                                                    <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                                             plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
                                                     <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color={red}/>} gap="xxsmall" margin="xxsmall"
                                                             plain={true} label="" onClick={() =>{
@@ -207,9 +208,9 @@ export function DashboardMain(props: DashboardMainProps){
                                             readOnly={readOnly}
                                             allEzShares={allEzShares}
                                             chartSettings={dashConfig.chartSettings![configIndexEdited]}
-                                            save={(newChartSettsValue, afterSave) => 
+                                            save={(newChartSettsValue, afterSave) => {
                                                 saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)},
-                                                                 (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}
+                                                                 (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}}
                                         />
                                     )
                                 }
