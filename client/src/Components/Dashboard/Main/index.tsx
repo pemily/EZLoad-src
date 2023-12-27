@@ -55,8 +55,8 @@ export function DashboardMain(props: DashboardMainProps){
     }
      
     return (        
-                <Carousel width="100%" controls={false} activeChild={configIndexEdited === -1 ? 0 : 1}>
-                    <Box width="100%" height="5000px">
+                <Box width="100%" pad="medium">
+                    <Box width="100%">
 
                         { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
                                 <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
@@ -165,12 +165,7 @@ export function DashboardMain(props: DashboardMainProps){
                     </Box>
 
                     <Box width="100%" >
-                            {
-                                (configIndexEdited === -1 || dashConfig.chartSettings === undefined || configIndexEdited >= dashConfig.chartSettings.length) && (
-                                    <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                                    Il y a un problème dans la configuration de vos graphique. Essayez de rafraichir la page</Text></Box>
-                                )
-                            }
+                            
 
                             <Box alignSelf="start" direction="row" margin="medium" >
                                 { <Button size="small" icon={<Previous size='small'/>}
@@ -195,7 +190,7 @@ export function DashboardMain(props: DashboardMainProps){
                                 }                                
                             </Box>
                     </Box>
-                </Carousel>
+                </Box>
     );
          
 }
