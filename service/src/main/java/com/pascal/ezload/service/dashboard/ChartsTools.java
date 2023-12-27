@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
@@ -44,8 +45,8 @@ public class ChartsTools {
         return allDates;
     }
 
-    public static Chart createChart(List<EZDate> dates) {
-        Chart chart = new Chart();
+    public static Chart createChart(ChartSettings chartSettings, List<EZDate> dates) {
+        Chart chart = new Chart(chartSettings);
         chart.setLabels(dates.stream().map(ChartsTools::date2Label).collect(Collectors.toList()));
         return chart;
     }

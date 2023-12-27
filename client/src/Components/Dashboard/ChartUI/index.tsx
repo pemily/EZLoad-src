@@ -11,8 +11,7 @@ import { backgrounds } from "grommet-theme-hpe";
 
 
 export interface ChartUIProps {    
-    processRunning: boolean;
-    chartSettings: ChartSettings;
+    processRunning: boolean;    
     chart: Chart; 
     allEzShare: EzShareData[];
     saveChartUI: (chartUI: ChartSettings) => void
@@ -29,13 +28,13 @@ export function ChartUI(props: ChartUIProps){
             <Collapsible open={!edition || props.processRunning}>                
                     <Box direction="row" margin="small">
                         <Box flex="grow" direction="column" alignSelf="center">
-                            <Text alignSelf="center"  margin="0">{props.chartSettings.title}</Text>
+                            <Text alignSelf="center"  margin="0">{props.chart.title}</Text>
                         </Box>
                         <Box  direction="row" alignSelf="end"  margin="0" pad="0">
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chartSettings, height: props.chartSettings.height!+10 }) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!+10 }) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chartSettings, height: props.chartSettings.height!-10 }) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!-10 }) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color="status-critical"/>} gap="xxsmall" margin="xxsmall"
@@ -56,7 +55,7 @@ export function ChartUI(props: ChartUIProps){
                                     }}/>
                         </Box>
                     </Box>
-                    <Box height={(props.chartSettings.height)+"vh"}>
+                    <Box height={(props.chart.height)+"vh"}>
                         <LineChart chart={props.chart}/>
                     </Box>
             </Collapsible> 
@@ -73,7 +72,7 @@ export function ChartUI(props: ChartUIProps){
                         <ChartSettingsEditor
                             readOnly={props.processRunning}
                             allEzShares={props.allEzShare}
-                            chartSettings={props.chartSettings}
+                            chartSettings={props.chart}
                             save={(newChartSettsValue, afterSave) => {
                                     props.saveChartUI(newChartSettsValue)}}
                         />

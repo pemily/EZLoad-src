@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.service.dashboard.Chart;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
@@ -34,12 +35,21 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private Set<String> brokers = new HashSet<>();
     private Set<String> accountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
-
-
     private List<ChartIndexV2> indexV2Selection = new LinkedList<>();
-
     private int height = 50;
     private int nbOfPoints = 200;
+
+    public ChartSettings(){}
+    public ChartSettings(ChartSettings chartSettings){
+        this.targetDevise = chartSettings.targetDevise;
+        this.title = chartSettings.title;
+        this.brokers = chartSettings.brokers;
+        this.accountTypes = chartSettings.accountTypes;
+        this.selectedStartDateSelection = chartSettings.selectedStartDateSelection;
+        this.indexV2Selection = chartSettings.indexV2Selection;
+        this.height = chartSettings.height;
+        this.nbOfPoints = chartSettings.nbOfPoints;
+    }
 
     public String getTargetDevise() {
         return targetDevise;

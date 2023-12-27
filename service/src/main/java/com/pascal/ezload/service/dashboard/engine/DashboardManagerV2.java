@@ -157,8 +157,7 @@ public class DashboardManagerV2 {
 
             List<ChartLine> allChartLines = new LinkedList<>();
 
-            Chart chart = ChartsTools.createChart(dates);
-            chart.setMainTitle(chartSettings.getTitle());
+            Chart chart = ChartsTools.createChart(chartSettings, dates);
             Colors colors = new Colors(chartSettings.getIndexV2Selection().size());
             chartSettings.getIndexV2Selection()
                     .forEach(chartIndex -> {

@@ -120,8 +120,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                                             r => {
                                                                                 setDashConfig(r);                                                                                
                                                                             })}}
-                                            processRunning={props.processRunning}
-                                            chartSettings={dashConfig.chartSettings![index]}
+                                            processRunning={props.processRunning}                                            
                                             chart={chart}
                                             allEzShare={props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames}
                                     />
