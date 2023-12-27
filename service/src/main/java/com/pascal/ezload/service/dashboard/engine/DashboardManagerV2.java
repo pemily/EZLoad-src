@@ -204,7 +204,8 @@ public class DashboardManagerV2 {
         if (currencyIndexConfig != null){
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
-                allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), perfSettings, chart));
+                if (p != null)
+                    allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), perfSettings, chart));
             });
         }
     }

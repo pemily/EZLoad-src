@@ -24,10 +24,25 @@ export function PageUI(props: PageUIProps){
 
 
     return (    
-        <Box width="100%" pad="medium">
-            <Text size="large" alignSelf="center">{props.dashboardPage.title}</Text>
+        <Box width="100%" pad="medium">            
             <Box width="100%">
               
+                <Box>
+                {
+                    props.dashboardPage.charts?.map((chart, index) => {
+                        return (
+                            <ChartUI key={"chartUI"+index}
+                                    deleteChartUI={() => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) })}}
+                                    saveChartUI={(chartUi: ChartSettings) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) })}}
+                                    readOnly={props.readOnly}                                            
+                                    chart={chart}
+                                    allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
+                            />
+                        );
+                    })
+                }
+                </Box>
+
                 <Box alignSelf="end" margin="small" direction="row" >
 
                         <Button size="small" icon={<Add size='small' />}
@@ -57,22 +72,7 @@ export function PageUI(props: PageUIProps){
                                             })
                         }}
                     />
-                </Box>
-                <Box>
-                {
-                    props.dashboardPage.charts?.map((chart, index) => {
-                        return (
-                            <ChartUI key={"chartUI"+index}
-                                    deleteChartUI={() => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) })}}
-                                    saveChartUI={(chartUi: ChartSettings) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) })}}
-                                    readOnly={props.readOnly}                                            
-                                    chart={chart}
-                                    allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
-                            />
-                        );
-                    })
-                }
-                </Box>
+                </Box>                
             </Box>
         </Box> 
     );

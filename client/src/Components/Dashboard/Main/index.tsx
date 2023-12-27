@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab } from "grommet";
+import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab, ThemeContext } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
 import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
@@ -39,14 +39,8 @@ export interface DashboardMainProps {
 
 export function DashboardMain(props: DashboardMainProps){        
     const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
-    const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]>(props.dashboardData?.pages === undefined || props.dashboardData.pages.length === 0 ? [] : props.dashboardData.pages);    
-/*    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);        
+    const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]|undefined>(props.dashboardData?.pages);    
 
-    useEffect(() => {
-        // will be executed when props.enable will become true 
-        setReadOnly(props.processRunning && props.enabled);              
-    }, [ props.enabled, props.processRunning]);
-*/
     if (!props.enabled){
         return (            
             <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
@@ -66,23 +60,45 @@ export function DashboardMain(props: DashboardMainProps){
                                 disabled={props.processRunning}
                                 label="Rafraichir" onClick={() => props.refreshDashboard()} />
             </Box>
-           
-            {
-                dashboardPages.map((page, pageIndex) => (
-                    <PageUI key={"page"+pageIndex}
-                            allEzShare={allEzShares} 
-                            readOnly={props.processRunning}
-                            dashboardPage={page}
-                            deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
-                                setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
-                            })}
-                            savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
-                                setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
-                            })}
-                            />
 
-                ))
-            }
+            <ThemeContext.Extend
+                value={{
+                    tabs: {                                
+                        gap: 'none',
+                        header: {
+                            background: 'background-back',                  
+                            extend: 'padding: 4px;',                  
+                        },
+                    },
+                }}>
+                {  dashboardPages && (                  
+                    <Tabs  onActive={(i: number) => {if (i === dashboardPages.length) 
+                                                            saveDashboardConfig([...dashboardPages, { title: "Nouvelle Page" }], afterSavePage => {                            
+                                                                setDashboardPages([...dashboardPages, {title: "Nouvelle Page"}])
+                                                        })}}>           
+                        {
+                            dashboardPages.map((page, pageIndex) => (
+                                <Tab title={page.title} key={"page"+pageIndex}>
+                                <PageUI allEzShare={allEzShares} 
+                                        readOnly={props.processRunning}
+                                        dashboardPage={page}
+                                        deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
+                                            setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
+                                        })}
+                                        savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
+                                            setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
+                                        })}
+                                        />              
+                                </Tab>                      
+                            ))
+                        }
+                        <Tab title="+">
+                        </Tab>
+                    </Tabs> 
+                    )
+                }
+            </ThemeContext.Extend>
+
             </>
     )
     

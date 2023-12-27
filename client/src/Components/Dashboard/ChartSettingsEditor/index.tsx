@@ -77,17 +77,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
     }
 
     return (            
-        <ThemeContext.Extend
-            value={{
-                tabs: {                                
-                    gap: 'none',
-                    header: {
-                    background: 'background-back',                  
-                    extend: 'padding: 4px;',                  
-                    },
-                },
-            }}
-        >
         <Box direction="column" alignSelf="start" width="95%" >
             <Tabs activeIndex={pageIndex} justify="start"
                             onActive={(nextIndex) => {                                    
@@ -233,8 +222,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 </Tab> 
             </Tabs>
         </Box>
-
-        </ThemeContext.Extend>
     );
  
     
