@@ -26,7 +26,8 @@ import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.Chart;
 import com.pascal.ezload.service.dashboard.DashboardData;
-import com.pascal.ezload.service.dashboard.config.DashboardSettings;
+import com.pascal.ezload.service.dashboard.config.ChartSettings;
+import com.pascal.ezload.service.dashboard.config.DashboardPage;
 import com.pascal.ezload.service.dashboard.engine.DashboardManagerV2;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
@@ -68,11 +69,10 @@ public class DashboardHandler {
             MainSettings mainSettings = settingsManager.loadProps().validate();
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
             DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
-            DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
-            List<Chart> charts = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, null);
+            List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
+            List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, null);
             dashboardData = new DashboardData();
-            dashboardData.setDashboardSettings(dashboardSettings);
-            dashboardData.setCharts(charts);
+            dashboardData.setPages(chartsPages);
             ezServerState.setDashboardData(dashboardData);
             dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
         }
@@ -101,11 +101,10 @@ public class DashboardHandler {
                         EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, settingsManager, mainSettings, ezProfil, reporting);
                         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
                         DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
-                        DashboardSettings dashboardSettings = dashboardManager.loadDashboardSettings();
-                        List<Chart> charts = dashboardManager.loadDashboard(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
+                        List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
+                        List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
-                        dashboardData.setDashboardSettings(dashboardSettings);
-                        dashboardData.setCharts(charts);
+                        dashboardData.setPages(chartsPages);
                         ezServerState.setDashboardData(dashboardData);
                         dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
                     }
@@ -116,12 +115,12 @@ public class DashboardHandler {
     @Path("/saveDashboardConfig")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public DashboardSettings saveDashboardConfig(DashboardSettings dashboardSettings) throws Exception {
+    public List<DashboardPage<ChartSettings>> saveDashboardConfig(List<DashboardPage<ChartSettings>> dashboardSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
         DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
         dashboardManager.saveDashboardSettings(dashboardSettings);
-        return dashboardSettings.validate();
+        return dashboardSettings;
     }
 
 

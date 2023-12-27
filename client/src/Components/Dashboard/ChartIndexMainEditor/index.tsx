@@ -38,7 +38,6 @@ export interface ChartIndexMainEditorProps {
 
 export function getChartIndexDescription(chartSettings: ChartSettings, chartIndexV2: ChartIndexV2){
     var result : string = "Affiche ";
-console.log("PASCAL 000", chartSettings, chartIndexV2);
     var signOfDevise: string = "";
     switch(chartSettings.targetDevise!){
         case "EUR": signOfDevise = "€"; break;
@@ -71,7 +70,6 @@ console.log("PASCAL 000", chartSettings, chartIndexV2);
     else {
         result += "la valeur en "+signOfDevise+" ";
     }
-    console.log("PASCAL 4444  chartIndexV2.shareIndexConfig: ", chartIndexV2);
     if (isDefined(chartIndexV2.shareIndexConfig)){
         switch (chartIndexV2.shareIndexConfig?.shareIndex){
             case "SHARE_BUY_SOLD_WITH_DETAILS":
@@ -121,7 +119,6 @@ console.log("PASCAL 000", chartSettings, chartIndexV2);
                 result += "de votre portefeuilles en incluant les liquidités"; break;
         }        
     }
-    console.log("PASCAL 55555", chartIndexV2, result);
     return applyEZLoadTextSignature(result);
   }
   

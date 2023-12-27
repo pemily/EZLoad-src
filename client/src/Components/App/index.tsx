@@ -223,11 +223,9 @@ export function App(){
             .catch(e => console.error(e));
     }
 
-    function getDashboard(): void | PromiseLike<void> {      
-        console.log("PASCAL CALL RELOAD DASHBOARD");  
+    function getDashboard(): void | PromiseLike<void> {     
         return jsonCall(ezApi.dashboard.getDashboardData())
             .then(r => {
-                console.log("PASCAL GET DASHBOARD DATA RESULT", r);
                 setDashboardData(r);
             })
             .catch((error) => {
@@ -236,11 +234,9 @@ export function App(){
     }
 
     function refreshDashboardData(): void {
-        console.log("PASCAL CALL REFRESH");        
         jsonCall(ezApi.dashboard.refreshDashboardData())
                 .then(followProcess)
                 .then(r => {
-                    console.log('PASCAL GET DASHBOARD AFTER REFRESH');
                     getDashboard();
                 })
                 .catch((error) => {
@@ -345,7 +341,7 @@ export function App(){
                     <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
                         <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
                                         dashboardData={dashboardData}
-                                        refreshDashboard={refreshDashboardData}
+                                        refreshDashboard={refreshDashboardData}                                        
                                         actionWithMsg={actionWithMsg}/>
                     </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>

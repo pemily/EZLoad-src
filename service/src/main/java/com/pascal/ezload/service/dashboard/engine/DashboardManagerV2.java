@@ -17,12 +17,10 @@
  */
 package com.pascal.ezload.service.dashboard.engine;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.dashboard.Chart;
-import com.pascal.ezload.service.dashboard.ChartLine;
-import com.pascal.ezload.service.dashboard.ChartsTools;
-import com.pascal.ezload.service.dashboard.Colors;
+import com.pascal.ezload.service.dashboard.*;
 import com.pascal.ezload.service.dashboard.config.*;
 import com.pascal.ezload.service.dashboard.engine.builder.*;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
@@ -52,7 +50,7 @@ public class DashboardManagerV2 {
         this.ezActionManager = ezActionManager;
     }
 
-    public DashboardSettings loadDashboardSettings() {
+    public List<DashboardPage<ChartSettings>>  loadDashboardSettings() {
         if (!new File(dashboardFile).exists()) {
             try (InputStream in = DashboardManagerV2.class.getResourceAsStream("/defaultDashboard.json")) {
                 FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
@@ -63,37 +61,39 @@ public class DashboardManagerV2 {
         }
 
         try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
-            DashboardSettings dashboardSettings = JsonUtil.createDefaultMapper().readValue(reader, DashboardSettings.class);
-            dashboardSettings.validate();
-            return dashboardSettings;
+            return JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
         }
         catch (Exception e){
             e.printStackTrace();
         }
 
-        return new DashboardSettings();
+        return new LinkedList<>();
     }
 
-    public List<Chart> loadDashboard(Reporting reporting, DashboardSettings dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
+    public List<DashboardPage<Chart>> loadDashboard(Reporting reporting, List<DashboardPage<ChartSettings>> dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
         // if ezPortfolioProxy est null => dry run with no data extraction
-        List<Chart> charts = new LinkedList<>();
-        charts = dashboardSettings.getChartSettings().stream()
-                .map(prefs -> {
-                    try {
-                        return createChart(reporting,
-                                ezPortfolioProxy,
-                                prefs
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+        return dashboardSettings.stream()
+                .map(page -> {
+                    DashboardPage<Chart> pageWithChart = new DashboardPage<>();
+                    pageWithChart.setTitle(page.getTitle());
+                    pageWithChart.setCharts(
+                    page.getCharts().stream().map(prefs -> {
+                        try {
+                            return createChart(reporting,
+                                    ezPortfolioProxy,
+                                    prefs
+                            );
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList()));
+                    return pageWithChart;
                 })
                 .collect(Collectors.toList());
-        return charts;
     }
 
-    public void saveDashboardSettings(DashboardSettings dashboardSettings) throws IOException {
-        dashboardSettings.clearErrors();
+    public void saveDashboardSettings(List<DashboardPage<ChartSettings>> dashboardSettings) throws IOException {
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(dashboardFile, StandardCharsets.UTF_8), dashboardSettings);
     }
 

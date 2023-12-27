@@ -1,7 +1,7 @@
 import { Box, Button, Text, Carousel, Card, Collapsible } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg, EzShareData, DashboardData } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -11,10 +11,10 @@ import { backgrounds } from "grommet-theme-hpe";
 
 
 export interface ChartUIProps {    
-    processRunning: boolean;    
+    readOnly: boolean;    
     chart: Chart; 
     allEzShare: EzShareData[];
-    saveChartUI: (chartUI: ChartSettings) => void
+    saveChartUI: (chart: ChartSettings) => void
     deleteChartUI: () => void
 }      
 
@@ -25,7 +25,7 @@ export function ChartUI(props: ChartUIProps){
         <>
 
         <Box pad="small" border="all" margin="xxsmall" background="white" flex="grow">
-            <Collapsible open={!edition || props.processRunning}>                
+            <Collapsible open={!edition || props.readOnly}>                
                     <Box direction="row" margin="small">
                         <Box flex="grow" direction="column" alignSelf="center">
                             <Text alignSelf="center"  margin="0">{props.chart.title}</Text>
@@ -61,7 +61,7 @@ export function ChartUI(props: ChartUIProps){
             </Collapsible> 
         
             
-            {(edition && !props.processRunning) && (
+            {(edition && !props.readOnly) && (
                 <>
                 <Box alignSelf="end" direction="row" margin="xsmall" >
                     { <Button size="small" icon={<Close size='small'/>}                            
@@ -70,7 +70,7 @@ export function ChartUI(props: ChartUIProps){
 
                 <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
                         <ChartSettingsEditor
-                            readOnly={props.processRunning}
+                            readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
                             chartSettings={props.chart}
                             save={(newChartSettsValue, afterSave) => {

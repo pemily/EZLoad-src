@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Carousel, Card, Collapsible } from "grommet";
+import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, DashboardSettings, ActionWithMsg, EzShareData, DashboardData } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -26,6 +26,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
 import { ChartUI } from "../ChartUI";
+import { PageUI } from "../PageUI";
 
 
 export interface DashboardMainProps {
@@ -36,17 +37,16 @@ export interface DashboardMainProps {
     refreshDashboard: () => void;
 }      
 
-export function DashboardMain(props: DashboardMainProps){    
-    const [dashConfig, setDashConfig] = useState<DashboardSettings>(props.dashboardData?.dashboardSettings === undefined ? {} : props.dashboardData.dashboardSettings);
+export function DashboardMain(props: DashboardMainProps){        
     const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
-    const [dashCharts, setDashCharts] = useState<Chart[]>(props.dashboardData?.charts === undefined ? [] : props.dashboardData.charts);    
-    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);        
+    const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]>(props.dashboardData?.pages === undefined || props.dashboardData.pages.length === 0 ? [] : props.dashboardData.pages);    
+/*    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);        
 
     useEffect(() => {
         // will be executed when props.enable will become true 
         setReadOnly(props.processRunning && props.enabled);              
     }, [ props.enabled, props.processRunning]);
-
+*/
     if (!props.enabled){
         return (            
             <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
@@ -54,82 +54,36 @@ export function DashboardMain(props: DashboardMainProps){
         );
     }
      
-    return (        
-                <Box width="100%" pad="medium">
-                    <Box width="100%">
+    return (
+        <>
+            { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
+                <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
+                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box>
+            )}
 
-                        { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
-                                <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box>
-                            )
-                        }
-                        { !readOnly && (!dashCharts || dashCharts.length === 0)  && (
-                                <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Cliquez sur "Rafraichir" pour charger vos données</Text></Box>
-                            )
-                        }
-                        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) === 0 && (
-                                <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                                    Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box>
-                            )
-                        }
-
-                        <Box alignSelf="end" margin="small" direction="row" >
-                            <Button size="small" icon={<Refresh size='small' />}
-                                disabled={readOnly /*|| !dashConfig.chartSettings || dashConfig.chartSettings?.length === 0*/}
+            <Box pad="small">
+                <Button size="small" alignSelf="end" icon={<Refresh size='small' />}
+                                disabled={props.processRunning}
                                 label="Rafraichir" onClick={() => props.refreshDashboard()} />
-
-                                <Button size="small" icon={<Add size='small' />}
-                                label="Nouveau" onClick={() => {
-                                    // init
-                                    const newChart: ChartSettings = {
-                                        accountTypes: accountTypes,
-                                        brokers: brokers,
-                                        title: 'Titre à changer',
-                                        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
-                                        targetDevise: 'EUR',
-                                        indexV2Selection: [{
-                                            portfolioIndexConfig: {
-                                                portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
-                                            },
-                                            label: "Valeur du portefeuille",
-                                            description: "",
-                                            perfSettings: undefined,
-                                            currencyIndexConfig: undefined,
-                                            shareIndexConfig: undefined,
-                                        }],
-                                    };
-
-                                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]}
-                                                                                : {...dashConfig, chartSettings: [newChart]}
-                                                        , r => {
-                                                            setDashConfig(r);
-                                                        });
-                                }}
+            </Box>
+           
+            {
+                dashboardPages.map((page, pageIndex) => (
+                    <PageUI key={"page"+pageIndex}
+                            allEzShare={allEzShares} 
+                            readOnly={props.processRunning}
+                            dashboardPage={page}
+                            deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
+                                setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
+                            })}
+                            savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
+                                setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
+                            })}
                             />
-                        </Box>
-                        <Box>
-                        {
-                            dashCharts?.map((chart, index) => {
-                                return (
-                                    <ChartUI deleteChartUI={() => {saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }, 
-                                                                            r => {
-                                                                                setDashConfig(r);
-                                                                            })}}
-                                            saveChartUI={(chartUi) => {saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((c,i) => i !== index ? c : chartUi) }, 
-                                                                            r => {
-                                                                                setDashConfig(r);                                                                                
-                                                                            })}}
-                                            processRunning={props.processRunning}                                            
-                                            chart={chart}
-                                            allEzShare={props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames}
-                                    />
-                                );
-                            })
-                        }
-                        </Box>
-                    </Box>
-                </Box>
-    );
-         
+
+                ))
+            }
+            </>
+    )
+    
 }

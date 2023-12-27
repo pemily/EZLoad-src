@@ -31,7 +31,7 @@ export interface LineChartProps {
 export function LineChart(props: LineChartProps){
     const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
     const lineIsVisible : boolean[] = [];    
-
+    
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
             lineIsVisible[i] = props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
@@ -93,7 +93,7 @@ export function LineChart(props: LineChartProps){
         plugins: {
             title: {
                 display: false,
-                text: props.chart.mainTitle
+                text: props.chart.title
             },
             tooltip: {
                 enabled: true,

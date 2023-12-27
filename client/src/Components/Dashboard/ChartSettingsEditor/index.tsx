@@ -68,7 +68,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
     const [pageIndex, setPageIndex] = useState<number>(0);     
     
     function nouvelIndex(targetDevise: string) : ChartIndexV2 {
-        console.log("PASCAL 1111");
         return {
                  label: 'Nouvel Indice',
                  portfolioIndexConfig: {
@@ -92,7 +91,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
         <Box direction="column" alignSelf="start" width="95%" >
             <Tabs activeIndex={pageIndex} justify="start"
                             onActive={(nextIndex) => {                                    
-                                console.log("PASCAL 2222", nextIndex, props.chartSettings.indexV2Selection?.length);
                                     if (nextIndex > props.chartSettings.indexV2Selection!.length) {
                                         // on clique sur +
                                         props.save(
@@ -159,7 +157,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 </Tab>    
                 {
                     props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => {     
-                        console.log("PASCAL indexLoop", chartIndex);
                         return (
                             <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
                                 <Box pad={{ vertical: 'none', horizontal: 'small' }}>

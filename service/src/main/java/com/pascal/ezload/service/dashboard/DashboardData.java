@@ -17,30 +17,21 @@
  */
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.dashboard.config.DashboardSettings;
+import com.pascal.ezload.service.dashboard.config.DashboardPage;
 
 import java.util.List;
 
 public class DashboardData {
 
-    private List<Chart> charts;
-    private DashboardSettings dashboardSettings;
+    private List<DashboardPage<Chart>> pages;
     private List<EzShareData> shareGoogleCodeAndNames;
 
-    public List<Chart> getCharts() {
-        return charts;
+    public List<DashboardPage<Chart>> getPages() {
+        return pages;
     }
 
-    public void setCharts(List<Chart> charts) {
-        this.charts = charts;
-    }
-
-    public DashboardSettings getDashboardSettings() {
-        return dashboardSettings;
-    }
-
-    public void setDashboardSettings(DashboardSettings dashboardSettings) {
-        this.dashboardSettings = dashboardSettings;
+    public void setPages(List<DashboardPage<Chart>> pages) {
+        this.pages = pages;
     }
 
     public List<EzShareData> getShareGoogleCodeAndNames() {
