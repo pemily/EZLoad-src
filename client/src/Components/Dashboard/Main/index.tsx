@@ -25,6 +25,7 @@ import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
+import { ChartUI } from "../ChartUI";
 
 
 export interface DashboardMainProps {
@@ -40,7 +41,6 @@ export function DashboardMain(props: DashboardMainProps){
     const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
     const [dashCharts, setDashCharts] = useState<Chart[]>(props.dashboardData?.charts === undefined ? [] : props.dashboardData.charts);    
     const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);        
-    const [configIndexEdited, setConfigIndexEdit] = useState<number>(-1);
 
     useEffect(() => {
         // will be executed when props.enable will become true 
@@ -104,7 +104,6 @@ export function DashboardMain(props: DashboardMainProps){
                                                                                 : {...dashConfig, chartSettings: [newChart]}
                                                         , r => {
                                                             setDashConfig(r);
-                                                            setConfigIndexEdit(dashConfig.chartSettings!.length);
                                                         });
                                 }}
                             />
@@ -113,82 +112,23 @@ export function DashboardMain(props: DashboardMainProps){
                         {
                             dashCharts?.map((chart, index) => {
                                 return (
-                                    <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
-                                                    pad="small" border="all" margin="xxsmall" background="white" flex="grow" key={"chart"+index}>
-                                        <Box direction="row" margin="small">
-                                            <Box flex="grow" direction="column" alignSelf="center">
-                                                <Text alignSelf="center"  margin="0">{chart.mainTitle}</Text>
-                                            </Box>
-                                            <Box  direction="row" alignSelf="end"  margin="0" pad="0">
-                                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig,
-                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ?
-                                                                                                                            { ...c, height: c.height!+10 }
-                                                                                                                            : c ) }
-                                                                                                                    , r => setDashConfig(r)) }/>
-                                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig,
-                                                                                                                        chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ?
-                                                                                                                            { ...c, height: c.height!-10 }
-                                                                                                                            : c ) }
-                                                                                                                    , r => setDashConfig(r)) }/>
-                                                <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
-                                                <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color="status-critical"/>} gap="xxsmall" margin="xxsmall"
-                                                        plain={true} label="" onClick={() =>{
-                                                            confirmAlert({
-                                                                title: 'Etes vous sûr de vouloir supprimer ce graphique?',
-                                                                buttons: [
-                                                                {
-                                                                    label: 'Oui',
-                                                                    onClick: () => {
-                                                                        setDashCharts(dashCharts.filter((c,i) => i !== index));
-                                                                        saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }
-                                                                                            , r => setDashConfig(r));
-                                                                    }
-                                                                },
-                                                                {
-                                                                    label: 'Non',
-                                                                    onClick: () => {}
-                                                                }
-                                                                ]
-                                                            });
-                                                        }}/>
-                                            </Box>
-                                        </Box>
-                                        <LineChart chart={chart}/>
-                                    </Box>
+                                    <ChartUI deleteChartUI={() => {saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }, 
+                                                                            r => {
+                                                                                setDashConfig(r);
+                                                                            })}}
+                                            saveChartUI={(chartUi) => {saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((c,i) => i !== index ? c : chartUi) }, 
+                                                                            r => {
+                                                                                setDashConfig(r);                                                                                
+                                                                            })}}
+                                            processRunning={props.processRunning}
+                                            chartSettings={dashConfig.chartSettings![index]}
+                                            chart={chart}
+                                            allEzShare={props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames}
+                                    />
                                 );
                             })
                         }
                         </Box>
-                    </Box>
-
-                    <Box width="100%" >
-                            
-
-                            <Box alignSelf="start" direction="row" margin="medium" >
-                                { <Button size="small" icon={<Previous size='small'/>}
-                                            disabled={readOnly}
-                                            label="Retour" onClick={() => { setConfigIndexEdit(-1); /*refresh() */ } } />  }
-                            </Box>
-
-                            <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
-                                {
-                                    configIndexEdited !== -1 && (
-                                        <ChartSettingsEditor
-                                            readOnly={readOnly}
-                                            allEzShares={allEzShares}
-                                            chartSettings={dashConfig.chartSettings![configIndexEdited]}
-                                            save={(newChartSettsValue, afterSave) => {
-                                                saveDashboardConfig({...dashConfig,
-                                                                        chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)
-                                                                    },
-                                                                 (dashConfig) => { setDashConfig(dashConfig); afterSave(); })}}
-                                        />
-                                    )
-                                }                                
-                            </Box>
                     </Box>
                 </Box>
     );
