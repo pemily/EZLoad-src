@@ -20,7 +20,7 @@ export interface ChartUIProps {
 
 export function ChartUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);
-
+console.log('PASCAL ', props.chart)
     return (
         <>
 
@@ -39,8 +39,13 @@ export function ChartUI(props: ChartUIProps){
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
                         </Box>
                     </Box>
-                    <Box height={(props.chart.height)+"vh"}>
-                        <LineChart chart={props.chart}/>
+                    <Box height={(props.chart.height)+"vh"}>     
+                        {
+                            props.chart.lines && (<LineChart chart={props.chart}/>)                            
+                        }                   
+                        {
+                            !props.chart.lines && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)
+                        }
                     </Box>
             </Collapsible> 
         
@@ -55,7 +60,7 @@ export function ChartUI(props: ChartUIProps){
                                             buttons: [
                                             {
                                                 label: 'Oui',
-                                                onClick: () => { props.deleteChartUI() }
+                                                onClick: () => { props.deleteChartUI();  setEdition(false) }
                                             },
                                             {
                                                 label: 'Non',

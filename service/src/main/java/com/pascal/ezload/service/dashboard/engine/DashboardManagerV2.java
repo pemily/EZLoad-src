@@ -180,7 +180,7 @@ public class DashboardManagerV2 {
         ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (portfolioIndexConfig != null){
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
-            Prices prices = perfSettings == null ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
+            Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs().get(index);
             allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), perfSettings, chart));
         }
@@ -191,7 +191,7 @@ public class DashboardManagerV2 {
         ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (shareIndexConfig != null){
             ShareIndex index = shareIndexConfig.getShareIndex();
-            Map<EZShare, Prices> share2Price = perfSettings == null ? shareIndexResult.getShareIndex2TargetPrices().get(index)
+            Map<EZShare, Prices> share2Price = perfSettings == null || !perfSettings.correctlyDefined() ? shareIndexResult.getShareIndex2TargetPrices().get(index)
                                                                     : perfIndexResult.getSharePerfs().get(index);
             share2Price.forEach((share, prices) ->
                     allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), perfSettings, chart)));
@@ -203,7 +203,7 @@ public class DashboardManagerV2 {
         ChartPerfSettings perfSettings = chartIndexV2.getPerfSettings();
         if (currencyIndexConfig != null){
             currenciesResult.getAllDevises().forEach(devise -> {
-                Prices p = perfSettings == null ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
+                Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
                 if (p != null)
                     allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), perfSettings, chart));
             });
@@ -213,7 +213,7 @@ public class DashboardManagerV2 {
     private ChartLine createChartLine(Prices prices, String lineTitle, Colors.ColorCode color, ChartPerfSettings chartPerfSettings, Chart chart){
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
-        if (chartPerfSettings != null){
+        if (chartPerfSettings != null && chartPerfSettings.correctlyDefined()){
             lineStyle = ChartLine.LineStyle.BAR_STYLE;
             transparency = 0.6f;
         }

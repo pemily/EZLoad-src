@@ -16,14 +16,16 @@ public class PerfIndexBuilder {
         Result result = new Result();
         indexSelection
             .forEach(index -> {
-                if (index.getShareIndexConfig() != null && index.getPerfSettings() != null){
-                    buildShareIndexes(shareIndexResult, index, result);
-                }
-                if (index.getPortfolioIndexConfig() != null && index.getPerfSettings() != null){
-                    buildPortfolioIndex(portfolioResult, index, result);
-                }
-                if (index.getCurrencyIndexConfig() != null && index.getPerfSettings() != null){
-                    buildCurrencyIndex(reporting,  currenciesResult, index, result);
+                if (index.getPerfSettings() != null && index.getPerfSettings().correctlyDefined()) {
+                    if (index.getShareIndexConfig() != null) {
+                        buildShareIndexes(shareIndexResult, index, result);
+                    }
+                    if (index.getPortfolioIndexConfig() != null) {
+                        buildPortfolioIndex(portfolioResult, index, result);
+                    }
+                    if (index.getCurrencyIndexConfig() != null) {
+                        buildCurrencyIndex(reporting, currenciesResult, index, result);
+                    }
                 }
             });
 

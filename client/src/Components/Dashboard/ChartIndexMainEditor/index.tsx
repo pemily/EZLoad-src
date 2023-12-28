@@ -277,11 +277,13 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                                                 'NONE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
                             userValues={[                             
                                 'Aucune',
+                                'Depuis la 1ère date du graphique',
                                 'Par mois',
                                 'Par année'
                             ]}
                             codeValues={[
                                 'NONE',
+                                'FROM_START',
                                 'MONTHLY',                                    
                                 'YEARLY'
                             ]}

@@ -20,4 +20,8 @@ public class ChartPerfSettings {
     public void setPerfGroupedBy(ChartPerfGroupedBy perfGroupedBy) {
         this.perfGroupedBy = perfGroupedBy;
     }
+
+    public boolean correctlyDefined() {
+        return perfGroupedBy != null && perfFilter != null;
+    }
 }
