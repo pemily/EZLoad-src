@@ -33,7 +33,7 @@ export interface ChartSettingsEditorProps {
     chartSettings: ChartSettings;
     allEzShares: EzShareData[];    
     readOnly: boolean;
-    save: (chartSettings: ChartSettings, afterSave: () => void) => void;
+    save: (chartSettings: ChartSettings, keepLines: boolean, afterSave: () => void) => void;
 }      
 
 
@@ -65,11 +65,12 @@ export const brokers = ["Autre",
 export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assurance-Vie"];
 
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
-    const [pageIndex, setPageIndex] = useState<number>(0);     
+    const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
-    function nouvelIndex(targetDevise: string) : ChartIndexV2 {
+    function nouvelIndice(targetDevise: string) : ChartIndexV2 {
         return {
                  label: 'Nouvel Indice',
+                 graphStyle: 'LINE',
                  portfolioIndexConfig: {
                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
                  }
@@ -78,18 +79,18 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
 
     return (            
         <Box direction="column" alignSelf="start" width="95%" >
-            <Tabs activeIndex={pageIndex} justify="start"
+            <Tabs activeIndex={indiceIndex} justify="start"
                             onActive={(nextIndex) => {                                    
                                     if (nextIndex > props.chartSettings.indexV2Selection!.length) {
                                         // on clique sur +
                                         props.save(
                                             {...props.chartSettings,
                                                 indexV2Selection: props.chartSettings.indexV2Selection === undefined ?
-                                                                [nouvelIndex(props.chartSettings.targetDevise!)] : [...props.chartSettings.indexV2Selection, nouvelIndex(props.chartSettings.targetDevise!)]
-                                            }, () => { setPageIndex(nextIndex); }
+                                                                [nouvelIndice(props.chartSettings.targetDevise!)] : [...props.chartSettings.indexV2Selection, nouvelIndice(props.chartSettings.targetDevise!)]
+                                            }, false, () => { setIndiceIndex(nextIndex); }
                                         )
                                     }
-                                    else setPageIndex(nextIndex);
+                                    else setIndiceIndex(nextIndex);
                                 }                                
             }>
                 <Tab title="Graphique" >
@@ -99,7 +100,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 isRequired={true}                     
                                 readOnly={false}                    
                                 onChange={newValue => {
-                                    props.save({...props.chartSettings, title: newValue}, () => {});
+                                    props.save({...props.chartSettings, title: newValue}, true, () => {});
                                 }}/>
                         
                         <ComboFieldWithCode id="startDateSelection"
@@ -110,7 +111,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         codeValues={['FROM_MY_FIRST_OPERATION', 'ONE_YEAR','TWO_YEAR','THREE_YEAR','FIVE_YEAR','TEN_YEAR']}                            
                                         userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans"]}
                                         description=""
-                                        onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, () => {})}/>
+                                        onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, false, () => {})}/>
 
 
                         <ComboField id="devise"
@@ -120,7 +121,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             readOnly={false}
                                             values={[ "EUR", "USD", "AUD", "CAD", "CHF"]}
                                             description=""
-                                            onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue}, () => {})}/>
+                                            onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue}, false, () => {})}/>
                         
 
                         <ComboMultipleWithCheckbox id="accountType"
@@ -131,7 +132,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             userValues={accountTypes}                                
                                             codeValues={accountTypes}
                                             description=""
-                                            onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue}, () => {})}/>
+                                            onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue}, false, () => {})}/>
 
                         <ComboMultipleWithCheckbox id="brokers"
                                             label="Filtre sur les courtiers"
@@ -141,7 +142,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             codeValues={brokers}
                                             userValues={brokers}
                                             description=""
-                                            onChange={newValue  => props.save({...props.chartSettings, brokers: newValue}, () => {})}/>
+                                            onChange={newValue  => props.save({...props.chartSettings, brokers: newValue}, false, () => {})}/>
                     </Box>
                 </Tab>    
                 {
@@ -160,7 +161,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                         {...chartIndex, label: newValue},
                                                         ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                     ]
-                                                }, () => {})
+                                                }, true, () => {})
                                         }/> 
                                         <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
@@ -171,8 +172,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                             label: 'Oui',
                                                             onClick: () => {
                                                                 props.save({...props.chartSettings, 
-                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, () => {
-                                                                        setPageIndex(pageIndex === props.chartSettings.indexV2Selection!.length ? pageIndex -1 : pageIndex)
+                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, true, () => {
+                                                                        setIndiceIndex(indiceIndex === props.chartSettings.indexV2Selection!.length ? indiceIndex -1 : indiceIndex)
                                                                     })
                                                             }
                                                         },
@@ -193,7 +194,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     {...chartIndex, description: updateEZLoadTextWithSignature(chartIndex.description, newValue) },
                                                     ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                 ]
-                                            }, () => {})
+                                            }, true, () => {})
                                     }/>
 
                                     <ChartIndexMainEditor                        
@@ -201,7 +202,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         allEzShares={props.allEzShares}
                                         chartIndexV2={chartIndex}
                                         readOnly={props.readOnly}                                        
-                                        save={newChartIndex  => 
+                                        save={(newChartIndex)  => 
                                             props.save({...props.chartSettings, 
                                                 indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
                                                     {
@@ -211,7 +212,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     },     
                                                     ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                 ]
-                                            }, () => {})}/>           
+                                            }, false, () => {})}/>           
                                           
                                 </Box>
                             </Tab>

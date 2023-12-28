@@ -29,6 +29,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PortfolioIndexBuilderV2 {
 
@@ -136,21 +137,25 @@ public class PortfolioIndexBuilderV2 {
     private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter){
         PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, sharePrices);
 
-        return acc.process(operations
-                            .stream()
-                            .filter(getBrokerFilter(brokersFilter))
-                            .filter(getAccountTypeFilter(accountTypeFilter)));
+        return acc.process(getFilteredOperationRows(operations, brokersFilter, accountTypeFilter));
     }
 
-    private Predicate<PortfolioStateAtDate> getDateFilter(EZDate from, EZDate today) {
+    public static Stream<Row> getFilteredOperationRows(List<Row> operations, Set<String> brokersFilter, Set<String> accountTypeFilter) {
+        return operations
+                .stream()
+                .filter(getBrokerFilter(brokersFilter))
+                .filter(getAccountTypeFilter(accountTypeFilter));
+    }
+
+    private static Predicate<PortfolioStateAtDate> getDateFilter(EZDate from, EZDate today) {
         return row -> row.getDate().isAfterOrEquals(from) && row.getDate().isBeforeOrEquals(today);
     }
 
-    private Predicate<Row> getAccountTypeFilter(Set<String> accountTypeFilter) {
+    private static Predicate<Row> getAccountTypeFilter(Set<String> accountTypeFilter) {
         return row -> accountTypeFilter.contains(row.getValueStr(MesOperations.COMPTE_TYPE_COL));
     }
 
-    private Predicate<Row> getBrokerFilter(Set<String> brokersFilter) {
+    private static Predicate<Row> getBrokerFilter(Set<String> brokersFilter) {
         return row -> brokersFilter.contains(row.getValueStr(MesOperations.COURTIER_DISPLAY_NAME_COL));
     }
 

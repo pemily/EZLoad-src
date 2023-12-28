@@ -87,11 +87,9 @@ export function DashboardMain(props: DashboardMainProps){
                                         <PageUI allEzShare={allEzShares} 
                                                 readOnly={props.processRunning}
                                                 dashboardPage={page}
-                                                deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
-                                                    setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
-                                                })}
-                                                savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
-                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
+                                                savePageUI={(newPage, keepLines, afterSave) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), keepLines, afterSavePage => {
+                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p));
+                                                    afterSave();
                                                 })}
                                                 />              
                                         </Tab>                      
@@ -115,7 +113,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                                     ...p,
                                                                     title: newValue
                                                                 } : p);
-                                saveDashboardConfig(f, afterSave => setDashboardPages(f));
+                                saveDashboardConfig(f, true, afterSave => setDashboardPages(f));
                             }
                             }/>
                             <Button fill={false} icon={<Trash size='medium' color="status-critical"/>} gap="none" margin="none" pad="0"
@@ -127,7 +125,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                     {
                                                         label: 'Oui',
                                                         onClick: () => { saveDashboardConfig(dashboardPages.filter((p, i) => i !== pageIndex),
-                                                                                 afterSave => setDashboardPages(dashboardPages.filter((p, i) => i !== pageIndex))) }
+                                                                                 true, afterSave => setDashboardPages(dashboardPages.filter((p, i) => i !== pageIndex))) }
                                                     },
                                                     {
                                                         label: 'Non',
@@ -142,7 +140,7 @@ export function DashboardMain(props: DashboardMainProps){
                     <Button margin="medium" size="small" alignSelf="start" icon={<Add size='small' />}
                                 disabled={props.processRunning}
                                 label="Nouvelle Page" 
-                                onClick={() => saveDashboardConfig([...dashboardPages, {title: "Titre à changer"}],
+                                onClick={() => saveDashboardConfig([...dashboardPages, {title: "Titre à changer"}], true,
                                                      afterSave => setDashboardPages([...dashboardPages, {title: "Titre à changer"}]))} />
             
                     </Box>

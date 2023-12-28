@@ -4,6 +4,7 @@ public class ChartIndexV2 {
 
     private String label;
     private String description;
+    private GraphStyle graphStyle = GraphStyle.LINE;
 
     // It's a oneOf (only one of those value below are set, others are null)
     private ChartPortfolioIndexConfig portfolioIndexConfig;
@@ -57,5 +58,13 @@ public class ChartIndexV2 {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public GraphStyle getGraphStyle() {
+        return graphStyle;
+    }
+
+    public void setGraphStyle(GraphStyle graphStyle) {
+        this.graphStyle = graphStyle;
     }
 }

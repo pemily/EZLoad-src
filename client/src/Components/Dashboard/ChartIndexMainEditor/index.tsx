@@ -25,7 +25,7 @@ import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
 import { ComboMultiple } from "../../Tools/ComboMultiple";
-import { ca } from "date-fns/locale";
+import { ca, is } from "date-fns/locale";
 
 export interface ChartIndexMainEditorProps {    
     chartSettings: ChartSettings;
@@ -48,7 +48,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
         default:  signOfDevise = chartSettings.targetDevise!;
     }
 
-    if (isDefined(chartIndexV2.perfSettings)){
+    if (isDefined(chartIndexV2.perfSettings) && isDefined(chartIndexV2.perfSettings?.perfFilter) && isDefined(chartIndexV2.perfSettings?.perfGroupedBy)){
         result += "la performance ";
         if (chartIndexV2.perfSettings?.perfGroupedBy === "FROM_START"){
             result += chartSettings.selectedStartDateSelection!;            
@@ -89,7 +89,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
         }        
     }
     if (isDefined(chartIndexV2.currencyIndexConfig)){
-        result += "des devises qui ont été utilisées pour le graphe";
+        result += "des devises qui ont été utilisées dans le graphique.\nIl faudra avoir d'autres indices dans ce graphique pour voir leurs devises";
     }
     if (isDefined(chartIndexV2.portfolioIndexConfig)){
         switch(chartIndexV2.portfolioIndexConfig?.portfolioIndex){
@@ -269,6 +269,51 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
         
                 <Box direction="row">
+                {
+                isDefined(props.chartIndexV2.shareIndexConfig) && (
+                    <>
+                    <ComboFieldWithCode id="shareGroupSelection"
+                        label="Groupe d'actions"
+                        errorMsg={undefined}
+                        readOnly={props.readOnly}
+                        selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
+                                                                            'CURRENT_SHARES': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
+                        userValues={[                             
+                            "Les actions courrante du portefeuille",
+                            "Toutes les actions qui ont été présentent dans le portefeuille",
+                            "Pas de groupe"
+                        ]}
+                        codeValues={[                            
+                           "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                        ]}
+                        description=""
+                        onChange={newValue => 
+                            props.save({...props.chartIndexV2, shareIndexConfig: {
+                                ...props.chartIndexV2.shareIndexConfig,
+                                shareSelection: newValue,                                
+                            }})
+                    }/>
+
+                    <ComboMultipleWithCheckbox id="additionalShares"
+                                            label="Actions individuelle"
+                                            selectedCodeValues={!isDefined(props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList) ? [] : props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList!}                            
+                                            errorMsg={undefined}
+                                            readOnly={false}
+                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
+                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
+                                            description=""
+                                            onChange={newValue  => props.save({...props.chartIndexV2, shareIndexConfig: {
+                                                ...props.chartIndexV2.shareIndexConfig,
+                                                additionalShareGoogleCodeList: newValue
+                                            }}
+
+                    )}/>
+                    </>        
+                 )
+                 }
+
+                </Box>
+                <Box direction="row">
                     <ComboFieldWithCode id="Perf"
                             label="Analyse de la performance"
                             errorMsg={undefined}
@@ -297,7 +342,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             }/>            
 
                         {
-                            isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && (
+                            isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && isDefined(props.chartIndexV2.perfSettings?.perfFilter) && (
                                 <ComboFieldWithCode id="AffichagePerf"
                                     label="unité"
                                     errorMsg={undefined}
@@ -321,53 +366,21 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             )
                         }    
                 </Box>
-
-                <Box direction="row">
-                {
-                isDefined(props.chartIndexV2.shareIndexConfig) && (
-                    <>
-                    <ComboFieldWithCode id="shareGroupSelection"
-                        label="Groupe d'actions"
-                        errorMsg={undefined}
-                        readOnly={props.readOnly}
-                        selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
-                                                                            'CURRENT_SHARES': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
-                        userValues={[                             
-                            "Les actions courrante du portefeuille",
-                            "Toutes les actions qui ont été présentent dans le portefeuille",
-                            "Les 10 actions avec le plus d'impact sur le portefeuille",
-                            "Pas de groupe"
-                        ]}
-                        codeValues={[                            
-                            "ADDITIONAL_SHARES_ONLY" , "CURRENT_SHARES" , "TEN_WITH_MOST_IMPACTS" , "ALL_SHARES"
-                        ]}
-                        description=""
-                        onChange={newValue => 
-                            props.save({...props.chartIndexV2, shareIndexConfig: {
-                                ...props.chartIndexV2.shareIndexConfig,
-                                shareIndex: newValue,                                
-                            }})
-                    }/>
-
-                    <ComboMultipleWithCheckbox id="additionalShares"
-                                            label="Actions individuelle"
-                                            selectedCodeValues={!isDefined(props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList) ? [] : props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList!}                            
-                                            errorMsg={undefined}
-                                            readOnly={false}
-                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
-                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
-                                            description=""
-                                            onChange={newValue  => props.save({...props.chartIndexV2, shareIndexConfig: {
-                                                ...props.chartIndexV2.shareIndexConfig,
-                                                additionalShareGoogleCodeList: newValue
-                                            }}
-
-                    )}/>
-                    </>        
-                 )
-                 }
-            </Box>
                 
+                <ComboFieldWithCode id="graphStyle"
+                                    label="Style de l'indice"
+                                    readOnly={props.readOnly}
+                                    description=""
+                                    errorMsg=""
+                                    selectedCodeValue={props.chartIndexV2.graphStyle?props.chartIndexV2.graphStyle : 'LINE'}
+                                    userValues={[                             
+                                        "Ligne",
+                                        "Barre"                                        
+                                    ]}
+                                    codeValues={[                            
+                                        "LINE" , "BAR"
+                                    ]}
+                                    onChange={newValue => props.save({...props.chartIndexV2, graphStyle: newValue})}/>
         </Box>
         </>
     );

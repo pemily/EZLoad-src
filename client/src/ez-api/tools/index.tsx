@@ -118,9 +118,9 @@ function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {
   return c;
 }
 
-export function saveDashboardConfig(dashConfig: DashboardPageChartSettings[], updModel: (dashConfig: DashboardPageChartSettings) => void){        
+export function saveDashboardConfig(dashConfig: DashboardPageChartSettings[], keepLines: boolean, updModel: (dashConfig: DashboardPageChartSettings) => void){        
   jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => { return {...page, charts: page.charts?.map(chart2ChartSettings)}})))
-    .then(r => updModel(r))
+    .then(r => updModel(keepLines ? dashConfig : r))
     .catch(e => console.error("Save Dashboard Error: ", e));
 }
 

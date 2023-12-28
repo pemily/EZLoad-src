@@ -10,17 +10,18 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
 
 
+
 export interface ChartUIProps {    
     readOnly: boolean;    
     chart: Chart; 
     allEzShare: EzShareData[];
-    saveChartUI: (chart: ChartSettings) => void
-    deleteChartUI: () => void
+    saveChartUI: (chart: ChartSettings, keepLines: boolean, afterSave: () => void) => void
+    deleteChartUI: (afterSave: () => void) => void
 }      
 
 export function ChartUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);
-console.log('PASCAL ', props.chart)
+    console.log("PASCAL", props.chart, props.readOnly, props.chart.lines === undefined)
     return (
         <>
 
@@ -32,20 +33,20 @@ console.log('PASCAL ', props.chart)
                         </Box>
                         <Box  direction="row" alignSelf="end"  margin="0" pad="0">
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!+10 }) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!+10 }, true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!-10 }) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!-10 }, true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
                         </Box>
                     </Box>
                     <Box height={(props.chart.height)+"vh"}>     
                         {
-                            props.chart.lines && (<LineChart chart={props.chart}/>)                            
+                            (props.chart.lines !== undefined && props.chart.lines.length > 0) && (<LineChart chart={props.chart}/>)                            
                         }                   
                         {
-                            !props.chart.lines && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)
-                        }
+                            (props.chart.lines === undefined || props.chart.lines.length === 0) && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)
+                        }                        
                     </Box>
             </Collapsible> 
         
@@ -60,7 +61,7 @@ console.log('PASCAL ', props.chart)
                                             buttons: [
                                             {
                                                 label: 'Oui',
-                                                onClick: () => { props.deleteChartUI();  setEdition(false) }
+                                                onClick: () => { props.deleteChartUI(() => setEdition(false));   }
                                             },
                                             {
                                                 label: 'Non',
@@ -70,7 +71,7 @@ console.log('PASCAL ', props.chart)
                                         });
                                     }}/>
                     { <Button size="small" icon={<Close size='small'/>}                            
-                               onClick={() => { setEdition(false); /*refresh() */ } } />  }
+                               onClick={() => { setEdition(false); } } />  }
                 </Box>
 
                 <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
@@ -78,8 +79,8 @@ console.log('PASCAL ', props.chart)
                             readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
                             chartSettings={props.chart}
-                            save={(newChartSettsValue, afterSave) => {
-                                    props.saveChartUI(newChartSettsValue)}}
+                            save={(newChartSettsValue, keepLines: boolean, afterSave) => {
+                                    props.saveChartUI(newChartSettsValue, keepLines, afterSave)}}
                         />
                 </Box>
                 </>

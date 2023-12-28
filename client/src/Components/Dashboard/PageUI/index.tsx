@@ -17,8 +17,7 @@ export interface PageUIProps {
     readOnly: boolean;    
     dashboardPage: DashboardPageChart; 
     allEzShare: EzShareData[];
-    savePageUI: (page: DashboardPageChart) => void
-    deletePageUI: () => void
+    savePageUI: (page: DashboardPageChart, keepLines: boolean, afterSave: () => void) => void
 }      
 
 export function PageUI(props: PageUIProps){
@@ -34,8 +33,9 @@ export function PageUI(props: PageUIProps){
                     props.dashboardPage.charts?.map((chart, index) => {
                         return (
                             <ChartUI key={"chartUI"+index}
-                                    deleteChartUI={() => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) })}}
-                                    saveChartUI={(chartUi: ChartSettings) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) })}}
+                                    deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
+                                    saveChartUI={(chartUi: ChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : 
+                                        chartUi) }, keepLines, afterSave)}}
                                     readOnly={props.readOnly}                                            
                                     chart={chart}
                                     allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
@@ -71,7 +71,7 @@ export function PageUI(props: PageUIProps){
                             props.savePageUI({
                                                 ...props.dashboardPage,
                                                 charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]
-                                            })
+                                            }, false, () => {})
                         }}
                     />
                 </Box>                

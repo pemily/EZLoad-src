@@ -15,20 +15,14 @@ public class SharePriceBuilder {
 
     private final EZActionManager actionManager;
     private final CurrenciesIndexBuilder.Result currencies;
-    private final ShareSelectionBuilder.Result shareSelectionResult;
 
-    public SharePriceBuilder(EZActionManager actionManager, ShareSelectionBuilder.Result shareSelectionResult, CurrenciesIndexBuilder.Result currencies){
+    public SharePriceBuilder(EZActionManager actionManager, CurrenciesIndexBuilder.Result currencies){
         this.actionManager = actionManager;
         this.currencies = currencies;
-        this.shareSelectionResult = shareSelectionResult;
     }
 
     public Result build(Reporting reporting, List<EZDate> dates){
-        Result result = new Result(dates);
-        shareSelectionResult
-                .getSelectedShares()
-                .forEach(share ->  result.getTargetPrices(reporting, share)); // Cela va ajouter le price de cette action dans la liste
-        return result;
+        return new Result(dates);
     }
 
 

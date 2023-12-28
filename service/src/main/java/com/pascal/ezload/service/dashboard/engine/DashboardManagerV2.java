@@ -137,15 +137,15 @@ public class DashboardManagerV2 {
             CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise);
             CurrenciesIndexBuilder.Result currenciesResult = currenciesIndexBuilder.build(dates);
 
-            ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager); // toutes les shares de l'index (most impacted/current shares/all shares) + les additionals shares => creer un ShareIndexSelectionBuilder
-            ShareSelectionBuilder.Result shareSelectionResult = shareSelectionBuilder.build(reporting, chartSettings.getIndexV2Selection());
-
-            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, shareSelectionResult, currenciesResult);
+            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesResult);
             SharePriceBuilder.Result sharePriceResult = sharePriceBuilder.build(reporting, dates);
 
             PortfolioIndexBuilderV2 portfolioIndexValuesBuilder = new PortfolioIndexBuilderV2(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesResult, sharePriceResult);
             PortfolioIndexBuilderV2.Result portfolioResult = portfolioIndexValuesBuilder.build(reporting, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
                     chartSettings.getIndexV2Selection());
+
+            ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager, portfolioResult); // toutes les shares de l'index (most impacted/current shares/all shares) + les additionals shares => creer un ShareIndexSelectionBuilder
+            ShareSelectionBuilder.Result shareSelectionResult = shareSelectionBuilder.build(reporting, chartSettings.getIndexV2Selection());
 
 
             ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(portfolioResult, sharePriceResult, currenciesResult, shareSelectionResult);
@@ -182,7 +182,7 @@ public class DashboardManagerV2 {
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
             Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs().get(index);
-            allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), perfSettings, chart));
+            allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
         }
     }
 
@@ -193,8 +193,11 @@ public class DashboardManagerV2 {
             ShareIndex index = shareIndexConfig.getShareIndex();
             Map<EZShare, Prices> share2Price = perfSettings == null || !perfSettings.correctlyDefined() ? shareIndexResult.getShareIndex2TargetPrices().get(index)
                                                                     : perfIndexResult.getSharePerfs().get(index);
-            share2Price.forEach((share, prices) ->
-                    allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), perfSettings, chart)));
+            if (share2Price != null) {
+                Colors.ColorCode color = colors.nextColorCode();
+                share2Price.forEach((share, prices) ->
+                        allChartLines.add(createChartLine(prices, prices.getLabel(), color, chartIndexV2.getGraphStyle(), chart)));
+            }
         }
     }
 
@@ -205,19 +208,19 @@ public class DashboardManagerV2 {
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
                 if (p != null)
-                    allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), perfSettings, chart));
+                    allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
             });
         }
     }
 
-    private ChartLine createChartLine(Prices prices, String lineTitle, Colors.ColorCode color, ChartPerfSettings chartPerfSettings, Chart chart){
+    private ChartLine createChartLine(Prices prices, String lineTitle, Colors.ColorCode color, GraphStyle graphStyle, Chart chart){
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
-        if (chartPerfSettings != null && chartPerfSettings.correctlyDefined()){
+        if (graphStyle == GraphStyle.BAR){
             lineStyle = ChartLine.LineStyle.BAR_STYLE;
             transparency = 0.6f;
         }
-        ChartLine chartLine = ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle, prices);
+        ChartLine chartLine = ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle, prices, true);
         chartLine.setColorLine(color.getColor(transparency));
         chartLine.setLineStyle(lineStyle);
         return chartLine;
