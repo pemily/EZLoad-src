@@ -67,7 +67,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                             
             </Box>
 
-                {  dashboardPages && (    
+                {  dashboardPages && dashboardPages.length > 0 && (    
                     <Collapsible open={!editPages}>
                     <ThemeContext.Extend
                     value={{
@@ -80,10 +80,7 @@ export function DashboardMain(props: DashboardMainProps){
                         },
                     }}>
                         <Box margin="small">
-                            <Tabs onActive={(i: number) => {if (i === dashboardPages.length) 
-                                                                    saveDashboardConfig([...dashboardPages, { title: "Nouvelle Page" }], afterSavePage => {                            
-                                                                        setDashboardPages([...dashboardPages, {title: "Nouvelle Page"}])
-                                                                })}}>           
+                            <Tabs>           
                                 {
                                     dashboardPages.map((page, pageIndex) => (
                                         <Tab title={page.title} key={"page"+pageIndex}>
@@ -108,18 +105,39 @@ export function DashboardMain(props: DashboardMainProps){
 
                 
                 { dashboardPages && editPages && (
-                    <Box  margin={{horizontal: "large"}} pad="xsmall">
+                    <Box  margin={{horizontal: "xlarge", vertical:"medium"}} pad="xsmall">
                      { dashboardPages.map((page, pageIndex) => (
-                        <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
-                         readOnly={props.processRunning} value={page.title} label={"Page "+pageIndex} onChange={newValue => {
-                            const f: DashboardPageChart[] = dashboardPages.map((p,i) => i === pageIndex ? 
-                                                            {
-                                                                ...p,
-                                                                title: newValue
-                                                            } : p);
-                            saveDashboardConfig(f, afterSave => setDashboardPages(f));
-                        }
-                        }/>
+                        <Box direction="row" >
+                            <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
+                            readOnly={props.processRunning} value={page.title} label="" onChange={newValue => {
+                                const f: DashboardPageChart[] = dashboardPages.map((p,i) => i === pageIndex ? 
+                                                                {
+                                                                    ...p,
+                                                                    title: newValue
+                                                                } : p);
+                                saveDashboardConfig(f, afterSave => setDashboardPages(f));
+                            }
+                            }/>
+                            <Button fill={false} icon={<Trash size='medium' color="status-critical"/>} gap="none" margin="none" pad="0"
+                                            label="" onClick={() =>{
+                                                confirmAlert({
+                                                    title: 'Etes vous sûr de vouloir supprimer cette page?',
+                                                    message: 'Tous les graphiques contenu dans cette page seront perdu.',
+                                                    buttons: [
+                                                    {
+                                                        label: 'Oui',
+                                                        onClick: () => { saveDashboardConfig(dashboardPages.filter((p, i) => i !== pageIndex),
+                                                                                 afterSave => setDashboardPages(dashboardPages.filter((p, i) => i !== pageIndex))) }
+                                                    },
+                                                    {
+                                                        label: 'Non',
+                                                        onClick: () => {}
+                                                    }
+                                                    ]
+                                                });
+                                            }}/>
+
+                        </Box>
                      )) }
                     <Button margin="medium" size="small" alignSelf="start" icon={<Add size='small' />}
                                 disabled={props.processRunning}

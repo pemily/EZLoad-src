@@ -268,62 +268,64 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
         
-            <ComboFieldWithCode id="Perf"
-                    label="Analyse de la performance"
-                    errorMsg={undefined}
-                    readOnly={props.readOnly}
-                    selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
-                                                                        'NONE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
-                    userValues={[                             
-                        'Aucune',
-                        'Par mois',
-                        'Par année'
-                    ]}
-                    codeValues={[
-                        'NONE',
-                        'MONTHLY',                                    
-                        'YEARLY'
-                    ]}
-                    description=""
-                    onChange={newValue => 
-                        props.save({...props.chartIndexV2, perfSettings: {
-                            ...props.chartIndexV2.perfSettings,
-                            perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
-                            perfFilter: newValue === 'NONE' ? undefined : props.chartIndexV2.perfSettings?.perfFilter
-                        }})
-            }/>            
+                <Box direction="row">
+                    <ComboFieldWithCode id="Perf"
+                            label="Analyse de la performance"
+                            errorMsg={undefined}
+                            readOnly={props.readOnly}
+                            selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
+                                                                                'NONE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
+                            userValues={[                             
+                                'Aucune',
+                                'Par mois',
+                                'Par année'
+                            ]}
+                            codeValues={[
+                                'NONE',
+                                'MONTHLY',                                    
+                                'YEARLY'
+                            ]}
+                            description=""
+                            onChange={newValue => 
+                                props.save({...props.chartIndexV2, perfSettings: {
+                                    ...props.chartIndexV2.perfSettings,
+                                    perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
+                                    perfFilter: newValue === 'NONE' ? undefined : props.chartIndexV2.perfSettings?.perfFilter
+                                }})
+                            }/>            
 
-            {
-                isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && (
-                    <ComboFieldWithCode id="AffichagePerf"
-                        label="unité"
-                        errorMsg={undefined}
-                        readOnly={props.readOnly}
-                        selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
-                        userValues={[   
-                            'En %',                          
-                            'En '+props.chartSettings.targetDevise,                        
-                        ]}
-                        codeValues={[
-                            'PERCENT',
-                            'VALUE'
-                        ]}
-                        description=""
-                        onChange={newValue => 
-                            props.save({...props.chartIndexV2, perfSettings: {
-                                ...props.chartIndexV2.perfSettings,
-                                perfFilter: newValue
-                            }})
-                    }/>
-                )
-            }    
+                        {
+                            isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && (
+                                <ComboFieldWithCode id="AffichagePerf"
+                                    label="unité"
+                                    errorMsg={undefined}
+                                    readOnly={props.readOnly}
+                                    selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
+                                    userValues={[   
+                                        'En %',                          
+                                        'En '+props.chartSettings.targetDevise,                        
+                                    ]}
+                                    codeValues={[
+                                        'PERCENT',
+                                        'VALUE'
+                                    ]}
+                                    description=""
+                                    onChange={newValue => 
+                                        props.save({...props.chartIndexV2, perfSettings: {
+                                            ...props.chartIndexV2.perfSettings,
+                                            perfFilter: newValue
+                                        }})
+                                }/>
+                            )
+                        }    
+                </Box>
 
-
-            {
+                <Box direction="row">
+                {
                 isDefined(props.chartIndexV2.shareIndexConfig) && (
                     <>
                     <ComboFieldWithCode id="shareGroupSelection"
-                        label="Choix de groupe d'actions"
+                        label="Groupe d'actions"
                         errorMsg={undefined}
                         readOnly={props.readOnly}
                         selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
@@ -332,7 +334,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             "Les actions courrante du portefeuille",
                             "Toutes les actions qui ont été présentent dans le portefeuille",
                             "Les 10 actions avec le plus d'impact sur le portefeuille",
-                            "Aucun"
+                            "Pas de groupe"
                         ]}
                         codeValues={[                            
                             "ADDITIONAL_SHARES_ONLY" , "CURRENT_SHARES" , "TEN_WITH_MOST_IMPACTS" , "ALL_SHARES"
@@ -346,7 +348,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                     }/>
 
                     <ComboMultipleWithCheckbox id="additionalShares"
-                                            label="Ajout d'actions"
+                                            label="Actions individuelle"
                                             selectedCodeValues={!isDefined(props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList) ? [] : props.chartIndexV2.shareIndexConfig?.additionalShareGoogleCodeList!}                            
                                             errorMsg={undefined}
                                             readOnly={false}
@@ -361,7 +363,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                     )}/>
                     </>        
                  )
-            }
+                 }
+            </Box>
                 
         </Box>
         </>

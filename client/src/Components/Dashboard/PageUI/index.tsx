@@ -32,7 +32,7 @@ export function PageUI(props: PageUIProps){
                     props.dashboardPage.charts?.map((chart, index) => {
                         return (
                             <ChartUI key={"chartUI"+index}
-                                    deleteChartUI={() => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) })}}
+                                    deleteChartUI={() => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) })}}
                                     saveChartUI={(chartUi: ChartSettings) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) })}}
                                     readOnly={props.readOnly}                                            
                                     chart={chart}

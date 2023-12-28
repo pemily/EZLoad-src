@@ -55,7 +55,7 @@ export function ChartUI(props: ChartUIProps){
                                             buttons: [
                                             {
                                                 label: 'Oui',
-                                                onClick: () => props.deleteChartUI
+                                                onClick: () => { props.deleteChartUI() }
                                             },
                                             {
                                                 label: 'Non',
