@@ -1,9 +1,11 @@
 import { Box, Button, Text, Carousel, Card, Collapsible, Tab } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart, ChartIndexV2 } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
+import { getChartIndexDescription } from '../ChartIndexMainEditor';
+
 import { LineChart } from '../../Tools/LineChart';
 import { ChartUI } from "../ChartUI";
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -46,26 +48,26 @@ export function PageUI(props: PageUIProps){
                 <Box alignSelf="end" margin="small" direction="row" >
 
                         <Button size="small" icon={<Add size='small' />}
-                        label="Nouveau" onClick={() => {
+                        label="Nouveau Graphique" onClick={() => {
                             // init
+                            const chartIndex: ChartIndexV2 = {
+                                portfolioIndexConfig: {
+                                    portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
+                                },
+                                label: "Valeur du portefeuille",                                    
+                                perfSettings: undefined,
+                                currencyIndexConfig: undefined,
+                                shareIndexConfig: undefined,
+                            };
                             const newChart: Chart = {
                                 accountTypes: accountTypes,
                                 brokers: brokers,
-                                title: 'Titre à changer',
+                                title: 'Titre à changer',                                                                
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                 targetDevise: 'EUR',
-                                indexV2Selection: [{
-                                    portfolioIndexConfig: {
-                                        portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
-                                    },
-                                    label: "Valeur du portefeuille",
-                                    description: "",
-                                    perfSettings: undefined,
-                                    currencyIndexConfig: undefined,
-                                    shareIndexConfig: undefined,
-                                }],
-                            };
-
+                                indexV2Selection: [ chartIndex ],
+                            };                            
+                            chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
                             props.savePageUI({
                                                 ...props.dashboardPage,
                                                 charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]
