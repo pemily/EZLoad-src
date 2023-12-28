@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab, ThemeContext } from "grommet";
+import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab, ThemeContext, Stack } from "grommet";
 import { useState, useEffect, useRef } from "react";
-import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
+import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
 import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
@@ -27,6 +27,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { backgrounds } from "grommet-theme-hpe";
 import { ChartUI } from "../ChartUI";
 import { PageUI } from "../PageUI";
+import { TextField } from "../../Tools/TextField";
 
 
 export interface DashboardMainProps {
@@ -40,6 +41,7 @@ export interface DashboardMainProps {
 export function DashboardMain(props: DashboardMainProps){        
     const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
     const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]|undefined>(props.dashboardData?.pages);    
+    const [editPages, setPageEdition] = useState<boolean>(false);
 
     if (!props.enabled){
         return (            
@@ -55,49 +57,78 @@ export function DashboardMain(props: DashboardMainProps){
                     Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box>
             )}
 
-            <Box pad="small">
+            <Box pad="small" direction="row" width="100%" justify="end">
+                { dashboardPages 
+                && (<Button size="small" alignSelf="end" icon={editPages ? <Close size='small' /> : <Configure size='small' />} margin="none" label="" onClick={() =>  {setPageEdition(!editPages)}} />)}
                 <Button size="small" alignSelf="end" icon={<Refresh size='small' />}
                                 disabled={props.processRunning}
                                 label="Rafraichir" onClick={() => props.refreshDashboard()} />
+            
+                                                            
             </Box>
 
-            <ThemeContext.Extend
-                value={{
-                    tabs: {                                
-                        gap: 'none',
-                        header: {
-                            background: 'background-back',                  
-                            extend: 'padding: 4px;',                  
+                {  dashboardPages && (    
+                    <Collapsible open={!editPages}>
+                    <ThemeContext.Extend
+                    value={{
+                        tabs: {                                
+                            gap: 'none',
+                            header: {
+                                background: 'background-back',                  
+                                extend: 'padding: 4px;',                  
+                            },
                         },
-                    },
-                }}>
-                {  dashboardPages && (                  
-                    <Tabs  onActive={(i: number) => {if (i === dashboardPages.length) 
-                                                            saveDashboardConfig([...dashboardPages, { title: "Nouvelle Page" }], afterSavePage => {                            
-                                                                setDashboardPages([...dashboardPages, {title: "Nouvelle Page"}])
-                                                        })}}>           
-                        {
-                            dashboardPages.map((page, pageIndex) => (
-                                <Tab title={page.title} key={"page"+pageIndex}>
-                                <PageUI allEzShare={allEzShares} 
-                                        readOnly={props.processRunning}
-                                        dashboardPage={page}
-                                        deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
-                                            setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
-                                        })}
-                                        savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
-                                            setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
-                                        })}
-                                        />              
-                                </Tab>                      
-                            ))
-                        }
-                        <Tab title="+">
-                        </Tab>
-                    </Tabs> 
-                    )
+                    }}>
+                        <Box margin="small">
+                            <Tabs onActive={(i: number) => {if (i === dashboardPages.length) 
+                                                                    saveDashboardConfig([...dashboardPages, { title: "Nouvelle Page" }], afterSavePage => {                            
+                                                                        setDashboardPages([...dashboardPages, {title: "Nouvelle Page"}])
+                                                                })}}>           
+                                {
+                                    dashboardPages.map((page, pageIndex) => (
+                                        <Tab title={page.title} key={"page"+pageIndex}>
+                                        <PageUI allEzShare={allEzShares} 
+                                                readOnly={props.processRunning}
+                                                dashboardPage={page}
+                                                deletePageUI={() => saveDashboardConfig(dashboardPages.filter((p,i) => i === pageIndex), afterSavePage => {                                
+                                                    setDashboardPages(dashboardPages.filter((p,i) => i === pageIndex))
+                                                })}
+                                                savePageUI={(newPage) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), afterSavePage => {
+                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p))
+                                                })}
+                                                />              
+                                        </Tab>                      
+                                    ))
+                                }
+                            </Tabs> 
+                        </Box>
+                    </ThemeContext.Extend>
+                    </Collapsible>)
                 }
-            </ThemeContext.Extend>
+
+                
+                { dashboardPages && editPages && (
+                    <Box  margin={{horizontal: "large"}} pad="xsmall">
+                     { dashboardPages.map((page, pageIndex) => (
+                        <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
+                         readOnly={props.processRunning} value={page.title} label={"Page "+pageIndex} onChange={newValue => {
+                            const f: DashboardPageChart[] = dashboardPages.map((p,i) => i === pageIndex ? 
+                                                            {
+                                                                ...p,
+                                                                title: newValue
+                                                            } : p);
+                            saveDashboardConfig(f, afterSave => setDashboardPages(f));
+                        }
+                        }/>
+                     )) }
+                    <Button margin="medium" size="small" alignSelf="start" icon={<Add size='small' />}
+                                disabled={props.processRunning}
+                                label="Nouvelle Page" 
+                                onClick={() => saveDashboardConfig([...dashboardPages, {title: "Titre à changer"}],
+                                                     afterSave => setDashboardPages([...dashboardPages, {title: "Titre à changer"}]))} />
+            
+                    </Box>
+                )}
 
             </>
     )

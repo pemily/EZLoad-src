@@ -37,8 +37,19 @@ export function ChartUI(props: ChartUIProps){
                                     plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!-10 }) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
-                            <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' color="status-critical"/>} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() =>{
+                        </Box>
+                    </Box>
+                    <Box height={(props.chart.height)+"vh"}>
+                        <LineChart chart={props.chart}/>
+                    </Box>
+            </Collapsible> 
+        
+            
+            {(edition && !props.readOnly) && (
+                <>
+                <Box alignSelf="end" direction="row" margin="none" gap="none" pad="0">
+                    <Button fill={false} size="small" icon={<Trash size='small' color="status-critical"/>} gap="none" margin="none" pad="0"
+                                    label="" onClick={() =>{
                                         confirmAlert({
                                             title: 'Etes vous sûr de vouloir supprimer ce graphique?',
                                             buttons: [
@@ -53,20 +64,9 @@ export function ChartUI(props: ChartUIProps){
                                             ]
                                         });
                                     }}/>
-                        </Box>
-                    </Box>
-                    <Box height={(props.chart.height)+"vh"}>
-                        <LineChart chart={props.chart}/>
-                    </Box>
-            </Collapsible> 
-        
-            
-            {(edition && !props.readOnly) && (
-                <>
-                <Box alignSelf="end" direction="row" margin="xsmall" >
                     { <Button size="small" icon={<Close size='small'/>}                            
                                onClick={() => { setEdition(false); /*refresh() */ } } />  }
-                    </Box>
+                </Box>
 
                 <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
                         <ChartSettingsEditor

@@ -265,9 +265,6 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                 )            
                 }
             </Box>
-            {
-                (<Text margin={{ vertical: 'none', horizontal: 'xsmall' }} size="xsmall" alignSelf="end">{getChartIndexDescription(props.chartSettings, props.chartIndexV2)}</Text>)
-            }
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
         

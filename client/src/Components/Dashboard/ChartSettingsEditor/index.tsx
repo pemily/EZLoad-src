@@ -162,7 +162,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     ]
                                                 }, () => {})
                                         }/> 
-                                        <Button fill={false} alignSelf="center" icon={<Trash color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
+                                        <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
                                                     confirmAlert({
                                                         title: 'Etes vous sûr de vouloir supprimer cet Indice?',                                                        
