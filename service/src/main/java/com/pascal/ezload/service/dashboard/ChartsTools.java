@@ -65,7 +65,7 @@ public class ChartsTools {
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValuesWithLabel(values.stream().map(vl -> vl.getValue() == 0 && removeZeroValues ? null : vl).collect(Collectors.toList()));
-        chartLine.setAxisSetting(YAxisSetting);
+        chartLine.setYAxisSetting(YAxisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }
@@ -78,7 +78,7 @@ public class ChartsTools {
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValues(values.stream().map(f -> f == 0 && removeZeroValues ? null : f).collect(Collectors.toList()));
-        chartLine.setAxisSetting(YAxisSetting);
+        chartLine.setYAxisSetting(YAxisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }

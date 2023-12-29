@@ -40,7 +40,7 @@ public class ChartLine {
     private List<ValueWithLabel> valuesWithLabel;
     private String colorLine; // rgba(255,99,132,1);
     private LineStyle lineStyle; // optionnel, pour configurer une autre echelle sur l'axe des Y (et pour faire la distinction entre pourcentage/devise par exemple)
-    private Y_AxisSetting YAxisSetting;
+    private Y_AxisSetting yAxisSetting;
 
     public String getTitle() {
         return title;
@@ -83,12 +83,12 @@ public class ChartLine {
     }
 
 
-    public Y_AxisSetting getAxisSetting() {
-        return YAxisSetting;
+    public Y_AxisSetting getYAxisSetting() {
+        return yAxisSetting;
     }
 
-    public void setAxisSetting(Y_AxisSetting YAxisSetting) {
-        this.YAxisSetting = YAxisSetting;
+    public void setYAxisSetting(Y_AxisSetting YAxisSetting) {
+        this.yAxisSetting = YAxisSetting;
     }
 
     public String toString(){
