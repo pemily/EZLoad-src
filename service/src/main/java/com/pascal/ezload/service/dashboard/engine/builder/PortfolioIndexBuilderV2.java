@@ -67,6 +67,18 @@ public class PortfolioIndexBuilderV2 {
                     r.date2share2PRU.put(state.getDate(), state.getSharePRU());
                     r.date2share2PRDividend.put(state.getDate(), state.getSharePRDividend());
                     r.date2share2PRUDividend.put(state.getDate(), state.getSharePRUDividend());
+                    r.date2portfolioValue.put(state.getDate(), state.getShareNb()
+                                                                .entrySet()
+                                                                .stream()
+                                                                .map(e -> {
+                                                                    float nbOfShare = e.getValue();
+                                                                    if (nbOfShare == 0) return 0f;
+                                                                    Prices prices = sharePrices.getTargetPrices(reporting, e.getKey());
+                                                                    float price = prices == null ? 0 : prices.getPriceAt(state.getDate()).getPrice();
+                                                                    return nbOfShare*price;
+                                                                })
+                                                                .reduce(Float::sum)
+                                                                .orElse(0f));
 
                     Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
                     state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
@@ -80,13 +92,13 @@ public class PortfolioIndexBuilderV2 {
 
     private Prices createPricesFor(Reporting reporting, PortfolioIndex portfolioIndex, List<PortfolioStateAtDate> states, Result r) {
         Prices prices = new Prices();
-        prices.setDevise(r.targetDevise);
+        prices.setDevise(currencies.getTargetDevise());
         prices.setLabel(portfolioIndex.name());
-        states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioIndex, state))));
+        states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioIndex, state, r))));
         return currencies.convertPricesToTargetDevise(reporting, prices);
     }
 
-    private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate state) {
+    private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate state, Result r) {
         switch (portfolioIndex){
             case INSTANT_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
@@ -106,25 +118,16 @@ public class PortfolioIndexBuilderV2 {
                 // to get the instant_liquidité, I must use the cumulative index
                 // parce que la notion de liquidité est pour un instant T, mais elle est une valeur qui depend de toutes les valeurs precedente
                 return state.getLiquidity().getCumulative();
-            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
-                float portfolioValue = state.getShareNb()
-                                        .entrySet()
-                                        .stream()
-                                        .map(e -> {
-                                            float nbOfShare = e.getValue();
-                                            if (nbOfShare == 0) return 0f;
-                                            Prices prices = sharePrices.getTargetPrices(reporting, e.getKey());
-                                            float price = prices == null ? 0 : prices.getPriceAt(state.getDate()).getPrice();
-                                            return nbOfShare*price;
-                                        })
-                                        .reduce(Float::sum)
-                                        .orElse(0f);
-
-                if (portfolioIndex == PortfolioIndex.INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY) {
-                    portfolioValue += state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
-                }
-                return portfolioValue;
+                return r.getDate2PortfolioValue().get(state.getDate());
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+                return r.getDate2PortfolioValue().get(state.getDate()) + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
+                return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+            case GAIN:
+                return r.getDate2PortfolioValue().get(state.getDate()) - state.getInputOutput().getCumulative(); // je pourrais peut etre rajouter les credit d'impots ici
+            case GAIN_WITH_CREDIT_IMPOT:
+                return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() - state.getInputOutput().getCumulative(); // je pourrais peut etre rajouter les credit d'impots ici
             case SOLD:
                 return (float) state.getShareSold().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
             case BUY:
@@ -163,7 +166,6 @@ public class PortfolioIndexBuilderV2 {
     public static class Result{
 
         private List<EZDate> dates;
-        private EZDevise targetDevise;
 
         private final Map<PortfolioIndex, Prices> portfolioIndex2TargetPrices = new HashMap<>();
         private final Map<EZDate, Map<EZShare, Float>> date2share2ShareNb = new HashMap<>();
@@ -174,6 +176,7 @@ public class PortfolioIndexBuilderV2 {
         private final Map<EZDate, Map<EZShare, Float>> date2share2PRU = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
         private final Map<EZDate, Map<EZShare, Float>> date2share2PRDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'actions totales)
         private final Map<EZDate, Map<EZShare, Float>> date2share2PRUDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
+        private final Map<EZDate, Float> date2portfolioValue = new HashMap<>(); // le montant du portefeuille a cette date (le prix de l'action * le nb d'action)
 
         public List<EZDate> getDates() {
             return dates;
@@ -186,6 +189,7 @@ public class PortfolioIndexBuilderV2 {
         public Map<EZDate, Map<EZShare, Float>> getDate2share2ShareNb() {
             return date2share2ShareNb;
         }
+        public Map<EZDate, Float> getDate2PortfolioValue() { return date2portfolioValue;}
         public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyAmount() {
             return date2share2BuyAmount;
         }

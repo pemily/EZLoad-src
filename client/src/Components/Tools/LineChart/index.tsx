@@ -53,7 +53,7 @@ export function LineChart(props: LineChartProps){
                     tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
                     borderColor: chartLine.colorLine,
                     backgroundColor: chartLine.colorLine,
-                    yAxisID: chartLine.axisSetting              
+                    yAxisID: chartLine.YAxisSetting
                 };  
                 return conf;     
             }
@@ -66,7 +66,7 @@ export function LineChart(props: LineChartProps){
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
-             yAxisID: chartLine.axisSetting,        
+             yAxisID: chartLine.YAxisSetting,
              fill: false,
              cubicInterpolationMode: 'monotone', 
              tension: 0.4, // le niveau de courbure    
@@ -196,7 +196,7 @@ export function LineChart(props: LineChartProps){
             },
             PERCENT: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "PERCENT").length > 0,
+                display: props.chart.lines.filter(l => l.YAxisSetting === "PERCENT").length > 0,
                 position: 'left',
                 title: {
                   display: true,
@@ -205,7 +205,7 @@ export function LineChart(props: LineChartProps){
             },
             PORTFOLIO: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "PORTFOLIO").length > 0,
+                display: props.chart.lines.filter(l => l.YAxisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
                 title: {
                     display: true,
@@ -214,7 +214,7 @@ export function LineChart(props: LineChartProps){
             },        
             NB: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "NB").length > 0,
+                display: props.chart.lines.filter(l => l.YAxisSetting === "NB").length > 0,
                 position: 'left',
                 title: {
                     display: false
@@ -222,7 +222,7 @@ export function LineChart(props: LineChartProps){
             },                         
             SHARE: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
+                display: props.chart.lines.filter(l => l.YAxisSetting === "SHARE").length > 0,
                 position: 'left',
                 title: {
                     display: true,
@@ -231,7 +231,7 @@ export function LineChart(props: LineChartProps){
             },                      
             DEVISE:{
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "DEVISE").length > 0,
+                display: props.chart.lines.filter(l => l.YAxisSetting === "DEVISE").length > 0,
                 position: 'right',
                 title: {
                   display: true,

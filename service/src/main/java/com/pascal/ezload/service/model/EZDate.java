@@ -127,6 +127,7 @@ public class EZDate implements Comparable<EZDate> {
     }
 
     public String toEzPortoflioDate(){
+        if (day == -1) throw new IllegalStateException("cette date est une période"+day+"/"+month+"/"+year);
         return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
     }
 
@@ -212,6 +213,8 @@ public class EZDate implements Comparable<EZDate> {
 
     @Override
     public String toString() {
+        if (day == -1) // c'est une periode
+            return month == -1 ? year+"" : leadingZero(month)+"/"+year;
         return toEzPortoflioDate();
     }
 

@@ -51,6 +51,9 @@ public class PerfIndexBuilder {
             case CUMUL_ENTREES_SORTIES:
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
+            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
+            case GAIN:
+            case GAIN_WITH_CREDIT_IMPOT:
                 pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
                 break;
             case BUY:
@@ -128,6 +131,8 @@ public class PerfIndexBuilder {
         // crée un Prices avec moins de valeur (les mois ou les années uniquement)
         // et avec les valeurs de la période (la somme, ou bien la dernière valeur)
         Prices pricesGrouped = new Prices();
+        pricesGrouped.setDevise(prices.getDevise());
+        pricesGrouped.setLabel(prices.getLabel()+" grouped by "+perfSettings.getPerfGroupedBy());
         do {
             Float currentValue = groupByFirstValueFct.get();
             for (PriceAtDate priceAtDate : prices.getPrices()) {
@@ -138,7 +143,7 @@ public class PerfIndexBuilder {
             pricesGrouped.addPrice(currentPeriod, new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
-        while (currentPeriod != todayPeriod);
+        while (!currentPeriod.equals(todayPeriod));
         return pricesGrouped;
     }
 
@@ -146,8 +151,9 @@ public class PerfIndexBuilder {
         // calcul de la perf en valeur ou en %
         Prices result = new Prices();
         result.setDevise(prices.getDevise());
-        result.setLabel(prices.getLabel());
+        result.setLabel(prices.getLabel()+" en "+perfSettings.getPerfFilter());
         Float previousValue = null;
+        boolean keepFirstValue  = perfSettings.getPerfGroupedBy() == ChartPerfGroupedBy.FROM_START;
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
             Float newPrice = null;
 
@@ -163,7 +169,10 @@ public class PerfIndexBuilder {
                 default: throw new IllegalStateException("Missing case: "+ perfSettings.getPerfFilter());
             }
             result.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate(), newPrice == null ? 0 : newPrice));
-            previousValue = priceAtDate.getPrice();
+            if (keepFirstValue){
+                if (previousValue == null && priceAtDate.getPrice() != 0) previousValue = priceAtDate.getPrice(); // on cherche la 1ere value non null
+            }
+            else previousValue = priceAtDate.getPrice();
         }
         return result;
     }

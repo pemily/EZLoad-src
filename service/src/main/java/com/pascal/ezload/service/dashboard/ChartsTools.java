@@ -51,34 +51,34 @@ public class ChartsTools {
         return chart;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
-        return createChartLine(chart, lineStyle, axisSetting, lineTitle, prices.getPrices()
+    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+        return createChartLine(chart, lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                 .stream()
                 .map(PriceAtDate::getPrice).collect(Collectors.toList()), removeZeroValues);
     }
 
-    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
+    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
         if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
         }
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValuesWithLabel(values.stream().map(vl -> vl.getValue() == 0 ? null : vl).collect(Collectors.toList()));
-        chartLine.setAxisSetting(axisSetting);
+        chartLine.setValuesWithLabel(values.stream().map(vl -> vl.getValue() == 0 && removeZeroValues ? null : vl).collect(Collectors.toList()));
+        chartLine.setAxisSetting(YAxisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<Float> values, boolean removeZeroValues){
+    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<Float> values, boolean removeZeroValues){
         if (chart.getLabels().size() != values.size()){
             throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
         }
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValues(values.stream().map(f -> f == 0 ? null : f).collect(Collectors.toList()));
-        chartLine.setAxisSetting(axisSetting);
+        chartLine.setValues(values.stream().map(f -> f == 0 && removeZeroValues ? null : f).collect(Collectors.toList()));
+        chartLine.setAxisSetting(YAxisSetting);
         chart.getLines().add(chartLine);
         return chartLine;
     }

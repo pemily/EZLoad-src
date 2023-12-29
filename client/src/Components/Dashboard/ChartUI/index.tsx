@@ -20,8 +20,7 @@ export interface ChartUIProps {
 }      
 
 export function ChartUI(props: ChartUIProps){
-    const [edition, setEdition] = useState<boolean>(false);
-    console.log("PASCAL", props.chart, props.readOnly, props.chart.lines === undefined)
+    const [edition, setEdition] = useState<boolean>(false);    
     return (
         <>
 

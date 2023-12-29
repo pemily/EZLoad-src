@@ -88,7 +88,7 @@ export function DashboardMain(props: DashboardMainProps){
                                                 readOnly={props.processRunning}
                                                 dashboardPage={page}
                                                 savePageUI={(newPage, keepLines, afterSave) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), keepLines, afterSavePage => {
-                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? newPage : p));
+                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? (keepLines ? newPage : afterSavePage[i]) : p));
                                                     afterSave();
                                                 })}
                                                 />              

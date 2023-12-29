@@ -27,7 +27,7 @@ public class ChartLine {
         BAR_STYLE
     }
 
-    public enum AxisSetting {
+    public enum Y_AxisSetting {
         PERCENT, // des pourcentages
         PORTFOLIO, // des gros nombres (valeurs du portefeuille)
         DEVISE, // la valeur des devises (des petits nombres autour de 1)
@@ -40,7 +40,7 @@ public class ChartLine {
     private List<ValueWithLabel> valuesWithLabel;
     private String colorLine; // rgba(255,99,132,1);
     private LineStyle lineStyle; // optionnel, pour configurer une autre echelle sur l'axe des Y (et pour faire la distinction entre pourcentage/devise par exemple)
-    private AxisSetting axisSetting;
+    private Y_AxisSetting YAxisSetting;
 
     public String getTitle() {
         return title;
@@ -83,12 +83,12 @@ public class ChartLine {
     }
 
 
-    public AxisSetting getAxisSetting() {
-        return axisSetting;
+    public Y_AxisSetting getAxisSetting() {
+        return YAxisSetting;
     }
 
-    public void setAxisSetting(AxisSetting axisSetting) {
-        this.axisSetting = axisSetting;
+    public void setAxisSetting(Y_AxisSetting YAxisSetting) {
+        this.YAxisSetting = YAxisSetting;
     }
 
     public String toString(){

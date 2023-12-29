@@ -51,7 +51,14 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     if (isDefined(chartIndexV2.perfSettings) && isDefined(chartIndexV2.perfSettings?.perfFilter) && isDefined(chartIndexV2.perfSettings?.perfGroupedBy)){
         result += "la performance ";
         if (chartIndexV2.perfSettings?.perfGroupedBy === "FROM_START"){
-            result += chartSettings.selectedStartDateSelection!;            
+            switch(chartSettings.selectedStartDateSelection!){
+                case "FROM_MY_FIRST_OPERATION": result += " depuis le début de mes opérations "; break;
+                case "ONE_YEAR": result += " sur 1 an "; break;
+                case "TWO_YEAR": result += " sur 2 ans "; break;
+                case "THREE_YEAR": result += " sur 3 ans "; break;
+                case "FIVE_YEAR": result += " sur 4 ans "; break;
+                case "TEN_YEAR": result += " sur 5 ans "; break;
+            }
         }
         else if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
             result += " mensuelle ";
@@ -114,9 +121,16 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "INSTANT_SORTIES":
                 result += "des retraits de liquidités"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
-                result += "de votre portefeuilles sans prendre en compte les liquidités"; break;
+                result += "de la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
                 result += "de votre portefeuilles en incluant les liquidités"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT":                
+                result += "de votre portefeuilles en incluant les liquidités et les crédits d'impôts"; break;
+            case "GAIN":
+                result += "de vos gains (valeur du portefeuille - les liquidités investits)"; break;
+            case "GAIN_WITH_CREDIT_IMPOT":
+                result += "de vos gains (valeur du portefeuille + les credits d'impôts - les liquidités investits)"; break;    
+            default: result += "Missing case in getChartIndexDescription "+chartIndexV2.portfolioIndexConfig?.portfolioIndex;
         }        
     }
     return applyEZLoadTextSignature(result);
@@ -172,8 +186,9 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             readOnly={props.readOnly}
                             selectedCodeValue={ !isDefined(props.chartIndexV2.portfolioIndexConfig?.portfolioIndex) ? 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' : props.chartIndexV2.portfolioIndexConfig?.portfolioIndex! }                            
                             userValues={[                             
-                                "Valeurs de votre portefeuilles avec les liquidités",
-                                "Valeurs de votre portefeuilles sans les liquidités",
+                                "Valeurs de votre portefeuille avec les liquidités",
+                                "Valeurs de votre portefeuille avec les liquidités et les crédits d'impôts",
+                                "Valeurs de votre portefeuille sans les liquidités",
                                 "Liquidités disponibles", 
                                 "Sommes des entrées/retraits de liquidités",
                                 "Ajouts de liquidités",
@@ -183,10 +198,13 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Dividendes reçu",
                                 "Somme des dividendes reçu",
                                 "Achat d'action",
-                                "Vente d'action"
+                                "Vente d'action",
+                                "Gains",
+                                "Gains en incluants les crédits d'impôts"
                             ]}
                             codeValues={[
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
+                                'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT',
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY',                                    
                                 'INSTANT_LIQUIDITE',
                                 'CUMUL_ENTREES_SORTIES',
@@ -197,7 +215,9 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'INSTANT_PORTFOLIO_DIVIDENDES',
                                 'CUMUL_PORTFOLIO_DIVIDENDES',
                                 'BUY',
-                                'SOLD']}
+                                'SOLD',
+                                'GAIN',
+                                'GAIN_WITH_CREDIT_IMPOT']}
                             description=""
                             onChange={newValue => 
                                 props.save({...props.chartIndexV2,
@@ -342,7 +362,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             }/>            
 
                         {
-                            isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && isDefined(props.chartIndexV2.perfSettings?.perfFilter) && (
+                            isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) && (
                                 <ComboFieldWithCode id="AffichagePerf"
                                     label="unité"
                                     errorMsg={undefined}

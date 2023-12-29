@@ -18,7 +18,6 @@
 package com.pascal.ezload.service.dashboard.engine;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.dashboard.*;
 import com.pascal.ezload.service.dashboard.config.*;
@@ -220,7 +219,7 @@ public class DashboardManagerV2 {
             lineStyle = ChartLine.LineStyle.BAR_STYLE;
             transparency = 0.6f;
         }
-        ChartLine chartLine = ChartsTools.createChartLine(chart, lineStyle, ChartLine.AxisSetting.PORTFOLIO, lineTitle, prices, true);
+        ChartLine chartLine = ChartsTools.createChartLine(chart, lineStyle, ChartLine.Y_AxisSetting.PORTFOLIO /* TODO PASCAL a revoir */, lineTitle, prices, true);
         chartLine.setColorLine(color.getColor(transparency));
         chartLine.setLineStyle(lineStyle);
         return chartLine;
