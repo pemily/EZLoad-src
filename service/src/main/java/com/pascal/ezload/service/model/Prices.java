@@ -23,7 +23,7 @@ public class Prices {
 
     private String label;
     private final Map<EZDate, PriceAtDate> pricesMap = new HashMap<>(); // must be ordered
-    private final List<PriceAtDate> pricesList = new ArrayList<>();
+    private final ArrayList<PriceAtDate> pricesList = new ArrayList<>();
     private EZDevise devise;
 
     public EZDevise getDevise() {
@@ -42,8 +42,13 @@ public class Prices {
     // la date et le price.getDate() peuvent etre different (dans les graphes, si je demande le prix un dimanche, j'aurais la date du vendredi)
     public void addPrice(EZDate date, PriceAtDate price){
         if (price.getDate() == null) return;
-        pricesList.add(new PriceAtDate(date, price.getPrice()));
+        pricesList.add(price.getPrice() == null ? new PriceAtDate(date) : new PriceAtDate(date, price.getPrice()));
         pricesMap.put(date, price);
+    }
+
+    public void replacePriceAt(int index, EZDate date, PriceAtDate priceAtDate) {
+        pricesMap.put(date, priceAtDate);
+        pricesList.set(index, priceAtDate);
     }
 
     // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
@@ -77,4 +82,6 @@ public class Prices {
     public String toString(){
         return label+" ("+devise+")";
     }
+
+
 }

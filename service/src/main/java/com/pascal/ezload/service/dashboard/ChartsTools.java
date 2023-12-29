@@ -53,8 +53,9 @@ public class ChartsTools {
 
     public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
         return createChartLine(chart, lineStyle, YAxisSetting, lineTitle, prices.getPrices()
-                .stream()
-                .map(PriceAtDate::getPrice).collect(Collectors.toList()), removeZeroValues);
+                                                                                        .stream()
+                                                                                        .map(PriceAtDate::getPrice).collect(Collectors.toList()),
+                                removeZeroValues);
     }
 
     public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
@@ -77,7 +78,7 @@ public class ChartsTools {
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValues(values.stream().map(f -> f == 0 && removeZeroValues ? null : f).collect(Collectors.toList()));
+        chartLine.setValues(values.stream().map(f -> (f == null || (f == 0 && removeZeroValues)) ? null : f).collect(Collectors.toList()));
         chartLine.setYAxisSetting(YAxisSetting);
         chart.getLines().add(chartLine);
         return chartLine;

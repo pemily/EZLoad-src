@@ -193,7 +193,7 @@ export function LineChart(props: LineChartProps){
                     drawBorder: false,
                     color: '#000000',                    
                }
-            },
+            },          
             PERCENT: {
                 type: 'linear',
                 display: props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,

@@ -133,17 +133,29 @@ public class PerfIndexBuilder {
         Prices pricesGrouped = new Prices();
         pricesGrouped.setDevise(prices.getDevise());
         pricesGrouped.setLabel(prices.getLabel()+" grouped by "+perfSettings.getPerfGroupedBy());
+        // init Prices grouped to have the same number of values than the labels
+        for (PriceAtDate priceAtDate : prices.getPrices()) {
+            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate()));
+        }
         do {
             Float currentValue = groupByFirstValueFct.get();
+            EZDate lastPeriodDate = null;
+            int lastPeriodIndex = -1;
             for (PriceAtDate priceAtDate : prices.getPrices()) {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
+                    lastPeriodDate = priceAtDate.getDate();
                     currentValue = groupByFct.apply(currentValue, priceAtDate.getPrice());
                 }
+                else if (lastPeriodDate != null){
+                    break; // we can stop the loop there is nothing interresting after this date, the period is over
+                }
+                lastPeriodIndex++;
             }
-            pricesGrouped.addPrice(currentPeriod, new PriceAtDate(currentPeriod, currentValue));
+            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(todayPeriod));
+
         return pricesGrouped;
     }
 
@@ -157,22 +169,25 @@ public class PerfIndexBuilder {
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
             Float newPrice = null;
 
-            switch (perfSettings.getPerfFilter()){
-                case VALUE:
-                    previousValue = previousValue == null ? 0 : previousValue;
-                    newPrice = priceAtDate.getPrice() - previousValue;
-                    break;
-                case PERCENT:
-                    if (previousValue != null && previousValue != 0)
-                        newPrice = priceAtDate.getPrice() * 100.0f / previousValue;
-                    break;
-                default: throw new IllegalStateException("Missing case: "+ perfSettings.getPerfFilter());
+            if (priceAtDate.getPrice() != null) {
+                switch (perfSettings.getPerfFilter()) {
+                    case VALUE:
+                        previousValue = previousValue == null ? 0 : previousValue;
+                        newPrice = priceAtDate.getPrice() - previousValue;
+                        break;
+                    case PERCENT:
+                        if (previousValue != null && previousValue != 0)
+                            newPrice = priceAtDate.getPrice() * 100.0f / previousValue;
+                        break;
+                    default:
+                        throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());
+                }
+                if (keepFirstValue){
+                    if (previousValue == null && priceAtDate.getPrice() != 0) previousValue = priceAtDate.getPrice(); // on cherche la 1ere value non null
+                }
+                else previousValue = priceAtDate.getPrice();
             }
-            result.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate(), newPrice == null ? 0 : newPrice));
-            if (keepFirstValue){
-                if (previousValue == null && priceAtDate.getPrice() != 0) previousValue = priceAtDate.getPrice(); // on cherche la 1ere value non null
-            }
-            else previousValue = priceAtDate.getPrice();
+            result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
         }
         return result;
     }

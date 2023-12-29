@@ -39,6 +39,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,25 +66,15 @@ public class DashboardHandler {
     public DashboardData getDashboardData() throws Exception {
         DashboardData dashboardData = ezServerState.getDashboardData();
         if (dashboardData == null){
-            SettingsManager settingsManager = SettingsManager.getInstance();
-            MainSettings mainSettings = settingsManager.loadProps().validate();
-            EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-            DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
-            List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
-            List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, null);
             dashboardData = new DashboardData();
-            dashboardData.setPages(chartsPages);
-            ezServerState.setDashboardData(dashboardData);
-            dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
+            dashboardData.setPages(new ArrayList<>());
+            dashboardData.setShareGoogleCodeAndNames(new ArrayList<>());
         }
         return dashboardData;
     }
 
-    private static List<DashboardData.EzShareData> loadAllEZShares(EzServerState ezServerState, EZActionManager actionManager) {
-        if (ezServerState.getDashboardData().getShareGoogleCodeAndNames() == null) {
-            ezServerState.getDashboardData().setShareGoogleCodeAndNames(actionManager.getAllEZShares().stream().map(s -> new DashboardData.EzShareData(s.getGoogleCode(), s.getEzName())).collect(Collectors.toList()));
-        }
-        return ezServerState.getDashboardData().getShareGoogleCodeAndNames();
+    private static List<DashboardData.EzShareData> loadAllEZShares(EZActionManager actionManager) {
+        return actionManager.getAllEZShares().stream().map(s -> new DashboardData.EzShareData(s.getGoogleCode(), s.getEzName())).collect(Collectors.toList());
     }
 
     @GET
@@ -105,8 +96,8 @@ public class DashboardHandler {
                         List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
                         dashboardData.setPages(chartsPages);
+                        dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(actionManager));
                         ezServerState.setDashboardData(dashboardData);
-                        dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(ezServerState, actionManager));
                     }
                 });
     }

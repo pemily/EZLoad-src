@@ -60,8 +60,7 @@ export function App(){
     const [allProfiles, setAllProfiles] = useState<string[]>([]);
     const [allShares, setAllShares] = useState<ActionWithMsg|undefined>(undefined); 
     const [dashboardData, setDashboardData] = useState<DashboardData|undefined>(undefined);
-    const [dashboardChartIndex, setDashboardChartIndex] = useState<number>(-1); // -1 == on voit les graphiques, n on edit le graphe n
-
+    
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
             setProcessLaunchFail(false);
@@ -236,9 +235,6 @@ export function App(){
     function refreshDashboardData(): void {
         jsonCall(ezApi.dashboard.refreshDashboardData())
                 .then(followProcess)
-                .then(r => {
-                    getDashboard();
-                })
                 .catch((error) => {
                     console.error("Error while loading DashboardData", error);
                 });                
@@ -468,7 +464,7 @@ export function App(){
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             { <ViewLog 
                                     ezProcess={lastProcess}    
-                                    processFinished={() => reloadAllData()}/>                            
+                                    processFinished={() => reloadAllData().then(r => getDashboard())}/>                            
                             }
                             { mainSettings && !processRunning && (<Text margin="large">Vous pouvez retourner à l''onglet de départ</Text>) }
                         </Box>

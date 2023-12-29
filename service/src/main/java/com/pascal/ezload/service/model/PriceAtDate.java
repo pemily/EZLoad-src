@@ -19,7 +19,7 @@ package com.pascal.ezload.service.model;
 
 public class PriceAtDate {
 
-    private float price;
+    private Float price;
     private EZDate date;
 
     public PriceAtDate(){}
@@ -29,7 +29,12 @@ public class PriceAtDate {
         this.price = price;
     }
 
-    public float getPrice() {
+    public PriceAtDate(EZDate date){
+        this.date = date;
+        this.price = null; // no value at this date
+    }
+
+    public Float getPrice() {
         return price;
     }
 
