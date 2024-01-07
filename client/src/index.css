@@ -28,3 +28,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: 'ezLoadSmallFont';
+  src: local("Arial"); 
+  src:(sans-serif);
+  font-size: 'xx-small';
+}

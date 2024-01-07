@@ -181,7 +181,7 @@ public class DashboardManagerV2 {
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
             Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs().get(index);
-            allChartLines.add(createChartLine(prices, prices.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
+            allChartLines.add(createChartLine(prices, chartIndexV2.getLabel(), prices.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
         }
     }
 
@@ -195,7 +195,7 @@ public class DashboardManagerV2 {
             if (share2Price != null) {
                 Colors.ColorCode color = colors.nextColorCode();
                 share2Price.forEach((share, prices) ->
-                        allChartLines.add(createChartLine(prices, prices.getLabel(), color, chartIndexV2.getGraphStyle(), chart)));
+                        allChartLines.add(createChartLine(prices, chartIndexV2.getLabel(), prices.getLabel(), color, chartIndexV2.getGraphStyle(), chart)));
             }
         }
     }
@@ -207,12 +207,12 @@ public class DashboardManagerV2 {
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs().get(devise);
                 if (p != null)
-                    allChartLines.add(createChartLine(p, p.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
+                    allChartLines.add(createChartLine(p, chartIndexV2.getLabel(), p.getLabel(), colors.nextColorCode(), chartIndexV2.getGraphStyle(), chart));
             });
         }
     }
 
-    private ChartLine createChartLine(Prices prices, String lineTitle, Colors.ColorCode color, GraphStyle graphStyle, Chart chart){
+    private ChartLine createChartLine(Prices prices, String indexLabel, String lineTitle, Colors.ColorCode color, GraphStyle graphStyle, Chart chart){
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
         if (graphStyle == GraphStyle.BAR){
@@ -222,6 +222,7 @@ public class DashboardManagerV2 {
         ChartLine chartLine = ChartsTools.createChartLine(chart, lineStyle, ChartLine.Y_AxisSetting.PORTFOLIO /* TODO PASCAL a revoir */, lineTitle, prices, true);
         chartLine.setColorLine(color.getColor(transparency));
         chartLine.setLineStyle(lineStyle);
+        chartLine.setIndexLabel(indexLabel);
         return chartLine;
     }
 

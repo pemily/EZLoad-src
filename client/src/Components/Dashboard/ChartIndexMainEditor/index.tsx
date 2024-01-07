@@ -49,18 +49,8 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     }
 
     if (isDefined(chartIndexV2.perfSettings) && isDefined(chartIndexV2.perfSettings?.perfFilter) && isDefined(chartIndexV2.perfSettings?.perfGroupedBy)){
-        result += "la performance ";
-        if (chartIndexV2.perfSettings?.perfGroupedBy === "FROM_START"){
-            switch(chartSettings.selectedStartDateSelection!){
-                case "FROM_MY_FIRST_OPERATION": result += " depuis le début de mes opérations "; break;
-                case "ONE_YEAR": result += " sur 1 an "; break;
-                case "TWO_YEAR": result += " sur 2 ans "; break;
-                case "THREE_YEAR": result += " sur 3 ans "; break;
-                case "FIVE_YEAR": result += " sur 4 ans "; break;
-                case "TEN_YEAR": result += " sur 5 ans "; break;
-            }
-        }
-        else if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
+        result += "la performance";
+        if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
             result += " mensuelle ";
         }
         else {
@@ -164,7 +154,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         currencyIndexConfig: undefined,
                                         shareIndexConfig: {
                                                 ...props.chartIndexV2.shareIndexConfig,
-                                                shareIndex: 'SHARE_PRICES'
+                                                shareIndex: 'SHARE_PRICES',
+                                                shareSelection: "CURRENT_SHARES" // valeur par défaut
                                                 }})                                    
                                 }
                                 else if (newValue === 'DEVISE'){
@@ -341,24 +332,24 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
                                                                                 'NONE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
                             userValues={[                             
-                                'Aucune',
-                                'Depuis la 1ère date du graphique',
+                                'Aucune',                                
                                 'Par mois',
                                 'Par année'
                             ]}
                             codeValues={[
                                 'NONE',
-                                'FROM_START',
                                 'MONTHLY',                                    
                                 'YEARLY'
                             ]}
                             description=""
                             onChange={newValue => 
                                 props.save({...props.chartIndexV2, perfSettings: {
-                                    ...props.chartIndexV2.perfSettings,
-                                    perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
-                                    perfFilter: newValue === 'NONE' ? undefined : props.chartIndexV2.perfSettings?.perfFilter
-                                }})
+                                                    ...props.chartIndexV2.perfSettings,
+                                                    perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
+                                                    perfFilter: newValue === 'NONE' ? undefined : isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? props.chartIndexV2.perfSettings?.perfFilter : 'PERCENT'
+                                            },
+                                            graphStyle: 'BAR'
+                                        })
                             }/>            
 
                         {
@@ -378,10 +369,13 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     ]}
                                     description=""
                                     onChange={newValue => 
-                                        props.save({...props.chartIndexV2, perfSettings: {
-                                            ...props.chartIndexV2.perfSettings,
-                                            perfFilter: newValue
-                                        }})
+                                        props.save({...props.chartIndexV2, 
+                                            perfSettings: {
+                                                ...props.chartIndexV2.perfSettings,
+                                                perfFilter: newValue,                                            
+                                            },
+                                            graphStyle: 'BAR'
+                                        })
                                 }/>
                             )
                         }    
@@ -389,10 +383,10 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                 
                 <ComboFieldWithCode id="graphStyle"
                                     label="Style de l'indice"
-                                    readOnly={props.readOnly}
+                                    readOnly={props.readOnly || isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy)}
                                     description=""
                                     errorMsg=""
-                                    selectedCodeValue={props.chartIndexV2.graphStyle?props.chartIndexV2.graphStyle : 'LINE'}
+                                    selectedCodeValue={props.chartIndexV2.graphStyle ? props.chartIndexV2.graphStyle : 'LINE'}
                                     userValues={[                             
                                         "Ligne",
                                         "Barre"                                        

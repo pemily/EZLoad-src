@@ -19,7 +19,7 @@ import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab, ThemeContext
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
 import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
+import { ezApi, jsonCall, saveDashboardConfig, isDefined } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -58,8 +58,7 @@ export function DashboardMain(props: DashboardMainProps){
             )}
 
             <Box pad="small" direction="row" width="100%" justify="end">
-                { dashboardPages 
-                && (<Button size="small" alignSelf="end" icon={editPages ? <Close size='small' /> : <Configure size='small' />} margin="none" label="" onClick={() =>  {setPageEdition(!editPages)}} />)}
+                { isDefined(dashboardPages) && (<Button size="small" alignSelf="end" icon={editPages ? <Close size='small' /> : <Configure size='small' />} margin="none" label="" onClick={() =>  {setPageEdition(!editPages)}} />)}
                 <Button size="small" alignSelf="end" icon={<Refresh size='small' />}
                                 disabled={props.processRunning}
                                 label="Rafraichir" onClick={() => props.refreshDashboard()} />

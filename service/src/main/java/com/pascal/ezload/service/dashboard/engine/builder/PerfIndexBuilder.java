@@ -114,10 +114,7 @@ public class PerfIndexBuilder {
                                    Supplier<Float> groupByFirstValueFct,
                                    BiFunction<Float, Float, Float> groupByFct){
 
-        Prices pricesGrouped = prices;
-        if (perfSettings.getPerfGroupedBy() != ChartPerfGroupedBy.FROM_START) { // Pas de regroupement pour le cas du FROM_START
-            pricesGrouped = createGroupedPrices(prices, perfSettings, groupByFirstValueFct, groupByFct);
-        }
+        Prices pricesGrouped = createGroupedPrices(prices, perfSettings, groupByFirstValueFct, groupByFct);
 
         return computePerf(prices, perfSettings, pricesGrouped);
     }
@@ -165,7 +162,7 @@ public class PerfIndexBuilder {
         result.setDevise(prices.getDevise());
         result.setLabel(prices.getLabel()+" en "+perfSettings.getPerfFilter());
         Float previousValue = null;
-        boolean keepFirstValue  = perfSettings.getPerfGroupedBy() == ChartPerfGroupedBy.FROM_START;
+
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
             Float newPrice = null;
 
@@ -182,10 +179,8 @@ public class PerfIndexBuilder {
                     default:
                         throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());
                 }
-                if (keepFirstValue){
-                    if (previousValue == null && priceAtDate.getPrice() != 0) previousValue = priceAtDate.getPrice(); // on cherche la 1ere value non null
-                }
-                else previousValue = priceAtDate.getPrice();
+
+                previousValue = priceAtDate.getPrice();
             }
             result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
         }

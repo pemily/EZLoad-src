@@ -39,31 +39,39 @@ public class PortfolioStateAtDate {
     // dividends percu
     private final StateValue dividends;
 
+    // les actions achetés (sans le details par actions)
+    private final StateValue shareBuy;
+
+    // les actions vendu (sans le details par actions)
+    private final StateValue shareSold;
+
     // float because with some broker, you have some part of actions
     private final Map<EZShare, Float> shareNb;
 
     // le montant d'action acheté
-    private final Map<EZShare, Float> shareBuy;
+    private final Map<EZShare, Float> shareBuyDetails;
 
     // le montant d'action vendu
-    private final Map<EZShare, Float> shareSold;
+    private final Map<EZShare, Float> shareSoldDetails;
 
     //
-    private final Map<EZShare, Float> sharePR; // Prix de revient d'une valeur. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShare, Float> sharePRNet; // Prix de revient d'une valeur. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShare, Float> sharePRU; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
+    private final Map<EZShare, Float> sharePRUNet; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
 
-    private final Map<EZShare, Float> sharePRDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShare, Float> sharePRNetDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShare, Float> sharePRUDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+    private final Map<EZShare, Float> sharePRUNetDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
 
 
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
     private final StateValue liquidity;
 
     private final StateValue creditImpot;
+
+    private final StateValue allTaxes; // toutes les taxes au niveau du portefeuille
 
     public PortfolioStateAtDate() {
         input = new StateValue();
@@ -73,12 +81,15 @@ public class PortfolioStateAtDate {
         liquidity = new StateValue();
         creditImpot = new StateValue();
         shareNb = new HashMap<>();
-        shareBuy = new HashMap<>();
-        shareSold = new HashMap<>();
-        sharePR = new HashMap<>();
-        sharePRU = new HashMap<>();
-        sharePRDividend = new HashMap<>();
-        sharePRUDividend = new HashMap<>();
+        shareBuyDetails = new HashMap<>();
+        shareSoldDetails = new HashMap<>();
+        sharePRNet = new HashMap<>();
+        sharePRUNet = new HashMap<>();
+        sharePRNetDividend = new HashMap<>();
+        sharePRUNetDividend = new HashMap<>();
+        shareBuy = new StateValue();
+        shareSold = new StateValue();
+        allTaxes = new StateValue();
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
@@ -88,18 +99,21 @@ public class PortfolioStateAtDate {
         this.dividends = new StateValue(previousState.dividends);
         this.liquidity = new StateValue(previousState.liquidity);
         this.creditImpot = new StateValue(previousState.creditImpot);
+        this.shareBuy = new StateValue(previousState.shareBuy);
+        this.shareSold = new StateValue(previousState.shareSold);
+        this.allTaxes = new StateValue(previousState.allTaxes);
         this.shareNb = new HashMap<>();
         this.shareNb.putAll(previousState.shareNb);
-        this.shareSold = new HashMap<>();
-        this.shareBuy = new HashMap<>();
-        this.sharePR = new HashMap<>();
-        this.sharePR.putAll(previousState.sharePR);
-        this.sharePRU = new HashMap<>();
-        this.sharePRU.putAll(previousState.sharePRU);
-        this.sharePRDividend = new HashMap<>();
-        this.sharePRDividend.putAll(previousState.sharePRDividend);
-        this.sharePRUDividend = new HashMap<>();
-        this.sharePRUDividend.putAll(previousState.sharePRUDividend);
+        this.shareSoldDetails = new HashMap<>();
+        this.shareBuyDetails = new HashMap<>();
+        this.sharePRNet = new HashMap<>();
+        this.sharePRNet.putAll(previousState.sharePRNet);
+        this.sharePRUNet = new HashMap<>();
+        this.sharePRUNet.putAll(previousState.sharePRUNet);
+        this.sharePRNetDividend = new HashMap<>();
+        this.sharePRNetDividend.putAll(previousState.sharePRNetDividend);
+        this.sharePRUNetDividend = new HashMap<>();
+        this.sharePRUNetDividend.putAll(previousState.sharePRUNetDividend);
     }
 
     public EZDate getDate() {
@@ -123,21 +137,24 @@ public class PortfolioStateAtDate {
     public StateValue getDividends() {
         return dividends;
     }
+    public StateValue getShareBuy() { return shareBuy; }
+    public StateValue getShareSold() { return shareSold; }
+    public StateValue getAllTaxes() { return allTaxes; }
 
     public Map<EZShare, Float> getShareNb() {
         return shareNb;
     }
 
-    public Map<EZShare, Float> getShareBuy() {
-        return shareBuy;
+    public Map<EZShare, Float> getShareBuyDetails() {
+        return shareBuyDetails;
     }
-    public Map<EZShare, Float> getShareSold() {
-        return shareSold;
+    public Map<EZShare, Float> getShareSoldDetails() {
+        return shareSoldDetails;
     }
-    public Map<EZShare, Float> getSharePR() { return sharePR; }
-    public Map<EZShare, Float> getSharePRU() { return sharePRU; }
-    public Map<EZShare, Float> getSharePRDividend() { return sharePRDividend; }
-    public Map<EZShare, Float> getSharePRUDividend() { return sharePRUDividend; }
+    public Map<EZShare, Float> getSharePRNet() { return sharePRNet; }
+    public Map<EZShare, Float> getSharePRUNet() { return sharePRUNet; }
+    public Map<EZShare, Float> getSharePRNetDividend() { return sharePRNetDividend; }
+    public Map<EZShare, Float> getSharePRUNetDividend() { return sharePRUNetDividend; }
 
     public StateValue getLiquidity() {
         return liquidity;

@@ -22,16 +22,40 @@ import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , Def
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
+import { ComboFieldWithCode } from "../ComboFieldWithCode";
+import { useRef } from "react";
 
 export interface LineChartProps {
-    chart: Chart;    
+    chart: Chart;        
+    showLegend: boolean;
 }      
 
+const getOrCreateLegendList = (chart: any, id: string) : HTMLElement => {
+    const legendContainer = document.getElementById(id);
+    if (legendContainer !== null) {
+        let listContainer = legendContainer.querySelector('ul');
+
+        if (!listContainer) {
+            listContainer = document.createElement('ul');
+            listContainer.style.display = 'flex';
+            listContainer.style.flexDirection = 'row';
+            listContainer.style.margin = '0';
+            listContainer.style.padding = '0';
+
+            legendContainer.appendChild(listContainer);
+        }
+
+        return listContainer;
+    }  
+    throw 'element '+id+' not found';
+}
 
 export function LineChart(props: LineChartProps){
     const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
     const lineIsVisible : boolean[] = [];    
 
+   // const chartRef = useRef<ChartJS|undefined>(undefined); // https://reacthustle.com/blog/how-to-customize-events-in-chartjs-3-with-react?expand_article=1
+    
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
             lineIsVisible[i] = props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
@@ -83,6 +107,7 @@ export function LineChart(props: LineChartProps){
         datasets: lines
     };
 
+    
     const options: ChartOptions ={
         responsive: true, // pour que le canvas s'agrandisse/diminue quand on resize la fenetre
         maintainAspectRatio: false,
@@ -112,9 +137,9 @@ export function LineChart(props: LineChartProps){
                         return context.dataset.label+': '+context.raw;
                     }
                 }
-            },
+            },           
             legend: {
-                display: true,                
+                display: props.showLegend,                
                 position: 'top' as const,               
                 onClick: function(e: any, legendItem: LegendItem, legend: LegendElement<any>) {
                     // Afffiche/Cache toutes les courbes qui on le meme nom de legend d'un seul coup
@@ -153,7 +178,7 @@ export function LineChart(props: LineChartProps){
                         });
                         return result;
                     }                    
-                },                
+                },   
             }
         },
         scales: {
@@ -249,6 +274,6 @@ export function LineChart(props: LineChartProps){
     ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
 
     return (
-        <ReactChartJS type="line" data={config}  options={options} />           
+        <ReactChartJS type="line" data={config}  options={options} />                   
     ); 
 }

@@ -61,12 +61,12 @@ public class PortfolioIndexBuilderV2 {
 
         states.forEach(state -> {
                     r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
-                    r.date2share2BuyAmount.put(state.getDate(), state.getShareBuy());
-                    r.date2share2SoldAmount.put(state.getDate(), state.getShareSold());
-                    r.date2share2PR.put(state.getDate(), state.getSharePR());
-                    r.date2share2PRU.put(state.getDate(), state.getSharePRU());
-                    r.date2share2PRDividend.put(state.getDate(), state.getSharePRDividend());
-                    r.date2share2PRUDividend.put(state.getDate(), state.getSharePRUDividend());
+                    r.date2share2BuyAmount.put(state.getDate(), state.getShareBuyDetails());
+                    r.date2share2SoldAmount.put(state.getDate(), state.getShareSoldDetails());
+                    r.date2share2PR.put(state.getDate(), state.getSharePRNet());
+                    r.date2share2PRU.put(state.getDate(), state.getSharePRUNet());
+                    r.date2share2PRDividend.put(state.getDate(), state.getSharePRNetDividend());
+                    r.date2share2PRUDividend.put(state.getDate(), state.getSharePRUNetDividend());
                     r.date2portfolioValue.put(state.getDate(), state.getShareNb()
                                                                 .entrySet()
                                                                 .stream()
@@ -80,8 +80,8 @@ public class PortfolioIndexBuilderV2 {
                                                                 .reduce(Float::sum)
                                                                 .orElse(0f));
 
-                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuy()); // copy les achats
-                    state.getShareSold().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
+                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
+                    state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
                     r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
         });
 
@@ -125,13 +125,13 @@ public class PortfolioIndexBuilderV2 {
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
                 return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
             case GAIN:
-                return r.getDate2PortfolioValue().get(state.getDate()) - state.getInputOutput().getCumulative(); // je pourrais peut etre rajouter les credit d'impots ici
+                return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() +  state.getShareSold().getCumulative();
             case GAIN_WITH_CREDIT_IMPOT:
-                return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() - state.getInputOutput().getCumulative(); // je pourrais peut etre rajouter les credit d'impots ici
+                return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() + state.getShareSold().getCumulative()  + state.getCreditImpot().getCumulative();
             case SOLD:
-                return (float) state.getShareSold().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
+                return (float) state.getShareSoldDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
             case BUY:
-                return (float) state.getShareBuy().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
+                return (float) state.getShareBuyDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
         }
         throw new IllegalStateException("Missing case: "+ portfolioIndex);
     }
