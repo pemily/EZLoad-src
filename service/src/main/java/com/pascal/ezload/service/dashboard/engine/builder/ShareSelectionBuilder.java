@@ -10,6 +10,7 @@ import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ShareSelectionBuilder {
 
@@ -21,45 +22,37 @@ public class ShareSelectionBuilder {
         this.portfolioResult = portfolioResult;
     }
 
-    public Result build(Reporting reporting, List<ChartIndexV2> indexV2Selection){
+    public Result build(ChartShareIndexConfig shareIndexConfig){
         // add the additional shares
-        Set<String> allGoogleCodes = indexV2Selection
-                .stream()
-                .map(ChartIndexV2::getShareIndexConfig)
-                .filter(Objects::nonNull)
-                .flatMap(index -> index.getAdditionalShareGoogleCodeList() == null ? new LinkedList<String>().stream() : index.getAdditionalShareGoogleCodeList().stream())
-                .collect(Collectors.toSet());
-
-        Set<ShareSelection> selection = indexV2Selection.stream()
-                                        .map(ChartIndexV2::getShareIndexConfig)
-                                        .filter(Objects::nonNull)
-                                        .map(ChartShareIndexConfig::getShareSelection)
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toSet());
-        selection.forEach(select -> {
-            switch (select){
+        Set<String> allGoogleCodes = new HashSet<>();
+        if (shareIndexConfig != null){
+            if (shareIndexConfig.getAdditionalShareGoogleCodeList() != null) {
+                allGoogleCodes.addAll(shareIndexConfig.getAdditionalShareGoogleCodeList());
+            }
+            ShareSelection selection = shareIndexConfig.getShareSelection();
+            switch (selection){
                 case ALL_SHARES:
                     allGoogleCodes.addAll(portfolioResult.getDate2share2ShareNb()
-                                                            .values()
-                                                            .stream()
-                                                            .flatMap(s -> s.entrySet().stream().filter(e -> e.getValue() > 0))
-                                                            .map(s -> s.getKey().getGoogleCode())
-                                                            .collect(Collectors.toSet()));
+                            .values()
+                            .stream()
+                            .flatMap(s -> s.entrySet().stream().filter(e -> e.getValue() > 0))
+                            .map(s -> s.getKey().getGoogleCode())
+                            .collect(Collectors.toSet()));
                     break;
                 case CURRENT_SHARES:
                     // take the most recent date
                     Optional<EZDate> date = portfolioResult.getDate2share2ShareNb().keySet().stream().max((d1,d2) -> (int) (d1.toEpochSecond()- d2.toEpochSecond()));
                     date.ifPresent(ezDate -> allGoogleCodes.addAll(portfolioResult.getDate2share2ShareNb()
-                                                            .get(ezDate)
-                                                            .entrySet()
-                                                            .stream().filter(s -> s.getValue() > 0)
-                                                            .map(s -> s.getKey().getGoogleCode()).collect(Collectors.toSet())));
+                            .get(ezDate)
+                            .entrySet()
+                            .stream().filter(s -> s.getValue() > 0)
+                            .map(s -> s.getKey().getGoogleCode()).collect(Collectors.toSet())));
                     break;
                 case ADDITIONAL_SHARES_ONLY:
                     break;
-                default: throw new IllegalStateException("Missing case "+select);
+                default: throw new IllegalStateException("Missing case "+selection);
             }
-        });
+        }
 
         List<EZShare> selectedShares = allGoogleCodes
                                         .stream()

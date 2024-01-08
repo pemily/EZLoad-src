@@ -174,11 +174,7 @@ public class DashboardManagerV2 {
             PortfolioIndexBuilderV2.Result portfolioResult = portfolioIndexValuesBuilder.build(reporting, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
                     chartSettings.getIndexV2Selection());
 
-            ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager, portfolioResult); // toutes les shares de l'index (most impacted/current shares/all shares) + les additionals shares => creer un ShareIndexSelectionBuilder
-            ShareSelectionBuilder.Result shareSelectionResult = shareSelectionBuilder.build(reporting, chartSettings.getIndexV2Selection());
-
-
-            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(portfolioResult, sharePriceResult, currenciesResult, shareSelectionResult);
+            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(portfolioResult, sharePriceResult, currenciesResult, new ShareSelectionBuilder(ezActionManager, portfolioResult));
             ShareIndexBuilder.Result shareIndexResult = shareIndexBuilder.build(reporting, dates, chartSettings.getIndexV2Selection());
 
             PerfIndexBuilder perfIndexBuilder = new PerfIndexBuilder();

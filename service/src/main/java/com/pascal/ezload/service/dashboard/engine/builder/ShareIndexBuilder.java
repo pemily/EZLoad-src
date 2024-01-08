@@ -19,28 +19,27 @@ public class ShareIndexBuilder {
     private final SharePriceBuilder.Result sharePriceResult;
     private final PortfolioIndexBuilderV2.Result portfolioIndexResult;
     private final CurrenciesIndexBuilder.Result currenciesResult;
-    private final ShareSelectionBuilder.Result shareSelectionResult;
+    private final ShareSelectionBuilder shareSelectionBuilder;
 
     private static final String NO_LABEL = "";
     private static final Float NO_VALUE = null;
 
 
-    public ShareIndexBuilder(PortfolioIndexBuilderV2.Result portfolioIndexResult, SharePriceBuilder.Result sharePriceResult, CurrenciesIndexBuilder.Result currenciesResult, ShareSelectionBuilder.Result shareSelectionResult){
+    public ShareIndexBuilder(PortfolioIndexBuilderV2.Result portfolioIndexResult, SharePriceBuilder.Result sharePriceResult, CurrenciesIndexBuilder.Result currenciesResult, ShareSelectionBuilder shareSelectionBuilder){
         this.portfolioIndexResult = portfolioIndexResult;
         this.sharePriceResult = sharePriceResult;
         this.currenciesResult = currenciesResult;
-        this.shareSelectionResult = shareSelectionResult;
+        this.shareSelectionBuilder = shareSelectionBuilder;
     }
 
 
     public Result build(Reporting reporting, List<EZDate> dates, List<ChartIndexV2> indexV2Selection) {
         Result result = new Result();
 
-        Set<ShareIndex> shareIndexSet = indexV2Selection
+        Set<ChartShareIndexConfig> shareIndexSet = indexV2Selection
                 .stream()
                 .map(ChartIndexV2::getShareIndexConfig)
                 .filter(Objects::nonNull)
-                .map(ChartShareIndexConfig::getShareIndex)
                 .collect(Collectors.toSet());
 
         build(reporting, dates, shareIndexSet, result);
@@ -48,12 +47,14 @@ public class ShareIndexBuilder {
     }
 
 
-    private void build(Reporting reporting, List<EZDate> dates, Set<ShareIndex> shareIndexes, Result r) {
-        shareSelectionResult.getSelectedShares()
-                .forEach(ezShare -> {
-                    shareIndexes
-                            .forEach(si -> {
-                                switch (si) {
+    private void build(Reporting reporting, List<EZDate> dates, Set<ChartShareIndexConfig> shareIndexesConfig, Result r) {
+        shareIndexesConfig
+                .forEach(si -> {
+                    ShareSelectionBuilder.Result shareSelectionResult = shareSelectionBuilder.build(si);
+
+                    shareSelectionResult.getSelectedShares()
+                            .forEach(ezShare -> {
+                                switch (si.getShareIndex()) {
                                     case SHARE_PRICES: addIndexInResult(r, SHARE_PRICES, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare)); break;
                                     case SHARE_PRU_NET: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUNet(), SHARE_PRU_NET); break;
                                     case SHARE_COUNT: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2ShareNb(), SHARE_COUNT); break;
@@ -64,8 +65,8 @@ public class ShareIndexBuilder {
                                     default:
                                         throw new IllegalStateException("Missing case");
                                 }
-                            });
                 });
+        });
     }
 
 
@@ -100,7 +101,7 @@ public class ShareIndexBuilder {
         private final Map<ShareIndex, Map<EZShare, Prices>> shareIndex2share2TargetPrices = new HashMap<>();
 
 
-        public Map<ShareIndex, Map<EZShare, Prices>> getShareIndex2TargetPrices() {
+        public Map<ShareIndex, Map<EZShare, Prices>> getShareIndex2TargetPrices() { ShareIndex doit etre computed avec le perfSettings.computeKey dans PerfIndexBuilder
             return shareIndex2share2TargetPrices;
         }
     }
