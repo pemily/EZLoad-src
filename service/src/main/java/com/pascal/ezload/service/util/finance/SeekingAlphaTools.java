@@ -120,7 +120,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 downloadPricesThenProcessRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
-                                return date.isAfterOrEquals(from) && date.isBeforeOrEquals(to);
+                                return date.isAfter(from) && date.isBeforeOrEquals(to);
                             })
                             .map(SeekingAlphaTools::createPriceAtDate)
                             .forEach(p -> sharePrices.addPrice(p.getDate(), p));

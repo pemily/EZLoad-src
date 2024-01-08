@@ -35,8 +35,84 @@ export interface ChartIndexMainEditorProps {
     allEzShares: EzShareData[];
 }      
 
+export function getChartIndexTitle(chartSettings: ChartSettings, chartIndexV2: ChartIndexV2) : string {
+    var result : string = "";
 
-export function getChartIndexDescription(chartSettings: ChartSettings, chartIndexV2: ChartIndexV2){
+    if (chartIndexV2.perfSettings?.perfFilter === "VALUE_VARIATION"){
+        result = "±";
+    }
+    else if (chartIndexV2.perfSettings?.perfFilter === "VARIATION_EN_PERCENT"){
+        result = "±%";
+    }
+
+    if (isDefined(chartIndexV2.shareIndexConfig)){
+        switch (chartIndexV2.shareIndexConfig?.shareIndex){
+            case "SHARE_BUY_SOLD_WITH_DETAILS":
+                result += "Achats/Ventes"; break;
+            case "SHARE_COUNT":
+                result += "Nb d'actions"; break;
+            case "SHARE_DIVIDEND":
+                result += "Dividendes"; break;
+            case "SHARE_DIVIDEND_YIELD":
+                result += "Rendement du dividende"; break;
+            case "SHARE_PRICES": 
+                result += "Prix"; break;
+            case "SHARE_PRU_NET":
+                result += "PRU sans dividendes"; break;
+            case "SHARE_PRU_NET_WITH_DIVIDEND":
+                result += "PRU avec dividendes"; break;
+        }        
+    }
+    if (isDefined(chartIndexV2.currencyIndexConfig)){
+        result += "Devises";
+    }
+    if (isDefined(chartIndexV2.portfolioIndexConfig)){
+        switch(chartIndexV2.portfolioIndexConfig?.portfolioIndex){
+            case "SOLD":
+                result += "Ventes"; break;
+            case "BUY":
+                result += "Achats"; break;
+            case "CUMUL_CREDIT_IMPOTS":
+                result += "Crédit d'impôts cumulés"; break;
+            case "CUMUL_ENTREES_SORTIES":
+                result += "Entrées/Sorties cumulés"; break;
+            case "CUMUL_PORTFOLIO_DIVIDENDES":
+                result += "Dividendes cumulés"; break;
+            case "INSTANT_ENTREES":
+                result += "Entrées"; break;
+            case "INSTANT_ENTREES_SORTIES":
+                result += "Entrées/Sorties"; break;
+            case "INSTANT_LIQUIDITE": 
+                result += "Liquidités"; break;
+            case "INSTANT_PORTFOLIO_DIVIDENDES":
+                result += "Dividendes"; break;
+            case "INSTANT_SORTIES":
+                result += "Sorties"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
+                result += "Valeurs des actions"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
+                result += "Valeur du portefeuille"; break;
+            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT":                
+                result += "Valeur du portefeuille + les crédits d'impôts"; break;
+            case "GAIN":
+                result += "Gain"; break;
+            case "GAIN_WITH_CREDIT_IMPOT":
+                result += "Gain avec Crédit d'impôts"; break;    
+            default: result += "Missing case in getChartIndexDescription "+chartIndexV2.portfolioIndexConfig?.portfolioIndex;
+        }        
+    }    
+
+    if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
+        result += "/mois";
+    }
+    else if(chartIndexV2.perfSettings?.perfGroupedBy === "YEARLY"){
+        result += "/an";
+    }
+    
+    return applyEZLoadTextSignature(result);
+}
+
+export function getChartIndexDescription(chartSettings: ChartSettings, chartIndexV2: ChartIndexV2): string{
     var result : string = "Affiche ";
     var signOfDevise: string = "";
     switch(chartSettings.targetDevise!){
@@ -49,20 +125,25 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     }
 
     if (isDefined(chartIndexV2.perfSettings) && isDefined(chartIndexV2.perfSettings?.perfFilter) && isDefined(chartIndexV2.perfSettings?.perfGroupedBy)){
-        result += "la performance";
-        if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
-            result += " mensuelle ";
-        }
-        else {
-            result += " annuelle ";
-        }
-        result+="en ";
+        var suffix = " en "+signOfDevise+" ";
         if (chartIndexV2.perfSettings?.perfFilter === "VALUE"){
-            result+=signOfDevise+" ";
+            result+=" le montant";
+        }
+        else if (chartIndexV2.perfSettings?.perfFilter === "VALUE_VARIATION"){
+            result+=" la variation ";
         }
         else {
-            result+= "% ";
+            result+= " la variation ";
+            var suffix = " en % ";
         }
+       
+        if (chartIndexV2.perfSettings?.perfGroupedBy === "MONTHLY"){
+            result += " mensuel ";
+        }
+        else {
+            result += " annuel ";
+        }
+        result += suffix;
     }
     else {
         result += "la valeur en "+signOfDevise+" ";
@@ -74,14 +155,14 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "SHARE_COUNT":
                 result += "de nombre d'action possédé"; break;
             case "SHARE_DIVIDEND":
-                result += "des dividendes"; break;
+                result += "des dividendes à la date du détachement"; break;
             case "SHARE_DIVIDEND_YIELD":
-                result += "du rendement du dividende"; break;
+                result += "du rendement du dividende à la date du détachement"; break;
             case "SHARE_PRICES": 
                 result += "du cours de l'action"; break;
-            case "SHARE_PRU":
+            case "SHARE_PRU_NET":
                 result += "du Prix de Revient Unitaire, les dividendes ne sont pas inclusent dans le calcul"; break;
-            case "SHARE_PRU_WITH_DIVIDEND":
+            case "SHARE_PRU_NET_WITH_DIVIDEND":
                 result += "du Prix de Revient Unitaire incluant les dividendes"; break;
         }        
     }
@@ -107,7 +188,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "INSTANT_LIQUIDITE": 
                 result += "des liquidités disponibles"; break;
             case "INSTANT_PORTFOLIO_DIVIDENDES":
-                result += "des dividendes reçu"; break;
+                result += "des dividendes reçu (date de paiement)"; break;
             case "INSTANT_SORTIES":
                 result += "des retraits de liquidités"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
@@ -240,8 +321,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'SHARE_BUY_SOLD_WITH_DETAILS',
                                 'SHARE_DIVIDEND',
                                 'SHARE_DIVIDEND_YIELD',
-                                'SHARE_PRU',
-                                'SHARE_PRU_WITH_DIVIDEND'
+                                'SHARE_PRU_NET',
+                                'SHARE_PRU_NET_WITH_DIVIDEND'
                             ]}
                             description=""
                             onChange={newValue => 
@@ -287,12 +368,12 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                         label="Groupe d'actions"
                         errorMsg={undefined}
                         readOnly={props.readOnly}
-                        selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
-                                                                            'CURRENT_SHARES': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
+                        selectedCodeValue={!isDefined(props.chartIndexV2.shareIndexConfig?.shareSelection) ?
+                                                                            'CURRENT_SHARES': props.chartIndexV2.shareIndexConfig?.shareSelection! }                            
                         userValues={[                             
                             "Les actions courrante du portefeuille",
                             "Toutes les actions qui ont été présentent dans le portefeuille",
-                            "Pas de groupe"
+                            "Uniquement les actions sélectionnées individuellement"
                         ]}
                         codeValues={[                            
                            "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
@@ -326,13 +407,13 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                 </Box>
                 <Box direction="row">
                     <ComboFieldWithCode id="Perf"
-                            label="Analyse de la performance"
+                            label="Regroupement"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
                             selectedCodeValue={!isDefined(props.chartIndexV2.perfSettings) || !isDefined(props.chartIndexV2.perfSettings?.perfGroupedBy) ?
                                                                                 'NONE': props.chartIndexV2.perfSettings?.perfGroupedBy! }                            
                             userValues={[                             
-                                'Aucune',                                
+                                'Aucun',                                
                                 'Par mois',
                                 'Par année'
                             ]}
@@ -346,7 +427,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 props.save({...props.chartIndexV2, perfSettings: {
                                                     ...props.chartIndexV2.perfSettings,
                                                     perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
-                                                    perfFilter: newValue === 'NONE' ? undefined : isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? props.chartIndexV2.perfSettings?.perfFilter : 'PERCENT'
+                                                    perfFilter: newValue === 'NONE' ? undefined : 
+                                                        isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? props.chartIndexV2.perfSettings?.perfFilter : 'VARIATION_EN_PERCENT'
                                             },
                                             graphStyle: 'BAR'
                                         })
@@ -358,13 +440,15 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     label="unité"
                                     errorMsg={undefined}
                                     readOnly={props.readOnly}
-                                    selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
+                                    selectedCodeValue={ !isDefined(props.chartIndexV2.perfSettings?.perfFilter) ? 'VARIATION_EN_PERCENT' : props.chartIndexV2.perfSettings?.perfFilter! }                            
                                     userValues={[   
-                                        'En %',                          
+                                        'Variation en %',
+                                        'Variation en '+props.chartSettings.targetDevise,
                                         'En '+props.chartSettings.targetDevise,                        
                                     ]}
                                     codeValues={[
-                                        'PERCENT',
+                                        'VARIATION_EN_PERCENT',
+                                        'VALUE_VARIATION',
                                         'VALUE'
                                     ]}
                                     description=""

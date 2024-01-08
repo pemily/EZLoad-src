@@ -48,7 +48,7 @@ public class CurrencyMap {
         if (from.equals(to)) {
             return fromPrice.getPrice();
         }
-        PriceAtDate factor = factors.getPriceAt(fromPrice.getDate());
+        PriceAtDate factor = factors.getPriceAt(fromPrice.getDate().isPeriod() ? fromPrice.getDate().endPeriodDate() : fromPrice.getDate());
         return fromPrice.getPrice()*factor.getPrice();
     }
 

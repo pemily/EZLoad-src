@@ -26,21 +26,36 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChartsTools {
+    public enum PERIOD_INTERVAL {
+        DAY, MONTH, YEAR
+    }
 
-    public static List<EZDate> getDatesSample(EZDate from, EZDate to, int nbOfPoint){
+    public static List<EZDate> getDatesSample(EZDate from, EZDate to, PERIOD_INTERVAL period, int nbOfPoint){
         if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
-        long nbOfTotalDays = from.nbOfDaysTo(to);
-        if (nbOfTotalDays+1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDays;
+        long nbOfTotalDates = period == PERIOD_INTERVAL.DAY ? from.nbOfDaysTo(to) : period == PERIOD_INTERVAL.MONTH ? from.nbOfMonthesTo(to) : to.getYear() - from.getYear();
+        if (nbOfTotalDates+1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDates;
 
         var allDates = new ArrayList<EZDate>(nbOfPoint);
 
-        nbOfPoint = nbOfPoint - 1; // because I add the last one at the end
-        float intervalSpace = ((float)nbOfTotalDays / (float)nbOfPoint );
+        nbOfPoint = period == PERIOD_INTERVAL.DAY ? nbOfPoint - 1 : nbOfPoint; // if day ? -1 because I add the last one at the end
+        float intervalSpace = period == PERIOD_INTERVAL.DAY ? ((float)nbOfTotalDates / (float)nbOfPoint ) : 1;
 
         for (int i = 0; i < nbOfPoint; i++){
-            allDates.add(from.plusDays((int)(intervalSpace * (float)i)));
+            if (period == PERIOD_INTERVAL.DAY)
+                allDates.add(from.plusDays((int)(intervalSpace * (float)i)));
+            else if (period == PERIOD_INTERVAL.MONTH) {
+                EZDate date = from.plusMonthes((int)(intervalSpace * (float)i));
+                allDates.add(EZDate.monthPeriod(date.getYear(), date.getMonth()));
+            }
+            else if (period == PERIOD_INTERVAL.YEAR) {
+                EZDate date = from.plusYears((int)(intervalSpace * (float)i));
+                allDates.add(EZDate.yearPeriod(date.getYear()));
+            }
         }
-        allDates.add(to);
+
+        if (period == PERIOD_INTERVAL.DAY) allDates.add(to);
+        else if (period == PERIOD_INTERVAL.MONTH) allDates.add(EZDate.monthPeriod(to.getMonth(), to.getYear()));
+        else allDates.add(EZDate.yearPeriod(to.getYear()));
 
         return allDates;
     }
@@ -51,8 +66,8 @@ public class ChartsTools {
         return chart;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
-        return createChartLine(chart, lineStyle, YAxisSetting, lineTitle, prices.getPrices()
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+        return createChartLine(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(PriceAtDate::getPrice).collect(Collectors.toList()),
                                 removeZeroValues);
@@ -71,20 +86,19 @@ public class ChartsTools {
         return chartLine;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<Float> values, boolean removeZeroValues){
-        if (chart.getLabels().size() != values.size()){
-            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
-        }
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<Float> values, boolean removeZeroValues){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValues(values.stream().map(f -> (f == null || (f == 0 && removeZeroValues)) ? null : f).collect(Collectors.toList()));
         chartLine.setYAxisSetting(YAxisSetting);
-        chart.getLines().add(chartLine);
         return chartLine;
     }
 
-    public static long date2Label(EZDate date){
+    public static Object date2Label(EZDate date){
+        if (date.isPeriod()){
+            return date.toString();
+        }
         return date.toEpochSecond()*1000;
     }
 }

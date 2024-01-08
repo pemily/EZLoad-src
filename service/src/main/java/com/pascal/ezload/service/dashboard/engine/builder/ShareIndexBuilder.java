@@ -54,12 +54,12 @@ public class ShareIndexBuilder {
                     shareIndexes
                             .forEach(si -> {
                                 switch (si) {
-                                    case SHARE_PRICES: buildSharePrices(reporting, ezShare, r); break;
-                                    case SHARE_PRU: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRU(), SHARE_PRU); break;
+                                    case SHARE_PRICES: addIndexInResult(r, SHARE_PRICES, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare)); break;
+                                    case SHARE_PRU_NET: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUNet(), SHARE_PRU_NET); break;
                                     case SHARE_COUNT: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2ShareNb(), SHARE_COUNT); break;
-                                    case SHARE_DIVIDEND: sharePriceResult.getDividends(reporting, ezShare); break;
-                                    case SHARE_DIVIDEND_YIELD: sharePriceResult.getDividendYield(reporting, ezShare); break;
-                                    case SHARE_PRU_WITH_DIVIDEND: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUDividend(), SHARE_PRU_WITH_DIVIDEND); break;
+                                    case SHARE_DIVIDEND: addIndexInResult(r, SHARE_DIVIDEND, ezShare, sharePriceResult.getDividends(reporting, ezShare)); break;
+                                    case SHARE_DIVIDEND_YIELD: addIndexInResult(r, SHARE_DIVIDEND_YIELD, ezShare, sharePriceResult.getDividendYield(reporting, ezShare)); break;
+                                    case SHARE_PRU_NET_WITH_DIVIDEND: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUNetDividend(), SHARE_PRU_NET_WITH_DIVIDEND); break;
                                     case SHARE_BUY_SOLD_WITH_DETAILS: buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), SHARE_BUY_SOLD_WITH_DETAILS); break;
                                     default:
                                         throw new IllegalStateException("Missing case");
@@ -69,15 +69,10 @@ public class ShareIndexBuilder {
     }
 
 
-    private void buildSharePrices(Reporting reporting, EZShare ezShare, Result r) {
-        Prices prices = sharePriceResult.getTargetPrices(reporting, ezShare);
-        addIndexInResult(r, SHARE_PRICES, ezShare, prices);
-    }
-
-
     private void buildPricesAndSaveInResult(List<EZDate> dates, EZShare ezShare, Result r, Map<EZDate, Map<EZShare, Float>> date2share2value, ShareIndex shareIndex) {
         Prices prices = new Prices();
         prices.setDevise(currenciesResult.getTargetDevise());
+        prices.setLabel(shareIndex.name()+" of "+ezShare.getEzName());
         for (EZDate date : dates) {
             Map<EZShare, Float> share2value = date2share2value.get(date);
             share2value

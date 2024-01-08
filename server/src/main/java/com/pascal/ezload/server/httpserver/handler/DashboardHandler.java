@@ -66,9 +66,15 @@ public class DashboardHandler {
     public DashboardData getDashboardData() throws Exception {
         DashboardData dashboardData = ezServerState.getDashboardData();
         if (dashboardData == null){
+            SettingsManager settingsManager = SettingsManager.getInstance();
+            MainSettings mainSettings = settingsManager.loadProps().validate();
+            EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
+            DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
+            List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
+            List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(dashboardSettings);
             dashboardData = new DashboardData();
-            dashboardData.setPages(new ArrayList<>());
-            dashboardData.setShareGoogleCodeAndNames(new ArrayList<>());
+            dashboardData.setPages(chartsPages);
+            dashboardData.setShareGoogleCodeAndNames(new LinkedList<>());
         }
         return dashboardData;
     }
@@ -93,7 +99,7 @@ public class DashboardHandler {
                         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
                         DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
                         List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
-                        List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(new TextReporting(), dashboardSettings, ezPortfolioProxy);
+                        List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboardAndCreateChart(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
                         dashboardData.setPages(chartsPages);
                         dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(actionManager));

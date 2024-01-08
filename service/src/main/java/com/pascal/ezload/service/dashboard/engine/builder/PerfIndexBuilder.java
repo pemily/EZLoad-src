@@ -37,7 +37,7 @@ public class PerfIndexBuilder {
         currenciesResult.getAllDevises()
                 .forEach(devise -> {
                     Prices pricesPerf = buildPerfPrices(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
-                    result.put(devise, pricesPerf);
+                    result.put(devise, perfSettings, pricesPerf);
                 });
     }
 
@@ -68,7 +68,7 @@ public class PerfIndexBuilder {
             default:
                 throw new IllegalStateException("Missing case: "+indexConfig.getPortfolioIndex());
         }
-        result.put(indexConfig.getPortfolioIndex(), pricesPeriodResult);
+        result.put(indexConfig.getPortfolioIndex(), perfSettings, pricesPeriodResult);
     }
 
     private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartIndexV2 index, Result result) {
@@ -79,8 +79,8 @@ public class PerfIndexBuilder {
         share2Prices.forEach((key, value) -> {
             Prices pricesPeriodResult;
             switch (indexConfig.getShareIndex()) {
-                case SHARE_PRU:
-                case SHARE_PRU_WITH_DIVIDEND:
+                case SHARE_PRU_NET:
+                case SHARE_PRU_NET_WITH_DIVIDEND:
                 case SHARE_PRICES:
                 case SHARE_COUNT:
                     pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
@@ -94,7 +94,7 @@ public class PerfIndexBuilder {
                     throw new IllegalStateException("Missing case: "+indexConfig.getShareIndex());
             }
 
-            result.put(indexConfig.getShareIndex(), key, pricesPeriodResult);
+            result.put(indexConfig.getShareIndex(), key, perfSettings, pricesPeriodResult);
         });
     }
 
@@ -148,7 +148,7 @@ public class PerfIndexBuilder {
                 }
                 lastPeriodIndex++;
             }
-            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, new PriceAtDate(currentPeriod, currentValue));
+            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(todayPeriod));
@@ -167,14 +167,18 @@ public class PerfIndexBuilder {
             Float newPrice = null;
 
             if (priceAtDate.getPrice() != null) {
+                boolean isFirstValue = previousValue == null;
                 switch (perfSettings.getPerfFilter()) {
                     case VALUE:
-                        previousValue = previousValue == null ? 0 : previousValue;
-                        newPrice = priceAtDate.getPrice() - previousValue;
+                        newPrice = priceAtDate.getPrice();
                         break;
-                    case PERCENT:
-                        if (previousValue != null && previousValue != 0)
-                            newPrice = priceAtDate.getPrice() * 100.0f / previousValue;
+                    case VALUE_VARIATION:
+                        previousValue = previousValue == null ? 0 : previousValue;
+                        newPrice = isFirstValue ? 0 : priceAtDate.getPrice() - previousValue;
+                        break;
+                    case VARIATION_EN_PERCENT:
+                        if (previousValue != null && previousValue == 0) newPrice = 100f;
+                        else newPrice = isFirstValue ? 0 : (priceAtDate.getPrice() * 100f / previousValue) -100f;
                         break;
                     default:
                         throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());
@@ -200,24 +204,24 @@ public class PerfIndexBuilder {
 
 
     public static class Result{
-        private final Map<ShareIndex, Map<EZShare, Prices>> sharePerfs = new HashMap<>();
-        private final Map<PortfolioIndex, Prices> portfolioPerfs = new HashMap<>();
-        private final Map<EZDevise, Prices> devisePerfs = new HashMap<>();
+        private final Map<String, Map<EZShare, Prices>> sharePerfs = new HashMap<>();
+        private final Map<String, Prices> portfolioPerfs = new HashMap<>();
+        private final Map<String, Prices> devisePerfs = new HashMap<>();
 
-        public Map<ShareIndex, Map<EZShare, Prices>> getSharePerfs() {
-            return sharePerfs;
+        public Map<EZShare, Prices> getSharePerfs(ShareIndex index, ChartPerfSettings perf) {
+            return sharePerfs.get(computeKey(index.name(), perf));
         }
 
-        public Map<PortfolioIndex, Prices> getPortoflioPerfs(){
-            return portfolioPerfs;
+        public Prices getPortoflioPerfs(PortfolioIndex index, ChartPerfSettings perf){
+            return portfolioPerfs.get(computeKey(index.name(), perf));
         }
 
-        public Map<EZDevise, Prices> getDevisePerfs(){
-            return devisePerfs;
+        public Prices getDevisePerfs(EZDevise index, ChartPerfSettings perf){
+            return devisePerfs.get(computeKey(index.getCode(), perf));
         }
 
-        private void put(ShareIndex index, EZShare share, Prices prices) {
-            this.sharePerfs.compute(index, (i, m) -> {
+        private void put(ShareIndex index, EZShare share, ChartPerfSettings perf, Prices prices) {
+            this.sharePerfs.compute(computeKey(index.name(), perf), (i, m) -> {
                if (m == null){
                    m = new HashMap<>();
                }
@@ -226,12 +230,19 @@ public class PerfIndexBuilder {
             });
         }
 
-        private void put(PortfolioIndex index, Prices prices) {
-            this.portfolioPerfs.put(index, prices);
+        private void put(PortfolioIndex index, ChartPerfSettings perf, Prices prices) {
+            this.portfolioPerfs.put(computeKey(index.name(), perf), prices);
         }
 
-        private void put(EZDevise index, Prices prices) {
-            this.devisePerfs.put(index, prices);
+        private void put(EZDevise index, ChartPerfSettings perf, Prices prices) {
+            this.devisePerfs.put(computeKey(index.getCode(), perf), prices);
+        }
+
+
+        private String computeKey(String indexName, ChartPerfSettings perf){
+            if (perf.correctlyDefined())
+                return indexName+"/"+perf.getPerfFilter().name()+"/"+perf.getPerfGroupedBy().name();
+            return indexName;
         }
     }
 }

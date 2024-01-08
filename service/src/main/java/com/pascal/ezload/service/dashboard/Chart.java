@@ -29,6 +29,7 @@ public class Chart extends ChartSettings {
     private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
     private List<Object> labels = new LinkedList<>();
     private List<ChartLine> lines = new LinkedList<>();
+    private ChartsTools.PERIOD_INTERVAL axisXPeriod;
 
     public Chart(ChartSettings chartSettings){
         super(chartSettings);
@@ -66,5 +67,13 @@ public class Chart extends ChartSettings {
 
     public void setLines(List<ChartLine> lines) {
         this.lines = lines;
+    }
+
+    public void setAxisXPeriod(ChartsTools.PERIOD_INTERVAL period){
+        this.axisXPeriod = period;
+    }
+
+    public ChartsTools.PERIOD_INTERVAL getAxisXPeriod(){
+        return this.axisXPeriod;
     }
 }

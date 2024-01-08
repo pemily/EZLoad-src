@@ -65,7 +65,7 @@ public class YahooTools extends ExternalSiteTools{
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     rows.map(YahooTools::createPriceAtDate)
-                            .filter(p -> p.getDate().isAfterOrEquals(from) && p.getDate().isBeforeOrEquals(to))
+                            .filter(p -> p.getDate().isAfter(from) && p.getDate().isBeforeOrEquals(to))
                             .forEach(p -> sharePrices.addPrice(p.getDate(), p));
 
                 });

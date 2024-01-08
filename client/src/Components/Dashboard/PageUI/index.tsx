@@ -4,7 +4,7 @@ import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from
 import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart, ChartIndexV2 } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
-import { getChartIndexDescription } from '../ChartIndexMainEditor';
+import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
 
 import { LineChart } from '../../Tools/LineChart';
 import { ChartUI } from "../ChartUI";
@@ -53,8 +53,7 @@ export function PageUI(props: PageUIProps){
                             const chartIndex: ChartIndexV2 = {
                                 portfolioIndexConfig: {
                                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
-                                },
-                                label: "Valeur du portefeuille",                                    
+                                },                                
                                 perfSettings: undefined,
                                 currencyIndexConfig: undefined,
                                 shareIndexConfig: undefined,
@@ -68,6 +67,7 @@ export function PageUI(props: PageUIProps){
                                 indexV2Selection: [ chartIndex ],
                             };                            
                             chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
+                            chartIndex.label = getChartIndexTitle(newChart, chartIndex);
                             props.savePageUI({
                                                 ...props.dashboardPage,
                                                 charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]

@@ -182,12 +182,13 @@ export function LineChart(props: LineChartProps){
             }
         },
         scales: {
+
             x: {
                 // https://www.chartjs.org/docs/latest/samples/scales/time-line.html
                 // https://github.com/chartjs/chartjs-adapter-date-fns
                type: "time",
                time: {
-                    unit: "month",                                        
+                    unit: props.chart.axisXPeriod === "YEAR" ? "year" : props.chart.axisXPeriod === "MONTH" ? "month": "day"
                },
                adapters: { 
                     date: {

@@ -27,7 +27,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample3Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 3);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), ChartsTools.PERIOD_INTERVAL.DAY,3);
         Assert.assertEquals(3, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,5), r.get(1));
@@ -36,7 +36,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample4Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 4);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10),  ChartsTools.PERIOD_INTERVAL.DAY,4);
         Assert.assertEquals(4, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,4), r.get(1));
@@ -46,7 +46,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample5Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 5);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), ChartsTools.PERIOD_INTERVAL.DAY, 5);
         Assert.assertEquals(5, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,3), r.get(1));
@@ -57,7 +57,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample6Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 6);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10),  ChartsTools.PERIOD_INTERVAL.DAY,6);
         Assert.assertEquals(6, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -69,7 +69,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample7Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 7);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), ChartsTools.PERIOD_INTERVAL.DAY, 7);
         Assert.assertEquals(7, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -83,7 +83,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSample10Points(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 10);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), ChartsTools.PERIOD_INTERVAL.DAY, 10);
         Assert.assertEquals(10, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));
@@ -100,7 +100,7 @@ public class ChartsToolsTest {
 
     @Test
     public void getDatesSampleTooManyPoints(){
-        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), 11);
+        List<EZDate> r = ChartsTools.getDatesSample(new EZDate(2000,1,1), new EZDate(2000,1,10), ChartsTools.PERIOD_INTERVAL.DAY, 11);
         Assert.assertEquals(9, r.size());
         Assert.assertEquals(new EZDate(2000,1,1), r.get(0));
         Assert.assertEquals(new EZDate(2000,1,2), r.get(1));

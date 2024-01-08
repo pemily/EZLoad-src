@@ -23,8 +23,9 @@ export interface ChartUIProps {
     deleteChartUI: (afterSave: () => void) => void
 }      
 
-function getIndexLabelsWithCounter(chartLines : ChartLine[]) : { label:string, count: number}[]{
+function getIndexLabelsWithCounter(chartLines : ChartLine[]|undefined) : { label:string, count: number}[]{
     const allDistinctLabels : { label:string, count: number}[] = [];
+    if (chartLines === undefined) return [];
     chartLines.forEach(l => {
         const i = allDistinctLabels.map(l2 => l2.label).indexOf(l.indexLabel!)
         if (i == -1){
@@ -37,6 +38,7 @@ function getIndexLabelsWithCounter(chartLines : ChartLine[]) : { label:string, c
             }
         }
     })    
+    console.log("PASCAL ", allDistinctLabels);
     return allDistinctLabels;
 }
 

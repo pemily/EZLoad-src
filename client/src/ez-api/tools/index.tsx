@@ -55,7 +55,7 @@ export function isTextContainsEZLoadSignature(text: string | undefined | null) :
   if (text === undefined || text === null || text.trim().length === 0){
       return true;
   }
-  return text.startsWith(" ") && text.endsWith(".\t ");
+  return text.startsWith(" ") && text.endsWith("\t ");
 }
 
 export function applyEZLoadTextSignature(text: string) : string {
@@ -63,8 +63,8 @@ export function applyEZLoadTextSignature(text: string) : string {
   if (!text.startsWith(" ")){
       result = " "+result;
   }
-  if (!text.endsWith(".\t ")){
-      result = result  + ".\t ";
+  if (!text.endsWith("\t ")){
+      result = result  + "\t ";
   }
   return result;
 }
@@ -115,6 +115,7 @@ function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {
   delete c.labels;
   delete c.axisId2titleX;
   delete c.axisId2titleY;
+  delete c.axisXPeriod;
   return c;
 }
 

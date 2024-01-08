@@ -74,7 +74,7 @@ public class SharePriceBuilder {
                                 EZDate finalPreviousDate = previousDate;
                                 float value = 0f;
                                 float totalDividendInOriginalDevise = (float) dividends.stream()
-                                        .filter(div -> div.getDetachementDate().isAfterOrEquals(finalPreviousDate) && div.getDetachementDate().isBefore(currentDate))
+                                        .filter(div -> currentDate.isPeriod() ? currentDate.contains(div.getDetachementDate()) : div.getDetachementDate().isAfter(finalPreviousDate) && div.getDetachementDate().isBeforeOrEquals(currentDate))
                                         .mapToDouble(Dividend::getAmount)
                                         .sum();
 

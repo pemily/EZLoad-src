@@ -25,7 +25,7 @@ import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
-import { ChartIndexMainEditor, getChartIndexDescription } from "../ChartIndexMainEditor";
+import { ChartIndexMainEditor, getChartIndexDescription, getChartIndexTitle } from "../ChartIndexMainEditor";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
@@ -67,14 +67,16 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
     const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
-    function nouvelIndice(targetDevise: string) : ChartIndexV2 {
-        return {
-                 label: 'Nouvel Indice',
+    function nouvelIndice(chartSettings: ChartSettings) : ChartIndexV2 {
+        const chartIndex : ChartIndexV2 = {       
                  graphStyle: 'LINE',
                  portfolioIndexConfig: {
                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
-                 }
+                 },                 
                }
+        chartIndex.description = getChartIndexDescription(chartSettings, chartIndex);
+        chartIndex.label = getChartIndexTitle(chartSettings, chartIndex);        
+        return chartIndex;
     }
 
     return (            
@@ -86,7 +88,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         props.save(
                                             {...props.chartSettings,
                                                 indexV2Selection: props.chartSettings.indexV2Selection === undefined ?
-                                                                [nouvelIndice(props.chartSettings.targetDevise!)] : [...props.chartSettings.indexV2Selection, nouvelIndice(props.chartSettings.targetDevise!)]
+                                                                [nouvelIndice(props.chartSettings)] : [...props.chartSettings.indexV2Selection, nouvelIndice(props.chartSettings)]
                                             }, false, () => { setIndiceIndex(nextIndex); }
                                         )
                                     }
@@ -161,7 +163,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                         {...chartIndex, label: newValue},
                                                         ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
                                                     ]
-                                                }, true, () => {})
+                                                }, false, () => {})
                                         }/> 
                                         <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
@@ -207,6 +209,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                 indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
                                                     {
                                                         ...newChartIndex,
+                                                        label: isTextContainsEZLoadSignature(newChartIndex.label) ? 
+                                                                    getChartIndexTitle(props.chartSettings, newChartIndex) : newChartIndex.label,
                                                         description: isTextContainsEZLoadSignature(newChartIndex.description) ? 
                                                                         getChartIndexDescription(props.chartSettings, newChartIndex) : newChartIndex.description
                                                     },     
