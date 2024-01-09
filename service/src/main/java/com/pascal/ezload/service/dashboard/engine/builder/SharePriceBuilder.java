@@ -28,23 +28,24 @@ public class SharePriceBuilder {
 
     public class Result {
         private final List<EZDate> dates;
-        private final Map<EZShare, Prices> shares2TargetPrices = new HashMap<>();
-        private final Map<EZShare, Prices> share2DividendsTargetPrices = new HashMap<>();
-        private final Map<EZShare, Prices> share2dividendYieldsTargetPrices = new HashMap<>();
+        private final Map<EZShareEQ, Prices> shares2TargetPrices = new HashMap<>();
+        private final Map<EZShareEQ, Prices> share2DividendsTargetPrices = new HashMap<>();
+        private final Map<EZShareEQ, Prices> share2dividendYieldsTargetPrices = new HashMap<>();
 
         Result(List<EZDate> dates){
             this.dates = dates;
         }
 
-        public EZShare getShareFromName(String name){
+        public EZShareEQ getShareFromName(String name){
             return actionManager.getAllEZShares().stream()
                     .filter(s -> s.getEzName().equalsIgnoreCase(name)) // TODO utiliser levenshtein ou Jaro Winkler?
                     .findFirst()
+                    .map(EZShareEQ::new)
                     .orElseThrow(() -> new IllegalStateException("L'action "+name+" n'a pas été trouvé dans la liste d'actions. Vous devez la rajouter"));
         }
 
 
-        public Prices getTargetPrices(Reporting reporting, EZShare share) {
+        public Prices getTargetPrices(Reporting reporting, EZShareEQ share) {
             return shares2TargetPrices.computeIfAbsent(share, ezShare -> {
                 try {
                     Prices prices = actionManager.getPrices(reporting, ezShare, dates);
@@ -59,7 +60,7 @@ public class SharePriceBuilder {
         }
 
 
-        public Prices getDividends(Reporting reporting, EZShare share){
+        public Prices getDividends(Reporting reporting, EZShareEQ share){
             return share2DividendsTargetPrices.computeIfAbsent(share, ezShare -> {
                 try {
                     List<Dividend> dividends = actionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size() - 1));
@@ -97,7 +98,7 @@ public class SharePriceBuilder {
 
 
 
-        public Prices getDividendYield(Reporting reporting, EZShare share){
+        public Prices getDividendYield(Reporting reporting, EZShareEQ share){
             // Le rendement du dividend
             return share2dividendYieldsTargetPrices.computeIfAbsent(share, ezShare -> {
                 Prices dividends = getDividends(reporting, ezShare);

@@ -58,7 +58,7 @@ export function LineChart(props: LineChartProps){
     
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
-            lineIsVisible[i] = props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
+            lineIsVisible[i] = true; // props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
         }
     }
 
@@ -227,7 +227,7 @@ export function LineChart(props: LineChartProps){
                 title: {
                   display: true,
                   text: '%'
-                }
+                },
             },
             PORTFOLIO: {
                 type: 'linear',
@@ -236,7 +236,7 @@ export function LineChart(props: LineChartProps){
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                }
+                },        
             },        
             NB: {
                 type: 'linear',
@@ -244,7 +244,7 @@ export function LineChart(props: LineChartProps){
                 position: 'left',
                 title: {
                     display: false
-                }
+                },
             },                         
             SHARE: {
                 type: 'linear',
@@ -253,7 +253,7 @@ export function LineChart(props: LineChartProps){
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                }
+                },
             },                      
             DEVISE:{
                 type: 'linear',
@@ -266,7 +266,7 @@ export function LineChart(props: LineChartProps){
                 // grid line settings
                 grid: {
                     drawOnChartArea: false, // only want the grid lines for one axis to show up
-                },                
+                },             
             }
         }
     }

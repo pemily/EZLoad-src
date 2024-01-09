@@ -1,7 +1,8 @@
 package com.pascal.ezload.service.dashboard.config;
 
-public class ChartIndexV2 {
+public class ChartIndex {
 
+    private String id;
     private String label;
     private String description;
     private GraphStyle graphStyle = GraphStyle.LINE;
@@ -66,5 +67,13 @@ public class ChartIndexV2 {
 
     public void setGraphStyle(GraphStyle graphStyle) {
         this.graphStyle = graphStyle;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

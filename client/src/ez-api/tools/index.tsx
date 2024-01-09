@@ -144,6 +144,9 @@ export function savePassword(courtier: 'BourseDirect', username: string|undefine
     .catch(e => console.error("Save Password Error: ", e));
 }
 
+export function genUUID(){
+  return crypto.randomUUID();
+}
 
 export function getChromeVersion() : string {
   let pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);

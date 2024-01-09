@@ -1,7 +1,7 @@
 import { Box, Button, Text, Carousel, Card, Collapsible, Tab } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart, ChartIndexV2 } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
@@ -50,7 +50,7 @@ export function PageUI(props: PageUIProps){
                         <Button size="small" icon={<Add size='small' />}
                         label="Nouveau Graphique" onClick={() => {
                             // init
-                            const chartIndex: ChartIndexV2 = {
+                            const chartIndex: ChartIndex = {
                                 portfolioIndexConfig: {
                                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
                                 },                                

@@ -18,7 +18,7 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 
-import com.pascal.ezload.service.dashboard.config.ChartIndexV2;
+import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.ChartPortfolioIndexConfig;
 import com.pascal.ezload.service.dashboard.config.PortfolioIndex;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
@@ -31,25 +31,25 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PortfolioIndexBuilderV2 {
+public class PortfolioIndexBuilder {
 
     private final List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
     private final CurrenciesIndexBuilder.Result currencies;
     private final SharePriceBuilder.Result sharePrices;
 
-    public PortfolioIndexBuilderV2(List<Row> operations, CurrenciesIndexBuilder.Result currencies, SharePriceBuilder.Result sharePrices){
+    public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder.Result currencies, SharePriceBuilder.Result sharePrices){
         this.operations = operations;
         this.currencies = currencies;
         this.sharePrices = sharePrices;
     }
 
-    public Result build(Reporting reporting, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, List<ChartIndexV2> chartSelection){
+    public Result build(Reporting reporting, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, List<ChartIndex> chartSelection){
         Result r = new Result();
         r.dates = dates;
         if (operations != null)
             buildPricesFor(reporting, brokersFilter, accountTypeFilter,
                     chartSelection.stream()
-                            .map(ChartIndexV2::getPortfolioIndexConfig)
+                            .map(ChartIndex::getPortfolioIndexConfig)
                             .filter(Objects::nonNull)
                             .collect(Collectors.toList()), r);
         return r;
@@ -80,7 +80,7 @@ public class PortfolioIndexBuilderV2 {
                                                                 .reduce(Float::sum)
                                                                 .orElse(0f));
 
-                    Map<EZShare, Float> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
+                    Map<EZShareEQ, Float> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
                     state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
                     r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
         });
@@ -168,14 +168,14 @@ public class PortfolioIndexBuilderV2 {
         private List<EZDate> dates;
 
         private final Map<PortfolioIndex, Prices> portfolioIndex2TargetPrices = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2ShareNb = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2SoldAmount = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2BuyOrSoldAmount = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2BuyAmount = new HashMap<>();
-        private final Map<EZDate, Map<EZShare, Float>> date2share2PRNet = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'actions totales) (permet de calculer le PRU)
-        private final Map<EZDate, Map<EZShare, Float>> date2share2PRUNet = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
-        private final Map<EZDate, Map<EZShare, Float>> date2share2PRNetDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'actions totales)
-        private final Map<EZDate, Map<EZShare, Float>> date2share2PRUNetDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2ShareNb = new HashMap<>();
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2SoldAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2BuyOrSoldAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2BuyAmount = new HashMap<>();
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRNet = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'actions totales) (permet de calculer le PRU)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUNet = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRNetDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'actions totales)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUNetDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
         private final Map<EZDate, Float> date2portfolioValue = new HashMap<>(); // le montant du portefeuille a cette date (le prix de l'action * le nb d'action)
 
         public List<EZDate> getDates() {
@@ -186,24 +186,24 @@ public class PortfolioIndexBuilderV2 {
         public Map<PortfolioIndex, Prices> getPortfolioIndex2TargetPrices() {
             return portfolioIndex2TargetPrices;
         }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2ShareNb() {
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2ShareNb() {
             return date2share2ShareNb;
         }
         public Map<EZDate, Float> getDate2PortfolioValue() { return date2portfolioValue;}
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyAmount() {
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2BuyAmount() {
             return date2share2BuyAmount;
         }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2SoldAmount() {
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2SoldAmount() {
             return date2share2SoldAmount;
         }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2BuyOrSoldAmount() {
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2BuyOrSoldAmount() {
             return date2share2BuyOrSoldAmount;
         }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRNet() { return date2share2PRNet; }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRUNet() { return date2share2PRUNet; }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRNet() { return date2share2PRNet; }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRUNet() { return date2share2PRUNet; }
 
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRNetDividend() { return date2share2PRNetDividend; }
-        public Map<EZDate, Map<EZShare, Float>> getDate2share2PRUNetDividend() { return date2share2PRUNetDividend; }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRNetDividend() { return date2share2PRNetDividend; }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRUNetDividend() { return date2share2PRUNetDividend; }
     }
 
 

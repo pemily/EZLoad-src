@@ -21,6 +21,8 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
 import com.pascal.ezload.service.util.CountryUtil;
 
+import java.util.Objects;
+
 /**
  * Si l'action a ete cree depuis la 1ere lecture d'un nouveau EZPortfolio, elle aura un ticker Google mais pas le ISIN
  * Si l'action a ete cree depuis une recherche BourseDirect, elle aura un ISIN
@@ -139,5 +141,17 @@ public class EZShare implements ActionData {
 
     public String toString(){
         return ezName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // il faut utiliser EZShareEQ a la place
+       throw new IllegalStateException("EZShare equals cannot be used"); // je n'ai pas mis de contraintes sur les nom ou code :(
+    }
+
+    @Override
+    public int hashCode() {
+        // il faut utiliser EZShareEQ a la place
+        throw new IllegalStateException("EZShare equals cannot be used"); // je n'ai pas mis de contraintes sur les nom ou code :(
     }
 }

@@ -18,8 +18,8 @@
 import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
 import { useState } from "react";
-import { ChartIndexV2, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
-import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature} from '../../../ez-api/tools';
+import { ChartIndex, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
@@ -67,13 +67,14 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
     const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
-    function nouvelIndice(chartSettings: ChartSettings) : ChartIndexV2 {
-        const chartIndex : ChartIndexV2 = {       
-                 graphStyle: 'LINE',
-                 portfolioIndexConfig: {
+    function nouvelIndice(chartSettings: ChartSettings) : ChartIndex {
+        const chartIndex : ChartIndex = {       
+                id: genUUID(),
+                graphStyle: 'LINE',
+                portfolioIndexConfig: {
                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
-                 },                 
-               }
+                },                 
+            }
         chartIndex.description = getChartIndexDescription(chartSettings, chartIndex);
         chartIndex.label = getChartIndexTitle(chartSettings, chartIndex);        
         return chartIndex;
@@ -110,8 +111,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         errorMsg={undefined}
                                         readOnly={false}
                                         selectedCodeValue={props.chartSettings.selectedStartDateSelection ? props.chartSettings.selectedStartDateSelection : 'FROM_MY_FIRST_OPERATION'}
-                                        codeValues={['FROM_MY_FIRST_OPERATION', 'ONE_YEAR','TWO_YEAR','THREE_YEAR','FIVE_YEAR','TEN_YEAR']}                            
-                                        userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans"]}
+                                        codeValues={['FROM_MY_FIRST_OPERATION', 'ONE_YEAR','TWO_YEARS','THREE_YEARS','FIVE_YEARS','TEN_YEARS', 'TWENTY_YEARS']}                            
+                                        userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans", "20 ans"]}
                                         description=""
                                         onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, false, () => {})}/>
 
@@ -202,7 +203,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                     <ChartIndexMainEditor                        
                                         chartSettings={props.chartSettings}                
                                         allEzShares={props.allEzShares}
-                                        chartIndexV2={chartIndex}
+                                        chartIndex={chartIndex}
                                         readOnly={props.readOnly}                                        
                                         save={(newChartIndex)  => 
                                             props.save({...props.chartSettings, 

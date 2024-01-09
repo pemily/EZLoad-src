@@ -54,7 +54,7 @@ public class ChartsTools {
         }
 
         if (period == PERIOD_INTERVAL.DAY) allDates.add(to);
-        else if (period == PERIOD_INTERVAL.MONTH) allDates.add(EZDate.monthPeriod(to.getMonth(), to.getYear()));
+        else if (period == PERIOD_INTERVAL.MONTH) allDates.add(EZDate.monthPeriod(to.getYear(), to.getMonth()));
         else allDates.add(EZDate.yearPeriod(to.getYear()));
 
         return allDates;

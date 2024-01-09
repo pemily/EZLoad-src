@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public class PerfIndexBuilder {
 
-    public Result build(Reporting reporting, List<ChartIndexV2> indexSelection, ShareIndexBuilder.Result shareIndexResult, PortfolioIndexBuilderV2.Result portfolioResult, CurrenciesIndexBuilder.Result currenciesResult) {
+    public Result build(Reporting reporting, List<ChartIndex> indexSelection, ShareIndexBuilder.Result shareIndexResult, PortfolioIndexBuilder.Result portfolioResult, CurrenciesIndexBuilder.Result currenciesResult) {
         Result result = new Result();
         indexSelection
             .forEach(index -> {
@@ -32,7 +32,7 @@ public class PerfIndexBuilder {
         return result;
     }
 
-    private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, ChartIndexV2 index, Result result) {
+    private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, ChartIndex index, Result result) {
         ChartPerfSettings perfSettings = index.getPerfSettings();
         currenciesResult.getAllDevises()
                 .forEach(devise -> {
@@ -41,7 +41,7 @@ public class PerfIndexBuilder {
                 });
     }
 
-    private void buildPortfolioIndex(PortfolioIndexBuilderV2.Result portfolioResult, ChartIndexV2 index, Result result) {
+    private void buildPortfolioIndex(PortfolioIndexBuilder.Result portfolioResult, ChartIndex index, Result result) {
         ChartPortfolioIndexConfig indexConfig = index.getPortfolioIndexConfig();
         ChartPerfSettings perfSettings = index.getPerfSettings();
         Prices pricesPeriodResult;
@@ -71,7 +71,7 @@ public class PerfIndexBuilder {
         result.put(indexConfig.getPortfolioIndex(), perfSettings, pricesPeriodResult);
     }
 
-    private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartIndexV2 index, Result result) {
+    private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartIndex index, Result result) {
         ChartShareIndexConfig indexConfig = index.getShareIndexConfig();
         ChartPerfSettings perfSettings = index.getPerfSettings();
         Map<EZShare, Prices> share2Prices = shareIndexResult.getShareIndex2TargetPrices().get(indexConfig.getShareIndex());
@@ -177,7 +177,10 @@ public class PerfIndexBuilder {
                         newPrice = isFirstValue ? 0 : priceAtDate.getPrice() - previousValue;
                         break;
                     case VARIATION_EN_PERCENT:
-                        if (previousValue != null && previousValue == 0) newPrice = 100f;
+                        if (previousValue != null && previousValue == 0){
+                            if (priceAtDate.getPrice() == 0) newPrice = 0f;
+                            else newPrice = 100f;
+                        }
                         else newPrice = isFirstValue ? 0 : (priceAtDate.getPrice() * 100f / previousValue) -100f;
                         break;
                     default:

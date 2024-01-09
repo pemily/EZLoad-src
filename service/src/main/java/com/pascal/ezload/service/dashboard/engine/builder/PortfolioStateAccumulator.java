@@ -169,7 +169,7 @@ public class PortfolioStateAccumulator {
     }
 
     private void soldShare(Row operation) {
-        EZShare share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        EZShareEQ share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);         // AMOUNT_COL is positive when sold
         float nbOfSoldShare = operation.getValueFloat(MesOperations.QUANTITE_COL); // QUANTITE_COL is negative
 
@@ -191,7 +191,7 @@ public class PortfolioStateAccumulator {
     }
 
     private void buyShare(Row operation) {
-        EZShare share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
+        EZShareEQ share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL); // QUANTITE_COL is positive
         float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);        // AMOUNT_COL is negative when buy
 
@@ -218,7 +218,7 @@ public class PortfolioStateAccumulator {
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
             float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
 
-            EZShare share = sharePrice.getShareFromName(shareName);
+            EZShareEQ share = sharePrice.getShareFromName(shareName);
             previousState.getSharePRNet()
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
 
@@ -234,7 +234,7 @@ public class PortfolioStateAccumulator {
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
             float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
 
-            EZShare share = sharePrice.getShareFromName(shareName);
+            EZShareEQ share = sharePrice.getShareFromName(shareName);
 
             previousState.getSharePRNetDividend()
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);

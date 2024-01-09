@@ -46,24 +46,24 @@ public class PortfolioStateAtDate {
     private final StateValue shareSold;
 
     // float because with some broker, you have some part of actions
-    private final Map<EZShare, Float> shareNb;
+    private final Map<EZShareEQ, Float> shareNb;
 
     // le montant d'action acheté
-    private final Map<EZShare, Float> shareBuyDetails;
+    private final Map<EZShareEQ, Float> shareBuyDetails;
 
     // le montant d'action vendu
-    private final Map<EZShare, Float> shareSoldDetails;
+    private final Map<EZShareEQ, Float> shareSoldDetails;
 
     //
-    private final Map<EZShare, Float> sharePRNet; // Prix de revient d'une valeur. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Float> sharePRNet; // Prix de revient d'une valeur. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShare, Float> sharePRUNet; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Float> sharePRUNet; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
 
-    private final Map<EZShare, Float> sharePRNetDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Float> sharePRNetDividend; // Prix de revient d'une valeur avec dividend. (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShare, Float> sharePRUNetDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Float> sharePRUNetDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
 
 
     // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
@@ -141,20 +141,20 @@ public class PortfolioStateAtDate {
     public StateValue getShareSold() { return shareSold; }
     public StateValue getAllTaxes() { return allTaxes; }
 
-    public Map<EZShare, Float> getShareNb() {
+    public Map<EZShareEQ, Float> getShareNb() {
         return shareNb;
     }
 
-    public Map<EZShare, Float> getShareBuyDetails() {
+    public Map<EZShareEQ, Float> getShareBuyDetails() {
         return shareBuyDetails;
     }
-    public Map<EZShare, Float> getShareSoldDetails() {
+    public Map<EZShareEQ, Float> getShareSoldDetails() {
         return shareSoldDetails;
     }
-    public Map<EZShare, Float> getSharePRNet() { return sharePRNet; }
-    public Map<EZShare, Float> getSharePRUNet() { return sharePRUNet; }
-    public Map<EZShare, Float> getSharePRNetDividend() { return sharePRNetDividend; }
-    public Map<EZShare, Float> getSharePRUNetDividend() { return sharePRUNetDividend; }
+    public Map<EZShareEQ, Float> getSharePRNet() { return sharePRNet; }
+    public Map<EZShareEQ, Float> getSharePRUNet() { return sharePRUNet; }
+    public Map<EZShareEQ, Float> getSharePRNetDividend() { return sharePRNetDividend; }
+    public Map<EZShareEQ, Float> getSharePRUNetDividend() { return sharePRUNetDividend; }
 
     public StateValue getLiquidity() {
         return liquidity;

@@ -1,23 +1,20 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.dashboard.config.ChartIndexV2;
 import com.pascal.ezload.service.dashboard.config.ChartShareIndexConfig;
 import com.pascal.ezload.service.dashboard.config.ShareSelection;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ShareSelectionBuilder {
 
     private final EZActionManager ezActionManager;
-    private final PortfolioIndexBuilderV2.Result portfolioResult;
+    private final PortfolioIndexBuilder.Result portfolioResult;
 
-    public ShareSelectionBuilder(EZActionManager ezActionManager, PortfolioIndexBuilderV2.Result portfolioResult){
+    public ShareSelectionBuilder(EZActionManager ezActionManager, PortfolioIndexBuilder.Result portfolioResult){
         this.ezActionManager = ezActionManager;
         this.portfolioResult = portfolioResult;
     }
@@ -54,23 +51,24 @@ public class ShareSelectionBuilder {
             }
         }
 
-        List<EZShare> selectedShares = allGoogleCodes
+        List<EZShareEQ> selectedShares = allGoogleCodes
                                         .stream()
                                         .map(ezActionManager::getFromGoogleTicker)
                                         .filter(Optional::isPresent)
                                         .map(Optional::get)
+                                        .map(EZShareEQ::new)
                                         .collect(Collectors.toList());
         return new Result(selectedShares);
     }
 
-    public class Result {
-        private final List<EZShare> selectedShares;
+    public static class Result {
+        private final List<EZShareEQ> selectedShares;
 
-        public Result(List<EZShare> selectedShares){
+        public Result(List<EZShareEQ> selectedShares){
             this.selectedShares = selectedShares;
         }
 
-        public List<EZShare> getSelectedShares() {
+        public List<EZShareEQ> getSelectedShares() {
             return selectedShares;
         }
     }

@@ -28,18 +28,16 @@ import com.pascal.ezload.service.dashboard.Chart;
 import com.pascal.ezload.service.dashboard.DashboardData;
 import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.dashboard.config.DashboardPage;
-import com.pascal.ezload.service.dashboard.engine.DashboardManagerV2;
+import com.pascal.ezload.service.dashboard.engine.DashboardManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.TextReporting;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,7 +67,7 @@ public class DashboardHandler {
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps().validate();
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-            DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
+            DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
             List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
             List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(dashboardSettings);
             dashboardData = new DashboardData();
@@ -97,7 +95,7 @@ public class DashboardHandler {
                     try(Reporting reporting = processLogger.getReporting().pushSection("Génération des Graphiques")) {
                         EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, settingsManager, mainSettings, ezProfil, reporting);
                         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-                        DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, actionManager);
+                        DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
                         List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
                         List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboardAndCreateChart(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
@@ -115,7 +113,7 @@ public class DashboardHandler {
     public List<DashboardPage<ChartSettings>> saveDashboardConfig(List<DashboardPage<ChartSettings>> dashboardSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        DashboardManagerV2 dashboardManager = new DashboardManagerV2(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
+        DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
         dashboardManager.saveDashboardSettings(dashboardSettings);
         return dashboardSettings;
     }
