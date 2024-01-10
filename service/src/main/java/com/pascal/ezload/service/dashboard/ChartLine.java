@@ -36,7 +36,7 @@ public class ChartLine {
     }
 
     private String title;
-    private String indexLabel;// the reference to the index Label, all chartLines with the same indexLabel will be grouped together
+    private String indexId;// the reference to the index Id, all chartLines with the same indexId will be grouped together
     private List<Float> values; // if null, valuesWithLabel will be used
     private List<ValueWithLabel> valuesWithLabel;
     private String colorLine; // rgba(255,99,132,1);
@@ -51,8 +51,8 @@ public class ChartLine {
         this.title = title;
     }
 
-    public String getIndexLabel(){ return indexLabel; }
-    public void setIndexLabel(String indexLabel) { this.indexLabel = indexLabel; }
+    public String getIndexId(){ return indexId; }
+    public void setIndexId(String indexId) { this.indexId = indexId; }
 
     public List<Float> getValues() {
         return values;

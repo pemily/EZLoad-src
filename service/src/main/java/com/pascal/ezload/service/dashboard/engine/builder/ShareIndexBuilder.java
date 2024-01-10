@@ -30,9 +30,9 @@ public class ShareIndexBuilder {
     }
 
 
-    public Result build(Reporting reporting, List<EZDate> dates, List<ChartIndex> indexV2Selection) {
+    public Result build(Reporting reporting, List<EZDate> dates, List<ChartIndex> indexSelection) {
         Result result = new Result();
-        build(reporting, dates, indexV2Selection, result);
+        build(reporting, dates, indexSelection, result);
         return result;
     }
 

@@ -64,7 +64,7 @@ export function PageUI(props: PageUIProps){
                                 title: 'Titre à changer',                                                                
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                 targetDevise: 'EUR',
-                                indexV2Selection: [ chartIndex ],
+                                indexSelection: [ chartIndex ],
                             };                            
                             chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
                             chartIndex.label = getChartIndexTitle(newChart, chartIndex);

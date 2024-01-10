@@ -34,8 +34,8 @@ export interface LineChartProps {
 const computeXPeriod = (chartIndexes : ChartIndex[] | undefined, chartLines: ChartLine[]) : 'day' | 'month' | 'year' => {
     if (chartIndexes === undefined) return "year";
 
-    const allLabelLinesDisplayed : string[] = chartLines === undefined ? [] : chartLines.map(l => l.indexLabel!);
-    const chartIndexFiltered: ChartIndex[] = chartIndexes.filter(ci => allLabelLinesDisplayed.indexOf(ci.label!) != -1);
+    const allLabelLinesDisplayed : string[] = chartLines === undefined ? [] : chartLines.map(l => l.indexId!);
+    const chartIndexFiltered: ChartIndex[] = chartIndexes.filter(ci => allLabelLinesDisplayed.indexOf(ci.id!) != -1);
 
     if (chartIndexFiltered.filter(ci => !isDefined(ci.perfSettings?.perfGroupedBy)).length > 0) return "day";
     if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "MONTHLY").length > 0) return "month";
@@ -76,7 +76,7 @@ export function LineChart(props: LineChartProps){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
 
-    const computedPeriod = computeXPeriod(props.chart.indexV2Selection, props.chart.lines);   
+    const computedPeriod = computeXPeriod(props.chart.indexSelection, props.chart.lines);
     const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels);    
     const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            

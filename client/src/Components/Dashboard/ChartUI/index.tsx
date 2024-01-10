@@ -1,7 +1,7 @@
 import { Box, Button, Text, Carousel, Card, Collapsible, ThemeContext, Anchor } from "grommet";
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close, Checkbox, CheckboxSelected, StrikeThrough } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, ChartLine } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -23,33 +23,34 @@ export interface ChartUIProps {
     deleteChartUI: (afterSave: () => void) => void
 }      
 
-function getIndexLabelsWithCounter(chartLines : ChartLine[]|undefined) : { label:string, count: number}[]{
-    const allDistinctLabels : { label:string, count: number}[] = [];
+function getIndexIdsWithCounter(chartLines : ChartLine[]|undefined, chartIndexes: ChartIndex[]) : { indexId:string, count: number, label: string}[]{
+    const allDistinctIds : { indexId:string, count: number, label: string}[] = [];
     if (chartLines === undefined) return [];
     chartLines.forEach(l => {
-        const i = allDistinctLabels.map(l2 => l2.label).indexOf(l.indexLabel!)
+        const i = allDistinctIds.map(l2 => l2.indexId).indexOf(l.indexId!)
         if (i == -1){
-            allDistinctLabels.push({label: l.indexLabel!, count: 1})
+            const label = chartIndexes.filter(ci => ci.id === l.indexId)[0].label!;
+            allDistinctIds.push({indexId: l.indexId!, count: 1, label: label})
         }
         else {
-            allDistinctLabels[i] = {
-                ...allDistinctLabels[i],
-                count: allDistinctLabels[i].count + 1
+            allDistinctIds[i] = {
+                ...allDistinctIds[i],
+                count: allDistinctIds[i].count + 1
             }
         }
-    })    
-    return allDistinctLabels;
+    })        
+    return allDistinctIds;
 }
 
-function selectIndexLine(currentLines: ChartLine[], allLines: ChartLine[], selectedLineTitle: string|undefined, selectedIndexLabel: string) : ChartLine[]{
-    return currentLines.filter(l => l.indexLabel !== selectedIndexLabel).concat(allLines.filter(line => line.indexLabel === selectedIndexLabel && line.title === selectedLineTitle))    
+function selectIndexLine(currentLines: ChartLine[], allLines: ChartLine[], selectedLineTitle: string|undefined, selectedIndexId: string) : ChartLine[]{
+    return currentLines.filter(l => l.indexId !== selectedIndexId).concat(allLines.filter(line => line.indexId === selectedIndexId && line.title === selectedLineTitle))    
 }
 
 function initializeLines(chart: Chart) : Chart{
-    const allLabels:string[] = getIndexLabelsWithCounter(chart.lines!).filter(l => l.count == 1).map(l => l.label);    
+    const allIndexIds:string[] = getIndexIdsWithCounter(chart.lines!, chart.indexSelection!).filter(l => l.count == 1).map(l => l.indexId);
     return {
         ...chart, 
-        lines: chart.lines?.filter(l => allLabels.indexOf(l.indexLabel!) !== -1)
+        lines: chart.lines?.filter(l => allIndexIds.indexOf(l.indexId!) !== -1)
     }
 }
 
@@ -79,24 +80,24 @@ export function ChartUI(props: ChartUIProps){
                         <Box alignSelf="center" direction="row" alignContent="center" flex="grow" align="center" gap="medium">
                             {
                                 // Affiche les legends soit une combo si plusieurs lignes ont le meme indexLabel, soit un simple button si un seul indexLabel est present
-                                getIndexLabelsWithCounter(props.chart.lines!)
+                                getIndexIdsWithCounter(props.chart.lines!, props.chart.indexSelection!)
                                     .map((l,i) => {
-                                        const firstChartLine: ChartLine = props.chart.lines?.filter(l2 => l2.indexLabel === l.label)[0]!;
+                                        const firstChartLine: ChartLine = props.chart.lines?.filter(l2 => l2.indexId === l.indexId)[0]!;
                                         if (l.count == 1){                                            
                                             return (<Anchor key={'indexLabelFilter'+i}                                                                   
                                                             size="small" icon={<Checkbox size='small' color="black" 
-                                                                        style={{background: filteredChart.lines?.filter(l2 => l2.indexLabel === l.label).length === 0 ?  "white" : firstChartLine.colorLine }}/>} 
+                                                                        style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0 ?  "white" : firstChartLine.colorLine }}/>} 
                                                                         gap="xsmall" margin="none"
                                                                         label={l.label} 
                                                                         onClick={() =>{ 
-                                                                            if (filteredChart.lines?.filter(l2 => l2.indexLabel === l.label).length === 0) {
+                                                                            if (filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0) {
                                                                                 setFilteredChart({...filteredChart, 
-                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, firstChartLine.title, l.label)
+                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, firstChartLine.title, l.indexId)
                                                                                 })
                                                                             }
                                                                             else {
                                                                                 setFilteredChart({...filteredChart, 
-                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, undefined, l.label)
+                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, undefined, l.indexId)
                                                                                 })
                                                                             }
                                                                         }}/>);
@@ -105,7 +106,7 @@ export function ChartUI(props: ChartUIProps){
                                         return (          
                                             <Box key={'indexLabelFilter'+i} gap="none" margin="none" direction="row" align="center">
                                                 <Checkbox size='small' color="black"
-                                                    style={{background: filteredChart.lines?.filter(l2 => l2.indexLabel === l.label).length === 0 ?  "white" : firstChartLine.colorLine }}
+                                                    style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0 ?  "white" : firstChartLine.colorLine }}
                                                 />
                                                 <ComboField id={'indexLabelFilterCombo'+i}                                                                                                  
                                                     label={l.label}
@@ -113,11 +114,11 @@ export function ChartUI(props: ChartUIProps){
                                                     description=""
                                                     errorMsg=""                                
                                                     value={undefined}
-                                                    values={props.chart.lines === undefined ? [""] : [""].concat(props.chart.lines.filter(l2 => l2.indexLabel === l.label).map(l2 => l2.title!))}
+                                                    values={props.chart.lines === undefined ? [""] : [""].concat(props.chart.lines.filter(l2 => l2.indexId === l.indexId).map(l2 => l2.title!))}
                                                     onChange={newValue => {
                                                         setFilteredChart({
                                                             ...filteredChart,                                                    
-                                                            lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, newValue, l.label)
+                                                            lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, newValue, l.indexId)
                                                         })
                                                     }}/>
                                             </Box>

@@ -84,12 +84,12 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
         <Box direction="column" alignSelf="start" width="95%" >
             <Tabs activeIndex={indiceIndex} justify="start"
                             onActive={(nextIndex) => {                                    
-                                    if (nextIndex > props.chartSettings.indexV2Selection!.length) {
+                                    if (nextIndex > props.chartSettings.indexSelection!.length) {
                                         // on clique sur +
                                         props.save(
                                             {...props.chartSettings,
-                                                indexV2Selection: props.chartSettings.indexV2Selection === undefined ?
-                                                                [nouvelIndice(props.chartSettings)] : [...props.chartSettings.indexV2Selection, nouvelIndice(props.chartSettings)]
+                                                indexSelection: props.chartSettings.indexSelection === undefined ?
+                                                                [nouvelIndice(props.chartSettings)] : [...props.chartSettings.indexSelection, nouvelIndice(props.chartSettings)]
                                             }, false, () => { setIndiceIndex(nextIndex); }
                                         )
                                     }
@@ -149,7 +149,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                     </Box>
                 </Tab>    
                 {
-                    props.chartSettings.indexV2Selection?.map((chartIndex, chartIndexPosition) => {     
+                    props.chartSettings.indexSelection?.map((chartIndex, chartIndexPosition) => {
                         return (
                             <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
                                 <Box pad={{ vertical: 'none', horizontal: 'small' }}>
@@ -160,13 +160,13 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             readOnly={props.readOnly}
                                             onChange={newValue => 
                                                 props.save({...props.chartSettings, 
-                                                    indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
+                                                    indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
                                                         {...chartIndex, label: newValue},
-                                                        ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
+                                                        ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
                                                     ]
                                                 }, false, () => {})
                                         }/> 
-                                        <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexV2Selection?.length! <= 1}
+                                        <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexSelection?.length! <= 1}
                                                 plain={true} label="" onClick={() =>{
                                                     confirmAlert({
                                                         title: 'Etes vous sûr de vouloir supprimer cet Indice?',                                                        
@@ -175,8 +175,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                             label: 'Oui',
                                                             onClick: () => {
                                                                 props.save({...props.chartSettings, 
-                                                                    indexV2Selection: props.chartSettings.indexV2Selection?.filter((c,i) => i !== chartIndexPosition)}, true, () => {
-                                                                        setIndiceIndex(indiceIndex === props.chartSettings.indexV2Selection!.length ? indiceIndex -1 : indiceIndex)
+                                                                    indexSelection: props.chartSettings.indexSelection?.filter((c,i) => i !== chartIndexPosition)}, true, () => {
+                                                                        setIndiceIndex(indiceIndex === props.chartSettings.indexSelection!.length ? indiceIndex -1 : indiceIndex)
                                                                     })
                                                             }
                                                         },
@@ -193,9 +193,9 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         description="Description"
                                         onChange={newValue => 
                                             props.save({...props.chartSettings, 
-                                                indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
+                                                indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
                                                     {...chartIndex, description: updateEZLoadTextWithSignature(chartIndex.description, newValue) },
-                                                    ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
+                                                    ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
                                                 ]
                                             }, true, () => {})
                                     }/>
@@ -207,7 +207,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         readOnly={props.readOnly}                                        
                                         save={(newChartIndex)  => 
                                             props.save({...props.chartSettings, 
-                                                indexV2Selection: [...props.chartSettings.indexV2Selection!.slice(0, chartIndexPosition),
+                                                indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
                                                     {
                                                         ...newChartIndex,
                                                         label: isTextContainsEZLoadSignature(newChartIndex.label) ? 
@@ -215,7 +215,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                         description: isTextContainsEZLoadSignature(newChartIndex.description) ? 
                                                                         getChartIndexDescription(props.chartSettings, newChartIndex) : newChartIndex.description
                                                     },     
-                                                    ...props.chartSettings.indexV2Selection!.slice(chartIndexPosition+1)
+                                                    ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
                                                 ]
                                             }, false, () => {})}/>           
                                           

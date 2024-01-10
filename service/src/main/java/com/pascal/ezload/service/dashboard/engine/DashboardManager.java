@@ -156,7 +156,7 @@ public class DashboardManager {
             }
             startDate = new EZDate(startDate.getYear(), 1, 1); // je démarre toujours au 1er janvier
 
-            OptionalInt periodInt = chartSettings.getIndexV2Selection().stream().mapToInt(chartIndexV2 -> {
+            OptionalInt periodInt = chartSettings.getIndexSelection().stream().mapToInt(chartIndexV2 -> {
                             if (chartIndexV2.getPerfSettings() != null && chartIndexV2.getPerfSettings().correctlyDefined()){
                                 if (chartIndexV2.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.MONTHLY) return 30; // index avec des data tous les mois
                                 return 365; // index avec des data tous les ans
@@ -176,17 +176,17 @@ public class DashboardManager {
 
             PortfolioIndexBuilder portfolioIndexValuesBuilder = new PortfolioIndexBuilder(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesResult, sharePriceResult);
             PortfolioIndexBuilder.Result portfolioResult = portfolioIndexValuesBuilder.build(reporting, dates, chartSettings.getBrokers(), chartSettings.getAccountTypes(),
-                    chartSettings.getIndexV2Selection());
+                    chartSettings.getIndexSelection());
 
             ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(portfolioResult, sharePriceResult, currenciesResult, new ShareSelectionBuilder(ezActionManager, portfolioResult));
-            ShareIndexBuilder.Result shareIndexResult = shareIndexBuilder.build(reporting, dates, chartSettings.getIndexV2Selection());
+            ShareIndexBuilder.Result shareIndexResult = shareIndexBuilder.build(reporting, dates, chartSettings.getIndexSelection());
 
             PerfIndexBuilder perfIndexBuilder = new PerfIndexBuilder();
-            PerfIndexBuilder.Result perfIndexResult = perfIndexBuilder.build(reporting, chartSettings.getIndexV2Selection(), shareIndexResult, portfolioResult, currenciesResult);
+            PerfIndexBuilder.Result perfIndexResult = perfIndexBuilder.build(reporting, chartSettings.getIndexSelection(), shareIndexResult, portfolioResult, currenciesResult);
 
-            Colors colors = new Colors(chartSettings.getIndexV2Selection().size());
+            Colors colors = new Colors(chartSettings.getIndexSelection().size());
             List<ChartLine> allChartLines = new LinkedList<>();
-            chartSettings.getIndexV2Selection()
+            chartSettings.getIndexSelection()
                     .forEach(chartIndex -> {
                         createCurrencyCharts(reporting, currenciesResult, perfIndexResult, allChartLines, colors, chartIndex);
                         createShareCharts(shareIndexResult, perfIndexResult, allChartLines, colors, chartIndex);
@@ -210,7 +210,7 @@ public class DashboardManager {
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
             Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs(index, perfSettings);
-            allChartLines.add(createChartLine(prices, chartIndex.getLabel(), chartIndex.getLabel(),
+            allChartLines.add(createChartLine(prices, chartIndex.getId(), chartIndex.getLabel(),
                                         computeYAxis(perfSettings, ChartLine.Y_AxisSetting.PORTFOLIO),
                                         colors.nextColorCode(), chartIndex.getGraphStyle()));
         }
@@ -228,7 +228,7 @@ public class DashboardManager {
                 shareIndexResult.getShareSelection(chartIndex.getId())
                         .getSelectedShares()
                         .forEach(share ->
-                                allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getLabel(), share.getEzName(),
+                                allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getId(), share.getEzName(),
                                         computeYAxis(perfSettings, index == ShareIndex.SHARE_COUNT ? ChartLine.Y_AxisSetting.NB : ChartLine.Y_AxisSetting.SHARE),
                                         color, chartIndex.getGraphStyle())));
             }
@@ -242,7 +242,7 @@ public class DashboardManager {
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs(devise, perfSettings);
                 if (p != null)
-                    allChartLines.add(createChartLine(p, chartIndex.getLabel(), p.getLabel(),
+                    allChartLines.add(createChartLine(p, chartIndex.getId(), p.getLabel(),
                                                         computeYAxis(perfSettings, ChartLine.Y_AxisSetting.DEVISE),
                                                         colors.nextColorCode(), chartIndex.getGraphStyle()));
             });
@@ -256,7 +256,7 @@ public class DashboardManager {
         return axisByDefault;
     }
 
-    private ChartLine createChartLine(Prices prices, String indexLabel, String lineTitle, ChartLine.Y_AxisSetting yAxis, Colors.ColorCode color, GraphStyle graphStyle){
+    private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, Colors.ColorCode color, GraphStyle graphStyle){
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
         if (graphStyle == GraphStyle.BAR){
@@ -266,7 +266,7 @@ public class DashboardManager {
         ChartLine chartLine = ChartsTools.createChartLine(lineStyle, yAxis, lineTitle, prices, true);
         chartLine.setColorLine(color.getColor(transparency));
         chartLine.setLineStyle(lineStyle);
-        chartLine.setIndexLabel(indexLabel);
+        chartLine.setIndexId(indexId);
         return chartLine;
     }
 

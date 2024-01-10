@@ -34,7 +34,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private Set<String> brokers = new HashSet<>();
     private Set<String> accountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
-    private List<ChartIndex> indexV2Selection = new LinkedList<>();
+    private List<ChartIndex> indexSelection = new LinkedList<>();
     private int height = 50;
     private int nbOfPoints = 200;
 
@@ -45,7 +45,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.brokers = chartSettings.brokers;
         this.accountTypes = chartSettings.accountTypes;
         this.selectedStartDateSelection = chartSettings.selectedStartDateSelection;
-        this.indexV2Selection = chartSettings.indexV2Selection;
+        this.indexSelection = chartSettings.indexSelection;
         this.height = chartSettings.height;
         this.nbOfPoints = chartSettings.nbOfPoints;
     }
@@ -82,12 +82,12 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.accountTypes = accountTypes;
     }
 
-    public List<ChartIndex> getIndexV2Selection() {
-        return indexV2Selection;
+    public List<ChartIndex> getIndexSelection() {
+        return indexSelection;
     }
 
-    public void setIndexV2Selection(List<ChartIndex> indexV2Selection) {
-        this.indexV2Selection = indexV2Selection;
+    public void setIndexSelection(List<ChartIndex> indexSelection) {
+        this.indexSelection = indexSelection;
     }
 
 
