@@ -27,9 +27,8 @@ import java.util.Map;
 public class Chart extends ChartSettings {
 
     private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
-    private List<Object> labels = new LinkedList<>();
+    private List<ChartsTools.Label> labels = new LinkedList<>();
     private List<ChartLine> lines = new LinkedList<>();
-    private ChartsTools.PERIOD_INTERVAL axisXPeriod;
 
     public Chart(ChartSettings chartSettings){
         super(chartSettings);
@@ -37,11 +36,11 @@ public class Chart extends ChartSettings {
 
     public Chart(){}
 
-    public List<Object> getLabels() {
+    public List<ChartsTools.Label> getLabels() {
         return labels;
     }
 
-    public void setLabels(List<Object> labels) {
+    public void setLabels(List<ChartsTools.Label> labels) {
         this.labels = labels;
     }
 
@@ -69,11 +68,4 @@ public class Chart extends ChartSettings {
         this.lines = lines;
     }
 
-    public void setAxisXPeriod(ChartsTools.PERIOD_INTERVAL period){
-        this.axisXPeriod = period;
-    }
-
-    public ChartsTools.PERIOD_INTERVAL getAxisXPeriod(){
-        return this.axisXPeriod;
-    }
 }

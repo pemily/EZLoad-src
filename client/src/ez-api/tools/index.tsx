@@ -115,7 +115,6 @@ function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {
   delete c.labels;
   delete c.axisId2titleX;
   delete c.axisId2titleY;
-  delete c.axisXPeriod;
   return c;
 }
 

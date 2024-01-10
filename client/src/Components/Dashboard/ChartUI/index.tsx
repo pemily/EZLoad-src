@@ -38,7 +38,6 @@ function getIndexLabelsWithCounter(chartLines : ChartLine[]|undefined) : { label
             }
         }
     })    
-    console.log("PASCAL ", allDistinctLabels);
     return allDistinctLabels;
 }
 

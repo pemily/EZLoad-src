@@ -95,11 +95,11 @@ public class EZDate implements Comparable<EZDate> {
     }
 
     public long nbOfDaysTo(EZDate to) {
-        return toLocalDate().until(LocalDate.of(to.year, to.month, to.day), ChronoUnit.DAYS);
+        return toLocalDate().until(to.toLocalDate(), ChronoUnit.DAYS);
     }
 
     public long nbOfMonthesTo(EZDate to) {
-        return toLocalDate().until(LocalDate.of(to.year, to.month, to.day), ChronoUnit.MONTHS);
+        return toLocalDate().until(to.toLocalDate(), ChronoUnit.MONTHS);
     }
 
     // return true if this is after dateToTest
@@ -141,7 +141,7 @@ public class EZDate implements Comparable<EZDate> {
 
     public String toYYYYMMDD(){
         if (isPeriod()) {
-            if (month == -1) return year+"/12/31"; // yearly period
+            if (isYearlyPeriod()) return year+"/12/31"; // yearly period
             if (month == 12) return year+"/12/31";
             LocalDate l = LocalDate.of(year, month+1, 1).minusDays(1);
             return year+"/"+leadingZero(month)+"/"+l.getDayOfMonth(); // je vais au 1er du mois suivant puis je recule d'un jour (pour eviter de me tromper sur le 30/31/28)
@@ -154,7 +154,7 @@ public class EZDate implements Comparable<EZDate> {
     }
 
     public LocalDate toLocalDate(){
-        if (month == -1){
+        if (isYearlyPeriod()){
             return LocalDate.of(year, 12, 31);
         }
         if (day == -1){
@@ -168,7 +168,7 @@ public class EZDate implements Comparable<EZDate> {
     
     public String toDate(char separator){
         if (isPeriod()){
-            if (month == -1) return year+"";
+            if (isYearlyPeriod()) return year+"";
             return year + separator + leadingZero(month);
         }
         return year+separator+leadingZero(month)+separator+leadingZero(day);
@@ -241,7 +241,7 @@ public class EZDate implements Comparable<EZDate> {
     @Override
     public String toString() {
         if (isPeriod()) // c'est une periode
-            return month == -1 ? year+"" : leadingZero(month)+"/"+year;
+            return isYearlyPeriod() ? year+"" : leadingZero(month)+"/"+year;
         return toEzPortoflioDate();
     }
 
@@ -258,12 +258,12 @@ public class EZDate implements Comparable<EZDate> {
 
     public boolean contains(EZDate date) {
         if (!isPeriod()) return this.equals(date);
-        return this.month == -1 ? date.getYear() == this.year : date.getYear() == this.year && date.getMonth() == this.month;
+        return this.isYearlyPeriod() ? date.getYear() == this.year : date.getYear() == this.year && date.getMonth() == this.month;
     }
 
     public EZDate createNextPeriod() {
         if (!isPeriod()) throw new IllegalStateException("This date does not represent a Period");
-        if (this.month == -1) return new EZDate(this.year+1, -1, -1);
+        if (this.isYearlyPeriod()) return new EZDate(this.year+1, -1, -1);
         if (this.month == 12) return new EZDate(this.year+1, 1, -1);
         return new EZDate(this.year, this.month+1, -1);
     }
@@ -274,14 +274,22 @@ public class EZDate implements Comparable<EZDate> {
 
     public EZDate endPeriodDate() {
         if (!isPeriod()) throw new IllegalStateException("This date does not represent a Period");
-        if (month == -1) return new EZDate(this.year, 12, 31);
+        if (isYearlyPeriod()) return new EZDate(this.year, 12, 31);
         if (month == 12) return new EZDate(this.year, 12, 31);
         return new EZDate(this.year, month+1, 1).yesterday();
     }
 
     public EZDate startPeriodDate() {
         if (!isPeriod()) throw new IllegalStateException("This date does not represent a Period");
-        if (month == -1) return new EZDate(this.year, 1, 1);
+        if (isYearlyPeriod()) return new EZDate(this.year, 1, 1);
         return new EZDate(this.year, 1, 1);
+    }
+
+    public boolean isYearlyPeriod(){
+        return month == -1;
+    }
+
+    public boolean isMonthlyPeriod(){
+        return day == -1 && month != -1;
     }
 }

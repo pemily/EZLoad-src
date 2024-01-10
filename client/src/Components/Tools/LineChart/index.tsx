@@ -16,9 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { Chart } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, ChartIndex, ChartLine, Label, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
-
+import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
@@ -29,25 +29,35 @@ export interface LineChartProps {
     chart: Chart;        
     showLegend: boolean;
 }      
+ 
 
-const getOrCreateLegendList = (chart: any, id: string) : HTMLElement => {
-    const legendContainer = document.getElementById(id);
-    if (legendContainer !== null) {
-        let listContainer = legendContainer.querySelector('ul');
+const computeXPeriod = (chartIndexes : ChartIndex[] | undefined, chartLines: ChartLine[]) : 'day' | 'month' | 'year' => {
+    if (chartIndexes === undefined) return "year";
 
-        if (!listContainer) {
-            listContainer = document.createElement('ul');
-            listContainer.style.display = 'flex';
-            listContainer.style.flexDirection = 'row';
-            listContainer.style.margin = '0';
-            listContainer.style.padding = '0';
+    const allLabelLinesDisplayed : string[] = chartLines === undefined ? [] : chartLines.map(l => l.indexLabel!);
+    const chartIndexFiltered: ChartIndex[] = chartIndexes.filter(ci => allLabelLinesDisplayed.indexOf(ci.label!) != -1);
 
-            legendContainer.appendChild(listContainer);
-        }
+    if (chartIndexFiltered.filter(ci => !isDefined(ci.perfSettings?.perfGroupedBy)).length > 0) return "day";
+    if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "MONTHLY").length > 0) return "month";
+    return "year";
+}
 
-        return listContainer;
-    }  
-    throw 'element '+id+' not found';
+const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', timeLabels: Label[]|undefined) : object[]|undefined => {
+    if (timeLabels === undefined) return undefined;
+    if (computedPeriod === 'month') {        
+        const r : number[] = timeLabels.filter(l => l.endOfMonth).map(t => {            
+            return t.time!;            
+        });
+        return r as any[] as object[];
+    }
+    else if (computedPeriod === 'year') {
+        const r : string[] = timeLabels.filter(l => l.endOfYear).map(t => {            
+            const d = new Date(t.time!);
+            return d.getFullYear()+'';
+        });
+        return r as any[] as object[];
+    }    
+    return timeLabels.map(l => l.time) as any[] as object[];
 }
 
 export function LineChart(props: LineChartProps){
@@ -65,16 +75,31 @@ export function LineChart(props: LineChartProps){
     if (!props.chart.lines){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
-    
-    const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
+
+    const computedPeriod = computeXPeriod(props.chart.indexV2Selection, props.chart.lines);   
+    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels);    
+    const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            
+            const shareValues: (number|undefined)[] | undefined = chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values;
+            
+            const shareValuesFiltered: (number|undefined)[] | undefined = computedPeriod === "day" ? shareValues :
+                                                        computedPeriod === "month" ? shareValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
+                                                        shareValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);
+
+            var tooltipsFiltered : (string|undefined)[] | undefined = chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined;
+            if (isDefined(chartLine.valuesWithLabel)){
+                tooltipsFiltered = computedPeriod === "day" ? tooltipsFiltered :
+                                                          computedPeriod === "month" ? tooltipsFiltered?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
+                                                          tooltipsFiltered?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);
+            }
+
             if (chartLine.lineStyle === "BAR_STYLE"){
                 var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
                     type: 'bar',             
                     hidden: !lineIsVisible[index],
                     label: chartLine.title,
-                    data: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
-                    tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
+                    data: shareValuesFiltered,
+                    tooltips: tooltipsFiltered,
                     borderColor: chartLine.colorLine,
                     backgroundColor: chartLine.colorLine,
                     yAxisID: chartLine.yaxisSetting
@@ -85,8 +110,8 @@ export function LineChart(props: LineChartProps){
              type: 'line',          
              hidden: !lineIsVisible[index],    
              label: chartLine.title,
-             data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
-             tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
+             data: shareValuesFiltered,
+             tooltips: tooltipsFiltered,
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
@@ -103,8 +128,8 @@ export function LineChart(props: LineChartProps){
 
 
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
-        labels: props.chart.labels,
-        datasets: lines
+        labels: finalLabels,
+        datasets: finalLines
     };
 
     
@@ -182,19 +207,18 @@ export function LineChart(props: LineChartProps){
             }
         },
         scales: {
-
             x: {
                 // https://www.chartjs.org/docs/latest/samples/scales/time-line.html
                 // https://github.com/chartjs/chartjs-adapter-date-fns
                type: "time",
                time: {
-                    unit: props.chart.axisXPeriod === "YEAR" ? "year" : props.chart.axisXPeriod === "MONTH" ? "month": "day"
-               },
+                    unit: computedPeriod == "day" ? "month" : computedPeriod,                    
+               },               
                adapters: { 
                     date: {
                       locale: fr, 
                     },
-               },                 
+               },             
                display: true,
                title: {
                     display: true,
@@ -207,22 +231,22 @@ export function LineChart(props: LineChartProps){
                         
                         return d[1]+'-'+d[2].substring(2);
                     },*/
-                    source: "auto",
+                    source: "labels",
                     maxRotation: 0, // Disabled rotation for performance
-                    autoSkip: true,                    
-                    autoSkipPadding: 25,
+                    autoSkip: true,         
+                    autoSkipPadding: 25,                    
                     crossAlign: "near",
                     align: 'start'
 
                },
                grid: {
                     drawBorder: false,
-                    color: '#000000',                    
+                    color: '#000000',                                        
                }
             },          
             PERCENT: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
                 position: 'left',
                 title: {
                   display: true,
@@ -231,7 +255,7 @@ export function LineChart(props: LineChartProps){
             },
             PORTFOLIO: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
                 title: {
                     display: true,
@@ -240,7 +264,7 @@ export function LineChart(props: LineChartProps){
             },        
             NB: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
                 position: 'left',
                 title: {
                     display: false
@@ -248,7 +272,7 @@ export function LineChart(props: LineChartProps){
             },                         
             SHARE: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
                 position: 'left',
                 title: {
                     display: true,
@@ -257,7 +281,7 @@ export function LineChart(props: LineChartProps){
             },                      
             DEVISE:{
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
                 position: 'right',
                 title: {
                   display: true,

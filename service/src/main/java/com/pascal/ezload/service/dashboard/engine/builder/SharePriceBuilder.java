@@ -3,6 +3,7 @@ package com.pascal.ezload.service.dashboard.engine.builder;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.finance.Dividend;
 
 import java.util.HashMap;
@@ -64,11 +65,11 @@ public class SharePriceBuilder {
             return share2DividendsTargetPrices.computeIfAbsent(share, ezShare -> {
                 try {
                     List<Dividend> dividends = actionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size() - 1));
+                    Prices prices = new Prices();
+                    prices.setLabel("Dividendes of "+ezShare.getEzName());
                     if (dividends != null) {
                         Optional<EZDevise> devise = dividends.stream().map(Dividend::getDevise).findFirst();
-
                         if (devise.isPresent()) {
-                            Prices prices = new Prices();
                             prices.setDevise(devise.get());
                             EZDate previousDate = dates.get(0);
                             for (EZDate currentDate : dates) {
@@ -88,7 +89,12 @@ public class SharePriceBuilder {
                             return currencies.convertPricesToTargetDevise(reporting, prices);
                         }
                     }
-                    return null;
+                    // Pas de dividendes
+                    prices.setDevise(DeviseUtil.EUR);
+                    for (EZDate currentDate : dates) {
+                        prices.addPrice(currentDate, new PriceAtDate(currentDate));
+                    }
+                    return prices;
                 } catch (Exception e) {
                     reporting.error("Erreur lors de la récupération du dividende de l'action: " + ezShare.getEzName(), e);
                     throw new RuntimeException("Erreur lors de la récupération du dividende de l'action: " + ezShare.getEzName(), e);

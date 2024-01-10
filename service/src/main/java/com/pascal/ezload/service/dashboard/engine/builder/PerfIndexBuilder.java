@@ -107,7 +107,13 @@ public class PerfIndexBuilder {
     }
 
     private static BiFunction<Float, Float, Float> sum() {
-        return (v1, v2) -> v1 != null ? v1 + v2 : v2;
+        return (v1, v2) -> {
+            Float sum;
+            if (v1 == null) sum = v2;
+            else if (v2 == null) sum = v1;
+            else sum = v1+v2;
+            return sum;
+        };
     }
 
     private Prices buildPerfPrices(Prices prices, ChartPerfSettings perfSettings,
@@ -123,7 +129,7 @@ public class PerfIndexBuilder {
         PriceAtDate firstDate = prices.getPrices().get(0);
 
         EZDate currentPeriod = createPeriod(perfSettings.getPerfGroupedBy(), firstDate.getDate()); // the first period to start
-        EZDate todayPeriod = createPeriod(perfSettings.getPerfGroupedBy(), EZDate.today()); // the end period we must reached
+        EZDate afterTodayPeriod = createPeriod(perfSettings.getPerfGroupedBy(), EZDate.today()).createNextPeriod(); // the end period we must reached
 
         // crée un Prices avec moins de valeur (les mois ou les années uniquement)
         // et avec les valeurs de la période (la somme, ou bien la dernière valeur)
@@ -151,7 +157,7 @@ public class PerfIndexBuilder {
             pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
-        while (!currentPeriod.equals(todayPeriod));
+        while (!currentPeriod.equals(afterTodayPeriod));
 
         return pricesGrouped;
     }

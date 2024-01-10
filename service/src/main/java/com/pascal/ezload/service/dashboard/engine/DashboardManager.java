@@ -199,7 +199,6 @@ public class DashboardManager {
             Map<String, String> yAxisTitles = new HashMap<>();
             yAxisTitles.put("Y_AXIS_TITLE", targetDevise.getSymbol());
             chart.setAxisId2titleY(yAxisTitles);
-            chart.setAxisXPeriod(period);
             return chart;
         }
     }

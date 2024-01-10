@@ -33,7 +33,10 @@ public class ChartsTools {
     public static List<EZDate> getDatesSample(EZDate from, EZDate to, PERIOD_INTERVAL period, int nbOfPoint){
         if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
         long nbOfTotalDates = period == PERIOD_INTERVAL.DAY ? from.nbOfDaysTo(to) : period == PERIOD_INTERVAL.MONTH ? from.nbOfMonthesTo(to) : to.getYear() - from.getYear();
-        if (nbOfTotalDates+1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDates;
+        if (period == PERIOD_INTERVAL.DAY) {
+            if (nbOfTotalDates + 1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDates;
+        }
+        else nbOfPoint = (int) nbOfTotalDates; // si c'est une periode on ne reduit pas
 
         var allDates = new ArrayList<EZDate>(nbOfPoint);
 
@@ -62,7 +65,22 @@ public class ChartsTools {
 
     public static Chart createChart(ChartSettings chartSettings, List<EZDate> dates) {
         Chart chart = new Chart(chartSettings);
-        chart.setLabels(dates.stream().map(ChartsTools::date2Label).collect(Collectors.toList()));
+
+        List<ChartsTools.Label> r = new LinkedList<>();
+        EZDate previousDate = null;
+        for (EZDate d : dates){
+            if (previousDate != null){
+                r.add(ChartsTools.date2Label(previousDate,
+                        previousDate.getMonth() != d.getMonth() || previousDate.getYear() != d.getYear(),
+                        previousDate.getYear() != d.getYear()));
+            }
+            previousDate = d;
+        }
+        if (previousDate != null){
+            r.add(ChartsTools.date2Label(previousDate, true, true));
+        }
+
+        chart.setLabels(r);
         return chart;
     }
 
@@ -95,10 +113,45 @@ public class ChartsTools {
         return chartLine;
     }
 
-    public static Object date2Label(EZDate date){
-        if (date.isPeriod()){
-            return date.toString();
+    public static Label date2Label(EZDate date, boolean endOfMonth, boolean endOfYear){
+        Label l = new Label(date);
+        l.setEndOfMonth(endOfMonth);
+        l.setEndOfYear(endOfYear);
+        return l;
+    }
+
+    public static class Label {
+        private long time;
+        private boolean endOfMonth;
+        private boolean endOfYear;
+
+        public Label(){}
+        public Label(EZDate date){
+            this.time = date.toEpochSecond()*1000;
         }
-        return date.toEpochSecond()*1000;
+
+        public long getTime() {
+            return time;
+        }
+
+        public void setTime(long time) {
+            this.time = time;
+        }
+
+        public boolean isEndOfMonth() {
+            return endOfMonth;
+        }
+
+        public void setEndOfMonth(boolean endOfMonth) {
+            this.endOfMonth = endOfMonth;
+        }
+
+        public boolean isEndOfYear() {
+            return endOfYear;
+        }
+
+        public void setEndOfYear(boolean endOfYear) {
+            this.endOfYear = endOfYear;
+        }
     }
 }

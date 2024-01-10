@@ -432,7 +432,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                     ...props.chartIndex.perfSettings,
                                                     perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
                                                     perfFilter: newValue === 'NONE' ? undefined : 
-                                                        isDefined(props.chartIndex.perfSettings?.perfFilter) ? props.chartIndex.perfSettings?.perfFilter : 'VARIATION_EN_PERCENT'
+                                                        isDefined(props.chartIndex.perfSettings?.perfFilter) ? props.chartIndex.perfSettings?.perfFilter : 'VALUE'
                                             },
                                             graphStyle: 'BAR'
                                         })
@@ -444,7 +444,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     label="Post-Traitement"
                                     errorMsg={undefined}
                                     readOnly={props.readOnly}
-                                    selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VARIATION_EN_PERCENT' : props.chartIndex.perfSettings?.perfFilter! }
+                                    selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VALUE' : props.chartIndex.perfSettings?.perfFilter! }
                                     userValues={[   
                                         'Sans traitement',
                                         'Calcule la variation entre 2 périodes',
