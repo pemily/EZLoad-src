@@ -37,6 +37,7 @@ public class Prices {
     public List<PriceAtDate> getPrices() {
         return Collections.unmodifiableList(pricesList);
     }
+    public Map<EZDate, PriceAtDate> getPricesMap() { return Collections.unmodifiableMap(pricesMap);}
 
     // must be ordered when calling this method
     // la date et le price.getDate() peuvent etre different (dans les graphes, si je demande le prix un dimanche, j'aurais la date du vendredi)

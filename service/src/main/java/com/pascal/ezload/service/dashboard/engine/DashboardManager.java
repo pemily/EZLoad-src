@@ -158,12 +158,10 @@ public class DashboardManager {
             startDate = new EZDate(startDate.getYear(), 1, 1); // je démarre toujours au 1er janvier
 
             OptionalInt periodInt = chartSettings.getIndexSelection().stream().mapToInt(chartIndexV2 -> {
-                            if (chartIndexV2.getPerfSettings() != null && chartIndexV2.getPerfSettings().correctlyDefined()){
-                                if (chartIndexV2.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.MONTHLY) return 30; // index avec des data tous les mois
-                                return 365; // index avec des data tous les ans
-                            }
-                            return 1; // index avec des data par jours
-                        } ).min();
+                        if (chartIndexV2.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.MONTHLY) return 30; // index avec des data tous les mois
+                        if (chartIndexV2.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.YEARLY) return 365; // index avec des data tous les ans
+                        return 1; //ChartPerfGroupedBy.DAILY index avec des data par jours
+                    }).min();
             ChartsTools.PERIOD_INTERVAL period = periodInt.isEmpty() ||  periodInt.getAsInt() == 1 ? ChartsTools.PERIOD_INTERVAL.DAY :  periodInt.getAsInt() == 30 ?  ChartsTools.PERIOD_INTERVAL.MONTH : ChartsTools.PERIOD_INTERVAL.YEAR;
 
             List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, period, chartSettings.getNbOfPoints());

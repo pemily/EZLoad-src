@@ -100,15 +100,15 @@ public class PortfolioIndexBuilder {
 
     private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate state, Result r) {
         switch (portfolioIndex){
-            case INSTANT_PORTFOLIO_DIVIDENDES:
+            case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
             case CUMUL_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getCumulative();
-            case INSTANT_ENTREES:
+            case CUMULABLE_INSTANT_ENTREES:
                 return state.getInput().getInstant();
-            case INSTANT_SORTIES:
+            case CUMULABLE_INSTANT_SORTIES:
                 return state.getOutput().getInstant();
-            case INSTANT_ENTREES_SORTIES:
+            case CUMULABLE_INSTANT_ENTREES_SORTIES:
                 return state.getInputOutput().getInstant();
             case CUMUL_ENTREES_SORTIES:
                 return state.getInputOutput().getCumulative();
@@ -124,13 +124,13 @@ public class PortfolioIndexBuilder {
                 return r.getDate2PortfolioValue().get(state.getDate()) + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
                 return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
-            case GAIN:
+            case CUMULABLE_GAIN:
                 return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() +  state.getShareSold().getCumulative();
-            case GAIN_WITH_CREDIT_IMPOT:
+            case CUMULABLE_GAIN_WITH_CREDIT_IMPOT:
                 return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() + state.getShareSold().getCumulative()  + state.getCreditImpot().getCumulative();
-            case SOLD:
+            case CUMULABLE_SOLD:
                 return (float) state.getShareSoldDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
-            case BUY:
+            case CUMULABLE_BUY:
                 return (float) state.getShareBuyDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
         }
         throw new IllegalStateException("Missing case: "+ portfolioIndex);

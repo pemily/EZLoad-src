@@ -73,7 +73,11 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 graphStyle: 'LINE',
                 portfolioIndexConfig: {
                     portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
-                },                 
+                },     
+                perfSettings: {
+                    perfGroupedBy: "DAILY",
+                    perfFilter: "VALUE"
+                }            
             }
         chartIndex.description = getChartIndexDescription(chartSettings, chartIndex);
         chartIndex.label = getChartIndexTitle(chartSettings, chartIndex);        

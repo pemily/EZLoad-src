@@ -52,17 +52,17 @@ public class PerfIndexBuilder {
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
-            case GAIN:
-            case GAIN_WITH_CREDIT_IMPOT:
+            case CUMULABLE_GAIN:
+            case CUMULABLE_GAIN_WITH_CREDIT_IMPOT:
                 pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
                 break;
-            case BUY:
-            case SOLD:
-            case INSTANT_ENTREES:
-            case INSTANT_SORTIES:
+            case CUMULABLE_BUY:
+            case CUMULABLE_SOLD:
+            case CUMULABLE_INSTANT_ENTREES:
+            case CUMULABLE_INSTANT_SORTIES:
             case INSTANT_LIQUIDITE:
-            case INSTANT_ENTREES_SORTIES:
-            case INSTANT_PORTFOLIO_DIVIDENDES:
+            case CUMULABLE_INSTANT_ENTREES_SORTIES:
+            case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
                 pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we sum the data inside the period
                 break;
             default:
@@ -85,9 +85,9 @@ public class PerfIndexBuilder {
                 case SHARE_COUNT:
                     pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
                     break;
-                case SHARE_DIVIDEND:
+                case CUMULABLE_SHARE_DIVIDEND:
                 case SHARE_DIVIDEND_YIELD:
-                case SHARE_BUY_SOLD_WITH_DETAILS:
+                case CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS:
                     pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), sum()); // we sum all the data inside the same period
                     break;
                 default:
@@ -126,6 +126,8 @@ public class PerfIndexBuilder {
     }
 
     private Prices createGroupedPrices(Prices prices, ChartPerfSettings perfSettings, Supplier<Float> groupByFirstValueFct, BiFunction<Float, Float, Float> groupByFct) {
+        if (perfSettings.getPerfGroupedBy() == ChartPerfGroupedBy.DAILY) return prices;
+
         PriceAtDate firstDate = prices.getPrices().get(0);
 
         EZDate currentPeriod = createPeriod(perfSettings.getPerfGroupedBy(), firstDate.getDate()); // the first period to start
@@ -168,15 +170,20 @@ public class PerfIndexBuilder {
         result.setDevise(prices.getDevise());
         result.setLabel(prices.getLabel()+" en "+perfSettings.getPerfFilter());
         Float previousValue = null;
+        float cumul = 0;
 
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
-            Float newPrice = null;
+            Float newPrice = perfSettings.getPerfFilter() == ChartPerfFilter.CUMUL ? cumul : null;
 
             if (priceAtDate.getPrice() != null) {
                 boolean isFirstValue = previousValue == null;
                 switch (perfSettings.getPerfFilter()) {
                     case VALUE:
                         newPrice = priceAtDate.getPrice();
+                        break;
+                    case CUMUL:
+                        newPrice = priceAtDate.getPrice() + cumul;
+                        cumul = newPrice;
                         break;
                     case VALUE_VARIATION:
                         previousValue = previousValue == null ? 0 : previousValue;
@@ -203,6 +210,8 @@ public class PerfIndexBuilder {
 
     private static EZDate createPeriod(ChartPerfGroupedBy groupedBy, EZDate date) {
         switch (groupedBy){
+            case DAILY:
+                return date;
             case MONTHLY:
                 return EZDate.monthPeriod(date.getYear(), date.getMonth());
             case YEARLY:
@@ -218,19 +227,19 @@ public class PerfIndexBuilder {
         private final Map<String, Prices> devisePerfs = new HashMap<>();
 
         public Map<EZShare, Prices> getSharePerfs(ShareIndex index, ChartPerfSettings perf) {
-            return sharePerfs.get(computeKey(index.name(), perf));
+            return sharePerfs.get(computeKey(index.name(), index.isCumulable(), perf));
         }
 
         public Prices getPortoflioPerfs(PortfolioIndex index, ChartPerfSettings perf){
-            return portfolioPerfs.get(computeKey(index.name(), perf));
+            return portfolioPerfs.get(computeKey(index.name(), index.isCumulable(), perf));
         }
 
         public Prices getDevisePerfs(EZDevise index, ChartPerfSettings perf){
-            return devisePerfs.get(computeKey(index.getCode(), perf));
+            return devisePerfs.get(computeKey(index.getCode(), false, perf));
         }
 
         private void put(ShareIndex index, EZShare share, ChartPerfSettings perf, Prices prices) {
-            this.sharePerfs.compute(computeKey(index.name(), perf), (i, m) -> {
+            this.sharePerfs.compute(computeKey(index.name(), index.isCumulable(), perf), (i, m) -> {
                if (m == null){
                    m = new HashMap<>();
                }
@@ -240,17 +249,17 @@ public class PerfIndexBuilder {
         }
 
         private void put(PortfolioIndex index, ChartPerfSettings perf, Prices prices) {
-            this.portfolioPerfs.put(computeKey(index.name(), perf), prices);
+            this.portfolioPerfs.put(computeKey(index.name(), index.isCumulable(), perf), prices);
         }
 
         private void put(EZDevise index, ChartPerfSettings perf, Prices prices) {
-            this.devisePerfs.put(computeKey(index.getCode(), perf), prices);
+            this.devisePerfs.put(computeKey(index.getCode(), false, perf), prices);
         }
 
 
-        private String computeKey(String indexName, ChartPerfSettings perf){
+        private String computeKey(String indexName, boolean activeCumul, ChartPerfSettings perf){
             if (perf.correctlyDefined())
-                return indexName+"/"+perf.getPerfFilter().name()+"/"+perf.getPerfGroupedBy().name();
+                return indexName+"/"+activeCumul+"/"+perf.getPerfFilter().name()+"/"+perf.getPerfGroupedBy().name();
             return indexName;
         }
     }

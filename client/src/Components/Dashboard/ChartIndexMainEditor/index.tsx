@@ -49,11 +49,11 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
-            case "SHARE_BUY_SOLD_WITH_DETAILS":
+            case "CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS":
                 result += "Achats/Ventes"; break;
             case "SHARE_COUNT":
                 result += "Nb d'actions"; break;
-            case "SHARE_DIVIDEND":
+            case "CUMULABLE_SHARE_DIVIDEND":
                 result += "Dividendes"; break;
             case "SHARE_DIVIDEND_YIELD":
                 result += "Rendement du dividende"; break;
@@ -70,9 +70,9 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
     }
     if (isDefined(chartIndex.portfolioIndexConfig)){
         switch(chartIndex.portfolioIndexConfig?.portfolioIndex){
-            case "SOLD":
+            case "CUMULABLE_SOLD":
                 result += "Ventes"; break;
-            case "BUY":
+            case "CUMULABLE_BUY":
                 result += "Achats"; break;
             case "CUMUL_CREDIT_IMPOTS":
                 result += "Crédit d'impôts cumulés"; break;
@@ -80,15 +80,15 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Entrées/Sorties cumulés"; break;
             case "CUMUL_PORTFOLIO_DIVIDENDES":
                 result += "Dividendes cumulés"; break;
-            case "INSTANT_ENTREES":
+            case "CUMULABLE_INSTANT_ENTREES":
                 result += "Entrées"; break;
-            case "INSTANT_ENTREES_SORTIES":
+            case "CUMULABLE_INSTANT_ENTREES_SORTIES":
                 result += "Entrées/Sorties"; break;
             case "INSTANT_LIQUIDITE": 
                 result += "Liquidités"; break;
-            case "INSTANT_PORTFOLIO_DIVIDENDES":
+            case "CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES":
                 result += "Dividendes"; break;
-            case "INSTANT_SORTIES":
+            case "CUMULABLE_INSTANT_SORTIES":
                 result += "Sorties"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
                 result += "Valeurs des actions"; break;
@@ -96,9 +96,9 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Valeur du portefeuille"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT":                
                 result += "Valeur du portefeuille + les crédits d'impôts"; break;
-            case "GAIN":
+            case "CUMULABLE_GAIN":
                 result += "Gain"; break;
-            case "GAIN_WITH_CREDIT_IMPOT":
+            case "CUMULABLE_GAIN_WITH_CREDIT_IMPOT":
                 result += "Gain avec Crédit d'impôts"; break;    
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
@@ -154,11 +154,11 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     }
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
-            case "SHARE_BUY_SOLD_WITH_DETAILS":
+            case "CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS":
                 result += "des achats et les ventes de l'action"; break;
             case "SHARE_COUNT":
                 result += "de nombre d'action possédé"; break;
-            case "SHARE_DIVIDEND":
+            case "CUMULABLE_SHARE_DIVIDEND":
                 result += "des dividendes à la date du détachement"; break;
             case "SHARE_DIVIDEND_YIELD":
                 result += "du rendement du dividende à la date du détachement"; break;
@@ -175,9 +175,9 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     }
     if (isDefined(chartIndex.portfolioIndexConfig)){
         switch(chartIndex.portfolioIndexConfig?.portfolioIndex){
-            case "SOLD":
+            case "CUMULABLE_SOLD":
                 result += "de la vente d'action"; break;
-            case "BUY":
+            case "CUMULABLE_BUY":
                 result += "de l'achat d'action"; break;
             case "CUMUL_CREDIT_IMPOTS":
                 result += "de la somme des crédit d'impôts depuis la date du début du graphique"; break;
@@ -185,15 +185,15 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "de la somme des entrées/retraits de liquidités depuis la date du début du graphique"; break;
             case "CUMUL_PORTFOLIO_DIVIDENDES":
                 result += "de la somme des dividendes reçu depuis la date du début du graphique"; break;
-            case "INSTANT_ENTREES":
+            case "CUMULABLE_INSTANT_ENTREES":
                 result += "des ajouts de liquidités"; break;
-            case "INSTANT_ENTREES_SORTIES":
+            case "CUMULABLE_INSTANT_ENTREES_SORTIES":
                 result += "de l'ajouts et des retraits des liquidités"; break;
             case "INSTANT_LIQUIDITE": 
                 result += "des liquidités disponibles"; break;
-            case "INSTANT_PORTFOLIO_DIVIDENDES":
+            case "CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES":
                 result += "des dividendes reçu (date de paiement)"; break;
-            case "INSTANT_SORTIES":
+            case "CUMULABLE_INSTANT_SORTIES":
                 result += "des retraits de liquidités"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY":
                 result += "de la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
@@ -201,9 +201,9 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "de votre portefeuilles en incluant les liquidités"; break;
             case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT":                
                 result += "de votre portefeuilles en incluant les liquidités et les crédits d'impôts"; break;
-            case "GAIN":
+            case "CUMULABLE_GAIN":
                 result += "de vos gains (valeur du portefeuille - les liquidités investits)"; break;
-            case "GAIN_WITH_CREDIT_IMPOT":
+            case "CUMULABLE_GAIN_WITH_CREDIT_IMPOT":
                 result += "de vos gains (valeur du portefeuille + les credits d'impôts - les liquidités investits)"; break;    
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
@@ -211,6 +211,12 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     return applyEZLoadTextSignature(result);
   }
   
+function isIndexCumulable(chartIndex: ChartIndex){
+    console.log("chartIndex.shareIndexConfig?.shareIndex", chartIndex.shareIndexConfig?.shareIndex);
+    console.log("chartIndex.portfolioIndexConfig?.portfolioIndex", chartIndex.portfolioIndexConfig?.portfolioIndex);
+    return chartIndex.shareIndexConfig?.shareIndex?.startsWith("CUMULABLE_") || chartIndex.portfolioIndexConfig?.portfolioIndex?.startsWith("CUMULABLE_");
+}
+
 export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){                
     return (  
         <>
@@ -284,23 +290,28 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY',                                    
                                 'INSTANT_LIQUIDITE',
                                 'CUMUL_ENTREES_SORTIES',
-                                'INSTANT_ENTREES',
-                                'INSTANT_SORTIES',
-                                'INSTANT_ENTREES_SORTIES',
+                                'CUMULABLE_INSTANT_ENTREES',
+                                'CUMULABLE_INSTANT_SORTIES',
+                                'CUMULABLE_INSTANT_ENTREES_SORTIES',
                                 'CUMUL_CREDIT_IMPOTS',                                    
-                                'INSTANT_PORTFOLIO_DIVIDENDES',
+                                'CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES',
                                 'CUMUL_PORTFOLIO_DIVIDENDES',
-                                'BUY',
-                                'SOLD',
-                                'GAIN',
-                                'GAIN_WITH_CREDIT_IMPOT']}
+                                'CUMULABLE_BUY',
+                                'CUMULABLE_SOLD',
+                                'CUMULABLE_GAIN',
+                                'CUMULABLE_GAIN_WITH_CREDIT_IMPOT']}
                             description=""
                             onChange={newValue => 
                                 props.save({...props.chartIndex,
                                                 portfolioIndexConfig: {
                                                             ...props.chartIndex.portfolioIndexConfig,
-                                                            portfolioIndex: newValue
-                                                            }})
+                                                            portfolioIndex: newValue,                                                            
+                                                            },
+                                                perfSettings: {
+                                                    ...props.chartIndex.perfSettings,
+                                                    perfFilter: newValue.startsWith('CUMULABLE_') ? props.chartIndex.perfSettings?.perfFilter : 'VALUE'
+                                                }
+                                        })
                         }/>
                 )              
                 }            
@@ -322,8 +333,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             codeValues={[
                                 'SHARE_PRICES',
                                 'SHARE_COUNT',                                    
-                                'SHARE_BUY_SOLD_WITH_DETAILS',
-                                'SHARE_DIVIDEND',
+                                'CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS',
+                                'CUMULABLE_SHARE_DIVIDEND',
                                 'SHARE_DIVIDEND_YIELD',
                                 'SHARE_PRU_NET',
                                 'SHARE_PRU_NET_WITH_DIVIDEND'
@@ -334,7 +345,12 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                  shareIndexConfig: {
                                                         ...props.chartIndex.shareIndexConfig,
                                                             shareIndex: newValue
-                                                }})
+                                                },
+                                                perfSettings: {
+                                                    ...props.chartIndex.perfSettings,
+                                                    perfFilter: newValue.startsWith('CUMULABLE_') ? props.chartIndex.perfSettings?.perfFilter : 'VALUE'
+                                                }
+                                            })
                         }/>
                 )
                 }
@@ -411,18 +427,17 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                 </Box>
                 <Box direction="row">
                     <ComboFieldWithCode id="Perf"
-                            label="Regroupement"
+                            label="Période"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
-                            selectedCodeValue={!isDefined(props.chartIndex.perfSettings) || !isDefined(props.chartIndex.perfSettings?.perfGroupedBy) ?
-                                                                                'NONE': props.chartIndex.perfSettings?.perfGroupedBy! }
+                            selectedCodeValue={props.chartIndex.perfSettings?.perfGroupedBy! }
                             userValues={[                             
-                                'Aucun',                                
+                                'Par jour',                                
                                 'Par mois',
-                                'Par année'
+                                'Par an'
                             ]}
                             codeValues={[
-                                'NONE',
+                                'DAILY',
                                 'MONTHLY',                                    
                                 'YEARLY'
                             ]}
@@ -430,9 +445,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             onChange={newValue => 
                                 props.save({...props.chartIndex, perfSettings: {
                                                     ...props.chartIndex.perfSettings,
-                                                    perfGroupedBy: newValue === 'NONE' ? undefined : newValue,
-                                                    perfFilter: newValue === 'NONE' ? undefined : 
-                                                        isDefined(props.chartIndex.perfSettings?.perfFilter) ? props.chartIndex.perfSettings?.perfFilter : 'VALUE'
+                                                    perfGroupedBy: newValue,
+                                                    perfFilter: props.chartIndex.perfSettings?.perfFilter
                                             },
                                             graphStyle: 'BAR'
                                         })
@@ -445,16 +459,36 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     errorMsg={undefined}
                                     readOnly={props.readOnly}
                                     selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VALUE' : props.chartIndex.perfSettings?.perfFilter! }
-                                    userValues={[   
-                                        'Sans traitement',
-                                        'Calcule la variation entre 2 périodes',
-                                        'Calcule la variation entre 2 périodes en %',                                        
-                                    ]}
-                                    codeValues={[
-                                        'VALUE',                                        
-                                        'VALUE_VARIATION',
-                                        'VARIATION_EN_PERCENT',                                        
-                                    ]}
+                                    userValues={
+                                        isIndexCumulable(props.chartIndex) ? 
+                                        [   
+                                            'Sans traitement',
+                                            'Cumul sur la période',
+                                            'Calcule la variation entre 2 périodes',
+                                            'Calcule la variation entre 2 périodes en %',                                        
+                                        ]
+                                        :
+                                        [   
+                                            'Sans traitement',                                            
+                                            'Calcule la variation entre 2 périodes',
+                                            'Calcule la variation entre 2 périodes en %',                                        
+                                        ]
+                                    }
+                                    codeValues={
+                                        isIndexCumulable(props.chartIndex) ? 
+                                        [
+                                            'VALUE',          
+                                            'CUMUL',                              
+                                            'VALUE_VARIATION',
+                                            'VARIATION_EN_PERCENT',                                        
+                                        ]
+                                        :
+                                        [
+                                            'VALUE',                                                      
+                                            'VALUE_VARIATION',
+                                            'VARIATION_EN_PERCENT',                                        
+                                        ]    
+                                    }
                                     description=""
                                     onChange={newValue => 
                                         props.save({...props.chartIndex,

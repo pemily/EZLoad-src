@@ -37,13 +37,12 @@ const computeXPeriod = (chartIndexes : ChartIndex[] | undefined, chartLines: Cha
     const allLabelLinesDisplayed : string[] = chartLines === undefined ? [] : chartLines.map(l => l.indexId!);
     const chartIndexFiltered: ChartIndex[] = chartIndexes.filter(ci => allLabelLinesDisplayed.indexOf(ci.id!) != -1);
 
-    if (chartIndexFiltered.filter(ci => !isDefined(ci.perfSettings?.perfGroupedBy)).length > 0) return "day";
+    if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "DAILY").length > 0) return "day";
     if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "MONTHLY").length > 0) return "month";
     return "year";
 }
 
-const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', timeLabels: Label[]|undefined) : object[]|undefined => {
-    if (timeLabels === undefined) return undefined;
+const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', timeLabels: Label[]) : object[] => {    
     if (computedPeriod === 'month') {        
         const r : number[] = timeLabels.filter(l => l.endOfMonth).map(t => {            
             return t.time!;            
@@ -77,7 +76,7 @@ export function LineChart(props: LineChartProps){
     }
 
     const computedPeriod = computeXPeriod(props.chart.indexSelection, props.chart.lines);
-    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels);    
+    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels!);    
     const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            
             const shareValues: (number|undefined)[] | undefined = chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values;
@@ -212,31 +211,26 @@ export function LineChart(props: LineChartProps){
                 // https://github.com/chartjs/chartjs-adapter-date-fns
                type: "time",
                time: {
-                    unit: computedPeriod == "day" ? "month" : computedPeriod,                    
+                    unit: computedPeriod === "day" ? "month" : computedPeriod,          
+                    tooltipFormat: computedPeriod === "day" ? "dd/MM/yyyy" : computedPeriod === "month" ? "MM/yyyy" : "yyyy"
                },               
                adapters: { 
                     date: {
-                      locale: fr, 
-                    },
+                      locale: fr,                       
+                    },                    
                },             
                display: true,
                title: {
-                    display: true,
+                    display: true,                    
                     text: props.chart.axisId2titleX!['x']
-               },
+               },               
                ticks: {
-                    // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-                   /* callback: function(val, index) {                        
-                        var d = this.getLabelForValue(index).split("/");                                                
-                        
-                        return d[1]+'-'+d[2].substring(2);
-                    },*/
                     source: "labels",
                     maxRotation: 0, // Disabled rotation for performance
                     autoSkip: true,         
                     autoSkipPadding: 25,                    
                     crossAlign: "near",
-                    align: 'start'
+                    align: 'start',
 
                },
                grid: {
@@ -248,6 +242,7 @@ export function LineChart(props: LineChartProps){
                 type: 'linear',
                 display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                   display: true,
                   text: '%'
@@ -257,6 +252,7 @@ export function LineChart(props: LineChartProps){
                 type: 'linear',
                 display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
@@ -266,6 +262,7 @@ export function LineChart(props: LineChartProps){
                 type: 'linear',
                 display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: false
                 },
@@ -274,6 +271,7 @@ export function LineChart(props: LineChartProps){
                 type: 'linear',
                 display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
@@ -283,6 +281,7 @@ export function LineChart(props: LineChartProps){
                 type: 'linear',
                 display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
                 position: 'right',
+                beginAtZero: true,
                 title: {
                   display: true,
                   text: props.chart.axisId2titleY!['Y_AXIS_TITLE']

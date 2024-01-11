@@ -51,22 +51,22 @@ public class ShareIndexBuilder {
                                             addIndexInResult(r, SHARE_PRICES, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare));
                                             break;
                                         case SHARE_PRU_NET:
-                                            buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUNet(), SHARE_PRU_NET);
+                                            buildPricesAndSaveInResult(r, SHARE_PRU_NET, ezShare, portfolioIndexResult.getDate2share2PRUNet(), dates);
                                             break;
                                         case SHARE_COUNT:
-                                            buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2ShareNb(), SHARE_COUNT);
+                                            buildPricesAndSaveInResult(r, SHARE_COUNT, ezShare, portfolioIndexResult.getDate2share2ShareNb(), dates);
                                             break;
-                                        case SHARE_DIVIDEND:
-                                            addIndexInResult(r, SHARE_DIVIDEND, ezShare, sharePriceResult.getDividends(reporting, ezShare));
+                                        case CUMULABLE_SHARE_DIVIDEND:
+                                            addIndexInResult(r, CUMULABLE_SHARE_DIVIDEND, ezShare, sharePriceResult.getDividends(reporting, ezShare));
                                             break;
                                         case SHARE_DIVIDEND_YIELD:
                                             addIndexInResult(r, SHARE_DIVIDEND_YIELD, ezShare, sharePriceResult.getDividendYield(reporting, ezShare));
                                             break;
                                         case SHARE_PRU_NET_WITH_DIVIDEND:
-                                            buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2PRUNetDividend(), SHARE_PRU_NET_WITH_DIVIDEND);
+                                            buildPricesAndSaveInResult(r, SHARE_PRU_NET_WITH_DIVIDEND, ezShare, portfolioIndexResult.getDate2share2PRUNetDividend(), dates);
                                             break;
-                                        case SHARE_BUY_SOLD_WITH_DETAILS:
-                                            buildPricesAndSaveInResult(dates, ezShare, r, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), SHARE_BUY_SOLD_WITH_DETAILS);
+                                        case CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS:
+                                            buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS, ezShare, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), dates);
                                             break;
                                         default:
                                             throw new IllegalStateException("Missing case");
@@ -77,7 +77,7 @@ public class ShareIndexBuilder {
     }
 
 
-    private void buildPricesAndSaveInResult(List<EZDate> dates, EZShareEQ ezShare, Result r, Map<EZDate, Map<EZShareEQ, Float>> date2share2value, ShareIndex shareIndex) {
+    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare,Map<EZDate, Map<EZShareEQ, Float>> date2share2value, List<EZDate> dates) {
         Prices prices = new Prices();
         prices.setDevise(currenciesResult.getTargetDevise());
         prices.setLabel(shareIndex.name()+" of "+ezShare.getEzName());
