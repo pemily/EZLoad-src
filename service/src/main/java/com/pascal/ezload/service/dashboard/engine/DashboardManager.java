@@ -30,6 +30,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.FileUtil;
 import com.pascal.ezload.service.util.JsonUtil;
+import com.pascal.ezload.service.util.NumberUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -257,6 +258,8 @@ public class DashboardManager {
     }
 
     private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, Colors.ColorCode color, GraphStyle graphStyle){
+        prices.getPrices().stream().filter(p -> p.getPrice() != null).forEach(p ->  p.setPrice((float) Math.round(p.getPrice()*100.0f) / 100.0f));
+
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
         if (graphStyle == GraphStyle.BAR){

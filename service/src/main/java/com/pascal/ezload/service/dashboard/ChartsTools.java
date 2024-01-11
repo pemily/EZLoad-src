@@ -91,16 +91,12 @@ public class ChartsTools {
                                 removeZeroValues);
     }
 
-    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
-        if (chart.getLabels().size() != values.size()){
-            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
-        }
+    public static ChartLine createChartLineWithLabels(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
         chartLine.setValuesWithLabel(values.stream().map(vl -> vl.getValue() == 0 && removeZeroValues ? null : vl).collect(Collectors.toList()));
         chartLine.setYAxisSetting(YAxisSetting);
-        chart.getLines().add(chartLine);
         return chartLine;
     }
 
