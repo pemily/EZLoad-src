@@ -46,6 +46,9 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
         result = "±";
         unitSuffix = "%";
     }
+    else if (chartIndex.perfSettings?.perfFilter === "CUMUL"){
+        result = "∑";
+    }
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
@@ -128,30 +131,29 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
         default:  signOfDevise = chartSettings.targetDevise!;
     }
 
-    if (isDefined(chartIndex.perfSettings) && isDefined(chartIndex.perfSettings?.perfFilter) && isDefined(chartIndex.perfSettings?.perfGroupedBy)){
-        var suffix = " en "+signOfDevise+" ";
-        if (chartIndex.perfSettings?.perfFilter === "VALUE"){
-            result+=" le montant";
-        }
-        else if (chartIndex.perfSettings?.perfFilter === "VALUE_VARIATION"){
-            result+=" la variation ";
-        }
-        else {
-            result+= " la variation ";
-            var suffix = " en % ";
-        }
-       
-        if (chartIndex.perfSettings?.perfGroupedBy === "MONTHLY"){
-            result += " mensuel ";
-        }
-        else {
-            result += " annuel ";
-        }
-        result += suffix;
+    var suffix = " en "+signOfDevise+" ";
+    if (chartIndex.perfSettings?.perfFilter === "VALUE"){
+        result+=" le montant ";
+    }
+    if (chartIndex.perfSettings?.perfFilter === "CUMUL"){
+        result+=" le cumul ";
+    }
+    else if (chartIndex.perfSettings?.perfFilter === "VALUE_VARIATION"){
+        result+=" la variation ";
     }
     else {
-        result += "la valeur en "+signOfDevise+" ";
+        result+= " la variation ";
+        var suffix = " en % ";
     }
+    
+    if (chartIndex.perfSettings?.perfGroupedBy === "MONTHLY"){
+        result += "mensuel ";
+    }
+    else {
+        result += "annuel ";
+    }
+    result += suffix;
+
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
             case "CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS":
@@ -503,20 +505,6 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                         }    
                 </Box>
                 
-                <ComboFieldWithCode id="graphStyle"
-                                    label="Style de l'indice"
-                                    readOnly={props.readOnly || isDefined(props.chartIndex.perfSettings?.perfGroupedBy)}
-                                    description=""
-                                    errorMsg=""
-                                    selectedCodeValue={props.chartIndex.graphStyle ? props.chartIndex.graphStyle : 'LINE'}
-                                    userValues={[                             
-                                        "Ligne",
-                                        "Barre"                                        
-                                    ]}
-                                    codeValues={[                            
-                                        "LINE" , "BAR"
-                                    ]}
-                                    onChange={newValue => props.save({...props.chartIndex, graphStyle: newValue})}/>
         </Box>
         </>
     );
