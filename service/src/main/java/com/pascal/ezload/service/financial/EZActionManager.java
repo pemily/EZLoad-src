@@ -119,9 +119,9 @@ public class EZActionManager {
         return ezShareData.getShares().stream().filter(a -> a.getIsin() != null && a.getIsin().equals(isin)).findFirst();
     }
 
-    public Optional<EZShare> getFromGoogleTicker(String gooleTicker) {
-        if (StringUtils.isBlank(gooleTicker)) return Optional.empty();
-        return ezShareData.getShares().stream().filter(a -> a.getGoogleCode() != null && a.getGoogleCode().equals(gooleTicker)).findFirst();
+    public Optional<EZShare> getFromGoogleTicker(String googleTicker) {
+        if (StringUtils.isBlank(googleTicker)) return Optional.empty();
+        return ezShareData.getShares().stream().filter(a -> a.getGoogleCode() != null && a.getGoogleCode().equals(googleTicker)).findFirst();
     }
 
     public Optional<EZShare> getFromName(String shareName) {

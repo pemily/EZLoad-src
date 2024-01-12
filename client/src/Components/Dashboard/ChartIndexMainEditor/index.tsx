@@ -179,7 +179,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
         }        
     }
     if (isDefined(chartIndex.currencyIndexConfig)){
-        result += "des devises qui ont été utilisées dans le graphique.\nIl faudra avoir d'autres indices dans ce graphique pour voir leurs devises";
+        result += "des devises qui ont été utilisées dans le graphique.";
     }
     else if (isDefined(chartIndex.portfolioIndexConfig)){
         switch(chartIndex.portfolioIndexConfig?.portfolioIndex){

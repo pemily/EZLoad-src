@@ -35,6 +35,8 @@ public class PerfIndexBuilder {
     private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, ChartIndex index, Result result) {
         ChartPerfSettings perfSettings = index.getPerfSettings();
         currenciesResult.getAllDevises()
+                .stream()
+                .filter(devise -> !currenciesResult.getTargetDevise().equals(devise))
                 .forEach(devise -> {
                     Prices pricesPerf = buildPerfPrices(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
                     result.put(devise, perfSettings, pricesPerf);

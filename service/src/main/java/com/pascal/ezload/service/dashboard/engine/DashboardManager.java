@@ -244,7 +244,7 @@ public class DashboardManager {
             currenciesResult.getAllDevises().forEach(devise -> {
                 Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs(devise, perfSettings);
                 if (p != null)
-                    allChartLines.add(createChartLine(p, chartIndex.getId(), p.getLabel(),
+                    allChartLines.add(createChartLine(p, chartIndex.getId(), devise.getSymbol()+" -> "+currenciesResult.getTargetDevise().getSymbol() ,
                                                         computeYAxis(perfSettings, ChartLine.Y_AxisSetting.DEVISE),
                                                         colors.nextColorCode(), getGraphStyle(chartIndex)));
             });
@@ -281,6 +281,9 @@ public class DashboardManager {
         }
         if (chartIndex.getPortfolioIndexConfig() != null){
             isLine = chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY && !chartIndex.getPortfolioIndexConfig().getPortfolioIndex().isCumulable();
+        }
+        if (chartIndex.getCurrencyIndexConfig() != null){
+            isLine = chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY;
         }
         return isLine || (chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY && chartIndex.getPerfSettings().getPerfFilter() == ChartPerfFilter.CUMUL) ? GraphStyle.LINE : GraphStyle.BAR;
     }
