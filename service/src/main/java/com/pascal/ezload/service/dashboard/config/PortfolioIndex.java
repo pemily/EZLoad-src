@@ -1,19 +1,19 @@
 package com.pascal.ezload.service.dashboard.config;
 
 public enum PortfolioIndex {
-    INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT(false), // L'additions des actions dans votre portefeuilles + les liquiditées + le credit d'impot
-    INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY(false), // L'additions des actions dans votre portefeuilles + les liquiditées
-    INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY(false), // L'additions des actions dans votre portefeuilles
-    INSTANT_LIQUIDITE(false), // Vos liquiditées disponible
+    CUMULABLE_VALEUR_PORTEFEUILLE(true), // Les plus/moins values des valeurs de vos actions dans votre portefeuille
+    CUMULABLE_INSTANT_LIQUIDITE(true), // Mvt sur les liquidités (dépot, retraits, taxes, dividendes)
     CUMULABLE_CREDIT_IMPOTS(true), // Crédit d'impots cumulés
     CUMULABLE_INSTANT_ENTREES(true), // les ajout de liquidité (ajouts en positif)
     CUMULABLE_INSTANT_SORTIES(true), // les retraits de liquidité (retrait en valeur absolue)
     CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES(true),  // Dividendes
-    CUMULABLE_INSTANT_ENTREES_SORTIES(true), // Entrées/Sorties (ajouts en positif, retraits en négatif)
     CUMULABLE_BUY(true), // Les achats dans le portefeuille
     CUMULABLE_SOLD(true), // Les ventes dans le portefeuille
-    CUMULABLE_GAIN(true), // Le INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY - CUMUL_ENTREES_SORTIES
-    CUMULABLE_GAIN_WITH_CREDIT_IMPOT(true) // Le INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY - CUMUL_ENTREES_SORTIES - Credit impot
+    CUMULABLE_GAIN(true), // Les gains par rapport à la veille
+
+    // COULD BE DELETED (if I have the  custom computed indexes)
+    CUMULABLE_INSTANT_ENTREES_SORTIES(true), // Entrées/Sorties (ajouts en positif, retraits en négatif) (CUMULABLE_INSTANT_ENTREES - CUMULABLE_INSTANT_SORTIES)
+    INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY(false), // CUMULABLE_VALEUR_PORTEFEUILLE + CUMULABLE_INSTANT_ENTREES - CUMULABLE_INSTANT_SORTIES
 
     ;
 

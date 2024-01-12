@@ -66,7 +66,7 @@ public class PortfolioStateAtDate {
     private final Map<EZShareEQ, Float> sharePRUNetDividend; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
 
 
-    // tout ce qui est en debit sur le compte (frais, impots, taxe) excepté les inputs/outputs et les dividendes
+    // tout les autres credit/debit sur le compte qui ne sont pas dans les autres catégory
     private final StateValue liquidity;
 
     private final StateValue creditImpot;

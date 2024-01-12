@@ -81,7 +81,6 @@ public class PortfolioStateAccumulator {
 
     private void process(Row operation) {
         OperationTitle operationType = OperationTitle.build(operation.getValueStr(MesOperations.OPERATION_TYPE_COL));
-        boolean addLiquidityAmount = true;
         switch (operationType){
             case AchatTitres:
                 buyShare(operation);
@@ -94,11 +93,6 @@ public class PortfolioStateAccumulator {
                 break;
             case RetraitFonds:{
                 addOutputQuantity(operation);
-                // fix ezportfolio, les Retrait de fonds ne sont pas indiqué en valeur négative dans EZPortfolio :( dommage
-                addLiquidityAmount = false;
-                Row negativeAmount = operation.createDeepCopy();
-                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
-                addLiquidityAmount(negativeAmount);
                 break;
             }
             case VenteTitres:
@@ -108,19 +102,14 @@ public class PortfolioStateAccumulator {
                 addInputQuantity(operation);
                 break;
             case AcompteImpotSurRevenu:{
-                addLiquidityAmount = false;
-                Row negativeAmount = operation.createDeepCopy();
-                negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
-                addLiquidityAmount(negativeAmount);
                 addCreditImpot(operation);
                 break;
             }
             case CourtageSurVenteDeTitres:{
-                addLiquidityAmount = false;
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
-                addLiquidityAmount(negativeAmount);
-                taxeEventOnShare(negativeAmount);
+                boolean addLiquidityAmount = !taxeEventOnShare(negativeAmount);
+                if (addLiquidityAmount) addLiquidityAmount(operation);
                 break;
             }
             case TaxeSurLesTransactions:
@@ -130,12 +119,13 @@ public class PortfolioStateAccumulator {
             case PrelevementsSociaux:
             case PrelevementsSociauxSurRetraitPEA:
             case Divers:
-                taxeEventOnShare(operation);
+                boolean addLiquidityAmount = !taxeEventOnShare(operation);
+                if (addLiquidityAmount) addLiquidityAmount(operation);
                 break;
             default:
                 throw new IllegalStateException("Missing case");
         }
-        if (addLiquidityAmount) addLiquidityAmount(operation);
+
         computePRU();
     }
 
@@ -221,7 +211,7 @@ public class PortfolioStateAccumulator {
 
     }
 
-    private void taxeEventOnShare(Row operation){
+    private boolean taxeEventOnShare(Row operation){
         String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
             float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
@@ -234,7 +224,9 @@ public class PortfolioStateAccumulator {
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
 
             previousState.getAllTaxes().plus(amount);
+            return true; // processed
         }
+        return false; // was not a taxe on a share, perhaps another taxe?
     }
 
     private void computePRU(){

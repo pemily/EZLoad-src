@@ -47,26 +47,11 @@ public class PerfIndexBuilder {
         ChartPortfolioIndexConfig indexConfig = index.getPortfolioIndexConfig();
         ChartPerfSettings perfSettings = index.getPerfSettings();
         Prices pricesPeriodResult;
-        switch (indexConfig.getPortfolioIndex()){
-            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
-            case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
-            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
-            case INSTANT_LIQUIDITE:
-            case CUMULABLE_GAIN:
-            case CUMULABLE_GAIN_WITH_CREDIT_IMPOT:
-                pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
-                break;
-            case CUMULABLE_CREDIT_IMPOTS:
-            case CUMULABLE_BUY:
-            case CUMULABLE_SOLD:
-            case CUMULABLE_INSTANT_ENTREES:
-            case CUMULABLE_INSTANT_SORTIES:
-            case CUMULABLE_INSTANT_ENTREES_SORTIES:
-            case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
-                pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we sum the data inside the period
-                break;
-            default:
-                throw new IllegalStateException("Missing case: "+indexConfig.getPortfolioIndex());
+        if (indexConfig.getPortfolioIndex().isCumulable()){
+            pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we sum the data inside the period
+        }
+        else {
+            pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
         }
         result.put(indexConfig.getPortfolioIndex(), perfSettings, pricesPeriodResult);
     }
@@ -78,22 +63,11 @@ public class PerfIndexBuilder {
 
         share2Prices.forEach((key, value) -> {
             Prices pricesPeriodResult;
-            switch (indexConfig.getShareIndex()) {
-                case SHARE_PRU_NET:
-                case SHARE_PRU_NET_WITH_DIVIDEND:
-                case SHARE_PRICES:
-                case SHARE_COUNT:
-                    pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
-                    break;
-                case CUMULABLE_SHARE_DIVIDEND:
-                case CUMULABLE_SHARE_DIVIDEND_YIELD:
-                case CUMULABLE_SHARE_BUY_SOLD:
-                case CUMULABLE_SHARE_BUY:
-                case CUMULABLE_SHARE_SOLD:
-                    pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), sum()); // we sum all the data inside the same period
-                    break;
-                default:
-                    throw new IllegalStateException("Missing case: "+indexConfig.getShareIndex());
+            if(indexConfig.getShareIndex().isCumulable()) {
+                pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), sum()); // we sum all the data inside the same period
+            }
+            else {
+                pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
             }
 
             result.put(indexConfig.getShareIndex(), key, perfSettings, pricesPeriodResult);

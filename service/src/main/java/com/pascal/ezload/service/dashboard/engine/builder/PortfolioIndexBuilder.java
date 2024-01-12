@@ -94,11 +94,15 @@ public class PortfolioIndexBuilder {
         Prices prices = new Prices();
         prices.setDevise(currencies.getTargetDevise());
         prices.setLabel(portfolioIndex.name());
-        states.forEach(state -> prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioIndex, state, r))));
+        PortfolioStateAtDate previousState = null;
+        for (PortfolioStateAtDate state : states){
+            prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioIndex, previousState, state, r)));
+            previousState = state;
+        }
         return currencies.convertPricesToTargetDevise(reporting, prices);
     }
 
-    private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate state, Result r) {
+    private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate previousState, PortfolioStateAtDate state, Result r) {
         switch (portfolioIndex){
             case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
@@ -110,20 +114,17 @@ public class PortfolioIndexBuilder {
                 return state.getInputOutput().getInstant();
             case CUMULABLE_CREDIT_IMPOTS:
                 return state.getCreditImpot().getInstant();
-            case INSTANT_LIQUIDITE:
-                // to get the instant_liquidité, I must use the cumulative index
-                // parce que la notion de liquidité est pour un instant T, mais elle est une valeur qui depend de toutes les valeurs precedente
-                return state.getLiquidity().getCumulative();
-            case INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY:
-                return r.getDate2PortfolioValue().get(state.getDate());
+            case CUMULABLE_INSTANT_LIQUIDITE:
+                // je ne comprends pas pq mais je dois déduire les credit d'impots (il nous est enlevé des liquidité par bourse direct) je pensais que c'etait juste informatif pour notre futur feuille d'impot, mais non ils sont débités
+                return state.getLiquidity().getInstant() + state.getInput().getInstant() - state.getOutput().getInstant() + state.getDividends().getInstant() - state.getAllTaxes().getInstant() + state.getShareSold().getInstant() - state.getShareBuy().getInstant() - state.getCreditImpot().getInstant();
+            case CUMULABLE_VALEUR_PORTEFEUILLE:
+                if (previousState == null) return 0;
+                return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() + state.getShareBuy().getInstant();
             case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
                 return r.getDate2PortfolioValue().get(state.getDate()) + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
-            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT:
-                return r.getDate2PortfolioValue().get(state.getDate()) + state.getCreditImpot().getCumulative() + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
             case CUMULABLE_GAIN:
-                return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() +  state.getShareSold().getCumulative();
-            case CUMULABLE_GAIN_WITH_CREDIT_IMPOT:
-                return r.getDate2PortfolioValue().get(state.getDate()) - state.getShareBuy().getCumulative() - state.getAllTaxes().getCumulative() + state.getDividends().getCumulative() + state.getShareSold().getCumulative()  + state.getCreditImpot().getCumulative();
+                if (previousState == null) return 0;
+                return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() - state.getAllTaxes().getInstant() + state.getDividends().getInstant() + state.getShareSold().getInstant();
             case CUMULABLE_SOLD:
                 return (float) state.getShareSoldDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
             case CUMULABLE_BUY:
@@ -136,14 +137,15 @@ public class PortfolioIndexBuilder {
     private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter){
         PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, sharePrices);
 
-        return acc.process(getFilteredOperationRows(operations, brokersFilter, accountTypeFilter));
+        return acc.process(getFilteredOperationRowsAndSort(operations, brokersFilter, accountTypeFilter));
     }
 
-    public static Stream<Row> getFilteredOperationRows(List<Row> operations, Set<String> brokersFilter, Set<String> accountTypeFilter) {
+    public static Stream<Row> getFilteredOperationRowsAndSort(List<Row> operations, Set<String> brokersFilter, Set<String> accountTypeFilter) {
         return operations
                 .stream()
                 .filter(getBrokerFilter(brokersFilter))
-                .filter(getAccountTypeFilter(accountTypeFilter));
+                .filter(getAccountTypeFilter(accountTypeFilter))
+                .sorted(Comparator.comparing(op -> op.getValueDate(MesOperations.DATE_COL)));
     }
 
     private static Predicate<PortfolioStateAtDate> getDateFilter(EZDate from, EZDate today) {

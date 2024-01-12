@@ -132,7 +132,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                         
 
                         <ComboMultipleWithCheckbox id="accountType"
-                                            label="Filtre sur le type de compte"
+                                            label="Filtre sur le type de compte (Béta)"
                                             selectedCodeValues={props.chartSettings.accountTypes ? props.chartSettings.accountTypes : accountTypes}                            
                                             errorMsg={undefined}
                                             readOnly={false}
@@ -142,7 +142,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue}, false, () => {})}/>
 
                         <ComboMultipleWithCheckbox id="brokers"
-                                            label="Filtre sur les courtiers"
+                                            label="Filtre sur les courtiers (Béta)"
                                             selectedCodeValues={props.chartSettings.brokers ? props.chartSettings.brokers : brokers}                            
                                             errorMsg={undefined}
                                             readOnly={false}
