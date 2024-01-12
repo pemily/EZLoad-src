@@ -30,7 +30,6 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.FileUtil;
 import com.pascal.ezload.service.util.JsonUtil;
-import com.pascal.ezload.service.util.NumberUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -226,10 +225,14 @@ public class DashboardManager {
                 Colors.ColorCode color = colors.nextColorCode();
                 shareIndexResult.getShareSelection(chartIndex.getId())
                         .getSelectedShares()
-                        .forEach(share ->
-                                allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getId(), share.getEzName(),
-                                        computeYAxis(perfSettings, index == ShareIndex.SHARE_COUNT ? ChartLine.Y_AxisSetting.NB : ChartLine.Y_AxisSetting.SHARE),
-                                        color, getGraphStyle(chartIndex))));
+                        .forEach(share -> {
+                            ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.SHARE;
+                            if (index == ShareIndex.SHARE_COUNT) yAxis = ChartLine.Y_AxisSetting.NB;
+                            else if (index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD) yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                            allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getId(), share.getEzName(),
+                                    computeYAxis(perfSettings, yAxis),
+                                    color, getGraphStyle(chartIndex)));
+                        });
             }
         }
     }
@@ -272,14 +275,14 @@ public class DashboardManager {
     }
 
     private GraphStyle getGraphStyle(ChartIndex chartIndex){
-        boolean isCumulable = false;
+        boolean isLine = true;
         if (chartIndex.getShareIndexConfig() != null) {
-            isCumulable = chartIndex.getShareIndexConfig().getShareIndex().isCumulable();
+            isLine = chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY && !chartIndex.getShareIndexConfig().getShareIndex().isCumulable();
         }
         if (chartIndex.getPortfolioIndexConfig() != null){
-            isCumulable = chartIndex.getPortfolioIndexConfig().getPortfolioIndex().isCumulable();
+            isLine = chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY && !chartIndex.getPortfolioIndexConfig().getPortfolioIndex().isCumulable();
         }
-        return isCumulable || chartIndex.getPerfSettings().getPerfGroupedBy() != ChartPerfGroupedBy.DAILY ? GraphStyle.BAR : GraphStyle.LINE;
+        return isLine || (chartIndex.getPerfSettings().getPerfGroupedBy() == ChartPerfGroupedBy.DAILY && chartIndex.getPerfSettings().getPerfFilter() == ChartPerfFilter.CUMUL) ? GraphStyle.LINE : GraphStyle.BAR;
     }
 
 }

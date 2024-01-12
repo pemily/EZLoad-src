@@ -81,7 +81,7 @@ public class PortfolioIndexBuilder {
                                                                 .orElse(0f));
 
                     Map<EZShareEQ, Float> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
-                    state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) + value)); // soustraie les ventes
+                    state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) - value)); // soustraie les ventes
                     r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
         });
 
@@ -102,18 +102,14 @@ public class PortfolioIndexBuilder {
         switch (portfolioIndex){
             case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
-            case CUMUL_PORTFOLIO_DIVIDENDES:
-                return state.getDividends().getCumulative();
             case CUMULABLE_INSTANT_ENTREES:
                 return state.getInput().getInstant();
             case CUMULABLE_INSTANT_SORTIES:
                 return state.getOutput().getInstant();
             case CUMULABLE_INSTANT_ENTREES_SORTIES:
                 return state.getInputOutput().getInstant();
-            case CUMUL_ENTREES_SORTIES:
-                return state.getInputOutput().getCumulative();
-            case CUMUL_CREDIT_IMPOTS:
-                return state.getCreditImpot().getCumulative();
+            case CUMULABLE_CREDIT_IMPOTS:
+                return state.getCreditImpot().getInstant();
             case INSTANT_LIQUIDITE:
                 // to get the instant_liquidité, I must use the cumulative index
                 // parce que la notion de liquidité est pour un instant T, mais elle est une valeur qui depend de toutes les valeurs precedente

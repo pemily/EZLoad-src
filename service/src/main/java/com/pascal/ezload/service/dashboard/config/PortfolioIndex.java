@@ -4,10 +4,8 @@ public enum PortfolioIndex {
     INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT(false), // L'additions des actions dans votre portefeuilles + les liquiditées + le credit d'impot
     INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY(false), // L'additions des actions dans votre portefeuilles + les liquiditées
     INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY(false), // L'additions des actions dans votre portefeuilles
-    CUMUL_ENTREES_SORTIES(false), // Entrées/Sorties cumulés
-    CUMUL_CREDIT_IMPOTS(false), // Crédit d'impots cumulés
-    CUMUL_PORTFOLIO_DIVIDENDES(false),  // Dividendes Cumulés
     INSTANT_LIQUIDITE(false), // Vos liquiditées disponible
+    CUMULABLE_CREDIT_IMPOTS(true), // Crédit d'impots cumulés
     CUMULABLE_INSTANT_ENTREES(true), // les ajout de liquidité (ajouts en positif)
     CUMULABLE_INSTANT_SORTIES(true), // les retraits de liquidité (retrait en valeur absolue)
     CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES(true),  // Dividendes
@@ -22,7 +20,7 @@ public enum PortfolioIndex {
     private final boolean cumulable;
 
     PortfolioIndex(boolean cumulable){
-        this.cumulable = false;
+        this.cumulable = cumulable;
     }
     public boolean isCumulable() {
         return cumulable;

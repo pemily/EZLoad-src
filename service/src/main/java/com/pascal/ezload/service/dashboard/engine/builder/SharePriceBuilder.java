@@ -112,10 +112,10 @@ public class SharePriceBuilder {
                     Prices dividendYields = new Prices();
                     dividendYields.setDevise(dividends.getDevise());
                     for (EZDate currentDate : dates) {
-                        float dividend = dividends.getPriceAt(currentDate).getPrice();
+                        Float dividend = dividends.getPriceAt(currentDate).getPrice();
 
                         float rendement = 0f;
-                        if (dividend > 0) {
+                        if (dividend != null && dividend > 0) {
                             Prices p = getTargetPrices(reporting, ezShare);
                             if (p != null) {
                                 float price = p.getPriceAt(currentDate).getPrice();
@@ -123,7 +123,7 @@ public class SharePriceBuilder {
 
                             }
                         }
-                        dividends.addPrice(currentDate, new PriceAtDate(currentDate, rendement));
+                        dividendYields.addPrice(currentDate, new PriceAtDate(currentDate, rendement));
                     }
                     return dividendYields;
                 }

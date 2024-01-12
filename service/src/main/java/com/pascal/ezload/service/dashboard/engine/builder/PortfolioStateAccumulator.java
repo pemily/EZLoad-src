@@ -91,7 +91,6 @@ public class PortfolioStateAccumulator {
             case DividendeBrutNonSoumisAAbattement:
             case DividendeBrutSoumisAAbattement:
                 addDividend(operation);
-                dividendEventOnShare(operation);
                 break;
             case RetraitFonds:{
                 addOutputQuantity(operation);
@@ -153,7 +152,16 @@ public class PortfolioStateAccumulator {
 
     private void addDividend(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
-        previousState.getDividends().plus(newNb);
+        previousState.getDividends().plus(newNb); // pour le portfeuille
+
+        String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
+        if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
+
+            EZShareEQ share = sharePrice.getShareFromName(shareName); // le detail par action
+
+            previousState.getSharePRNetDividend()
+                    .compute(share, (sh, oldValue) -> oldValue == null ? newNb : oldValue - newNb); // si on a un dividend, ca diminue le prix de revient de l'action
+        }
     }
 
     private void addInputQuantity(Row operation) {
@@ -226,18 +234,6 @@ public class PortfolioStateAccumulator {
                     .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
 
             previousState.getAllTaxes().plus(amount);
-        }
-    }
-
-    private void dividendEventOnShare(Row operation){
-        String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
-        if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
-            float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
-
-            EZShareEQ share = sharePrice.getShareFromName(shareName);
-
-            previousState.getSharePRNetDividend()
-                    .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue + amount);
         }
     }
 

@@ -29,8 +29,8 @@ function getIndexIdsWithCounter(chartLines : ChartLine[]|undefined, chartIndexes
     chartLines.forEach(l => {
         const i = allDistinctIds.map(l2 => l2.indexId).indexOf(l.indexId!)
         if (i == -1){
-            const label = chartIndexes.filter(ci => ci.id === l.indexId)[0].label!;
-            allDistinctIds.push({indexId: l.indexId!, count: 1, label: label})
+            const label = chartIndexes.filter(ci => ci.id === l.indexId)[0]?.label;
+            allDistinctIds.push({indexId: l.indexId!, count: 1, label: label === undefined ? "[INDEX LABEL DELETED]" : label})
         }
         else {
             allDistinctIds[i] = {

@@ -59,14 +59,20 @@ public class ShareIndexBuilder {
                                         case CUMULABLE_SHARE_DIVIDEND:
                                             addIndexInResult(r, CUMULABLE_SHARE_DIVIDEND, ezShare, sharePriceResult.getDividends(reporting, ezShare));
                                             break;
-                                        case SHARE_DIVIDEND_YIELD:
-                                            addIndexInResult(r, SHARE_DIVIDEND_YIELD, ezShare, sharePriceResult.getDividendYield(reporting, ezShare));
+                                        case CUMULABLE_SHARE_DIVIDEND_YIELD:
+                                            addIndexInResult(r, CUMULABLE_SHARE_DIVIDEND_YIELD, ezShare, sharePriceResult.getDividendYield(reporting, ezShare));
                                             break;
                                         case SHARE_PRU_NET_WITH_DIVIDEND:
                                             buildPricesAndSaveInResult(r, SHARE_PRU_NET_WITH_DIVIDEND, ezShare, portfolioIndexResult.getDate2share2PRUNetDividend(), dates);
                                             break;
-                                        case CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS:
-                                            buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS, ezShare, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), dates);
+                                        case CUMULABLE_SHARE_BUY_SOLD:
+                                            buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY_SOLD, ezShare, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), dates);
+                                            break;
+                                        case CUMULABLE_SHARE_BUY:
+                                            buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY, ezShare, portfolioIndexResult.getDate2share2BuyAmount(), dates);
+                                            break;
+                                        case CUMULABLE_SHARE_SOLD:
+                                            buildPricesAndSaveInResult(r, CUMULABLE_SHARE_SOLD, ezShare, portfolioIndexResult.getDate2share2SoldAmount(), dates);
                                             break;
                                         default:
                                             throw new IllegalStateException("Missing case");

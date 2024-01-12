@@ -52,13 +52,17 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
-            case "CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS":
+            case "CUMULABLE_SHARE_BUY_SOLD":
                 result += "Achats/Ventes"; break;
+            case "CUMULABLE_SHARE_BUY":
+                result += "Achats"; break;
+            case "CUMULABLE_SHARE_SOLD":
+                result += "Ventes"; break;
             case "SHARE_COUNT":
                 result += "Nb d'actions"; break;
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "Dividendes"; break;
-            case "SHARE_DIVIDEND_YIELD":
+            case "CUMULABLE_SHARE_DIVIDEND_YIELD":
                 result += "Rendement du dividende"; break;
             case "SHARE_PRICES": 
                 result += "Prix"; break;
@@ -77,12 +81,6 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Ventes"; break;
             case "CUMULABLE_BUY":
                 result += "Achats"; break;
-            case "CUMUL_CREDIT_IMPOTS":
-                result += "Crédit d'impôts cumulés"; break;
-            case "CUMUL_ENTREES_SORTIES":
-                result += "Entrées/Sorties cumulés"; break;
-            case "CUMUL_PORTFOLIO_DIVIDENDES":
-                result += "Dividendes cumulés"; break;
             case "CUMULABLE_INSTANT_ENTREES":
                 result += "Entrées"; break;
             case "CUMULABLE_INSTANT_ENTREES_SORTIES":
@@ -131,62 +129,66 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
         default:  signOfDevise = chartSettings.targetDevise!;
     }
 
-    var suffix = " en "+signOfDevise+" ";
+    var suffix = "en "+signOfDevise+" ";
+    var masculin = false;
     if (chartIndex.perfSettings?.perfFilter === "VALUE"){
-        result+=" le montant ";
+        result+=" la valeur ";        
     }
-    if (chartIndex.perfSettings?.perfFilter === "CUMUL"){
+    else if (chartIndex.perfSettings?.perfFilter === "CUMUL"){
         result+=" le cumul ";
+        masculin = true;
     }
     else if (chartIndex.perfSettings?.perfFilter === "VALUE_VARIATION"){
-        result+=" la variation ";
+        result+=" la variation ";        
     }
     else {
         result+= " la variation ";
-        var suffix = " en % ";
+        var suffix = "en % ";
     }
     
     if (chartIndex.perfSettings?.perfGroupedBy === "MONTHLY"){
-        result += "mensuel ";
+        if (masculin) result += "mensuel ";
+        else result += "mensuelle ";
     }
-    else {
-        result += "annuel ";
+    else if (chartIndex.perfSettings?.perfGroupedBy === "YEARLY"){
+        if (masculin) result += "annuel ";
+        else result += "annuelle ";
     }
     result += suffix;
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
-            case "CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS":
+            case "CUMULABLE_SHARE_BUY_SOLD":
                 result += "des achats et les ventes de l'action"; break;
+            case "CUMULABLE_SHARE_BUY":
+                result += "des achats de l'action"; break;
+            case "CUMULABLE_SHARE_SOLD":
+                result += "des ventes de l'action"; break;
             case "SHARE_COUNT":
                 result += "de nombre d'action possédé"; break;
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "des dividendes à la date du détachement"; break;
-            case "SHARE_DIVIDEND_YIELD":
+            case "CUMULABLE_SHARE_DIVIDEND_YIELD":
                 result += "du rendement du dividende à la date du détachement"; break;
             case "SHARE_PRICES": 
                 result += "du cours de l'action"; break;
             case "SHARE_PRU_NET":
-                result += "du Prix de Revient Unitaire, les dividendes ne sont pas inclusent dans le calcul"; break;
+                result += "du Prix de Revient Unitaire Net"; break;
             case "SHARE_PRU_NET_WITH_DIVIDEND":
-                result += "du Prix de Revient Unitaire incluant les dividendes"; break;
+                result += "du Prix de Revient Unitaire Net (incluant les dividendes à la date de paiement)"; break;
         }        
     }
     if (isDefined(chartIndex.currencyIndexConfig)){
         result += "des devises qui ont été utilisées dans le graphique.\nIl faudra avoir d'autres indices dans ce graphique pour voir leurs devises";
     }
-    if (isDefined(chartIndex.portfolioIndexConfig)){
+    else if (isDefined(chartIndex.portfolioIndexConfig)){
         switch(chartIndex.portfolioIndexConfig?.portfolioIndex){
             case "CUMULABLE_SOLD":
                 result += "de la vente d'action"; break;
             case "CUMULABLE_BUY":
                 result += "de l'achat d'action"; break;
-            case "CUMUL_CREDIT_IMPOTS":
-                result += "de la somme des crédit d'impôts depuis la date du début du graphique"; break;
-            case "CUMUL_ENTREES_SORTIES":
-                result += "de la somme des entrées/retraits de liquidités depuis la date du début du graphique"; break;
-            case "CUMUL_PORTFOLIO_DIVIDENDES":
-                result += "de la somme des dividendes reçu depuis la date du début du graphique"; break;
+            case "CUMULABLE_CREDIT_IMPOTS":
+                result += "des crédit d'impôts depuis la date du début du graphique"; break;
             case "CUMULABLE_INSTANT_ENTREES":
                 result += "des ajouts de liquidités"; break;
             case "CUMULABLE_INSTANT_ENTREES_SORTIES":
@@ -210,12 +212,10 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }
-    return applyEZLoadTextSignature(result);
+    return applyEZLoadTextSignature(result.replace("  ", " "));
   }
   
 function isIndexCumulable(chartIndex: ChartIndex){
-    console.log("chartIndex.shareIndexConfig?.shareIndex", chartIndex.shareIndexConfig?.shareIndex);
-    console.log("chartIndex.portfolioIndexConfig?.portfolioIndex", chartIndex.portfolioIndexConfig?.portfolioIndex);
     return chartIndex.shareIndexConfig?.shareIndex?.startsWith("CUMULABLE_") || chartIndex.portfolioIndexConfig?.portfolioIndex?.startsWith("CUMULABLE_");
 }
 
@@ -274,13 +274,11 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Valeurs de votre portefeuille avec les liquidités et les crédits d'impôts",
                                 "Valeurs de votre portefeuille sans les liquidités",
                                 "Liquidités disponibles", 
-                                "Sommes des entrées/retraits de liquidités",
                                 "Ajouts de liquidités",
                                 "Retraits de liquidités",
                                 "Ajouts/Retraits de liquidités",
-                                "Somme des crédit d'impôts",
+                                "Crédit d'impôts",
                                 "Dividendes reçu",
-                                "Somme des dividendes reçu",
                                 "Achat d'action",
                                 "Vente d'action",
                                 "Gains",
@@ -291,13 +289,11 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY_AND_CREDIT_IMPOT',
                                 'INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY',                                    
                                 'INSTANT_LIQUIDITE',
-                                'CUMUL_ENTREES_SORTIES',
                                 'CUMULABLE_INSTANT_ENTREES',
                                 'CUMULABLE_INSTANT_SORTIES',
                                 'CUMULABLE_INSTANT_ENTREES_SORTIES',
-                                'CUMUL_CREDIT_IMPOTS',                                    
+                                'CUMULABLE_CREDIT_IMPOTS',                                    
                                 'CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES',
-                                'CUMUL_PORTFOLIO_DIVIDENDES',
                                 'CUMULABLE_BUY',
                                 'CUMULABLE_SOLD',
                                 'CUMULABLE_GAIN',
@@ -326,18 +322,22 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             userValues={[                             
                                 "Cours de l'action",
                                 "Nombre d'action",
+                                "Achats",
+                                "Ventes",
                                 "Achats/Ventes",
-                                "Dividendes",
-                                "Rendement du dividende",
+                                "Dividendes (Date de détachement)",
+                                "Rendement du dividende (Date de détachement)",
                                 "Prix de Revient Unitaire",
-                                "Prix de Revient Unitaire incluant les dividendes"
+                                "Prix de Revient Unitaire incluant les dividendes (date de paiement)"
                             ]}
                             codeValues={[
                                 'SHARE_PRICES',
                                 'SHARE_COUNT',                                    
-                                'CUMULABLE_SHARE_BUY_SOLD_WITH_DETAILS',
+                                'CUMULABLE_SHARE_BUY',
+                                'CUMULABLE_SHARE_SOLD',
+                                'CUMULABLE_SHARE_BUY_SOLD',
                                 'CUMULABLE_SHARE_DIVIDEND',
-                                'SHARE_DIVIDEND_YIELD',
+                                'CUMULABLE_SHARE_DIVIDEND_YIELD',
                                 'SHARE_PRU_NET',
                                 'SHARE_PRU_NET_WITH_DIVIDEND'
                             ]}
@@ -409,7 +409,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                     }/>
 
                     <ComboMultipleWithCheckbox id="additionalShares"
-                                            label="Actions individuelle"
+                                            label="+ Actions individuelle"
                                             selectedCodeValues={!isDefined(props.chartIndex.shareIndexConfig?.additionalShareGoogleCodeList) ? [] : props.chartIndex.shareIndexConfig?.additionalShareGoogleCodeList!}
                                             errorMsg={undefined}
                                             readOnly={false}
@@ -465,7 +465,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         isIndexCumulable(props.chartIndex) ? 
                                         [   
                                             'Sans traitement',
-                                            'Cumul sur la période',
+                                            'Cumul sur la durée du graphique',
                                             'Calcule la variation entre 2 périodes',
                                             'Calcule la variation entre 2 périodes en %',                                        
                                         ]
