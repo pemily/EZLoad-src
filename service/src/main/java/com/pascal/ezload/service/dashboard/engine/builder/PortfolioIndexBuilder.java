@@ -104,24 +104,26 @@ public class PortfolioIndexBuilder {
 
     private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate previousState, PortfolioStateAtDate state, Result r) {
         switch (portfolioIndex){
-            case CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES:
+            case CUMULABLE_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
-            case CUMULABLE_INSTANT_ENTREES:
+            case CUMULABLE_ENTREES:
                 return state.getInput().getInstant();
-            case CUMULABLE_INSTANT_SORTIES:
+            case CUMULABLE_SORTIES:
                 return state.getOutput().getInstant();
-            case CUMULABLE_INSTANT_ENTREES_SORTIES:
+            case CUMULABLE_ENTREES_SORTIES:
                 return state.getInputOutput().getInstant();
             case CUMULABLE_CREDIT_IMPOTS:
                 return state.getCreditImpot().getInstant();
-            case CUMULABLE_INSTANT_LIQUIDITE:
+            case CUMULABLE_LIQUIDITE:
                 // je ne comprends pas pq mais je dois déduire les credit d'impots (il nous est enlevé des liquidité par bourse direct) je pensais que c'etait juste informatif pour notre futur feuille d'impot, mais non ils sont débités
                 return state.getLiquidity().getInstant() + state.getInput().getInstant() - state.getOutput().getInstant() + state.getDividends().getInstant() - state.getAllTaxes().getInstant() + state.getShareSold().getInstant() - state.getShareBuy().getInstant() - state.getCreditImpot().getInstant();
             case CUMULABLE_VALEUR_PORTEFEUILLE:
                 if (previousState == null) return 0;
-                return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() + state.getShareBuy().getInstant();
-            case INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
-                return r.getDate2PortfolioValue().get(state.getDate()) + state.getLiquidity().getCumulative();// to get the instant_liquidité, I must use the cumulative index
+                return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate());
+            case CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+                float cumulableValeurPortefeuille = r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate());
+                float liquidity = state.getLiquidity().getInstant() + state.getInput().getInstant() - state.getOutput().getInstant() + state.getDividends().getInstant() - state.getAllTaxes().getInstant() + state.getShareSold().getInstant() - state.getShareBuy().getInstant() - state.getCreditImpot().getInstant();
+                return cumulableValeurPortefeuille + liquidity;
             case CUMULABLE_GAIN:
                 if (previousState == null) return 0;
                 return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() - state.getAllTaxes().getInstant() + state.getDividends().getInstant() + state.getShareSold().getInstant();

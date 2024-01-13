@@ -52,7 +52,7 @@ export function PageUI(props: PageUIProps){
                             // init
                             const chartIndex: ChartIndex = {
                                 portfolioIndexConfig: {
-                                    portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
+                                    portfolioIndex: "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
                                 },                                
                                 perfSettings: undefined,
                                 currencyIndexConfig: undefined,

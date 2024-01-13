@@ -83,19 +83,19 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Achats"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
                 result += "Crédit d'impots"; break;
-            case "CUMULABLE_INSTANT_ENTREES":
+            case "CUMULABLE_ENTREES":
                 result += "Entrées"; break;
-            case "CUMULABLE_INSTANT_ENTREES_SORTIES":
+            case "CUMULABLE_ENTREES_SORTIES":
                 result += "Entrées/Sorties"; break;
-            case "CUMULABLE_INSTANT_LIQUIDITE": 
+            case "CUMULABLE_LIQUIDITE":
                 result += "Liquidités"; break;
-            case "CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES":
+            case "CUMULABLE_PORTFOLIO_DIVIDENDES":
                 result += "Dividendes"; break;
-            case "CUMULABLE_INSTANT_SORTIES":
+            case "CUMULABLE_SORTIES":
                 result += "Sorties"; break;
             case "CUMULABLE_VALEUR_PORTEFEUILLE":
                 result += "Valeurs des actions"; break;
-            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
+            case "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
                 result += "Valeur du portefeuille"; break;
             case "CUMULABLE_GAIN":
                 result += "Gain"; break;
@@ -187,19 +187,19 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "de l'achat d'action"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
                 result += "des crédit d'impôts depuis la date du début du graphique"; break;
-            case "CUMULABLE_INSTANT_ENTREES":
+            case "CUMULABLE_ENTREES":
                 result += "des dépôts de liquidités"; break;
-            case "CUMULABLE_INSTANT_ENTREES_SORTIES":
+            case "CUMULABLE_ENTREES_SORTIES":
                 result += "des dépôts et retraits des liquidités"; break;
-            case "CUMULABLE_INSTANT_LIQUIDITE": 
+            case "CUMULABLE_LIQUIDITE":
                 result += "des mouvements sur les liquidités (dépots, retraits, taxes, dividendes, etc...)"; break;
-            case "CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES":
+            case "CUMULABLE_PORTFOLIO_DIVIDENDES":
                 result += "des dividendes reçu (date de paiement)"; break;
-            case "CUMULABLE_INSTANT_SORTIES":
+            case "CUMULABLE_SORTIES":
                 result += "des retraits de liquidités"; break;
             case "CUMULABLE_VALEUR_PORTEFEUILLE":
                 result += "de la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
-            case "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
+            case "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
                 result += "de votre portefeuilles en incluant les liquidités"; break;
             case "CUMULABLE_GAIN":
                 result += "de vos gains (valeur du portefeuille - les liquidités investits)"; break;
@@ -232,7 +232,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                             shareIndexConfig: undefined,
                                             portfolioIndexConfig: {
                                                     ...props.chartIndex.portfolioIndexConfig,
-                                                    portfolioIndex: 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' // valeur par defaut
+                                                    portfolioIndex: 'CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' // valeur par defaut
                                                     }})
                                 }
                                 else if (newValue === 'SHARE'){
@@ -262,7 +262,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             label="Indice"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
-                            selectedCodeValue={ !isDefined(props.chartIndex.portfolioIndexConfig?.portfolioIndex) ? 'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' : props.chartIndex.portfolioIndexConfig?.portfolioIndex! }
+                            selectedCodeValue={ !isDefined(props.chartIndex.portfolioIndexConfig?.portfolioIndex) ? 'CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY' : props.chartIndex.portfolioIndexConfig?.portfolioIndex! }
                             userValues={[                             
                                 "Valeurs de votre portefeuille avec les liquidités",                                
                                 "Valeurs de votre portefeuille d'actions",
@@ -277,14 +277,14 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Gains"
                             ]}
                             codeValues={[
-                                'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',                                
+                                'CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',                                
                                 'CUMULABLE_VALEUR_PORTEFEUILLE',                                    
-                                'CUMULABLE_INSTANT_LIQUIDITE',
-                                'CUMULABLE_INSTANT_ENTREES',
-                                'CUMULABLE_INSTANT_SORTIES',
-                                'CUMULABLE_INSTANT_ENTREES_SORTIES',
+                                'CUMULABLE_LIQUIDITE',
+                                'CUMULABLE_ENTREES',
+                                'CUMULABLE_SORTIES',
+                                'CUMULABLE_ENTREES_SORTIES',
                                 'CUMULABLE_CREDIT_IMPOTS',                                    
-                                'CUMULABLE_INSTANT_PORTFOLIO_DIVIDENDES',
+                                'CUMULABLE_PORTFOLIO_DIVIDENDES',
                                 'CUMULABLE_BUY',
                                 'CUMULABLE_SOLD',
                                 'CUMULABLE_GAIN']}
@@ -418,6 +418,51 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
 
                 </Box>
                 <Box direction="row">
+                    <ComboFieldWithCode id="AffichagePerf"
+                        label="Donnée"
+                        errorMsg={undefined}
+                        readOnly={props.readOnly}
+                        selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VALUE' : props.chartIndex.perfSettings?.perfFilter! }
+                        userValues={
+                            isIndexCumulable(props.chartIndex) ? 
+                            [   
+                                'Sans traitement - A SUPPRIMER (C est la variation en fait)',
+                                'Somme sur la durée du graphique',
+                                'Calcule la variation ',
+                                'Calcule la variation en %',                                        
+                            ]
+                            :
+                            [   
+                                'Sans traitement - A SUPPRIMER (C est la variation en fait)',                                            
+                                'Calcule la variation entre 2 périodes',
+                                'Calcule la variation entre 2 périodes en %',                                        
+                            ]
+                        }
+                        codeValues={
+                            isIndexCumulable(props.chartIndex) ? 
+                            [
+                                'VALUE',          
+                                'CUMUL',                              
+                                'VALUE_VARIATION',
+                                'VARIATION_EN_PERCENT',                                        
+                            ]
+                            :
+                            [
+                                'VALUE',                                                      
+                                'VALUE_VARIATION',
+                                'VARIATION_EN_PERCENT',                                        
+                            ]    
+                        }
+                        description=""
+                        onChange={newValue => 
+                            props.save({...props.chartIndex,
+                                perfSettings: {
+                                    ...props.chartIndex.perfSettings,
+                                    perfFilter: newValue,                                            
+                                },
+                                graphStyle: 'BAR'
+                            })
+                    }/>                                
                     <ComboFieldWithCode id="Perf"
                             label="Période"
                             errorMsg={undefined}
@@ -444,55 +489,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         })
                             }/>            
 
-                        {
-                            isDefined(props.chartIndex.perfSettings?.perfGroupedBy) && (
-                                <ComboFieldWithCode id="AffichagePerf"
-                                    label="Post-Traitement"
-                                    errorMsg={undefined}
-                                    readOnly={props.readOnly}
-                                    selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VALUE' : props.chartIndex.perfSettings?.perfFilter! }
-                                    userValues={
-                                        isIndexCumulable(props.chartIndex) ? 
-                                        [   
-                                            'Sans traitement',
-                                            'Cumul sur la durée du graphique',
-                                            'Calcule la variation entre 2 périodes',
-                                            'Calcule la variation entre 2 périodes en %',                                        
-                                        ]
-                                        :
-                                        [   
-                                            'Sans traitement',                                            
-                                            'Calcule la variation entre 2 périodes',
-                                            'Calcule la variation entre 2 périodes en %',                                        
-                                        ]
-                                    }
-                                    codeValues={
-                                        isIndexCumulable(props.chartIndex) ? 
-                                        [
-                                            'VALUE',          
-                                            'CUMUL',                              
-                                            'VALUE_VARIATION',
-                                            'VARIATION_EN_PERCENT',                                        
-                                        ]
-                                        :
-                                        [
-                                            'VALUE',                                                      
-                                            'VALUE_VARIATION',
-                                            'VARIATION_EN_PERCENT',                                        
-                                        ]    
-                                    }
-                                    description=""
-                                    onChange={newValue => 
-                                        props.save({...props.chartIndex,
-                                            perfSettings: {
-                                                ...props.chartIndex.perfSettings,
-                                                perfFilter: newValue,                                            
-                                            },
-                                            graphStyle: 'BAR'
-                                        })
-                                }/>
-                            )
-                        }    
+                        
                 </Box>
                 
         </Box>

@@ -72,7 +72,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 id: genUUID(),
                 graphStyle: 'LINE',
                 portfolioIndexConfig: {
-                    portfolioIndex: "INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+                    portfolioIndex: "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
                 },     
                 perfSettings: {
                     perfGroupedBy: "DAILY",
