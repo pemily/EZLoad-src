@@ -54,6 +54,7 @@ public class Prices {
 
     // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
     public PriceAtDate getPriceAt(EZDate date){
+        date = date.isPeriod() ? date.endPeriodDate() : date;
         PriceAtDate p = pricesMap.get(date);
         if (p == null) {
             // test jusqu'à 20 jours de moins

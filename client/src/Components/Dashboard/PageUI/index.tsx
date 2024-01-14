@@ -52,15 +52,18 @@ export function PageUI(props: PageUIProps){
                             // init
                             const chartIndex: ChartIndex = {
                                 portfolioIndexConfig: {
-                                    portfolioIndex: "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
+                                    portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
                                 },                                
-                                perfSettings: undefined,
+                                perfSettings: {
+                                    perfFilter: "VALUE",
+                                    perfGroupedBy: "DAILY"
+                                },
                                 currencyIndexConfig: undefined,
                                 shareIndexConfig: undefined,
                             };
                             const newChart: Chart = {
-                                accountTypes: accountTypes,
-                                brokers: brokers,
+                                excludeAccountTypes: [],
+                                excludeBrokers: [],
                                 title: 'Titre à changer',                                                                
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                 targetDevise: 'EUR',

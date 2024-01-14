@@ -81,35 +81,44 @@ public class PortfolioStateAccumulator {
 
     private void process(Row operation) {
         OperationTitle operationType = OperationTitle.build(operation.getValueStr(MesOperations.OPERATION_TYPE_COL));
+        boolean addLiquidityAmount = false;
+        boolean minusLiquidityAmount = false;
         switch (operationType){
             case AchatTitres:
                 buyShare(operation);
+                addLiquidityAmount = true; // add car le montant est négatif
                 break;
             case DividendeVerse:
             case DividendeBrut:
             case DividendeBrutNonSoumisAAbattement:
             case DividendeBrutSoumisAAbattement:
                 addDividend(operation);
+                addLiquidityAmount = true;
                 break;
             case RetraitFonds:{
                 addOutputQuantity(operation);
+                minusLiquidityAmount = true;
                 break;
             }
             case VenteTitres:
                 soldShare(operation);
+                addLiquidityAmount = true;
                 break;
             case VersementFonds:
                 addInputQuantity(operation);
+                addLiquidityAmount = true;
                 break;
             case AcompteImpotSurRevenu:{
                 addCreditImpot(operation);
+                minusLiquidityAmount = true;
                 break;
             }
             case CourtageSurVenteDeTitres:{
+                // ca devrait etre une operation négative dans EZPortfolio :(
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + operation.getValueStr(MesOperations.AMOUNT_COL));
-                boolean addLiquidityAmount = !taxeEventOnShare(negativeAmount);
-                if (addLiquidityAmount) addLiquidityAmount(operation);
+                taxeEventOnShare(negativeAmount);
+                minusLiquidityAmount = true;
                 break;
             }
             case TaxeSurLesTransactions:
@@ -119,29 +128,48 @@ public class PortfolioStateAccumulator {
             case PrelevementsSociaux:
             case PrelevementsSociauxSurRetraitPEA:
             case Divers:
-                boolean addLiquidityAmount = !taxeEventOnShare(operation);
-                if (addLiquidityAmount) addLiquidityAmount(operation);
+                taxeEventOnShare(operation);
+                addLiquidityAmount = true;
                 break;
             default:
                 throw new IllegalStateException("Missing case");
         }
+        // mets a jour les liquiditées en fonctions des opérations qui se sont déroulé
+        if (addLiquidityAmount){
+            float amount = extractAmount(operation);
+            previousState.getLiquidity().plus(amount);
+        }
+        if (minusLiquidityAmount) {
+            float amount = extractAmount(operation);
+            previousState.getLiquidity().minus(amount);
+        }
+        /*
+        previousState.getLiquidity().plus(
+                previousState.getInput().getInstant()
+                - previousState.getOutput().getInstant()
+                + previousState.getDividends().getInstant()
+                - previousState.getAllTaxes().getInstant()
+                + previousState.getShareSold().getInstant()
+                - previousState.getShareBuy().getInstant()
+                - previousState.getCreditImpot().getInstant()); // je ne comprends pas pq mais je dois déduire les credit d'impots (il nous est enlevé des liquidité par bourse direct) je pensais que c'etait juste informatif pour notre futur feuille d'impot, mais non ils sont débités
 
+*/
         computePRU();
     }
 
 
-    private void addLiquidityAmount(Row operation){
+    private float extractAmount(Row operation) {
         float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
-        previousState.getLiquidity().plus(newNb);
+        return newNb;
     }
 
     private void addCreditImpot(Row operation){
-        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
+        float newNb = extractAmount(operation);
         previousState.getCreditImpot().plus(newNb);
     }
 
     private void addDividend(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
+        float newNb = extractAmount(operation);
         previousState.getDividends().plus(newNb); // pour le portfeuille
 
         String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
@@ -155,20 +183,20 @@ public class PortfolioStateAccumulator {
     }
 
     private void addInputQuantity(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
+        float newNb = extractAmount(operation);
         previousState.getInput().plus(newNb);
         previousState.getInputOutput().plus(newNb);
     }
 
     private void addOutputQuantity(Row operation) {
-        float newNb = operation.getValueFloat(MesOperations.AMOUNT_COL);
+        float newNb = extractAmount(operation);
         previousState.getOutput().plus(newNb);
         previousState.getInputOutput().minus(newNb);
     }
 
     private void soldShare(Row operation) {
         EZShareEQ share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
-        float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);         // AMOUNT_COL is positive when sold
+        float amount = extractAmount(operation);         // AMOUNT_COL is positive when sold
         float nbOfSoldShare = operation.getValueFloat(MesOperations.QUANTITE_COL); // QUANTITE_COL is negative
 
         previousState.getShareNb()
@@ -191,7 +219,7 @@ public class PortfolioStateAccumulator {
     private void buyShare(Row operation) {
         EZShareEQ share = sharePrice.getShareFromName(operation.getValueStr(MesOperations.ACTION_NAME_COL));
         float nbOfBuyShare = operation.getValueFloat(MesOperations.QUANTITE_COL); // QUANTITE_COL is positive
-        float amount = operation.getValueFloat(MesOperations.AMOUNT_COL);        // AMOUNT_COL is negative when buy
+        float amount = extractAmount(operation);       // AMOUNT_COL is negative when buy
 
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfBuyShare : oldValue + nbOfBuyShare);
@@ -214,7 +242,7 @@ public class PortfolioStateAccumulator {
     private boolean taxeEventOnShare(Row operation){
         String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
-            float amount = - operation.getValueFloat(MesOperations.AMOUNT_COL);
+            float amount = - extractAmount(operation);
 
             EZShareEQ share = sharePrice.getShareFromName(shareName);
             previousState.getSharePRNet()

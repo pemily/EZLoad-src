@@ -72,7 +72,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 id: genUUID(),
                 graphStyle: 'LINE',
                 portfolioIndexConfig: {
-                    portfolioIndex: "CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+                    portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
                 },     
                 perfSettings: {
                     perfGroupedBy: "DAILY",
@@ -132,24 +132,24 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                         
 
                         <ComboMultipleWithCheckbox id="accountType"
-                                            label="Filtre sur le type de compte (Béta)"
-                                            selectedCodeValues={props.chartSettings.accountTypes ? props.chartSettings.accountTypes : accountTypes}                            
+                                            label="Exclure le type de compte (Béta)"
+                                            selectedCodeValues={props.chartSettings.excludeAccountTypes ? props.chartSettings.excludeAccountTypes : accountTypes}                            
                                             errorMsg={undefined}
                                             readOnly={false}
                                             userValues={accountTypes}                                
                                             codeValues={accountTypes}
                                             description=""
-                                            onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue}, false, () => {})}/>
+                                            onChange={newValue  => props.save({...props.chartSettings, excludeAccountTypes: newValue}, false, () => {})}/>
 
                         <ComboMultipleWithCheckbox id="brokers"
-                                            label="Filtre sur les courtiers (Béta)"
-                                            selectedCodeValues={props.chartSettings.brokers ? props.chartSettings.brokers : brokers}                            
+                                            label="Exclure les courtiers (Béta)"
+                                            selectedCodeValues={props.chartSettings.excludeBrokers ? props.chartSettings.excludeBrokers : brokers}                            
                                             errorMsg={undefined}
                                             readOnly={false}
                                             codeValues={brokers}
                                             userValues={brokers}
                                             description=""
-                                            onChange={newValue  => props.save({...props.chartSettings, brokers: newValue}, false, () => {})}/>
+                                            onChange={newValue  => props.save({...props.chartSettings, excludeBrokers: newValue}, false, () => {})}/>
                     </Box>
                 </Tab>    
                 {
@@ -179,7 +179,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                             label: 'Oui',
                                                             onClick: () => {
                                                                 props.save({...props.chartSettings, 
-                                                                    indexSelection: props.chartSettings.indexSelection?.filter((c,i) => i !== chartIndexPosition)}, true, () => {
+                                                                    indexSelection: props.chartSettings.indexSelection?.filter((c,i) => i !== chartIndexPosition)}, false, () => {
                                                                         setIndiceIndex(indiceIndex === props.chartSettings.indexSelection!.length ? indiceIndex -1 : indiceIndex)
                                                                     })
                                                             }

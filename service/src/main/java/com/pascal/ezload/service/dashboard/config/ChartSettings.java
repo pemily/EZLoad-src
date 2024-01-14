@@ -31,8 +31,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     private String targetDevise; // EUR, USD
     private String title;
-    private Set<String> brokers = new HashSet<>();
-    private Set<String> accountTypes = new HashSet<>();
+    private Set<String> excludeBrokers = new HashSet<>();
+    private Set<String> excludeAccountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
     private List<ChartIndex> indexSelection = new LinkedList<>();
     private int height = 50;
@@ -42,8 +42,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
     public ChartSettings(ChartSettings chartSettings){
         this.targetDevise = chartSettings.targetDevise;
         this.title = chartSettings.title;
-        this.brokers = chartSettings.brokers;
-        this.accountTypes = chartSettings.accountTypes;
+        this.excludeBrokers = chartSettings.excludeBrokers;
+        this.excludeAccountTypes = chartSettings.excludeAccountTypes;
         this.selectedStartDateSelection = chartSettings.selectedStartDateSelection;
         this.indexSelection = chartSettings.indexSelection;
         this.height = chartSettings.height;
@@ -66,20 +66,20 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.title = title;
     }
 
-    public Set<String> getBrokers() {
-        return brokers;
+    public Set<String> getExcludeBrokers() {
+        return excludeBrokers;
     }
 
-    public void setBrokers(Set<String> brokers) {
-        this.brokers = brokers;
+    public void setExcludeBrokers(Set<String> excludeBrokers) {
+        this.excludeBrokers = excludeBrokers;
     }
 
-    public Set<String> getAccountTypes() {
-        return accountTypes;
+    public Set<String> getExcludeAccountTypes() {
+        return excludeAccountTypes;
     }
 
-    public void setAccountTypes(Set<String> accountTypes) {
-        this.accountTypes = accountTypes;
+    public void setExcludeAccountTypes(Set<String> excludeAccountTypes) {
+        this.excludeAccountTypes = excludeAccountTypes;
     }
 
     public List<ChartIndex> getIndexSelection() {

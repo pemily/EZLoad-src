@@ -47,8 +47,8 @@ public class ShareIndexBuilder {
                         shareSelectionResult.getSelectedShares()
                                 .forEach(ezShare -> {
                                     switch (si.getShareIndexConfig().getShareIndex()) {
-                                        case SHARE_PRICES:
-                                            addIndexInResult(r, SHARE_PRICES, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare));
+                                        case SHARE_PRICE:
+                                            addIndexInResult(r, SHARE_PRICE, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare));
                                             break;
                                         case SHARE_PRU_NET:
                                             buildPricesAndSaveInResult(r, SHARE_PRU_NET, ezShare, portfolioIndexResult.getDate2share2PRUNet(), dates);

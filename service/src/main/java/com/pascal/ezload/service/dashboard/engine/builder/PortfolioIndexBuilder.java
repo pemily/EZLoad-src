@@ -43,11 +43,11 @@ public class PortfolioIndexBuilder {
         this.sharePrices = sharePrices;
     }
 
-    public Result build(Reporting reporting, List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter, List<ChartIndex> chartSelection){
+    public Result build(Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType, List<ChartIndex> chartSelection){
         Result r = new Result();
         r.dates = dates;
         if (operations != null)
-            buildPricesFor(reporting, brokersFilter, accountTypeFilter,
+            buildPricesFor(reporting, excludeBrokers, excludeAccountType,
                     chartSelection.stream()
                             .map(ChartIndex::getPortfolioIndexConfig)
                             .filter(Objects::nonNull)
@@ -56,8 +56,8 @@ public class PortfolioIndexBuilder {
     }
 
 
-    private void buildPricesFor(Reporting reporting, Set<String> brokersFilter, Set<String> accountTypeFilter, List<ChartPortfolioIndexConfig> chartIndexesConfig, Result r){
-        List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, brokersFilter, accountTypeFilter);
+    private void buildPricesFor(Reporting reporting, Set<String> excludeBrokers, Set<String> excludeAccountType, List<ChartPortfolioIndexConfig> chartIndexesConfig, Result r){
+        List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, excludeBrokers, excludeAccountType);
 
         states.forEach(state -> {
                     r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
@@ -115,16 +115,15 @@ public class PortfolioIndexBuilder {
             case CUMULABLE_CREDIT_IMPOTS:
                 return state.getCreditImpot().getInstant();
             case CUMULABLE_LIQUIDITE:
-                // je ne comprends pas pq mais je dois déduire les credit d'impots (il nous est enlevé des liquidité par bourse direct) je pensais que c'etait juste informatif pour notre futur feuille d'impot, mais non ils sont débités
-                return state.getLiquidity().getInstant() + state.getInput().getInstant() - state.getOutput().getInstant() + state.getDividends().getInstant() - state.getAllTaxes().getInstant() + state.getShareSold().getInstant() - state.getShareBuy().getInstant() - state.getCreditImpot().getInstant();
-            case CUMULABLE_VALEUR_PORTEFEUILLE:
-                if (previousState == null) return 0;
-                return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate());
-            case CUMULABLE_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
-                float cumulableValeurPortefeuille = r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate());
-                float liquidity = state.getLiquidity().getInstant() + state.getInput().getInstant() - state.getOutput().getInstant() + state.getDividends().getInstant() - state.getAllTaxes().getInstant() + state.getShareSold().getInstant() - state.getShareBuy().getInstant() - state.getCreditImpot().getInstant();
-                return cumulableValeurPortefeuille + liquidity;
-            case CUMULABLE_GAIN:
+                // ici c'est le mouvement de liquidité sur la journée, pour avoir les liquidités disponible du jour il faut additionner toutes les cumulable entity depuis le début
+                return state.getLiquidity().getInstant();
+            case VALEUR_PORTEFEUILLE:
+                return r.getDate2PortfolioValue().get(state.getDate());
+            case VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+                float valeurPortefeuille = r.getDate2PortfolioValue().get(state.getDate());
+                float liquidity = state.getLiquidity().getCumulative();
+                return valeurPortefeuille + liquidity;
+            case CUMULABLE_GAIN_NET:
                 if (previousState == null) return 0;
                 return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() - state.getAllTaxes().getInstant() + state.getDividends().getInstant() + state.getShareSold().getInstant();
             case CUMULABLE_SOLD:
@@ -136,17 +135,16 @@ public class PortfolioIndexBuilder {
     }
 
     // ezPortfolio operation contains all operations in Euro
-    private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> brokersFilter, Set<String> accountTypeFilter){
+    private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
         PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, sharePrices);
 
-        return acc.process(getFilteredOperationRowsAndSort(operations, brokersFilter, accountTypeFilter));
+        return acc.process(getFilteredOperationRowsAndSort(operations.stream().filter(op -> op.getValueDate(MesOperations.DATE_COL) != null), excludeBrokers, excludeAccountType));
     }
 
-    public static Stream<Row> getFilteredOperationRowsAndSort(List<Row> operations, Set<String> brokersFilter, Set<String> accountTypeFilter) {
+    public static Stream<Row> getFilteredOperationRowsAndSort(Stream<Row> operations, Set<String> excludeBrokers, Set<String> excludeAccountType) {
         return operations
-                .stream()
-                .filter(getBrokerFilter(brokersFilter))
-                .filter(getAccountTypeFilter(accountTypeFilter))
+                .filter(getBrokerFilter(excludeBrokers))
+                .filter(getAccountTypeFilter(excludeAccountType))
                 .sorted(Comparator.comparing(op -> op.getValueDate(MesOperations.DATE_COL)));
     }
 
@@ -154,12 +152,12 @@ public class PortfolioIndexBuilder {
         return row -> row.getDate().isAfter(from) && row.getDate().isBeforeOrEquals(today);
     }
 
-    private static Predicate<Row> getAccountTypeFilter(Set<String> accountTypeFilter) {
-        return row -> accountTypeFilter.contains(row.getValueStr(MesOperations.COMPTE_TYPE_COL));
+    private static Predicate<Row> getAccountTypeFilter(Set<String> excludeAccountType) {
+        return row -> !excludeAccountType.contains(row.getValueStr(MesOperations.COMPTE_TYPE_COL));
     }
 
-    private static Predicate<Row> getBrokerFilter(Set<String> brokersFilter) {
-        return row -> brokersFilter.contains(row.getValueStr(MesOperations.COURTIER_DISPLAY_NAME_COL));
+    private static Predicate<Row> getBrokerFilter(Set<String> excludeBrokers) {
+        return row -> !excludeBrokers.contains(row.getValueStr(MesOperations.COURTIER_DISPLAY_NAME_COL));
     }
 
 

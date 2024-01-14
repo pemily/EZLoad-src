@@ -142,7 +142,7 @@ export function ChartUI(props: ChartUIProps){
             
             {(edition && !props.readOnly) && (
                 <>
-                <Box alignSelf="end" direction="row" margin="none" gap="none" pad="0">
+                <Box justify="between" direction="row" margin="none" gap="none" pad="0" >
                     <Button fill={false} size="small" icon={<Trash size='small' color="status-critical"/>} gap="none" margin="none" pad="0"
                                     label="" onClick={() =>{
                                         confirmAlert({
