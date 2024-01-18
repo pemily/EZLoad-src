@@ -307,8 +307,8 @@ public class EZActionManager {
                 List<EZDate> dateRangeForCurrency = Arrays.asList(commonDate.minusDays(7), EZDate.today());
                 CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, dateRangeForCurrency);
                 CurrencyMap local2Euro2 = getCurrencyMap(reporting, prices2.getDevise(), DeviseUtil.EUR, dateRangeForCurrency);
-                float price1InEuro = local2Euro1.getTargetPrice(todayPrice1);
-                float price2InEuro = local2Euro2.getTargetPrice(todayPrice2);
+                float price1InEuro = local2Euro1.getTargetPrice(todayPrice1, true);
+                float price2InEuro = local2Euro2.getTargetPrice(todayPrice2, true);
 
                 float diff = Math.abs(price1InEuro - price2InEuro);
                 float percentOfDiff = diff * 100.f / price1InEuro;

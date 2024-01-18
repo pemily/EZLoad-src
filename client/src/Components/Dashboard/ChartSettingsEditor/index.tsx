@@ -119,8 +119,11 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans", "20 ans"]}
                                         description=""
                                         onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, false, () => {})}/>
-
-
+{
+/*
+Je désactive car je ne sais pas si j'active la devise USD:
+1/ est ce que le cours de l'action doit etre montré avec le montant * le cours de la devise du jour? 
+2/ est ce que les achat du passé doivent etre convertis imméditatement avec le cours de la devise d'aujourd'hui ou du passé? 
                         <ComboField id="devise"
                                             label="Devise du Graphique"
                                             value={props.chartSettings.targetDevise ? props.chartSettings.targetDevise : "EUR"}
@@ -129,8 +132,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                             values={[ "EUR", "USD", "AUD", "CAD", "CHF"]}
                                             description=""
                                             onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue}, false, () => {})}/>
-                        
-
+ 
+*/}
                         <ComboMultipleWithCheckbox id="accountType"
                                             label="Exclure le type de compte (Béta)"
                                             selectedCodeValues={props.chartSettings.excludeAccountTypes ? props.chartSettings.excludeAccountTypes : accountTypes}                            

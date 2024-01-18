@@ -154,6 +154,7 @@ public class DashboardManager {
                 default:
                     throw new IllegalStateException("Unknown selected value: " + chartSettings.getSelectedStartDateSelection());
             }
+            int startDateYear = startDate.getYear();
             startDate = new EZDate(startDate.getYear(), 1, 1); // je démarre toujours au 1er janvier
 
             OptionalInt periodInt = chartSettings.getIndexSelection().stream().mapToInt(chartIndexV2 -> {
@@ -163,7 +164,11 @@ public class DashboardManager {
                     }).min();
             ChartsTools.PERIOD_INTERVAL period = periodInt.isEmpty() ||  periodInt.getAsInt() == 1 ? ChartsTools.PERIOD_INTERVAL.DAY :  periodInt.getAsInt() == 30 ?  ChartsTools.PERIOD_INTERVAL.MONTH : ChartsTools.PERIOD_INTERVAL.YEAR;
 
-            List<EZDate> dates = ChartsTools.getDatesSample(startDate, today, period, chartSettings.getNbOfPoints());
+            int nbOfYear = today.getYear() - startDate.getYear();
+            int nbOfTotalPoint = (chartSettings.getNbOfPoints() / nbOfYear) * (nbOfYear + 1);
+            List<EZDate> dates = ChartsTools.getDatesSample(startDate.minusYears(1), today, period, nbOfTotalPoint); // -1 an pour avoir la donnée de la 1ere année, si jamais on affiche la croissance d'une valeur, sinon on n'a pas assez d'historique pour la caulculer
+            int endOfFirstYearIndex = (int) dates.stream().filter(f -> f.getYear() < startDateYear).count();
+
             EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
             CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise);
@@ -186,13 +191,25 @@ public class DashboardManager {
             List<ChartLine> allChartLines = new LinkedList<>();
             chartSettings.getIndexSelection()
                     .forEach(chartIndex -> {
-                        createCurrencyCharts(reporting, currenciesResult, perfIndexResult, allChartLines, colors, chartIndex);
-                        createShareCharts(shareIndexResult, perfIndexResult, allChartLines, colors, chartIndex);
-                        createPortfolioCharts(portfolioResult, perfIndexResult, allChartLines, colors, chartIndex);
+                        allChartLines.addAll(createCurrencyCharts(reporting, currenciesResult, perfIndexResult, colors, chartIndex));
+                        allChartLines.addAll(createShareCharts(shareIndexResult, perfIndexResult, colors, chartIndex));
+                        allChartLines.addAll(createPortfolioCharts(portfolioResult, perfIndexResult, colors, chartIndex));
                     }
             );
 
+
             Chart chart = ChartsTools.createChart(chartSettings, dates);
+            int lastIndex = chart.getLabels().size();
+            // il faut couper le début de toutes les listes pour ne prendre que les dates apres startDate
+            chart.setLabels(chart.getLabels().subList(endOfFirstYearIndex, lastIndex)); // ici on coupe les labels
+            allChartLines.forEach(l -> { // ici on coupe les valeurs
+                if (l.getValues() != null){
+                    l.setValues(l.getValues().subList(endOfFirstYearIndex, lastIndex));
+                }
+                else {
+                    l.setValuesWithLabel(l.getValuesWithLabel().subList(endOfFirstYearIndex, lastIndex));
+                }
+            });
             chart.setLines(allChartLines);
             Map<String, String> yAxisTitles = new HashMap<>();
             yAxisTitles.put("Y_AXIS_TITLE", targetDevise.getSymbol());
@@ -201,20 +218,27 @@ public class DashboardManager {
         }
     }
 
-    private void createPortfolioCharts(PortfolioIndexBuilder.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createPortfolioCharts(PortfolioIndexBuilder.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+        List<ChartLine> allChartLines = new LinkedList<>();
         ChartPortfolioIndexConfig portfolioIndexConfig = chartIndex.getPortfolioIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
         if (portfolioIndexConfig != null){
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
             Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
                                                 : perfIndexResult.getPortoflioPerfs(index, perfSettings);
+
+            ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.PORTFOLIO;
+            if (index == PortfolioIndex.CUMULABLE_DIVIDEND_YIELD_BRUT) yAxis = ChartLine.Y_AxisSetting.PERCENT;
+
             allChartLines.add(createChartLine(prices, chartIndex.getId(), chartIndex.getLabel(),
-                                        computeYAxis(perfSettings, ChartLine.Y_AxisSetting.PORTFOLIO),
+                                        computeYAxis(perfSettings, yAxis),
                                         colors.nextColorCode(), getGraphStyle(chartIndex)));
         }
+        return allChartLines;
     }
 
-    private void createShareCharts(ShareIndexBuilder.Result shareIndexResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createShareCharts(ShareIndexBuilder.Result shareIndexResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+        List<ChartLine> allChartLines = new LinkedList<>();
         ChartShareIndexConfig shareIndexConfig = chartIndex.getShareIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
         if (shareIndexConfig != null){
@@ -228,16 +252,21 @@ public class DashboardManager {
                         .forEach(share -> {
                             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.SHARE;
                             if (index == ShareIndex.SHARE_COUNT) yAxis = ChartLine.Y_AxisSetting.NB;
-                            else if (index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD) yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                            else if (index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD
+                                    || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT
+                                    || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET)
+                                    yAxis = ChartLine.Y_AxisSetting.PERCENT;
                             allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getId(), share.getEzName(),
                                     computeYAxis(perfSettings, yAxis),
                                     color, getGraphStyle(chartIndex)));
                         });
             }
         }
+        return allChartLines;
     }
 
-    private void createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, PerfIndexBuilder.Result perfIndexResult, List<ChartLine> allChartLines, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+        List<ChartLine> allChartLines = new LinkedList<>();
         CurrencyIndexConfig currencyIndexConfig = chartIndex.getCurrencyIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
         if (currencyIndexConfig != null){
@@ -249,6 +278,7 @@ public class DashboardManager {
                                                         colors.nextColorCode(), getGraphStyle(chartIndex)));
             });
         }
+        return allChartLines;
     }
 
 

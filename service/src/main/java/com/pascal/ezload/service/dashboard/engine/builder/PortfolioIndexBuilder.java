@@ -25,6 +25,7 @@ import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.DeviseUtil;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -36,6 +37,7 @@ public class PortfolioIndexBuilder {
     private final List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
     private final CurrenciesIndexBuilder.Result currencies;
     private final SharePriceBuilder.Result sharePrices;
+    private final static EZDevise ezPortfolioDevise = DeviseUtil.EUR; // EZPortfolio sur google drive est en euro
 
     public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder.Result currencies, SharePriceBuilder.Result sharePrices){
         this.operations = operations;
@@ -57,17 +59,18 @@ public class PortfolioIndexBuilder {
 
 
     private void buildPricesFor(Reporting reporting, Set<String> excludeBrokers, Set<String> excludeAccountType, List<ChartPortfolioIndexConfig> chartIndexesConfig, Result r){
-        List<PortfolioStateAtDate> states = buildPortfolioValuesInEuro(r.dates, excludeBrokers, excludeAccountType);
+        List<PortfolioStateAtDate> states = buildPortfolioValuesInTargetDevise(reporting, r.dates, excludeBrokers, excludeAccountType);
 
         states.forEach(state -> {
-                    r.date2share2ShareNb.put(state.getDate(), state.getShareNb());
-                    r.date2share2BuyAmount.put(state.getDate(), state.getShareBuyDetails());
-                    r.date2share2SoldAmount.put(state.getDate(), state.getShareSoldDetails());
-                    r.date2share2PRNet.put(state.getDate(), state.getSharePRNet());
-                    r.date2share2PRUNet.put(state.getDate(), state.getSharePRUNet());
-                    r.date2share2PRNetDividend.put(state.getDate(), state.getSharePRNetDividend());
-                    r.date2share2PRUNetDividend.put(state.getDate(), state.getSharePRUNetDividend());
-                    r.date2portfolioValue.put(state.getDate(), state.getShareNb()
+                    EZDate date = state.getDate();
+                    r.date2share2ShareNb.put(date, state.getShareNb());
+                    r.date2share2BuyAmount.put(date, state.getShareBuyDetails());
+                    r.date2share2SoldAmount.put(date, state.getShareSoldDetails());
+                    r.date2share2PRBrut.put(date, state.getSharePRBrut());
+                    r.date2share2PRUBrut.put(date, state.getSharePRUBrut());
+                    r.date2share2PRNet.put(date, state.getSharePRNet());
+                    r.date2share2PRUNet.put(date, state.getSharePRUNet());
+                    r.date2portfolioValue.put(date, state.getShareNb()
                                                                 .entrySet()
                                                                 .stream()
                                                                 .map(e -> {
@@ -82,7 +85,7 @@ public class PortfolioIndexBuilder {
 
                     Map<EZShareEQ, Float> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
                     state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, 0f) - value)); // soustraie les ventes
-                    r.date2share2BuyOrSoldAmount.put(state.getDate(), share2BuyOrSold);
+                    r.date2share2BuyOrSoldAmount.put(date, share2BuyOrSold); // Pas de conversion vers target devise car getShareBuyDetails & getShareSoldDetails sont deja convertis
         });
 
         chartIndexesConfig
@@ -90,19 +93,20 @@ public class PortfolioIndexBuilder {
                         createPricesFor(reporting, chartIndexConfig.getPortfolioIndex(), states, r)));
     }
 
+
     private Prices createPricesFor(Reporting reporting, PortfolioIndex portfolioIndex, List<PortfolioStateAtDate> states, Result r) {
         Prices prices = new Prices();
         prices.setDevise(currencies.getTargetDevise());
         prices.setLabel(portfolioIndex.name());
         PortfolioStateAtDate previousState = null;
         for (PortfolioStateAtDate state : states){
-            prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(reporting, portfolioIndex, previousState, state, r)));
+            prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(portfolioIndex, previousState, state, r)));
             previousState = state;
         }
-        return currencies.convertPricesToTargetDevise(reporting, prices);
+        return prices;
     }
 
-    private float getTargetPrice(Reporting reporting, PortfolioIndex portfolioIndex, PortfolioStateAtDate previousState, PortfolioStateAtDate state, Result r) {
+    private float getTargetPrice(PortfolioIndex portfolioIndex, PortfolioStateAtDate previousState, PortfolioStateAtDate state, Result r) {
         switch (portfolioIndex){
             case CUMULABLE_PORTFOLIO_DIVIDENDES:
                 return state.getDividends().getInstant();
@@ -119,10 +123,11 @@ public class PortfolioIndexBuilder {
                 return state.getLiquidity().getInstant();
             case VALEUR_PORTEFEUILLE:
                 return r.getDate2PortfolioValue().get(state.getDate());
-            case VALEUR_PORTEFEUILLE_WITH_LIQUIDITY:
+            case VALEUR_PORTEFEUILLE_WITH_LIQUIDITY: {
                 float valeurPortefeuille = r.getDate2PortfolioValue().get(state.getDate());
                 float liquidity = state.getLiquidity().getCumulative();
                 return valeurPortefeuille + liquidity;
+            }
             case CUMULABLE_GAIN_NET:
                 if (previousState == null) return 0;
                 return r.getDate2PortfolioValue().get(state.getDate()) - r.getDate2PortfolioValue().get(previousState.getDate()) - state.getShareBuy().getInstant() - state.getAllTaxes().getInstant() + state.getDividends().getInstant() + state.getShareSold().getInstant();
@@ -130,22 +135,36 @@ public class PortfolioIndexBuilder {
                 return (float) state.getShareSoldDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
             case CUMULABLE_BUY:
                 return (float) state.getShareBuyDetails().values().stream().mapToDouble(aFloat -> aFloat == null ? 0 : aFloat).sum();
+            case CUMULABLE_DIVIDEND_YIELD_BRUT: {
+                float valeurPortefeuille = r.getDate2PortfolioValue().get(state.getDate());
+                valeurPortefeuille += state.getLiquidity().getCumulative();
+                return valeurPortefeuille > 0 ?  state.getDividends().getInstant() * 100 / valeurPortefeuille : 0;
+            }
+
         }
         throw new IllegalStateException("Missing case: "+ portfolioIndex);
     }
 
-    // ezPortfolio operation contains all operations in Euro
-    private List<PortfolioStateAtDate> buildPortfolioValuesInEuro(List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
+    // ezPortfolio operation contains all operations in target Devise
+    private List<PortfolioStateAtDate> buildPortfolioValuesInTargetDevise(Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
         PortfolioStateAccumulator acc = new PortfolioStateAccumulator(dates, sharePrices);
 
-        return acc.process(getFilteredOperationRowsAndSort(operations.stream().filter(op -> op.getValueDate(MesOperations.DATE_COL) != null), excludeBrokers, excludeAccountType));
+        return acc.process(getFilteredOperationRowsAndSortInTargetDevise(reporting, operations.stream().filter(op -> op.getValueDate(MesOperations.DATE_COL) != null), excludeBrokers, excludeAccountType));
     }
 
-    public static Stream<Row> getFilteredOperationRowsAndSort(Stream<Row> operations, Set<String> excludeBrokers, Set<String> excludeAccountType) {
+    public Stream<Row> getFilteredOperationRowsAndSortInTargetDevise(Reporting reporting, Stream<Row> operations, Set<String> excludeBrokers, Set<String> excludeAccountType) {
         return operations
                 .filter(getBrokerFilter(excludeBrokers))
                 .filter(getAccountTypeFilter(excludeAccountType))
-                .sorted(Comparator.comparing(op -> op.getValueDate(MesOperations.DATE_COL)));
+                .sorted(Comparator.comparing(op -> op.getValueDate(MesOperations.DATE_COL)))
+                .map(op -> {
+                    Row r = op.createDeepCopy();
+                    EZDate date = r.getValueDate(MesOperations.DATE_COL);
+                    Float amount = r.getValueFloat(MesOperations.AMOUNT_COL);
+                    r.setValue(MesOperations.AMOUNT_COL, ""+currencies.convertPriceToTargetDevise(reporting, ezPortfolioDevise, date, amount));
+                    return r;
+                });
+
     }
 
     private static Predicate<PortfolioStateAtDate> getDateFilter(EZDate from, EZDate today) {
@@ -170,10 +189,10 @@ public class PortfolioIndexBuilder {
         private final Map<EZDate, Map<EZShareEQ, Float>> date2share2SoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShareEQ, Float>> date2share2BuyOrSoldAmount = new HashMap<>();
         private final Map<EZDate, Map<EZShareEQ, Float>> date2share2BuyAmount = new HashMap<>();
-        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRNet = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'actions totales) (permet de calculer le PRU)
-        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUNet = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
-        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRNetDividend = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'actions totales)
-        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUNetDividend = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRBrut = new HashMap<>(); // Prix de revient sur la valeur (pour le nombre d'actions totales) (permet de calculer le PRU)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUBrut = new HashMap<>(); // Prix de revient unitaire sur la valeur (pour une action)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRNet = new HashMap<>(); // Prix de revient sur la valeur en incluant les dividendes (pour le nombre d'actions totales)
+        private final Map<EZDate, Map<EZShareEQ, Float>> date2share2PRUNet = new HashMap<>(); // Prix de revient unitaire sur la valeur en incluant les dividendes (pour une action)
         private final Map<EZDate, Float> date2portfolioValue = new HashMap<>(); // le montant du portefeuille a cette date (le prix de l'action * le nb d'action)
 
         public List<EZDate> getDates() {
@@ -197,11 +216,11 @@ public class PortfolioIndexBuilder {
         public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2BuyOrSoldAmount() {
             return date2share2BuyOrSoldAmount;
         }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRBrut() { return date2share2PRBrut; }
+        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRUBrut() { return date2share2PRUBrut; }
+
         public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRNet() { return date2share2PRNet; }
         public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRUNet() { return date2share2PRUNet; }
-
-        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRNetDividend() { return date2share2PRNetDividend; }
-        public Map<EZDate, Map<EZShareEQ, Float>> getDate2share2PRUNetDividend() { return date2share2PRUNetDividend; }
     }
 
 

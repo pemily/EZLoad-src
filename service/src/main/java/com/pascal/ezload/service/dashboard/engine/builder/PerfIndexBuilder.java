@@ -168,9 +168,15 @@ public class PerfIndexBuilder {
                     case VARIATION_EN_PERCENT:
                         if (previousValue != null && previousValue == 0){
                             if (priceAtDate.getPrice() == 0) newPrice = 0f;
-                            else newPrice = 100f;
+                            else newPrice = null; // pas de données précédente, plutot que de mettre 100% d'augmentation qui ne veut rien dire, je ne met rien ca veut dire que la periode n'est pas adapté pour la comparaison
                         }
-                        else newPrice = isFirstValue ? 0 : (priceAtDate.getPrice() * 100f / previousValue) -100f;
+                        else {
+                            if (isFirstValue) newPrice = null;
+                            else {
+                                if (priceAtDate.getPrice() == 0) newPrice = null; // on a surement plus de donnée
+                                else newPrice = (priceAtDate.getPrice() * 100f / previousValue) - 100f;
+                            }
+                        }
                         break;
                     default:
                         throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());

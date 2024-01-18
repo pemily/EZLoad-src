@@ -157,8 +157,11 @@ export function LineChart(props: LineChartProps){
                             if (valueWithLabel.indexOf(":") === -1)
                                 return context.dataset.label+': '+valueWithLabel;
                             return context.dataset.label+' '+valueWithLabel;
-                        }
-                        return context.dataset.label+': '+context.raw;
+                        }                        
+                        // ajout de l'unité automatiquement                        
+                        return context.dataset.label+': '+context.formattedValue
+                                                    +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 
+                                                            context.dataset.yAxisID === 'NB' ? '' : ' '+props.chart.axisId2titleY?.Y_AXIS_TITLE);
                     }
                 }
             },           

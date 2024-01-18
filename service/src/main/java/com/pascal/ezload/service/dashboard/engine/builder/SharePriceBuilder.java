@@ -51,7 +51,7 @@ public class SharePriceBuilder {
                 try {
                     Prices prices = actionManager.getPrices(reporting, ezShare, dates);
                     if (prices != null)
-                        return currencies.convertPricesToTargetDevise(reporting, prices);
+                        return currencies.convertPricesToTargetDevise(reporting, prices, true);
                     reporting.error("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
                     throw new RuntimeException("Les cours de l'action "+share.getEzName()+" "+share.getGoogleCode()+" n'ont pas été trouvé");
                 } catch (Exception e) {
@@ -86,7 +86,7 @@ public class SharePriceBuilder {
                                 prices.addPrice(currentDate, new PriceAtDate(currentDate, value));
                                 previousDate = currentDate;
                             }
-                            return currencies.convertPricesToTargetDevise(reporting, prices);
+                            return currencies.convertPricesToTargetDevise(reporting, prices, true);
                         }
                     }
                     // Pas de dividendes
@@ -110,6 +110,7 @@ public class SharePriceBuilder {
                 Prices dividends = getDividends(reporting, ezShare);
                 if (dividends != null) {
                     Prices dividendYields = new Prices();
+                    dividendYields.setLabel(dividends.getLabel());
                     dividendYields.setDevise(dividends.getDevise());
                     for (EZDate currentDate : dates) {
                         Float dividend = dividends.getPriceAt(currentDate).getPrice();
@@ -130,5 +131,6 @@ public class SharePriceBuilder {
                 return null;
             });
         }
+
     }
 }

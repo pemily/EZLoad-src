@@ -10,6 +10,7 @@ public enum PortfolioIndex {
     CUMULABLE_BUY(true), // Les achats dans le portefeuille
     CUMULABLE_SOLD(true), // Les ventes dans le portefeuille
     CUMULABLE_GAIN_NET(true), // Les gains par rapport à la veille
+    CUMULABLE_DIVIDEND_YIELD_BRUT(true), // le rendement du portefeuille en %
     // TODO ADD CUMULABLE_TAXES
 
     // COULD BE DELETED (if I have the  custom computed indexes)
@@ -26,5 +27,4 @@ public enum PortfolioIndex {
     public boolean isCumulable() {
         return cumulable;
     }
-
 }

@@ -43,12 +43,17 @@ public class CurrenciesIndexBuilder {
             return targetDevise;
         }
 
-        public Prices convertPricesToTargetDevise(Reporting reporting, Prices p) {
+        public Prices convertPricesToTargetDevise(Reporting reporting, Prices p, boolean useLastFactor) {
             if (p != null && p.getDevise() != null) {
                 CurrencyMap currencyMap = getCurrencyMap(reporting, p.getDevise());
-                return currencyMap.convertPricesToTarget(p);
+                return currencyMap.convertPricesToTarget(p, useLastFactor);
             }
             return p;
+        }
+
+        public Float convertPriceToTargetDevise(Reporting reporting, EZDevise fromDevise, EZDate date, Float value){
+            CurrencyMap currencyMap = getCurrencyMap(reporting, fromDevise);
+            return currencyMap.convertPriceToTarget(date, value);
         }
 
         public Prices getDevisePrices(Reporting reporting, EZDevise from) {
