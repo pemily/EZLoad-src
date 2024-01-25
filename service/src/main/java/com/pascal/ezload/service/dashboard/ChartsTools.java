@@ -19,7 +19,6 @@ package com.pascal.ezload.service.dashboard;
 
 import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
 
 import java.util.*;
@@ -85,17 +84,25 @@ public class ChartsTools {
     }
 
     public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
-        return createChartLine(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
+        return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
-                                                                                        .map(PriceAtDate::getPrice).collect(Collectors.toList()),
+                                                                                        .map(pd -> {
+                                                                                            if (pd.getPrice() == null || (removeZeroValues && pd.getPrice() == 0)) return null;
+                                                                                            float roundValue = (float) Math.round(pd.getPrice()*100.0f) / 100.0f;
+                                                                                            ChartLine.RichValue v = new ChartLine.RichValue();
+                                                                                            v.setEstimated(pd.isEstimated());
+                                                                                            v.setValue(pd.getPrice());
+                                                                                            v.setLabel("["+pd.getDate().toEzPortoflioDate()+"] "+prices.getLabel()+": "+roundValue+prices.getDevise().getSymbol()); // le label de la valeur
+                                                                                            return v;
+                                                                                        }).collect(Collectors.toList()),
                                 removeZeroValues);
     }
 
-    public static ChartLine createChartLineWithLabels(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values, boolean removeZeroValues){
+    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values, boolean removeZeroValues){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValuesWithLabel(values.stream().map(vl -> vl.getValue() == 0 && removeZeroValues ? null : vl).collect(Collectors.toList()));
+        chartLine.setRichValues(values);
         chartLine.setYAxisSetting(YAxisSetting);
         return chartLine;
     }

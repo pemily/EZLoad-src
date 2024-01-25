@@ -100,7 +100,7 @@ public class PortfolioIndexBuilder {
         prices.setLabel(portfolioIndex.name());
         PortfolioStateAtDate previousState = null;
         for (PortfolioStateAtDate state : states){
-            prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(portfolioIndex, previousState, state, r)));
+            prices.addPrice(state.getDate(), new PriceAtDate(state.getDate(), getTargetPrice(portfolioIndex, previousState, state, r), false));
             previousState = state;
         }
         return prices;

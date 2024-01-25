@@ -33,7 +33,7 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest1() {
         List<PriceAtDate> pricesAtDates = List.of(
-                new PriceAtDate(new EZDate(2000, 1, 10), 1)
+                new PriceAtDate(new EZDate(2000, 1, 10), 1, false)
         );
         List<EZDate> dates = List.of(
                 new EZDate(2002, 1, 10)
@@ -49,7 +49,7 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest2() {
         List<PriceAtDate> pricesAtDates = List.of(
-                new PriceAtDate(new EZDate(2000, 1, 10), 1)
+                new PriceAtDate(new EZDate(2000, 1, 10), 1, false)
         );
         List<EZDate> dates = List.of(
                 new EZDate(1999, 1, 10)
@@ -65,7 +65,7 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesVerySimpleTest3() {
         List<PriceAtDate> pricesAtDates = List.of(
-                new PriceAtDate(new EZDate(2000, 1, 10), 1)
+                new PriceAtDate(new EZDate(2000, 1, 10), 1, false)
         );
         List<EZDate> dates = List.of(
                 new EZDate(2000, 1, 10)
@@ -82,9 +82,9 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest1() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2000,1,11), 1),
-                new PriceAtDate(new EZDate(2000,1,12), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2000,1,11), 1, false),
+                new PriceAtDate(new EZDate(2000,1,12), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2002,1,10),
@@ -101,9 +101,9 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest2() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2001,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,11), 1),
-                new PriceAtDate(new EZDate(2001,1,12), 1)
+                new PriceAtDate(new EZDate(2001,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,11), 1, false),
+                new PriceAtDate(new EZDate(2001,1,12), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,10),
@@ -122,9 +122,9 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest3() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,11), 1),
-                new PriceAtDate(new EZDate(2001,1,12), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,11), 1, false),
+                new PriceAtDate(new EZDate(2001,1,12), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,11),
@@ -144,8 +144,8 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest4() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,10), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,10), 1, false)
         );
         List<EZDate> dates = List.of(
                 new EZDate(2000, 1, 12)
@@ -161,7 +161,7 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest5() {
         List<PriceAtDate> pricesAtDates = List.of(
-                new PriceAtDate(new EZDate(2000, 1, 10), 1)
+                new PriceAtDate(new EZDate(2000, 1, 10), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,12),
@@ -178,8 +178,8 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesSimpleTest6() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,10), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,10), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,12),
@@ -197,16 +197,16 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesTest1() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,10), 1),
-                new PriceAtDate(new EZDate(2002,1,10), 1),
-                new PriceAtDate(new EZDate(2003,1,10), 1),
-                new PriceAtDate(new EZDate(2004,1,10), 1),
-                new PriceAtDate(new EZDate(2005,1,10), 1),
-                new PriceAtDate(new EZDate(2006,1,10), 1),
-                new PriceAtDate(new EZDate(2007,1,10), 1),
-                new PriceAtDate(new EZDate(2008,1,10), 1),
-                new PriceAtDate(new EZDate(2009,1,10), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,10), 1, false),
+                new PriceAtDate(new EZDate(2002,1,10), 1, false),
+                new PriceAtDate(new EZDate(2003,1,10), 1, false),
+                new PriceAtDate(new EZDate(2004,1,10), 1, false),
+                new PriceAtDate(new EZDate(2005,1,10), 1, false),
+                new PriceAtDate(new EZDate(2006,1,10), 1, false),
+                new PriceAtDate(new EZDate(2007,1,10), 1, false),
+                new PriceAtDate(new EZDate(2008,1,10), 1, false),
+                new PriceAtDate(new EZDate(2009,1,10), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,10),
@@ -232,16 +232,16 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesTest2() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2001,1,10), 1),
-                new PriceAtDate(new EZDate(2002,1,10), 1),
-                new PriceAtDate(new EZDate(2003,1,10), 1),
-                new PriceAtDate(new EZDate(2004,1,10), 1),
-                new PriceAtDate(new EZDate(2005,1,10), 1),
-                new PriceAtDate(new EZDate(2006,1,10), 1),
-                new PriceAtDate(new EZDate(2007,1,10), 1),
-                new PriceAtDate(new EZDate(2008,1,10), 1),
-                new PriceAtDate(new EZDate(2009,1,10), 1)
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2001,1,10), 1, false),
+                new PriceAtDate(new EZDate(2002,1,10), 1, false),
+                new PriceAtDate(new EZDate(2003,1,10), 1, false),
+                new PriceAtDate(new EZDate(2004,1,10), 1, false),
+                new PriceAtDate(new EZDate(2005,1,10), 1, false),
+                new PriceAtDate(new EZDate(2006,1,10), 1, false),
+                new PriceAtDate(new EZDate(2007,1,10), 1, false),
+                new PriceAtDate(new EZDate(2008,1,10), 1, false),
+                new PriceAtDate(new EZDate(2009,1,10), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,12),
@@ -267,16 +267,16 @@ public class PricesToolsTest {
     @Test
     public void fillPricesForAListOfDatesTest3() {
         List<PriceAtDate> pricesAtDates = Arrays.asList(
-                new PriceAtDate(new EZDate(2000,1,1), 1),
-                new PriceAtDate(new EZDate(2000,1,5), 1),
-                new PriceAtDate(new EZDate(2000,1,10), 1),
-                new PriceAtDate(new EZDate(2000,1,15), 1),
-                new PriceAtDate(new EZDate(2000,1,20), 1),
-                new PriceAtDate(new EZDate(2000,1,25), 1),
-                new PriceAtDate(new EZDate(2000,1,30), 1),
-                new PriceAtDate(new EZDate(2000,2,5), 1),
-                new PriceAtDate(new EZDate(2000,2,10), 1),
-                new PriceAtDate(new EZDate(2000,2,15), 1)
+                new PriceAtDate(new EZDate(2000,1,1), 1, false),
+                new PriceAtDate(new EZDate(2000,1,5), 1, false),
+                new PriceAtDate(new EZDate(2000,1,10), 1, false),
+                new PriceAtDate(new EZDate(2000,1,15), 1, false),
+                new PriceAtDate(new EZDate(2000,1,20), 1, false),
+                new PriceAtDate(new EZDate(2000,1,25), 1, false),
+                new PriceAtDate(new EZDate(2000,1,30), 1, false),
+                new PriceAtDate(new EZDate(2000,2,5), 1, false),
+                new PriceAtDate(new EZDate(2000,2,10), 1, false),
+                new PriceAtDate(new EZDate(2000,2,15), 1, false)
         );
         List<EZDate> dates = Arrays.asList(
                 new EZDate(2000,1,2),

@@ -43,7 +43,7 @@ public class Prices {
     // la date et le price.getDate() peuvent etre different (dans les graphes, si je demande le prix un dimanche, j'aurais la date du vendredi)
     public void addPrice(EZDate date, PriceAtDate price){
         if (price.getDate() == null) return;
-        pricesList.add(price.getPrice() == null ? new PriceAtDate(date) : new PriceAtDate(date, price.getPrice()));
+        pricesList.add(price.getPrice() == null ? new PriceAtDate(date, price.isEstimated()) : new PriceAtDate(date, price.getPrice(), price.isEstimated()));
         pricesMap.put(date, price);
     }
 

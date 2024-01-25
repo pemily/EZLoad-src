@@ -196,7 +196,7 @@ public class YahooTools extends ExternalSiteTools{
                         return rows.stream().map(r -> {
                                     float value = NumberUtils.str2Float(r.get(1));
                                     EZDate date = EZDate.parseYYYMMDDDate(r.get(0), '-'); // date de detachement
-                                    return new Dividend(value, date, date, date, date, date, null, devise);
+                                    return new Dividend(value, date, date, date, date, date, null, devise, false);
                                 })
                                 .sorted(Comparator.comparing(Dividend::getDate))
                                 .collect(Collectors.toList());

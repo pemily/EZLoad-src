@@ -56,7 +56,7 @@ public class GoogleTools {
                         EZDate today = EZDate.today();
                         prices.setLabel(ezShare.getEzName()+" (Prix du jour uniquement)");
                         prices.setDevise(devise);
-                        prices.addPrice(today, new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(deviseStr.length()))));
+                        prices.addPrice(today, new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(deviseStr.length())), false));
                         return prices;
                     }
                 }

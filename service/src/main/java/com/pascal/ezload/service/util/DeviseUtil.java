@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DeviseUtil {
+    public static final EZDevise SPECIAL_PERCENT = new EZDevise("PERCENT", "%");
     public static final EZDevise AUD = new EZDevise("AUD", "A$");
     public static final EZDevise CAD = new EZDevise("CAD", "C$");
     public static final EZDevise CHF = new EZDevise("CHF", "CHF");

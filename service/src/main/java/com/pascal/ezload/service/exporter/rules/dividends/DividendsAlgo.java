@@ -144,7 +144,7 @@ public abstract class DividendsAlgo {
                 // prends le 1er + everyNMonth mois
                 nextDividendsDate = new EZDate(previousDate.getYear(), Math.min(previousDate.getMonth() + everyNMonth, 12), previousDate.getDay());
             }
-            Dividend nextDividend = new Dividend(lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, Dividend.EnumFrequency.SEMESTRIEL, lastDividend.getDevise());
+            Dividend nextDividend = new Dividend(lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, Dividend.EnumFrequency.SEMESTRIEL, lastDividend.getDevise(), true);
             dividends.add(nextDividend);
         }
 
@@ -170,7 +170,7 @@ public abstract class DividendsAlgo {
 
     protected Function<Dividend, EZDate> getDividendYear(MainSettings.EnumAlgoDateSelector dateSelector) {
         if (dateSelector == MainSettings.EnumAlgoDateSelector.DATE_DE_DETACHEMENT)
-            return Dividend::getDetachementDate;
+            return Dividend::getDetachmentDate;
 
         return Dividend::getPayDate;
     }

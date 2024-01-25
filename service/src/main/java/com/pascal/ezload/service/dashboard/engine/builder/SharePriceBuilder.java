@@ -31,18 +31,19 @@ public class SharePriceBuilder {
         private final List<EZDate> dates;
         private final Map<EZShareEQ, Prices> shares2TargetPrices = new HashMap<>();
         private final Map<EZShareEQ, Prices> share2DividendsTargetPrices = new HashMap<>();
-        private final Map<EZShareEQ, Prices> share2dividendYieldsTargetPrices = new HashMap<>();
+        private final Map<EZShareEQ, Prices> share2annualDividendYieldsTargetPrices = new HashMap<>();
+        private final Map<String, Float> shareYear2annualDividend = new HashMap<>();
 
-        Result(List<EZDate> dates){
+        Result(List<EZDate> dates) {
             this.dates = dates;
         }
 
-        public EZShareEQ getShareFromName(String name){
+        public EZShareEQ getShareFromName(String name) {
             return actionManager.getAllEZShares().stream()
                     .filter(s -> s.getEzName().equalsIgnoreCase(name)) // TODO utiliser levenshtein ou Jaro Winkler?
                     .findFirst()
                     .map(EZShareEQ::new)
-                    .orElseThrow(() -> new IllegalStateException("L'action "+name+" n'a pas été trouvé dans la liste d'actions. Vous devez la rajouter"));
+                    .orElseThrow(() -> new IllegalStateException("L'action " + name + " n'a pas été trouvé dans la liste d'actions. Vous devez la rajouter"));
         }
 
 
@@ -52,8 +53,8 @@ public class SharePriceBuilder {
                     Prices prices = actionManager.getPrices(reporting, ezShare, dates);
                     if (prices != null)
                         return currencies.convertPricesToTargetDevise(reporting, prices, true);
-                    reporting.error("Les cours de l'action "+share.getEzName()+" n'ont pas été trouvé");
-                    throw new RuntimeException("Les cours de l'action "+share.getEzName()+" "+share.getGoogleCode()+" n'ont pas été trouvé");
+                    reporting.error("Les cours de l'action " + share.getEzName() + " n'ont pas été trouvé");
+                    throw new RuntimeException("Les cours de l'action " + share.getEzName() + " " + share.getGoogleCode() + " n'ont pas été trouvé");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -61,29 +62,27 @@ public class SharePriceBuilder {
         }
 
 
-        public Prices getDividends(Reporting reporting, EZShareEQ share){
+        public Prices getDividends(Reporting reporting, EZShareEQ share) {
             return share2DividendsTargetPrices.computeIfAbsent(share, ezShare -> {
                 try {
                     List<Dividend> dividends = actionManager.searchDividends(reporting, ezShare, dates.get(0), dates.get(dates.size() - 1));
                     Prices prices = new Prices();
-                    prices.setLabel("Dividendes of "+ezShare.getEzName());
+                    prices.setLabel("Dividendes of " + ezShare.getEzName());
                     if (dividends != null) {
                         Optional<EZDevise> devise = dividends.stream().map(Dividend::getDevise).findFirst();
                         if (devise.isPresent()) {
                             prices.setDevise(devise.get());
                             EZDate previousDate = dates.get(0);
                             for (EZDate currentDate : dates) {
-                                EZDate finalPreviousDate = previousDate;
-                                float value = 0f;
-                                float totalDividendInOriginalDevise = (float) dividends.stream()
-                                        .filter(div -> currentDate.isPeriod() ? currentDate.contains(div.getDetachementDate()) : div.getDetachementDate().isAfter(finalPreviousDate) && div.getDetachementDate().isBeforeOrEquals(currentDate))
-                                        .mapToDouble(Dividend::getAmount)
-                                        .sum();
+                                PriceAtDate dividendFound = extractDividendForCurrentDate(dividends, previousDate, currentDate);
 
-                                if (totalDividendInOriginalDevise > 0) {
-                                   value = totalDividendInOriginalDevise;
+                                EZDate date = dividendFound != null ? dividendFound.getDate() : currentDate;
+
+                                float value = 0f;
+                                if (dividendFound != null && dividendFound.getPrice() > 0) {
+                                    value = dividendFound.getPrice();
                                 }
-                                prices.addPrice(currentDate, new PriceAtDate(currentDate, value));
+                                prices.addPrice(currentDate, new PriceAtDate(date, value, dividendFound != null && dividendFound.isEstimated()));
                                 previousDate = currentDate;
                             }
                             return currencies.convertPricesToTargetDevise(reporting, prices, true);
@@ -92,7 +91,7 @@ public class SharePriceBuilder {
                     // Pas de dividendes
                     prices.setDevise(DeviseUtil.EUR);
                     for (EZDate currentDate : dates) {
-                        prices.addPrice(currentDate, new PriceAtDate(currentDate));
+                        prices.addPrice(currentDate, new PriceAtDate(currentDate, false));
                     }
                     return prices;
                 } catch (Exception e) {
@@ -102,35 +101,95 @@ public class SharePriceBuilder {
             });
         }
 
+        private PriceAtDate extractDividendForCurrentDate(List<Dividend> dividends, EZDate previousDate, EZDate currentDate) {
+            // exemple 1:
+            //          Si dividende est a la date du 28/01/2024
+            //          et que previousDate == 15/01/2024 et currentDate == 01/02/2024
+            // il faut que le dividende soit sur la previousDate pour ne pas changer le mois en cours. ca a des impactes sur le dividende au mois ou annuel sinon
+
+            // exemple 2:
+            //          Si dividende est a la date du 01/04/2024
+            //          et que previousDate == 31/03/2024 et currentDate == 20/04/2024
+            // il faut que le dividende soit sur la currentDate
+
+            float totalDividendInOriginalDevise = 0f;
+            PriceAtDate dividendFound = null;
+            boolean estimated = false;
+            for (Dividend div : dividends){
+                estimated |= div.isEstimated();
+                if (currentDate.isPeriod()) {
+                    if (currentDate.contains(div.getDetachmentDate())){
+                        totalDividendInOriginalDevise += div.getAmount();
+                        dividendFound = new PriceAtDate(div.getDetachmentDate(), totalDividendInOriginalDevise, estimated);
+                        estimated = false;
+                    }
+                }
+                else if(div.getDetachmentDate().isAfter(previousDate)
+                            && div.getDetachmentDate().isBeforeOrEquals(currentDate)){
+                    totalDividendInOriginalDevise += div.getAmount();
+                    dividendFound = new PriceAtDate(div.getDetachmentDate(), totalDividendInOriginalDevise, estimated);
+                    estimated = false;
+                }
+            }
+            return dividendFound;
+        }
 
 
-        public Prices getDividendYield(Reporting reporting, EZShareEQ share){
+        public Prices getAnnualDividendYield(Reporting reporting, EZShareEQ share) {
             // Le rendement du dividend
-            return share2dividendYieldsTargetPrices.computeIfAbsent(share, ezShare -> {
+            return share2annualDividendYieldsTargetPrices.computeIfAbsent(share, ezShare -> {
                 Prices dividends = getDividends(reporting, ezShare);
                 if (dividends != null) {
-                    Prices dividendYields = new Prices();
-                    dividendYields.setLabel(dividends.getLabel());
-                    dividendYields.setDevise(dividends.getDevise());
+                    Prices annualDividendYields = new Prices();
+                    annualDividendYields.setLabel(dividends.getLabel());
+                    annualDividendYields.setDevise(DeviseUtil.SPECIAL_PERCENT);
                     for (EZDate currentDate : dates) {
-                        Float dividend = dividends.getPriceAt(currentDate).getPrice();
+                        int year = currentDate.getYear();
+                        boolean isEstimation = false;
+                        Float annualDividend = computeAnnualDividend(reporting, share, year);
+                        if (year == EZDate.today().getYear()) {
+                            Float previousAnnualDiv = computeAnnualDividend(reporting, share, year-1);
+                            if (previousAnnualDiv != null && annualDividend < previousAnnualDiv) {
+                                annualDividend = previousAnnualDiv;
+                                isEstimation = true;
+                            }
+
+                        }
 
                         float rendement = 0f;
-                        if (dividend != null && dividend > 0) {
+                        if (annualDividend != null && annualDividend > 0) {
                             Prices p = getTargetPrices(reporting, ezShare);
                             if (p != null) {
                                 float price = p.getPriceAt(currentDate).getPrice();
-                                rendement = (dividend * 100f) / price;
+                                rendement = (annualDividend * 100f) / price;
 
                             }
                         }
-                        dividendYields.addPrice(currentDate, new PriceAtDate(currentDate, rendement));
+                        annualDividendYields.addPrice(currentDate, new PriceAtDate(currentDate, rendement, isEstimation));
                     }
-                    return dividendYields;
+                    return annualDividendYields;
                 }
                 return null;
             });
         }
 
+        private Float computeAnnualDividend(Reporting reporting, EZShareEQ ezShare, int year) {
+            return shareYear2annualDividend.computeIfAbsent(ezShare.getEzName()+"_"+year, ezShareEQ -> {
+                Prices dividends = getDividends(reporting, ezShare);
+                float annualDividend = 0;
+                if (dividends == null) return null;
+
+                for (PriceAtDate p : dividends.getPrices()) {
+                    if (p.getDate().getYear() == year) {
+                        annualDividend += p.getPrice() == null ? 0 : p.getPrice();
+                    }
+                    if (p.getDate().getYear() > year)
+                        break;
+                }
+
+                return annualDividend;
+            });
+        }
     }
+
 }

@@ -70,8 +70,8 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "PRU"; break;
             case "SHARE_PRU_NET":
                 result += "PRU Net"; break;
-            case "CUMULABLE_SHARE_DIVIDEND_YIELD":
-                result += "Rendement du dividende"; break;
+            case "SHARE_ANNUAL_DIVIDEND_YIELD":
+                result += "Rendement du dividende annuel"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
                 result += "Rendement du dividende sur PRU brut"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
@@ -168,8 +168,8 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "de nombre d'action possédé"; break;
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "des dividendes à la date du détachement"; break;
-            case "CUMULABLE_SHARE_DIVIDEND_YIELD":
-                result += "du rendement du dividende à la date du détachement"; break;
+            case "SHARE_ANNUAL_DIVIDEND_YIELD":
+                result += "du rendement du dividende brut annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
             case "SHARE_PRICE":
                 result += "du cours de l'action"; break;
             case "SHARE_PRU_BRUT":
@@ -177,9 +177,9 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "SHARE_PRU_NET":
                 result += "du Prix de Revient Unitaire Net (dividendes inclus)"; break; // utilise la date de paiement
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
-                result += "du rendement du dividende basé sur votre PRU brut à la date détachement"; break;
+                result += "du rendement du dividende basé sur votre PRU brut (dividendes exclus) à la date détachement"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
-                result += "du rendement du dividende basé sur votre PRU net (dividendes incluses) à la date détachement"; break;
+                result += "du rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement"; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
@@ -237,7 +237,7 @@ function getDefaultPerfFilterForCumulableIndex(chartIndex: ChartIndex) : "CUMUL"
     if (isDefined(chartIndex.shareIndexConfig)){        
         switch(chartIndex.shareIndexConfig?.shareIndex){
             case "CUMULABLE_SHARE_DIVIDEND" :
-            case "CUMULABLE_SHARE_DIVIDEND_YIELD":
+            case "SHARE_ANNUAL_DIVIDEND_YIELD":
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
                 return "VALUE";
@@ -356,10 +356,10 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Achats",
                                 "Ventes",
                                 "Achats/Ventes",
-                                "Dividendes (Date de détachement)",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
-                                "Rendement du dividende (Date de détachement)",
+                                "Dividendes Brut (Date de détachement)",
+                                "Rendement du dividende annuel",
                                 "Rendement du dividende sur PRU Net (Date de détachement)",
                                 "Rendement du dividende sur PRU Brut (Date de détachement)"
                             ]}
@@ -369,10 +369,10 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'CUMULABLE_SHARE_BUY',
                                 'CUMULABLE_SHARE_SOLD',
                                 'CUMULABLE_SHARE_BUY_SOLD',
-                                'CUMULABLE_SHARE_DIVIDEND',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',
-                                'CUMULABLE_SHARE_DIVIDEND_YIELD',
+                                'CUMULABLE_SHARE_DIVIDEND',
+                                'SHARE_ANNUAL_DIVIDEND_YIELD',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT'
                             ]}

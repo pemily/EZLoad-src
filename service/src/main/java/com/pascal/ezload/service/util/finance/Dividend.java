@@ -23,8 +23,9 @@ import com.pascal.ezload.service.model.EZDevise;
 public class Dividend {
 
         public enum EnumFrequency { MENSUEL, TRIMESTRIEL, SEMESTRIEL, ANNUEL, EXCEPTIONEL }
+        boolean estimated;
         float amount;
-        EZDate detachementDate;
+        EZDate detachmentDate;
         EZDate declareDate;
         EZDate payDate;
         EZDate recordDate;
@@ -32,23 +33,24 @@ public class Dividend {
         EnumFrequency frequency;
         EZDevise devise;
 
-        public Dividend(float amount, EZDate detachementDate, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, EnumFrequency frequency, EZDevise devise) {
+        public Dividend(float amount, EZDate detachmentDate, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, EnumFrequency frequency, EZDevise devise, boolean estimated) {
             this.amount = amount;
-            this.detachementDate = detachementDate;
+            this.detachmentDate = detachmentDate;
             this.declareDate = declareDate;
             this.payDate = payDate;
             this.recordDate = recordDate;
             this.date = date;
             this.frequency = frequency;
             this.devise = devise;
+            this.estimated = estimated;
         }
 
         public float getAmount() {
             return amount;
         }
 
-        public EZDate getDetachementDate() {
-            return detachementDate;
+        public EZDate getDetachmentDate() {
+            return detachmentDate;
         }
 
         public EZDate getDeclareDate() {
@@ -74,5 +76,7 @@ public class Dividend {
         public EZDevise getDevise(){
             return devise;
         }
+
+        public boolean isEstimated() { return estimated; }
 
     }

@@ -21,17 +21,20 @@ public class PriceAtDate {
 
     private Float price;
     private EZDate date;
+    private boolean estimated;
 
     public PriceAtDate(){}
 
-    public PriceAtDate(EZDate date, float price){
+    public PriceAtDate(EZDate date, float price, boolean estimated){
         this.date = date;
         this.price = price;
+        this.estimated = estimated;
     }
 
-    public PriceAtDate(EZDate date){
+    public PriceAtDate(EZDate date, boolean estimated){
         this.date = date;
         this.price = null; // no value at this date
+        this.estimated = estimated;
     }
 
     public Float getPrice() {
@@ -50,7 +53,11 @@ public class PriceAtDate {
         this.date = date;
     }
 
+    public boolean isEstimated(){
+        return estimated;
+    }
+
     public String toString(){
-        return date.toString()+" price: "+price;
+        return date.toString()+(estimated ? " estimated" : "")+" price: "+price;
     }
 }

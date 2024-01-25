@@ -38,7 +38,7 @@ public class ChartLine {
     private String title;
     private String indexId;// the reference to the index Id, all chartLines with the same indexId will be grouped together
     private List<Float> values; // if null, valuesWithLabel will be used
-    private List<ValueWithLabel> valuesWithLabel;
+    private List<RichValue> richValues;
     private String colorLine; // rgba(255,99,132,1);
     private LineStyle lineStyle; // optionnel, pour configurer une autre echelle sur l'axe des Y (et pour faire la distinction entre pourcentage/devise par exemple)
     private Y_AxisSetting yAxisSetting;
@@ -62,12 +62,12 @@ public class ChartLine {
         this.values = values;
     }
 
-    public List<ValueWithLabel> getValuesWithLabel() {
-        return valuesWithLabel;
+    public List<RichValue> getRichValues() {
+        return richValues;
     }
 
-    public void setValuesWithLabel(List<ValueWithLabel> valuesWithLabel) {
-        this.valuesWithLabel = valuesWithLabel;
+    public void setRichValues(List<RichValue> valuesWithLabel) {
+        this.richValues = valuesWithLabel;
     }
 
     public String getColorLine() {
@@ -99,9 +99,10 @@ public class ChartLine {
         return title;
     }
 
-    public static class ValueWithLabel {
+    public static class RichValue {
         private String label;
         private Float value;
+        private boolean estimated;
 
         public String getLabel() {
             return label;
@@ -117,6 +118,14 @@ public class ChartLine {
 
         public void setValue(Float value) {
             this.value = value;
+        }
+
+        public boolean isEstimated() {
+            return estimated;
+        }
+
+        public void setEstimated(boolean estimated) {
+            this.estimated = estimated;
         }
     }
 }

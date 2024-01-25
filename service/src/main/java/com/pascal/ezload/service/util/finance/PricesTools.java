@@ -72,7 +72,7 @@ class PricesTools<PD>  {
             EZDate previousPriceDate = previousPrice == null ? null : getDate.apply(previousPrice);
 
             if (previousPriceDate != null && searchedDate.isBefore(previousPriceDate)){
-                pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0));
+                pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0, false));
                 setNextSearchedDate();
             }
             else{
@@ -111,7 +111,7 @@ class PricesTools<PD>  {
             pricesResult.addPrice(searchedDate, createPriceAtDate.apply(previousPrice));
         }
         else{
-            pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0));
+            pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0, false));
         }
         setNextSearchedDate();
     }

@@ -14,7 +14,7 @@ public class CumulBuilder {
         for (PriceAtDate pd : p.getPrices()) {
             float value = pd.getPrice() == null ? 0 : pd.getPrice();
             cumul = value + cumul;
-            r.addPrice(pd.getDate(), new PriceAtDate(pd.getDate(), cumul));
+            r.addPrice(pd.getDate(), new PriceAtDate(pd.getDate(), cumul, pd.isEstimated()));
         }
         return r;
     }

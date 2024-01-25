@@ -135,7 +135,14 @@ public class EZDate implements Comparable<EZDate> {
     }
 
     public String toEzPortoflioDate(){
-        if (isPeriod()) throw new IllegalStateException("cette date est une période"+day+"/"+month+"/"+year);
+        if (isPeriod()) {
+            if (isYearlyPeriod()){
+                return year+"";
+            }
+            if (isMonthlyPeriod()){
+                return leadingZero(month)+"/"+year;
+            }
+        }
         return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
     }
 
@@ -176,7 +183,7 @@ public class EZDate implements Comparable<EZDate> {
 
     // millisec since 1970/01/01
     public long toEpochSecond(){
-        return toLocalDate().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        return toLocalDate().atTime(23,59,0,0).atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public static EZDate parseFrenchDate(String date, char separator) {

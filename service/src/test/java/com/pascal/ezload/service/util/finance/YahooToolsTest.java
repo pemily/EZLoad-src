@@ -149,9 +149,9 @@ public class YahooToolsTest {
         EZDate to = EZDate.parseYYYMMDDDate("2022/09/11", '/');
         List<EZDate> dates = List.of(from, to);
         CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
-        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1), false);
+        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1, false), false);
         assertNotEquals(0, px);
-        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1), false);
+        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1, false), false);
         assertNotEquals(0, px);
     }
 
@@ -161,9 +161,9 @@ public class YahooToolsTest {
         EZDate to = EZDate.parseYYYMMDDDate("2023/01/22", '/');
         List<EZDate> dates = List.of(from, to);
         CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
-        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1), false);
+        float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1, false), false);
         assertNotEquals(0, px);
-        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1), false);
+        px = currencyMap.getTargetPrice(new PriceAtDate(to, 1, false), false);
         assertNotEquals(0, px);
     }
 

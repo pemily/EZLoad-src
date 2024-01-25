@@ -86,7 +86,8 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                             seekingAlphaDate(attributes.get("record_date")),
                                             seekingAlphaDate(attributes.get("date")),
                                             frequency,
-                                            devise);
+                                            devise,
+                                            false);
                                 })
                                 .collect(Collectors.toList());
                     });
@@ -169,7 +170,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     private static PriceAtDate createPriceAtDate(Map.Entry<String, Object> entry) {
         Map<String, Number> value = (Map<String, Number>) entry.getValue();
         String closePrice = value.get("open") + "";
-        return new PriceAtDate(parseDate(entry), NumberUtils.str2Float(closePrice));
+        return new PriceAtDate(parseDate(entry), NumberUtils.str2Float(closePrice), false);
     }
 
     private static EZDate parseDate(Map.Entry<String, Object> entry) {

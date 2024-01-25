@@ -116,14 +116,16 @@ public class PerfIndexBuilder {
         pricesGrouped.setLabel(prices.getLabel()+" grouped by "+perfSettings.getPerfGroupedBy());
         // init Prices grouped to have the same number of values than the labels
         for (PriceAtDate priceAtDate : prices.getPrices()) {
-            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate()));
+            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate(), priceAtDate.isEstimated()));
         }
         do {
             Float currentValue = groupByFirstValueFct.get();
             EZDate lastPeriodDate = null;
             int lastPeriodIndex = -1;
+            boolean estimation = false;
             for (PriceAtDate priceAtDate : prices.getPrices()) {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
+                    estimation |= priceAtDate.isEstimated();
                     lastPeriodDate = priceAtDate.getDate();
                     currentValue = groupByFct.apply(currentValue, priceAtDate.getPrice());
                 }
@@ -132,7 +134,7 @@ public class PerfIndexBuilder {
                 }
                 lastPeriodIndex++;
             }
-            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
+            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue == null ? new PriceAtDate(currentPeriod, estimation) : new PriceAtDate(currentPeriod, currentValue, estimation));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(afterTodayPeriod));
@@ -184,7 +186,7 @@ public class PerfIndexBuilder {
 
                 previousValue = priceAtDate.getPrice();
             }
-            result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
+            result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate(), priceAtDate.isEstimated()) : new PriceAtDate(priceAtDate.getDate(), newPrice, priceAtDate.isEstimated()));
         }
         return result;
     }

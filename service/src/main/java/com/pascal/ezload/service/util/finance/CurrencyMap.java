@@ -71,7 +71,7 @@ public class CurrencyMap {
         Prices r = new Prices();
         r.setLabel(p.getLabel());
         r.setDevise(to);
-        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price, useLastFactor))));
+        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price, useLastFactor), price.isEstimated())));
         return r;
     }
 

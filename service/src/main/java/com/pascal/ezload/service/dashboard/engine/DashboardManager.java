@@ -207,7 +207,7 @@ public class DashboardManager {
                     l.setValues(l.getValues().subList(endOfFirstYearIndex, lastIndex));
                 }
                 else {
-                    l.setValuesWithLabel(l.getValuesWithLabel().subList(endOfFirstYearIndex, lastIndex));
+                    l.setRichValues(l.getRichValues().subList(endOfFirstYearIndex, lastIndex));
                 }
             });
             chart.setLines(allChartLines);
@@ -252,7 +252,7 @@ public class DashboardManager {
                         .forEach(share -> {
                             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.SHARE;
                             if (index == ShareIndex.SHARE_COUNT) yAxis = ChartLine.Y_AxisSetting.NB;
-                            else if (index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD
+                            else if (index == ShareIndex.SHARE_ANNUAL_DIVIDEND_YIELD
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET)
                                     yAxis = ChartLine.Y_AxisSetting.PERCENT;
@@ -289,8 +289,6 @@ public class DashboardManager {
     }
 
     private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, Colors.ColorCode color, GraphStyle graphStyle){
-        prices.getPrices().stream().filter(p -> p.getPrice() != null).forEach(p ->  p.setPrice((float) Math.round(p.getPrice()*100.0f) / 100.0f));
-
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         float transparency = 1f;
         if (graphStyle == GraphStyle.BAR){

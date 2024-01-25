@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { Chart, ChartIndex, ChartLine, Label, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, ChartIndex, ChartLine, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
@@ -79,29 +79,25 @@ export function LineChart(props: LineChartProps){
     const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels!);    
     const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            
-            const shareValues: (number|undefined)[] | undefined = chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values;
-            
-            const shareValuesFiltered: (number|undefined)[] | undefined = computedPeriod === "day" ? shareValues :
-                                                        computedPeriod === "month" ? shareValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
-                                                        shareValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);
-
-            var tooltipsFiltered : (string|undefined)[] | undefined = chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined;
-            if (isDefined(chartLine.valuesWithLabel)){
-                tooltipsFiltered = computedPeriod === "day" ? tooltipsFiltered :
-                                                          computedPeriod === "month" ? tooltipsFiltered?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
-                                                          tooltipsFiltered?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);
-            }
+            const richValuesFiltered : RichValue[] | undefined = !isDefined(chartLine.richValues) ? undefined : computedPeriod === "day" ? chartLine.richValues :
+                                                                    computedPeriod === "month" ? chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
+                                                                    chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);            
 
             if (chartLine.lineStyle === "BAR_STYLE"){
                 var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
                     type: 'bar',             
                     hidden: !lineIsVisible[index],
                     label: chartLine.title,
-                    data: shareValuesFiltered,
-                    tooltips: tooltipsFiltered,
+                    data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
+                    tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
                     borderColor: chartLine.colorLine,
-                    backgroundColor: chartLine.colorLine,
-                    yAxisID: chartLine.yaxisSetting
+                    backgroundColor: (ctx: any, v: any) => {
+                        if (richValuesFiltered?.at(ctx.dataIndex)?.estimated)
+                            return chartLine.colorLine?.substring(0,chartLine.colorLine?.lastIndexOf(','))+',0.2)'
+                        return chartLine.colorLine;
+                    },
+                    yAxisID: chartLine.yaxisSetting,                    
+                    borderWidth: 1,                                        
                 };  
                 return conf;     
             }
@@ -109,14 +105,17 @@ export function LineChart(props: LineChartProps){
              type: 'line',          
              hidden: !lineIsVisible[index],    
              label: chartLine.title,
-             data: shareValuesFiltered,
-             tooltips: tooltipsFiltered,
+             data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
+             tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
              borderColor: chartLine.colorLine,
              backgroundColor: chartLine.colorLine,
              borderWidth: 1,
              yAxisID: chartLine.yaxisSetting,
              fill: false,
-             cubicInterpolationMode: 'monotone', 
+             cubicInterpolationMode: 'monotone',
+             segment: {
+                borderDash: (ctx: any, value: any) => richValuesFiltered?.at(ctx.p1DataIndex)?.estimated || richValuesFiltered?.at(ctx.p2DataIndex)?.estimated ? [1,4] : undefined
+             },
              tension: 0.4, // le niveau de courbure    
              pointStyle: 'circle',
              pointRadius: 1,// la taille du point
@@ -153,10 +152,10 @@ export function LineChart(props: LineChartProps){
                         if (context.raw === null || context.raw === undefined) 
                             return "";
                         if (context.dataset.tooltips){
-                            const valueWithLabel : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
-                            if (valueWithLabel.indexOf(":") === -1)
-                                return context.dataset.label+': '+valueWithLabel;
-                            return context.dataset.label+' '+valueWithLabel;
+                            const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            if (richValue.indexOf(":") === -1)
+                                return context.dataset.label+': '+richValue;
+                            return context.dataset.label+' '+richValue;
                         }                        
                         // ajout de l'unité automatiquement                        
                         return context.dataset.label+': '+context.formattedValue
