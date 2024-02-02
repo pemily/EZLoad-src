@@ -90,14 +90,16 @@ export function LineChart(props: LineChartProps){
                     label: chartLine.title,
                     data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
                     tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
-                    borderColor: chartLine.colorLine,
                     backgroundColor: (ctx: any, v: any) => {
+                        // affiche les valeurs estimé en transparence
                         if (richValuesFiltered?.at(ctx.dataIndex)?.estimated)
                             return chartLine.colorLine?.substring(0,chartLine.colorLine?.lastIndexOf(','))+',0.2)'
                         return chartLine.colorLine;
                     },
                     yAxisID: chartLine.yaxisSetting,                    
-                    borderWidth: 1,                                        
+                    borderWidth: 0,    
+                    borderColor: chartLine.colorLine,
+                    inflateAmount: 3
                 };  
                 return conf;     
             }
@@ -114,6 +116,7 @@ export function LineChart(props: LineChartProps){
              fill: false,
              cubicInterpolationMode: 'monotone',
              segment: {
+                // affiche les valeurs estimé en pointillé
                 borderDash: (ctx: any, value: any) => richValuesFiltered?.at(ctx.p1DataIndex)?.estimated || richValuesFiltered?.at(ctx.p2DataIndex)?.estimated ? [1,4] : undefined
              },
              tension: 0.4, // le niveau de courbure    
@@ -135,8 +138,9 @@ export function LineChart(props: LineChartProps){
         responsive: true, // pour que le canvas s'agrandisse/diminue quand on resize la fenetre
         maintainAspectRatio: false,
         interaction: {
-            mode: 'x', // on suit la sourie sur l'axe des X pour afficher les infos des courbes
-            intersect: false, // false: affiche les infos du points dès que la souris est sur un axe            
+            mode: "nearest", // on suit la sourie sur l'axe des X pour afficher les infos des courbes
+            intersect: false, // false: affiche les infos du points dès que la souris est sur un axe                                                
+            axis: "xy",
         },
         plugins: {
             title: {
@@ -145,7 +149,8 @@ export function LineChart(props: LineChartProps){
             },
             tooltip: {
                 enabled: true,
-                position: "nearest",                
+                position: "nearest",     
+                titleAlign: 'center',
                 callbacks: {
                     label: function(context: any) {
                         // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
@@ -153,17 +158,17 @@ export function LineChart(props: LineChartProps){
                             return "";
                         if (context.dataset.tooltips){
                             const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
-                            if (richValue.indexOf(":") === -1)
-                                return context.dataset.label+': '+richValue;
-                            return context.dataset.label+' '+richValue;
-                        }                        
+                            /* if (richValue.indexOf(":") === -1)
+                                return context.dataset.label+': '+richValue; */
+                            return richValue;
+                        }
                         // ajout de l'unité automatiquement                        
                         return context.dataset.label+': '+context.formattedValue
                                                     +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 
                                                             context.dataset.yAxisID === 'NB' ? '' : ' '+props.chart.axisId2titleY?.Y_AXIS_TITLE);
                     }
                 }
-            },           
+            },
             legend: {
                 display: props.showLegend,                
                 position: 'top' as const,               

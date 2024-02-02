@@ -102,16 +102,6 @@ public class SharePriceBuilder {
         }
 
         private PriceAtDate extractDividendForCurrentDate(List<Dividend> dividends, EZDate previousDate, EZDate currentDate) {
-            // exemple 1:
-            //          Si dividende est a la date du 28/01/2024
-            //          et que previousDate == 15/01/2024 et currentDate == 01/02/2024
-            // il faut que le dividende soit sur la previousDate pour ne pas changer le mois en cours. ca a des impactes sur le dividende au mois ou annuel sinon
-
-            // exemple 2:
-            //          Si dividende est a la date du 01/04/2024
-            //          et que previousDate == 31/03/2024 et currentDate == 20/04/2024
-            // il faut que le dividende soit sur la currentDate
-
             float totalDividendInOriginalDevise = 0f;
             PriceAtDate dividendFound = null;
             boolean estimated = false;

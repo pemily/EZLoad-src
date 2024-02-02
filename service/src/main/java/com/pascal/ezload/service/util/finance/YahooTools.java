@@ -46,7 +46,7 @@ public class YahooTools extends ExternalSiteTools{
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
                     new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
-                            .fillPricesForAListOfDates(reporting);
+                            .fillPricesForAListOfDates();
                 });
                 return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
             }
@@ -221,7 +221,7 @@ public class YahooTools extends ExternalSiteTools{
         devisePrices.setLabel(fromDevise.getSymbol()+" => "+toDevise.getSymbol());
         downloadPricesThenProcessCvsRows(reporting, cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
             new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, devisePrices)
-                    .fillPricesForAListOfDates(reporting);
+                    .fillPricesForAListOfDates();
         });
 
         return new CurrencyMap(fromDevise, toDevise, devisePrices.getPrices());

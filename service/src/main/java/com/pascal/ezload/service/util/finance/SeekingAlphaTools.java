@@ -143,7 +143,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 downloadPricesThenProcessRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
                     new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
-                            .fillPricesForAListOfDates(reporting);
+                            .fillPricesForAListOfDates();
                 });
                 return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
             } catch (Exception e) {

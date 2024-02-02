@@ -45,6 +45,12 @@ public class EZDate implements Comparable<EZDate> {
         year = d.getYear();
     }
 
+    public EZDate(LocalDate localDate) {
+        this.year = localDate.getYear();
+        this.month = localDate.getMonthValue();
+        this.day = localDate.getDayOfMonth();
+    }
+
     public static EZDate yearPeriod(int year){
         return new EZDate(year, -1, -1);
     }
@@ -100,6 +106,10 @@ public class EZDate implements Comparable<EZDate> {
 
     public long nbOfMonthesTo(EZDate to) {
         return toLocalDate().until(to.toLocalDate(), ChronoUnit.MONTHS);
+    }
+
+    public int lengthOfMonth(){
+        return toLocalDate().lengthOfMonth();
     }
 
     // return true if this is after dateToTest

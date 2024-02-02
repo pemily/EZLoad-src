@@ -21,6 +21,7 @@ import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,35 +30,48 @@ public class ChartsTools {
         DAY, MONTH, YEAR
     }
 
-    public static List<EZDate> getDatesSample(EZDate from, EZDate to, PERIOD_INTERVAL period, int nbOfPoint){
-        if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
-        long nbOfTotalDates = period == PERIOD_INTERVAL.DAY ? from.nbOfDaysTo(to) : period == PERIOD_INTERVAL.MONTH ? from.nbOfMonthesTo(to) : to.getYear() - from.getYear();
+
+    public static List<EZDate> getDatesSample(EZDate from, EZDate to, PERIOD_INTERVAL period, int approximativeNbOfPoints){
+        if (approximativeNbOfPoints < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
+        int intervalSpace = 0;
         if (period == PERIOD_INTERVAL.DAY) {
-            if (nbOfTotalDates + 1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDates;
-        }
-        else nbOfPoint = (int) nbOfTotalDates; // si c'est une periode on ne reduit pas
-
-        var allDates = new ArrayList<EZDate>(nbOfPoint);
-
-        nbOfPoint = period == PERIOD_INTERVAL.DAY ? nbOfPoint - 1 : nbOfPoint; // if day ? -1 because I add the last one at the end
-        float intervalSpace = period == PERIOD_INTERVAL.DAY ? ((float)nbOfTotalDates / (float)nbOfPoint ) : 1;
-
-        for (int i = 0; i < nbOfPoint; i++){
-            if (period == PERIOD_INTERVAL.DAY)
-                allDates.add(from.plusDays((int)(intervalSpace * (float)i)));
-            else if (period == PERIOD_INTERVAL.MONTH) {
-                EZDate date = from.plusMonthes((int)(intervalSpace * (float)i));
-                allDates.add(EZDate.monthPeriod(date.getYear(), date.getMonth()));
-            }
-            else if (period == PERIOD_INTERVAL.YEAR) {
-                EZDate date = from.plusYears((int)(intervalSpace * (float)i));
-                allDates.add(EZDate.yearPeriod(date.getYear()));
-            }
+            long nbOfTotalDates = from.nbOfDaysTo(to);
+            if (nbOfTotalDates + 1 < approximativeNbOfPoints) approximativeNbOfPoints = (int) nbOfTotalDates;
+            intervalSpace = Math.round((float) nbOfTotalDates / (float) approximativeNbOfPoints);
+            if (intervalSpace > 25) intervalSpace = 25;
+            if (intervalSpace == 0) intervalSpace = 1;
         }
 
-        if (period == PERIOD_INTERVAL.DAY) allDates.add(to);
-        else if (period == PERIOD_INTERVAL.MONTH) allDates.add(EZDate.monthPeriod(to.getYear(), to.getMonth()));
-        else allDates.add(EZDate.yearPeriod(to.getYear()));
+        EZDate previousDate = from;
+        if (period == PERIOD_INTERVAL.MONTH){
+            previousDate = EZDate.monthPeriod(from.getYear(), from.getMonth());
+        }
+        else if (period == PERIOD_INTERVAL.YEAR){
+            previousDate = EZDate.yearPeriod(from.getYear());
+        }
+
+
+        List<EZDate> allDates = new ArrayList<>();
+        allDates.add(from);
+        while(previousDate.isBefore(to)){
+            EZDate newDate = null;
+            if (period == PERIOD_INTERVAL.DAY) {
+                newDate = previousDate.plusDays(intervalSpace);
+                if (newDate.plusDays(intervalSpace).getMonth() != newDate.getMonth()){
+                    // la prochaine date on changera de mois, donc le newDate va etre placé sur le dernier jour du mois:
+                    newDate = new EZDate(newDate.getYear(), newDate.getMonth(), newDate.lengthOfMonth());
+                }
+                if (newDate.isAfter(to)){
+                    newDate = to;
+                }
+            }
+            else if (period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR) {
+                newDate = previousDate.createNextPeriod();
+
+            }
+            allDates.add(newDate);
+            previousDate = newDate;
+        }
 
         return allDates;
     }
@@ -92,7 +106,7 @@ public class ChartsTools {
                                                                                             ChartLine.RichValue v = new ChartLine.RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
                                                                                             v.setValue(pd.getPrice());
-                                                                                            v.setLabel("["+pd.getDate().toEzPortoflioDate()+"] "+prices.getLabel()+": "+roundValue+prices.getDevise().getSymbol()); // le label de la valeur
+                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+prices.getDevise().getSymbol()); // le label de la valeur
                                                                                             return v;
                                                                                         }).collect(Collectors.toList()),
                                 removeZeroValues);

@@ -48,7 +48,7 @@ class PricesTools<PD>  {
     }
 
 
-    public void fillPricesForAListOfDates(Reporting reporting) {
+    public void fillPricesForAListOfDates() {
         listOfDatesIndex = -1;
         setNextSearchedDate();
         allPrices

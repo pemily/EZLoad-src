@@ -218,6 +218,8 @@ public class DashboardManager {
         }
     }
 
+
+
     private List<ChartLine> createPortfolioCharts(PortfolioIndexBuilder.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartPortfolioIndexConfig portfolioIndexConfig = chartIndex.getPortfolioIndexConfig();
