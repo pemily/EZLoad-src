@@ -302,7 +302,7 @@ public class EZActionManager {
             EZDate commonDate = mostRecentCommonDate.get();
             PriceAtDate todayPrice1 = prices1.getPriceAt(commonDate);
             PriceAtDate todayPrice2 = prices2.getPriceAt(commonDate);
-            if (todayPrice1.getPrice() != 0 && todayPrice2.getPrice() != 0
+            if (todayPrice1.getValue() != 0 && todayPrice2.getValue() != 0
                     && Math.abs(todayPrice1.getDate().nbOfDaysTo(todayPrice2.getDate())) <= 1) {
                 List<EZDate> dateRangeForCurrency = Arrays.asList(commonDate.minusDays(7), EZDate.today());
                 CurrencyMap local2Euro1 = getCurrencyMap(reporting, prices1.getDevise(), DeviseUtil.EUR, dateRangeForCurrency);

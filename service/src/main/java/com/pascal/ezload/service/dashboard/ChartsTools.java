@@ -21,7 +21,6 @@ import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,12 +100,15 @@ public class ChartsTools {
         return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(pd -> {
-                                                                                            if (pd.getPrice() == null || (removeZeroValues && pd.getPrice() == 0)) return null;
-                                                                                            float roundValue = (float) Math.round(pd.getPrice()*100.0f) / 100.0f;
+                                                                                            if (pd.getValue() == null || (removeZeroValues && pd.getValue() == 0)) return null;
+                                                                                            float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
                                                                                             ChartLine.RichValue v = new ChartLine.RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
-                                                                                            v.setValue(pd.getPrice());
-                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+prices.getDevise().getSymbol()); // le label de la valeur
+                                                                                            v.setValue(pd.getValue());
+                                                                                            String unité = prices.getDevise().getSymbol();
+                                                                                            if (YAxisSetting == ChartLine.Y_AxisSetting.PERCENT) unité="%";
+                                                                                            else if (YAxisSetting == ChartLine.Y_AxisSetting.NB) unité = "";
+                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+unité); // le label de la valeur
                                                                                             return v;
                                                                                         }).collect(Collectors.toList()),
                                 removeZeroValues);

@@ -12,7 +12,7 @@ public class CumulBuilder {
 
         float cumul = 0;
         for (PriceAtDate pd : p.getPrices()) {
-            float value = pd.getPrice() == null ? 0 : pd.getPrice();
+            float value = pd.getValue() == null ? 0 : pd.getValue();
             cumul = value + cumul;
             r.addPrice(pd.getDate(), new PriceAtDate(pd.getDate(), cumul, pd.isEstimated()));
         }

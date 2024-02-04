@@ -106,8 +106,10 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Valeur du portefeuille"; break;
             case "CUMULABLE_GAIN_NET":
                 result += "Gain"; break;
-            case "CUMULABLE_DIVIDEND_YIELD_BRUT":            
-                result += "Rendement"; break;
+            case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":            
+                result += "Rendement réel constaté"; break;
+            case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
+                result += "Rendement théorique du dividende annuel"; break;
             default: result += "Missing case in getChartIndexTitle "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }    
@@ -169,7 +171,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "des dividendes à la date du détachement"; break;
             case "SHARE_ANNUAL_DIVIDEND_YIELD":
-                result += "du rendement du dividende brut annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
+                result += "du rendement du dividende annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
             case "SHARE_PRICE":
                 result += "du cours de l'action"; break;
             case "SHARE_PRU_BRUT":
@@ -210,8 +212,10 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "de votre portefeuille incluant les liquidités"; break;
             case "CUMULABLE_GAIN_NET":
                 result += "de vos gains (valeur du portefeuille - les liquidités investis)"; break;            
-            case "CUMULABLE_DIVIDEND_YIELD_BRUT":
-                result += "du rendement de votre portefeuille"; break;                
+            case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":
+                result += "du rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
+            case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
+                result += "du rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité"; break;    
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }
@@ -230,7 +234,8 @@ function getDefaultPerfFilterForCumulableIndex(chartIndex: ChartIndex) : "CUMUL"
             case "CUMULABLE_SORTIES" :
             case "CUMULABLE_BUY" :
             case "CUMULABLE_SOLD" : 
-            case "CUMULABLE_DIVIDEND_YIELD_BRUT" :
+            case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT" :
+            case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
                 return "VALUE"; // Pas d'interet de voir le cumul
         }        
     }    
@@ -308,7 +313,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Achat d'actions", //////////////////Pas d'interet en cumulé
                                 "Vente d'actions", //////////////////Pas d'interet en cumulé
                                 "Gains",
-                                "Rendements brut"
+                                "Rendements réél",
+                                "Rendement théorique"
                             ]}
                             codeValues={[
                                 'VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
@@ -322,7 +328,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'CUMULABLE_BUY',
                                 'CUMULABLE_SOLD',
                                 'CUMULABLE_GAIN_NET',
-                                'CUMULABLE_DIVIDEND_YIELD_BRUT']}
+                                'CUMULABLE_DIVIDEND_REAL_YIELD_BRUT',
+                                'ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT']}
                             description=""
                             onChange={newValue => {
                                     const portfolioIndex : ChartPortfolioIndexConfig = {

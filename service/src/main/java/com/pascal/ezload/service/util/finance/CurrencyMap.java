@@ -39,7 +39,7 @@ public class CurrencyMap {
             this.factors.setDevise(from);
             this.factors.setLabel(getLabel());
             factors.forEach(p -> this.factors.addPrice(p.getDate(), p));
-            lastFactor = factors.get(factors.size()-1).getPrice();
+            lastFactor = factors.get(factors.size()-1).getValue();
         }
     }
 
@@ -49,10 +49,10 @@ public class CurrencyMap {
 
     public float getTargetPrice(PriceAtDate fromPrice, boolean useLastFactor /* le taux du jour quelque soit la date */){
         if (from.equals(to)) {
-            return fromPrice.getPrice();
+            return fromPrice.getValue();
         }
-        Float factor = useLastFactor ? lastFactor : factors.getPriceAt(fromPrice.getDate()).getPrice();
-        return fromPrice.getPrice()*factor;
+        Float factor = useLastFactor ? lastFactor : factors.getPriceAt(fromPrice.getDate()).getValue();
+        return fromPrice.getValue()*factor;
     }
 
     public Prices getFactors(){
@@ -78,7 +78,7 @@ public class CurrencyMap {
     public Float convertPriceToTarget(EZDate date, Float valueAtFromDevise){
         if (valueAtFromDevise == null || factors == null) return valueAtFromDevise; // if factors == null => fromdevise & target devise are identical
         PriceAtDate factor = factors.getPriceAt(date);
-        return valueAtFromDevise * factor.getPrice();
+        return valueAtFromDevise * factor.getValue();
     }
 
     public String toString(){

@@ -230,7 +230,8 @@ public class DashboardManager {
                                                 : perfIndexResult.getPortoflioPerfs(index, perfSettings);
 
             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.PORTFOLIO;
-            if (index == PortfolioIndex.CUMULABLE_DIVIDEND_YIELD_BRUT) yAxis = ChartLine.Y_AxisSetting.PERCENT;
+            if (index == PortfolioIndex.CUMULABLE_DIVIDEND_REAL_YIELD_BRUT
+                || index == PortfolioIndex.ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT) yAxis = ChartLine.Y_AxisSetting.PERCENT;
 
             allChartLines.add(createChartLine(prices, chartIndex.getId(), chartIndex.getLabel(),
                                         computeYAxis(perfSettings, yAxis),

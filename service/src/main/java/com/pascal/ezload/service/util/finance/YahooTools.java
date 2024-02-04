@@ -85,10 +85,7 @@ public class YahooTools extends ExternalSiteTools{
         // 2006-05-25,4.030000,4.605000,4.020000,4.600000,4.261155,395343000
         String date = row.get(0); // format: 2020-10-25
         String closePrice = row.get(4); // take the close
-        PriceAtDate sharePrice = new PriceAtDate();
-        sharePrice.setPrice(NumberUtils.str2Float((closePrice)));
-        sharePrice.setDate(EZDate.parseYYYMMDDDate(date, '-'));
-        return sharePrice;
+        return new PriceAtDate(EZDate.parseYYYMMDDDate(date, '-'), NumberUtils.str2Float((closePrice)), false);
     }
 
     private static void downloadPricesThenProcessCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {

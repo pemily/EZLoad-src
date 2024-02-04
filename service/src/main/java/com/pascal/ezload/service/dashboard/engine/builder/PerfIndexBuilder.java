@@ -127,7 +127,7 @@ public class PerfIndexBuilder {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
                     estimation |= priceAtDate.isEstimated();
                     lastPeriodDate = priceAtDate.getDate();
-                    currentValue = groupByFct.apply(currentValue, priceAtDate.getPrice());
+                    currentValue = groupByFct.apply(currentValue, priceAtDate.getValue());
                 }
                 else if (lastPeriodDate != null){
                     break; // we can stop the loop there is nothing interresting after this date, the period is over
@@ -153,30 +153,30 @@ public class PerfIndexBuilder {
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
             Float newPrice = perfSettings.getPerfFilter() == ChartPerfFilter.CUMUL ? cumul : null;
 
-            if (priceAtDate.getPrice() != null) {
+            if (priceAtDate.getValue() != null) {
                 boolean isFirstValue = previousValue == null;
                 switch (perfSettings.getPerfFilter()) {
                     case VALUE:
-                        newPrice = priceAtDate.getPrice();
+                        newPrice = priceAtDate.getValue();
                         break;
                     case CUMUL:
-                        newPrice = priceAtDate.getPrice() + cumul;
+                        newPrice = priceAtDate.getValue() + cumul;
                         cumul = newPrice;
                         break;
                     case VALUE_VARIATION:
                         previousValue = previousValue == null ? 0 : previousValue;
-                        newPrice = isFirstValue ? 0 : priceAtDate.getPrice() - previousValue;
+                        newPrice = isFirstValue ? 0 : priceAtDate.getValue() - previousValue;
                         break;
                     case VARIATION_EN_PERCENT:
                         if (previousValue != null && previousValue == 0){
-                            if (priceAtDate.getPrice() == 0) newPrice = 0f;
+                            if (priceAtDate.getValue() == 0) newPrice = 0f;
                             else newPrice = null; // pas de données précédente, plutot que de mettre 100% d'augmentation qui ne veut rien dire, je ne met rien ca veut dire que la periode n'est pas adapté pour la comparaison
                         }
                         else {
                             if (isFirstValue) newPrice = null;
                             else {
-                                if (priceAtDate.getPrice() == 0) newPrice = null; // on a surement plus de donnée
-                                else newPrice = (priceAtDate.getPrice() * 100f / previousValue) - 100f;
+                                if (priceAtDate.getValue() == 0) newPrice = null; // on a surement plus de donnée
+                                else newPrice = (priceAtDate.getValue() * 100f / previousValue) - 100f;
                             }
                         }
                         break;
@@ -184,7 +184,7 @@ public class PerfIndexBuilder {
                         throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());
                 }
 
-                previousValue = priceAtDate.getPrice();
+                previousValue = priceAtDate.getValue();
             }
             result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate(), priceAtDate.isEstimated()) : new PriceAtDate(priceAtDate.getDate(), newPrice, priceAtDate.isEstimated()));
         }

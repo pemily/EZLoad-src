@@ -32,7 +32,7 @@ public class ShareSelectionBuilder {
                     allGoogleCodes.addAll(portfolioResult.getDate2share2ShareNb()
                             .values()
                             .stream()
-                            .flatMap(s -> s.entrySet().stream().filter(e -> e.getValue() > 0))
+                            .flatMap(s -> s.entrySet().stream().filter(e -> e.getValue().getValue() > 0))
                             .map(s -> s.getKey().getGoogleCode())
                             .collect(Collectors.toSet()));
                     break;
@@ -42,7 +42,7 @@ public class ShareSelectionBuilder {
                     date.ifPresent(ezDate -> allGoogleCodes.addAll(portfolioResult.getDate2share2ShareNb()
                             .get(ezDate)
                             .entrySet()
-                            .stream().filter(s -> s.getValue() > 0)
+                            .stream().filter(s -> s.getValue().getValue() > 0)
                             .map(s -> s.getKey().getGoogleCode()).collect(Collectors.toSet())));
                     break;
                 case ADDITIONAL_SHARES_ONLY:

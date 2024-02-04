@@ -10,10 +10,11 @@ public enum PortfolioIndex {
     CUMULABLE_BUY(true), // Les achats dans le portefeuille
     CUMULABLE_SOLD(true), // Les ventes dans le portefeuille
     CUMULABLE_GAIN_NET(true), // Les gains par rapport à la veille
-    CUMULABLE_DIVIDEND_YIELD_BRUT(true), // le rendement du portefeuille en %
+    CUMULABLE_DIVIDEND_REAL_YIELD_BRUT(true), // le rendement réel du portefeuille en %
+    ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT(false), //  rendement théorique du portefeuille sur le dividend annuel
     // TODO ADD CUMULABLE_TAXES
 
-    // COULD BE DELETED (if I have the  custom computed indexes)
+
     CUMULABLE_ENTREES_SORTIES(true), // Entrées/Sorties (ajouts en positif, retraits en négatif) (CUMULABLE_ENTREES - CUMULABLE_SORTIES)
     VALEUR_PORTEFEUILLE_WITH_LIQUIDITY(false), // VALEUR_PORTEFEUILLE + CUMULABLE_ENTREES - CUMULABLE_SORTIES
 

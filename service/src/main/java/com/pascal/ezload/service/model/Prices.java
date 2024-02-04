@@ -73,9 +73,7 @@ public class Prices {
             }
         }
         if (p == null){
-            p = new PriceAtDate();
-            p.setDate(date);
-            p.setPrice(0f);
+            p = new PriceAtDate(date, 0f, false);
         }
         return p;
     }

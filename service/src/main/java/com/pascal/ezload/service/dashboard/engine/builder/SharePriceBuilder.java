@@ -47,7 +47,7 @@ public class SharePriceBuilder {
         }
 
 
-        public Prices getTargetPrices(Reporting reporting, EZShareEQ share) {
+        public Prices getPricesToTargetDevise(Reporting reporting, EZShareEQ share) {
             return shares2TargetPrices.computeIfAbsent(share, ezShare -> {
                 try {
                     Prices prices = actionManager.getPrices(reporting, ezShare, dates);
@@ -79,8 +79,8 @@ public class SharePriceBuilder {
                                 EZDate date = dividendFound != null ? dividendFound.getDate() : currentDate;
 
                                 float value = 0f;
-                                if (dividendFound != null && dividendFound.getPrice() > 0) {
-                                    value = dividendFound.getPrice();
+                                if (dividendFound != null && dividendFound.getValue() > 0) {
+                                    value = dividendFound.getValue();
                                 }
                                 prices.addPrice(currentDate, new PriceAtDate(date, value, dividendFound != null && dividendFound.isEstimated()));
                                 previousDate = currentDate;
@@ -148,9 +148,9 @@ public class SharePriceBuilder {
 
                         float rendement = 0f;
                         if (annualDividend != null && annualDividend > 0) {
-                            Prices p = getTargetPrices(reporting, ezShare);
+                            Prices p = getPricesToTargetDevise(reporting, ezShare);
                             if (p != null) {
-                                float price = p.getPriceAt(currentDate).getPrice();
+                                float price = p.getPriceAt(currentDate).getValue();
                                 rendement = (annualDividend * 100f) / price;
 
                             }
@@ -171,7 +171,7 @@ public class SharePriceBuilder {
 
                 for (PriceAtDate p : dividends.getPrices()) {
                     if (p.getDate().getYear() == year) {
-                        annualDividend += p.getPrice() == null ? 0 : p.getPrice();
+                        annualDividend += p.getValue() == null ? 0 : p.getValue();
                     }
                     if (p.getDate().getYear() > year)
                         break;

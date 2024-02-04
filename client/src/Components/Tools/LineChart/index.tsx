@@ -156,7 +156,7 @@ export function LineChart(props: LineChartProps){
                         // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
                         if (context.raw === null || context.raw === undefined) 
                             return "";
-                        if (context.dataset.tooltips){
+                        if (context.dataset.tooltips){                            
                             const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
                             /* if (richValue.indexOf(":") === -1)
                                 return context.dataset.label+': '+richValue; */

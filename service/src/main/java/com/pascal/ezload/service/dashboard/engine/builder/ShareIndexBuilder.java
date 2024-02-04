@@ -2,10 +2,7 @@ package com.pascal.ezload.service.dashboard.engine.builder;
 
 import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.ShareIndex;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.PriceAtDate;
-import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.HashMap;
@@ -49,7 +46,7 @@ public class ShareIndexBuilder {
                                 .forEach(ezShare -> {
                                     switch (si.getShareIndexConfig().getShareIndex()) {
                                         case SHARE_PRICE:
-                                            addIndexInResult(r, SHARE_PRICE, ezShare, sharePriceResult.getTargetPrices(reporting, ezShare));
+                                            addIndexInResult(r, SHARE_PRICE, ezShare, sharePriceResult.getPricesToTargetDevise(reporting, ezShare));
                                             break;
                                         case SHARE_COUNT:
                                             buildPricesAndSaveInResult(r, SHARE_COUNT, ezShare, portfolioIndexResult.getDate2share2ShareNb(), dates);
@@ -64,16 +61,18 @@ public class ShareIndexBuilder {
                                             buildPricesAndSaveInResult(r, CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT, ezShare, portfolioIndexResult.getDate2share2PRUBrut(), dates,
                                                                                 (d, pru) -> {
                                                                                     PriceAtDate p = sharePriceResult.getDividends(reporting, ezShare).getPriceAt(d);
-                                                                                    if (p == null || p.getPrice() == null || pru == null) return new PriceAtDate(d, p.isEstimated());
-                                                                                    return new PriceAtDate(d, (p.getPrice() * 100f) / pru, p.isEstimated());
+                                                                                    if (p == null || pru == null || pru.getValue() == 0) return new PriceAtDate(d, p != null && p.isEstimated());
+                                                                                    Price newPrice = p.multiply(new Price(100)).divide(pru);
+                                                                                    return new PriceAtDate(d, newPrice);
                                                                                 });
                                             break;
                                         case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET:
                                             buildPricesAndSaveInResult(r, CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET, ezShare, portfolioIndexResult.getDate2share2PRUNet(), dates,
                                                                                     (d, pru) -> {
                                                                                         PriceAtDate p = sharePriceResult.getDividends(reporting, ezShare).getPriceAt(d);
-                                                                                        if (p == null || p.getPrice() == null || pru == null) return new PriceAtDate(d, p.isEstimated());
-                                                                                        return new PriceAtDate(d, (p.getPrice() * 100f)/ pru, p.isEstimated());
+                                                                                        if (p == null || pru == null || pru.getValue() == 0) return new PriceAtDate(d, p != null && p.isEstimated());
+                                                                                        Price newPrice = p.multiply(new Price(100)).divide(pru);
+                                                                                        return new PriceAtDate(d, newPrice);
                                                                                     });
                                             break;
                                         case SHARE_PRU_BRUT:
@@ -99,17 +98,17 @@ public class ShareIndexBuilder {
         });
     }
 
-    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare,Map<EZDate, Map<EZShareEQ, Float>> date2share2value, List<EZDate> dates) {
-        buildPricesAndSaveInResult(r, shareIndex, ezShare, date2share2value, dates, (d, v) -> v == null ? new PriceAtDate(d, false) : new PriceAtDate(d, v, false));
+    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare, Map<EZDate, Map<EZShareEQ, Price>> date2share2value, List<EZDate> dates) {
+        buildPricesAndSaveInResult(r, shareIndex, ezShare, date2share2value, dates, (d, v) -> v == null ? new PriceAtDate(d, false) : new PriceAtDate(d, v.getValue(), v.isEstimated()));
     }
 
-    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare, Map<EZDate, Map<EZShareEQ, Float>> date2share2value, List<EZDate> dates, BiFunction<EZDate, Float, PriceAtDate> valueTransformation) {
+    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare, Map<EZDate, Map<EZShareEQ, Price>> date2share2value, List<EZDate> dates, BiFunction<EZDate, Price, PriceAtDate> valueTransformation) {
         Prices prices = new Prices();
         prices.setDevise(currenciesResult.getTargetDevise());
         prices.setLabel(shareIndex.name()+" of "+ezShare.getEzName());
         for (EZDate date : dates) {
-            Map<EZShareEQ, Float> share2value = date2share2value.get(date);
-            Float value = share2value.get(ezShare);
+            Map<EZShareEQ, Price> share2value = date2share2value.get(date);
+            Price value = share2value.get(ezShare);
             prices.addPrice(date, valueTransformation.apply(date, value));
         }
         addIndexInResult(r, shareIndex, ezShare, prices);

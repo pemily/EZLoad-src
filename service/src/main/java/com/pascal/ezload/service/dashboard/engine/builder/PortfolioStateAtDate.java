@@ -18,6 +18,7 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.Price;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +36,14 @@ public class PortfolioStateAtDate {
     // entrees sorties cumulées
     private final StateValue inputOutput;  // input output ensemble pour avoir une ligne cumulée dans la UI
 
+    // la valeur du portefeuille en action (nb d'actions * valeur du prix de l'action)
+    private Price portfolioValue;
+
     // dividends percu
     private final StateValue dividends;
+
+    // rendement du portefeuille (basé sur le rendement annuel des actions et leur proportion (moyenne pondéré) a cette date)
+    private Price dividendYield;
 
     // les actions achetés (sans le details par actions)
     private final StateValue shareBuy;
@@ -45,24 +52,24 @@ public class PortfolioStateAtDate {
     private final StateValue shareSold;
 
     // float because with some broker, you have some part of actions
-    private final Map<EZShareEQ, Float> shareNb;
+    private final Map<EZShareEQ, Price> shareNb;
 
     // le montant d'action acheté
-    private final Map<EZShareEQ, Float> shareBuyDetails;
+    private final Map<EZShareEQ, Price> shareBuyDetails;
 
     // le montant d'action vendu
-    private final Map<EZShareEQ, Float> shareSoldDetails;
+    private final Map<EZShareEQ, Price> shareSoldDetails;
 
     //
-    private final Map<EZShareEQ, Float> sharePRBrut; // Prix de revient d'une valeur. (les prix d'achats - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Price> sharePRBrut; // Prix de revient d'une valeur. (les prix d'achats - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShareEQ, Float> sharePRUBrut; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Price> sharePRUBrut; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
 
-    private final Map<EZShareEQ, Float> sharePRNet; // Prix de revient d'une valeur avec dividend. (les prix d'achats - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Price> sharePRNet; // Prix de revient d'une valeur avec dividend. (les prix d'achats - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShareEQ, Float> sharePRUNet; // (les prix d'achats - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Price> sharePRUNet; // (les prix d'achats - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
 
     /*
      Si je veux comptabiliser les taxes
@@ -81,6 +88,8 @@ public class PortfolioStateAtDate {
         output = new StateValue();
         inputOutput = new StateValue();
         dividends = new StateValue();
+        portfolioValue = new Price();
+        dividendYield = new Price();
         liquidity = new StateValue();
         creditImpot = new StateValue();
         shareNb = new HashMap<>();
@@ -96,10 +105,13 @@ public class PortfolioStateAtDate {
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
+        this.date = previousState.getDate();
         this.input = new StateValue(previousState.input);
         this.output = new StateValue(previousState.output);
         this.inputOutput = new StateValue(previousState.inputOutput);
         this.dividends = new StateValue(previousState.dividends);
+        this.portfolioValue = previousState.getPortfolioValue();
+        this.dividendYield = previousState.getDividendYield();
         this.liquidity = new StateValue(previousState.liquidity);
         this.creditImpot = new StateValue(previousState.creditImpot);
         this.shareBuy = new StateValue(previousState.shareBuy);
@@ -108,7 +120,9 @@ public class PortfolioStateAtDate {
         this.shareNb = new HashMap<>();
         this.shareNb.putAll(previousState.shareNb);
         this.shareSoldDetails = new HashMap<>();
+        this.shareSoldDetails.putAll(previousState.getShareSoldDetails());
         this.shareBuyDetails = new HashMap<>();
+        this.shareBuyDetails.putAll(previousState.getShareBuyDetails());
         this.sharePRBrut = new HashMap<>();
         this.sharePRBrut.putAll(previousState.sharePRBrut);
         this.sharePRUBrut = new HashMap<>();
@@ -140,24 +154,37 @@ public class PortfolioStateAtDate {
     public StateValue getDividends() {
         return dividends;
     }
+    public Price getDividendYield(){
+        return dividendYield;
+    }
+    public void setDividendYield(Price p){
+        this.dividendYield = p;;
+    }
+    public Price getPortfolioValue(){
+        return this.portfolioValue;
+    }
+    public void setPortfolioValue(Price f){
+        this.portfolioValue = f;
+    }
+
     public StateValue getShareBuy() { return shareBuy; }
     public StateValue getShareSold() { return shareSold; }
     public StateValue getAllTaxes() { return allTaxes; }
 
-    public Map<EZShareEQ, Float> getShareNb() {
+    public Map<EZShareEQ, Price> getShareNb() {
         return shareNb;
-    }
+    } // la valeur n'est pas un prix, mais un nombre d'action
 
-    public Map<EZShareEQ, Float> getShareBuyDetails() {
+    public Map<EZShareEQ, Price> getShareBuyDetails() {
         return shareBuyDetails;
     }
-    public Map<EZShareEQ, Float> getShareSoldDetails() {
+    public Map<EZShareEQ, Price> getShareSoldDetails() {
         return shareSoldDetails;
     }
-    public Map<EZShareEQ, Float> getSharePRBrut() { return sharePRBrut; }
-    public Map<EZShareEQ, Float> getSharePRUBrut() { return sharePRUBrut; }
-    public Map<EZShareEQ, Float> getSharePRNet() { return sharePRNet; }
-    public Map<EZShareEQ, Float> getSharePRUNet() { return sharePRUNet; }
+    public Map<EZShareEQ, Price> getSharePRBrut() { return sharePRBrut; }
+    public Map<EZShareEQ, Price> getSharePRUBrut() { return sharePRUBrut; }
+    public Map<EZShareEQ, Price> getSharePRNet() { return sharePRNet; }
+    public Map<EZShareEQ, Price> getSharePRUNet() { return sharePRUNet; }
 
     public StateValue getLiquidity() {
         return liquidity;
@@ -168,46 +195,46 @@ public class PortfolioStateAtDate {
     }
 
     public static class StateValue {
-        private Float cumulative; // from the begin of the world
-        private Float instant; // difference with the previous value
+        private Price cumulative; // from the begin of the world
+        private Price instant; // difference with the previous value
 
         public StateValue(){
-            this.instant = 0f;
-            this.cumulative = 0f;
+            this.instant = new Price();
+            this.cumulative = new Price();
         }
 
         public StateValue(StateValue previousState){
-            this.instant = 0f;
-            this.cumulative = previousState.cumulative + instant;
+            this.instant = new Price();
+            this.cumulative = previousState.cumulative;
         }
 
-        public StateValue(Float instant){
+        public StateValue(Price instant){
             this.cumulative = instant;
             this.instant = instant;
         }
 
-        public StateValue(Float instant, Float cumulative){
+        public StateValue(Price instant, Price cumulative){
             this.cumulative = cumulative;
             this.instant = instant;
         }
 
-        public Float getCumulative(){
+        public Price getCumulative(){
             return cumulative;
         }
 
-        public Float getInstant(){
+        public Price getInstant(){
             return instant;
         }
 
-        public StateValue plus(float newNb) {
-            instant += newNb;
-            cumulative += newNb;
+        public StateValue plus(Price p) {
+            this.instant = instant.plus(p);
+            this.cumulative = cumulative.plus(p);
             return this;
         }
 
-        public StateValue minus(float newNb) {
-            instant -= newNb;
-            cumulative -= newNb;
+        public StateValue minus(Price p) {
+            this.instant = instant.minus(p);
+            this.cumulative = cumulative.minus(p);
             return this;
         }
 
