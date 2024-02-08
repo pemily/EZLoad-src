@@ -26,8 +26,8 @@ public class GoogleTools {
     public static String googleCodeReversed(String googleCode) {
         // ezPortfolio contien: NASDAQ: TSLA, mais la recherche utilise: TSLA:NASDAQ
         if (googleCode == null) return null;
-        String codes[] = StringUtils.divide(googleCode, ':');
-        if (codes.length > 1){
+        String[] codes = StringUtils.divide(googleCode, ':');
+        if (codes != null){
             return codes[1]+":"+codes[0];
         }
         return googleCode;
@@ -35,11 +35,11 @@ public class GoogleTools {
 
 
     // Warning, only the today date is inside this Prices list
-    static public Prices getCurrentPrice(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
-        if (!StringUtils.isBlank(ezShare.getGoogleCode())) {
-            String url = "https://www.google.com/finance/quote/"+googleCodeReversed(ezShare.getGoogleCode());
+    static public Prices getCurrentPrice(Reporting reporting, HttpUtilCached cache, String googleCode) throws Exception {
+        if (!StringUtils.isBlank(googleCode)) {
+            String url = "https://www.google.com/finance/quote/"+googleCodeReversed(googleCode);
             long cachePerMinute =  EZDate.today().toEpochSecond()/60;
-            return cache.get(reporting, "google_quote_"+ezShare.getGoogleCode()+"_"+cachePerMinute, url, inputStream -> {
+            return cache.get(reporting, "google_quote_"+googleCode+"_"+cachePerMinute, url, inputStream -> {
                 String page = FileUtil.inputStream2String(inputStream);
                 // <div class="YMlKec fxKbKc">299,68&nbsp;$</div>
                 String[] data = StringUtils.divide(page, "<div class=\"YMlKec fxKbKc\">");
@@ -54,7 +54,7 @@ public class GoogleTools {
                         EZDevise devise = DeviseUtil.foundBySymbolOrCode(deviseStr);
                         Prices prices = new Prices();
                         EZDate today = EZDate.today();
-                        prices.setLabel(ezShare.getEzName()+" (Prix du jour uniquement)");
+                        prices.setLabel(googleCode+" (Prix du jour uniquement)");
                         prices.setDevise(devise);
                         prices.addPrice(today, new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(deviseStr.length())), false));
                         return prices;

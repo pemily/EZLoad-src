@@ -7,8 +7,8 @@ import java.util.Objects;
 public class EZShareEQ extends EZShare {
 
     public EZShareEQ(EZShare ez){
-        if (ez.getEzName() == null) throw new IllegalStateException("Le nom d'une action ne peut pas etre null");
-        if (ez.getEzName().isBlank()) throw new IllegalStateException("Le nom d'une action ne peut pas etre null");
+        if (ez.getEzName() == null) throw new IllegalStateException("Le nom d'une action ne peut pas être null");
+        if (ez.getEzName().isBlank()) throw new IllegalStateException("Le nom d'une action ne peut pas être vide");
         this.setEzName(ez.getEzName());
         this.setCountryCode(ez.getCountryCode());
         this.setDescription(ez.getDescription());
@@ -26,7 +26,8 @@ public class EZShareEQ extends EZShare {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EZShareEQ ezShareEQ = (EZShareEQ) o;
-        return Objects.equals(getEzName(), ezShareEQ.getEzName());
+        return Objects.equals(getEzName(), ezShareEQ.getEzName())
+                || Objects.equals(getAlternativeName(), ezShareEQ.getEzName());
     }
 
     @Override

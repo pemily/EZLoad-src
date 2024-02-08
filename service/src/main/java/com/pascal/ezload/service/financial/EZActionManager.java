@@ -45,13 +45,22 @@ public class EZActionManager {
         loadEZActions();
     }
 
-    public void createIfNeeded(ShareValue sv) throws IOException {
+    public void createIfNeeded(ShareValue sv) throws Exception {
         if (sv.getTickerCode() != null && sv.getTickerCode().equals(ShareValue.LIQUIDITY_CODE))
             return;
 
         Optional<EZShare> action = getFromGoogleTicker(sv.getTickerCode());
         if (action.isEmpty()) {
             action = getFromName(sv.getUserShareName());
+            if (action.isEmpty() && sv.getTickerCode() != null){
+                action = getFromGoogleTickerSecondChance(sv.getTickerCode());
+                // ce sont les memes actions, mais ils y a 2 ticker possible sur google (exemple avec Verizon: VZ & NYSE:VZ)
+                // et le nom dans le fichier shareData.json est different de celui d'EZPortfolio
+                if (action.isPresent()){
+                    action.get().setAlternativeName(sv.getUserShareName());
+                    saveEZActions();
+                }
+            }
         }
 
         if (action.isEmpty()){
@@ -121,12 +130,30 @@ public class EZActionManager {
 
     public Optional<EZShare> getFromGoogleTicker(String googleTicker) {
         if (StringUtils.isBlank(googleTicker)) return Optional.empty();
-        return ezShareData.getShares().stream().filter(a -> a.getGoogleCode() != null && a.getGoogleCode().equals(googleTicker)).findFirst();
+        return ezShareData.getShares().stream()
+                    .filter(a -> a.getGoogleCode() != null
+                                && (a.getGoogleCode().equals(googleTicker) || GoogleTools.googleCodeReversed(a.getGoogleCode()).equals(googleTicker)))
+                    .findFirst();
+    }
+
+    public Optional<EZShare> getFromGoogleTickerSecondChance(String googleTicker) {
+        if (StringUtils.isBlank(googleTicker)) return Optional.empty();
+        return ezShareData.getShares().stream()
+                                        .filter(a -> a.getGoogleCode() != null)
+                                        .filter(a -> {
+                                             String code = a.getGoogleCode();
+                                             String[] c = StringUtils.divide(code, ":");
+                                             if (c == null) return false;
+                                             return c[1].equals(googleTicker);
+                                        }).findFirst();
     }
 
     public Optional<EZShare> getFromName(String shareName) {
         if (StringUtils.isBlank(shareName)) return Optional.empty();
-        return ezShareData.getShares().stream().filter(a -> a.getEzName() != null && a.getEzName().equals(shareName)).findFirst();
+        return ezShareData.getShares().stream()
+                .filter(a -> (a.getEzName() != null && a.getEzName().equals(shareName))
+                        || (a.getAlternativeName() != null && a.getAlternativeName().equals(shareName)))
+                .findFirst();
     }
 
     private void loadEZActions() {
@@ -262,7 +289,7 @@ public class EZActionManager {
             }
             Prices googlePrices = null;
             try {
-                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : GoogleTools.getCurrentPrice(reporting, cache, ezShare);
+                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : GoogleTools.getCurrentPrice(reporting, cache, ezShare.getGoogleCode());
             }
             catch (Exception e){
             }

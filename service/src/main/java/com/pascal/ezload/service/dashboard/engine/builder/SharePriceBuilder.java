@@ -6,10 +6,7 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.finance.Dividend;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SharePriceBuilder {
 
@@ -40,7 +37,8 @@ public class SharePriceBuilder {
 
         public EZShareEQ getShareFromName(String name) {
             return actionManager.getAllEZShares().stream()
-                    .filter(s -> s.getEzName().equalsIgnoreCase(name)) // TODO utiliser levenshtein ou Jaro Winkler?
+                    .filter(s -> s.getEzName().equalsIgnoreCase(name)
+                            || (s.getAlternativeName() != null && s.getAlternativeName().equalsIgnoreCase(name))) // TODO utiliser levenshtein ou Jaro Winkler?
                     .findFirst()
                     .map(EZShareEQ::new)
                     .orElseThrow(() -> new IllegalStateException("L'action " + name + " n'a pas été trouvé dans la liste d'actions. Vous devez la rajouter"));

@@ -32,7 +32,8 @@ import java.util.Objects;
 public class EZShare implements ActionData {
     public static final String NEW_SHARE = "NEW";
 
-    private String ezName; // the name from the user preference
+    private String ezName; // the name from the shareData.json
+    private String alternativeName; // found in EZPortfolio when loading it
     private String googleCode; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
     private String yahooCode; // can be null if ISIN not found
     private String isin; // can be null for the share coming from the EZPortfolio (during the initialization), they will be selected to be invalid in EZActionManager
@@ -58,6 +59,14 @@ public class EZShare implements ActionData {
 
     public void setEzName(String ezName) {
         this.ezName = ezName != null ? ezName.trim() : null;
+    }
+
+    public String getAlternativeName(){
+        return alternativeName;
+    }
+
+    public void setAlternativeName(String alternativeName){
+        this.alternativeName = alternativeName != null ? alternativeName.trim() : null ;
     }
 
     public String getGoogleCode() {

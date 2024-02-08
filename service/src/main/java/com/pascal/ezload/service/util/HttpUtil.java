@@ -63,6 +63,16 @@ public class HttpUtil {
         if (requestProperties != null) requestProperties.forEach(requestBuilder::header);
 
         HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() == 302 || response.statusCode() == 303){
+            // redirect
+            String newLocation = response.headers().firstValue("location").orElse(null);
+            if (newLocation != null){
+                return downloadV2(newLocation, requestProperties, f);
+            }
+            else{
+                throw new RuntimeException("302 sur url: "+urlStr+" headers: "+response.headers().map());
+            }
+        }
         try(InputStream in =response.body()) {
             return f.apply(in);
         }
