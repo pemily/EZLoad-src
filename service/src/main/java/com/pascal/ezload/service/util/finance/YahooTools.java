@@ -106,21 +106,21 @@ public class YahooTools extends ExternalSiteTools{
     static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
-            String url = "https://query1.finance.yahoo.com/v7/finance/options/"+ezShare.getYahooCode()+"?date="+EZDate.today().toEpochSecond();
+            String url = "https://query1.finance.yahoo.com/v8/finance/chart/"+ezShare.getYahooCode();
             return cache.get(reporting, "yahoo_devise_"+ezShare.getYahooCode(), url, inputStream -> {
                 Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
-                Map<String, Object> optionChain = (Map<String, Object>) top.get("optionChain");
-                if (optionChain == null) {
-                    return null;
+                Map<String, Object> chart = (Map<String, Object>) top.get("chart");
+                if (chart == null) {
+                    throw new RuntimeException("Impossible de recuperer la devise pour "+ezShare.getYahooCode()+" url: "+url);
                 }
 
-                List<Map<String, Object>> result = (List<Map<String, Object>>) optionChain.get("result");
+                List<Map<String, Object>> result = (List<Map<String, Object>>) chart.get("result");
                 if (result == null || result.size() == 0){
-                    return null;
+                    throw new RuntimeException("Impossible de recuperer la devise pour "+ezShare.getYahooCode()+" url: "+url);
                 }
 
-                Map<String, String> quote = (Map<String, String>) result.get(0).get("quote");
-                String currency = quote.get("currency");
+                Map<String, String> meta = (Map<String, String>) result.get(0).get("meta");
+                String currency = meta.get("currency");
 
                 return DeviseUtil.foundByCode(currency);
             });

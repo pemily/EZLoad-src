@@ -149,7 +149,7 @@ public class SharePriceBuilder {
                             Prices p = getPricesToTargetDevise(reporting, ezShare);
                             if (p != null) {
                                 float price = p.getPriceAt(currentDate).getValue();
-                                rendement = (annualDividend * 100f) / price;
+                                rendement = price == 0 ? 0f : (annualDividend * 100f) / price;
 
                             }
                         }
