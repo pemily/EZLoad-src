@@ -42,7 +42,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
 
     // return null if the dividend cannot be downloaded for this action
-    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws IOException {
+    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             Map<String, String> props = new HashMap<>();
             props.put("Accept-Encoding", "identity");
@@ -51,8 +51,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
             String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
                 // wait(2);
-                    try {
-                    return cache.get(reporting, "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + to.toYYYYMMDD(), url, props, inputStream -> {
+                    return cache.get(reporting, "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + EZDate.today(), url, props, inputStream -> {
                         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                         inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
                         Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
@@ -68,7 +67,9 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
                                     String freq = attributes.get("freq") != null ? attributes.get("freq").toString() : null;
 
-                                    Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL; // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
+                                    Dividend.EnumFrequency frequency = Dividend.EnumFrequency.EXCEPTIONEL;
+                                    // J'ai vu du NONE & UNKNOWN => https://seekingalpha.com/api/v3/symbols/GAM/dividend_history?&years=2
+                                    // Le NONE c'est lorsque l'action vient d'etre creer ex avec NLOP et qu'il n'y a pas d'historique pour connaitre la freq du dividende
                                     if ("MONTHLY".equals(freq))
                                         frequency = Dividend.EnumFrequency.MENSUEL;
                                     else if ("QUARTERLY".equals(freq))
@@ -78,6 +79,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                     else if ("YEARLY".equals(freq))
                                         frequency = Dividend.EnumFrequency.ANNUEL;
 
+                                    // Seeking alpha peut me donner des dividendes dans le futur si ils ont ete annoncé
                                     return new Dividend(
                                             NumberUtils.str2Float(attributes.get("amount").toString()),
                                             seekingAlphaDate(attributes.get("ex_date")),
@@ -91,14 +93,9 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                 })
                                 .collect(Collectors.toList());
                     });
-                } catch (Exception e) {
-                    reporting.info("Error pendant la recherche du dividende avec: " + url + " - Erreur: " + e.getMessage() + e.getMessage());
-                    logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: " + url, e);
-                }
             }
         }
-
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
     private static void wait(int nbSec){
@@ -111,14 +108,13 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
 
     // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
-    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            try {
                 Prices sharePrices = new Prices();
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
                 sharePrices.setLabel(ezShare.getEzName());
                 // remove 7 days to the from date because seeking alpha have only 1 data per week, this is to be sure to have a data for the from date (and avoid a 0)
-                downloadPricesThenProcessRows(reporting, cache, ezShare, from.minusDays(7), to, rows -> {
+                downloadPricesThenProcessRows(reporting, cache, ezShare, from.minusDays(7), rows -> {
                     rows.filter(entry -> {
                                 EZDate date = parseDate(entry);
                                 return date.isAfter(from) && date.isBeforeOrEquals(to);
@@ -128,43 +124,41 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                 });
                 long nbOfDays = from.nbOfDaysTo(to) / 7; // seeking alpha give only 1 value per week
                 return checkResult(reporting, ezShare, sharePrices, nbOfDays);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action " + ezShare.getEzName());
-            }
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
-    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            try {
                 Prices sharePrices = new Prices();
                 sharePrices.setLabel(ezShare.getEzName());
                 sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                downloadPricesThenProcessRows(reporting, cache, ezShare, listOfDates.get(0), listOfDates.get(listOfDates.size() - 1), rows -> {
+                downloadPricesThenProcessRows(reporting, cache, ezShare, listOfDates.get(0), rows -> {
                     new PricesTools<>(rows, listOfDates, SeekingAlphaTools::parseDate, SeekingAlphaTools::createPriceAtDate, sharePrices)
                             .fillPricesForAListOfDates();
                 });
                 return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Pas de prix trouvé sur SeekingAlpha pour l'action " + ezShare.getEzName());
-            }
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
+    public static String getPricesCacheName(EZShare ezShare, EZDate from){
+        return "seekingAlpha_history_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "-" + EZDate.today().toYYYYMMDD();
+    }
 
-    private static void downloadPricesThenProcessRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
+    private static void downloadPricesThenProcessRows(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, ConsumerThatThrows<Stream<Map.Entry<String, Object>>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String url = "https://static.seekingalpha.com/cdn/finance-api/lua_charts?period=MAX&symbol=" + ezShare.getSeekingAlphaCode();
-            cache.get(reporting, "seekingAlpha_history_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "-" + to.toYYYYMMDD(), url, inputStream -> {
+            cache.get(reporting, getPricesCacheName(ezShare, from), url, inputStream -> {
                 Map<String, Object> r = new HashMap<>();
                 r = JsonUtil.readWithLazyMapper(inputStream, r.getClass());
                 r = (Map<String, Object>) r.get("attributes");
                 rowsConsumer.accept(r.entrySet().stream());
                 return null;
             });
+            return;
         }
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
     private static PriceAtDate createPriceAtDate(Map.Entry<String, Object> entry) {
@@ -189,12 +183,13 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
-    static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
+    static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws HttpUtil.DownloadException, IOException {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String cacheName = "seekingalpha_devise_" + ezShare.getSeekingAlphaCode();
             String devise = null;
             if (!cache.exists(cacheName)) {
-                HtmlPage result = HttpUtil.getFromUrl("https://seekingalpha.com/symbol/" + ezShare.getSeekingAlphaCode(), false);
+                String url = "https://seekingalpha.com/symbol/" + ezShare.getSeekingAlphaCode();
+                HtmlPage result = HttpUtil.getFromUrl(url, false);
                 for (DomElement iter : result.getDomElementDescendants()) {
                     String att = iter.getAttribute("data-test-id");
                     if (att.equals("symbol-description")) {
@@ -207,8 +202,10 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                         }
                     }
                 }
-                if (devise == null) devise = "null";
-                cache.createCache(cacheName, devise);
+                if (devise == null){
+                    throw new HttpUtil.DownloadException("Impossible de recuperer la devise sur l'url: "+url+" Text: \n"+result.getVisibleText());
+                }
+                else cache.createCache(cacheName, devise);
             } else {
                 devise = cache.getContent(cacheName);
                 if ("null".equals(devise)){
@@ -219,7 +216,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
             if (devise != null) return DeviseUtil.foundByCode(devise);
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
 

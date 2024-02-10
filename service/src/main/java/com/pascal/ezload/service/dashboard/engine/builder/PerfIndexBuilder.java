@@ -74,34 +74,28 @@ public class PerfIndexBuilder {
         });
     }
 
-    private static Supplier<Float> init() {
-        return () -> null;
+    private static Supplier<Price> init() {
+        return Price::new;
     }
 
-    private static BiFunction<Float, Float, Float> keepLast() {
+    private static BiFunction<Price, Price, Price> keepLast() {
         return (v1, v2) -> v2;
     }
 
-    private static BiFunction<Float, Float, Float> sum() {
-        return (v1, v2) -> {
-            Float sum;
-            if (v1 == null) sum = v2;
-            else if (v2 == null) sum = v1;
-            else sum = v1+v2;
-            return sum;
-        };
+    private static BiFunction<Price, Price, Price> sum() {
+        return Price::plus;
     }
 
     private Prices buildPerfPrices(Prices prices, ChartPerfSettings perfSettings,
-                                   Supplier<Float> groupByFirstValueFct,
-                                   BiFunction<Float, Float, Float> groupByFct){
+                                   Supplier<Price> groupByFirstValueFct,
+                                   BiFunction<Price, Price, Price> groupByFct){
 
         Prices pricesGrouped = createGroupedPrices(prices, perfSettings, groupByFirstValueFct, groupByFct);
 
         return computePerf(prices, perfSettings, pricesGrouped);
     }
 
-    private Prices createGroupedPrices(Prices prices, ChartPerfSettings perfSettings, Supplier<Float> groupByFirstValueFct, BiFunction<Float, Float, Float> groupByFct) {
+    private Prices createGroupedPrices(Prices prices, ChartPerfSettings perfSettings, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
         if (perfSettings.getPerfGroupedBy() == ChartPerfGroupedBy.DAILY) return prices;
 
         PriceAtDate firstDate = prices.getPrices().get(0);
@@ -116,10 +110,10 @@ public class PerfIndexBuilder {
         pricesGrouped.setLabel(prices.getLabel()+" grouped by "+perfSettings.getPerfGroupedBy());
         // init Prices grouped to have the same number of values than the labels
         for (PriceAtDate priceAtDate : prices.getPrices()) {
-            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate(), priceAtDate.isEstimated()));
+            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate()));
         }
         do {
-            Float currentValue = groupByFirstValueFct.get();
+            Price currentValue = groupByFirstValueFct.get();
             EZDate lastPeriodDate = null;
             int lastPeriodIndex = -1;
             boolean estimation = false;
@@ -127,14 +121,14 @@ public class PerfIndexBuilder {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
                     estimation |= priceAtDate.isEstimated();
                     lastPeriodDate = priceAtDate.getDate();
-                    currentValue = groupByFct.apply(currentValue, priceAtDate.getValue());
+                    currentValue = groupByFct.apply(currentValue, priceAtDate);
                 }
                 else if (lastPeriodDate != null){
                     break; // we can stop the loop there is nothing interresting after this date, the period is over
                 }
                 lastPeriodIndex++;
             }
-            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue == null ? new PriceAtDate(currentPeriod, estimation) : new PriceAtDate(currentPeriod, currentValue, estimation));
+            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue.getValue() == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(afterTodayPeriod));
@@ -147,36 +141,36 @@ public class PerfIndexBuilder {
         Prices result = new Prices();
         result.setDevise(prices.getDevise());
         result.setLabel(prices.getLabel()+" en "+perfSettings.getPerfFilter());
-        Float previousValue = null;
-        float cumul = 0;
+        Price previousValue = new Price();
+        Price cumul = new Price(0);
 
         for (PriceAtDate priceAtDate : pricesGrouped.getPrices()){
-            Float newPrice = perfSettings.getPerfFilter() == ChartPerfFilter.CUMUL ? cumul : null;
+            Price newPrice = perfSettings.getPerfFilter() == ChartPerfFilter.CUMUL ? cumul : new Price();
 
             if (priceAtDate.getValue() != null) {
-                boolean isFirstValue = previousValue == null;
+                boolean isFirstValue = previousValue.getValue() == null;
                 switch (perfSettings.getPerfFilter()) {
                     case VALUE:
-                        newPrice = priceAtDate.getValue();
+                        newPrice = priceAtDate;
                         break;
                     case CUMUL:
-                        newPrice = priceAtDate.getValue() + cumul;
+                        newPrice = priceAtDate.plus(cumul);
                         cumul = newPrice;
                         break;
                     case VALUE_VARIATION:
-                        previousValue = previousValue == null ? 0 : previousValue;
-                        newPrice = isFirstValue ? 0 : priceAtDate.getValue() - previousValue;
+                        previousValue = previousValue.getValue() == null ? new Price(0) : previousValue;
+                        newPrice = isFirstValue ? new Price(0) : priceAtDate.minus(previousValue);
                         break;
                     case VARIATION_EN_PERCENT:
-                        if (previousValue != null && previousValue == 0){
-                            if (priceAtDate.getValue() == 0) newPrice = 0f;
-                            else newPrice = null; // pas de données précédente, plutot que de mettre 100% d'augmentation qui ne veut rien dire, je ne met rien ca veut dire que la periode n'est pas adapté pour la comparaison
+                        if (previousValue.getValue() != null && previousValue.getValue() == 0){
+                            if (priceAtDate.getValue() == 0) newPrice = new Price(0);
+                            else newPrice = new Price(); // pas de données précédente, plutot que de mettre 100% d'augmentation qui ne veut rien dire, je ne met rien ca veut dire que la periode n'est pas adapté pour la comparaison
                         }
                         else {
-                            if (isFirstValue) newPrice = null;
+                            if (isFirstValue) newPrice = new Price();
                             else {
-                                if (priceAtDate.getValue() == 0) newPrice = null; // on a surement plus de donnée
-                                else newPrice = (priceAtDate.getValue() * 100f / previousValue) - 100f;
+                                if (priceAtDate.getValue() == 0) newPrice = new Price(); // on a surement plus de donnée
+                                else newPrice = priceAtDate.multiply(new Price(100)).divide(previousValue).minus(new Price(100));
                             }
                         }
                         break;
@@ -184,24 +178,20 @@ public class PerfIndexBuilder {
                         throw new IllegalStateException("Missing case: " + perfSettings.getPerfFilter());
                 }
 
-                previousValue = priceAtDate.getValue();
+                previousValue = priceAtDate;
             }
-            result.addPrice(priceAtDate.getDate(), newPrice == null ? new PriceAtDate(priceAtDate.getDate(), priceAtDate.isEstimated()) : new PriceAtDate(priceAtDate.getDate(), newPrice, priceAtDate.isEstimated()));
+            result.addPrice(priceAtDate.getDate(), newPrice.getValue() == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
         }
         return result;
     }
 
 
     private static EZDate createPeriod(ChartPerfGroupedBy groupedBy, EZDate date) {
-        switch (groupedBy){
-            case DAILY:
-                return date;
-            case MONTHLY:
-                return EZDate.monthPeriod(date.getYear(), date.getMonth());
-            case YEARLY:
-                return EZDate.yearPeriod(date.getYear());
-        }
-        throw new IllegalStateException("Missing case: "+groupedBy);
+        return switch (groupedBy) {
+            case DAILY -> date;
+            case MONTHLY -> EZDate.monthPeriod(date.getYear(), date.getMonth());
+            case YEARLY -> EZDate.yearPeriod(date.getYear());
+        };
     }
 
 

@@ -105,7 +105,6 @@ public class PortfolioStateAtDate {
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
-        this.date = previousState.getDate();
         this.input = new StateValue(previousState.input);
         this.output = new StateValue(previousState.output);
         this.inputOutput = new StateValue(previousState.inputOutput);
@@ -205,17 +204,13 @@ public class PortfolioStateAtDate {
 
         public StateValue(StateValue previousState){
             this.instant = new Price();
-            this.cumulative = previousState.cumulative;
+            this.cumulative = new Price(previousState.cumulative);
         }
 
-        public StateValue(Price instant){
-            this.cumulative = instant;
-            this.instant = instant;
-        }
 
         public StateValue(Price instant, Price cumulative){
-            this.cumulative = cumulative;
-            this.instant = instant;
+            this.cumulative = new Price(cumulative);
+            this.instant = new Price(instant);
         }
 
         public Price getCumulative(){

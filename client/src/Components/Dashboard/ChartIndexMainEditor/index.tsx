@@ -430,7 +430,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
         
-                <Box direction="row">
+            <Box direction="row">
                 {
                 isDefined(props.chartIndex.shareIndexConfig) && (
                     <>

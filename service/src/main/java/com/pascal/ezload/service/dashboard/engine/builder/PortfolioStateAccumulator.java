@@ -31,7 +31,6 @@ import com.pascal.ezload.service.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PortfolioStateAccumulator {
@@ -57,14 +56,14 @@ public class PortfolioStateAccumulator {
             .sorted(Comparator.comparing(r1 -> r1.getValueDate(MesOperations.DATE_COL)))
             .forEach(r -> {
                 EZDate opDate = r.getValueDate(MesOperations.DATE_COL);
-                while (selectedDate != null && selectedDate.isBefore(opDate)){
+                while (selectedDate != null && (selectedDate.isPeriod() ? opDate.isAfter(selectedDate.endPeriodDate()) : opDate.isAfter(selectedDate))){
                     useSelectedDate();
                     incSelectedDate();
                 }
                 process(r);
             });
         EZDate lastDate = dates.get(dates.size()-1);
-        while (selectedDate != null && selectedDate.isBeforeOrEquals(lastDate)){
+        while (selectedDate != null && (selectedDate.isPeriod() ? selectedDate.endPeriodDate().isBeforeOrEquals(lastDate) : selectedDate.isBeforeOrEquals(lastDate))){
             useSelectedDate();
             incSelectedDate();
         }
@@ -72,8 +71,15 @@ public class PortfolioStateAccumulator {
     }
 
     private void useSelectedDate() {
+        // ici on connait enfin la date de notre state
         previousState.setDate(selectedDate);
+        // on peut calculer les valeurs qui ne sont pas lié a une operation particuliere mais a toute les operations qui se retrouve dans la selectedDate
+        computePortfolioValue(selectedDate);
+        computePRU();
+        computeDividendYield(selectedDate);
+        // on ajoute le state dans le resultat
         result.add(previousState);
+        // et on prepare le nouveau state
         previousState = new PortfolioStateAtDate(previousState);
     }
 
@@ -89,56 +95,43 @@ public class PortfolioStateAccumulator {
         OperationTitle operationType = OperationTitle.build(operation.getValueStr(MesOperations.OPERATION_TYPE_COL));
         boolean addLiquidityAmount = false;
         boolean minusLiquidityAmount = false;
-        switch (operationType){
-            case AchatTitres:
+        switch (operationType) {
+            case AchatTitres -> {
                 buyShare(operation);
                 addLiquidityAmount = true; // add car le montant est négatif
-                break;
-            case DividendeVerse:
-            case DividendeBrut:
-            case DividendeBrutNonSoumisAAbattement:
-            case DividendeBrutSoumisAAbattement:
+            }
+            case DividendeVerse, DividendeBrut, DividendeBrutNonSoumisAAbattement, DividendeBrutSoumisAAbattement -> {
                 addDividend(operation);
                 addLiquidityAmount = true;
-                break;
-            case RetraitFonds:{
+            }
+            case RetraitFonds -> {
                 addOutputQuantity(operation);
                 minusLiquidityAmount = true;
-                break;
             }
-            case VenteTitres:
+            case VenteTitres -> {
                 soldShare(operation);
                 addLiquidityAmount = true;
-                break;
-            case VersementFonds:
+            }
+            case VersementFonds -> {
                 addInputQuantity(operation);
                 addLiquidityAmount = true;
-                break;
-            case AcompteImpotSurRevenu:{
+            }
+            case AcompteImpotSurRevenu -> {
                 addCreditImpot(operation);
                 minusLiquidityAmount = true;
-                break;
             }
-            case CourtageSurVenteDeTitres:{
+            case CourtageSurVenteDeTitres -> {
                 // ca devrait etre une operation négative dans EZPortfolio :(
                 Row negativeAmount = operation.createDeepCopy();
                 negativeAmount.setValue(MesOperations.AMOUNT_COL, "-" + extractAmount(operation).getValue());
                 taxeEventOnShare(negativeAmount);
                 minusLiquidityAmount = true;
-                break;
             }
-            case TaxeSurLesTransactions:
-            case DroitsDeGardeFraisDivers:
-            case CourtageSurAchatDeTitres:
-            case RetenueFiscale:
-            case PrelevementsSociaux:
-            case PrelevementsSociauxSurRetraitPEA:
-            case Divers:
+            case TaxeSurLesTransactions, DroitsDeGardeFraisDivers, CourtageSurAchatDeTitres, RetenueFiscale, PrelevementsSociaux, PrelevementsSociauxSurRetraitPEA, Divers -> {
                 taxeEventOnShare(operation);
                 addLiquidityAmount = true;
-                break;
-            default:
-                throw new IllegalStateException("Missing case");
+            }
+            default -> throw new IllegalStateException("Missing case");
         }
         // mets a jour les liquiditées en fonctions des opérations qui se sont déroulé
         if (addLiquidityAmount){
@@ -150,9 +143,6 @@ public class PortfolioStateAccumulator {
             previousState.getLiquidity().minus(amount);
         }
 
-        computePortfolioValue();
-        computePRU();
-        computeDividendYield();
     }
 
 
@@ -258,7 +248,7 @@ public class PortfolioStateAccumulator {
         return false; // was not a taxe on a share, perhaps another taxe?
     }
 
-    private void computePortfolioValue(){
+    private void computePortfolioValue(EZDate date){
         previousState.setPortfolioValue(previousState.getShareNb()
                                         .entrySet()
                                         .stream()
@@ -266,7 +256,7 @@ public class PortfolioStateAccumulator {
                                             Price nbOfShare = e.getValue();
                                             if (nbOfShare.getValue() == 0) return Price.ZERO;
                                             Prices prices = sharePriceBuilderResult.getPricesToTargetDevise(reporting, e.getKey());
-                                            Price price = prices == null ? Price.ZERO : prices.getPriceAt(previousState.getDate());
+                                            Price price = prices == null ? Price.ZERO : prices.getPriceAt(date);
                                             return nbOfShare.multiply(price);
                                         })
                                         .reduce(Price::plus)
@@ -284,7 +274,7 @@ public class PortfolioStateAccumulator {
 
 
     // doit etre apres computePortfolioValue()
-    private void computeDividendYield(){
+    private void computeDividendYield(EZDate date){
         Price portfolioValue = previousState.getPortfolioValue();
 
         Price yield = previousState
@@ -294,14 +284,14 @@ public class PortfolioStateAccumulator {
                             .map(e -> {
                                 Price nbOfShare = e.getValue();
                                 EZShareEQ share = e.getKey();
-                                PriceAtDate annualDividendPrice = sharePriceBuilderResult.getAnnualDividendYield(reporting, share).getPriceAt(previousState.getDate());
+                                PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getAnnualDividendYieldWithEstimates(reporting, share).getPriceAt(date);
 
-                                PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(previousState.getDate());
+                                PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(date);
                                 Price shareAmount = currentPrice.multiply(nbOfShare);
 
-                                Price ratioOfShareAmountOnPortfolio = shareAmount.divide(portfolioValue);
+                                Price ratioOfShareAmountOnPortfolio = portfolioValue.getValue() == null || portfolioValue.getValue() == 0 ? new Price() : shareAmount.divide(portfolioValue);
 
-                                return annualDividendPrice.multiply(ratioOfShareAmountOnPortfolio);
+                                return annualDividendYieldPrice.multiply(ratioOfShareAmountOnPortfolio);
                             })
                             .reduce(Price::plus)
                             .orElse(Price.ZERO);

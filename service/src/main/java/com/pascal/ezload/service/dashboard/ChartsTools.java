@@ -51,7 +51,12 @@ public class ChartsTools {
 
 
         List<EZDate> allDates = new ArrayList<>();
-        allDates.add(from);
+        allDates.add(switch (period){
+                        case DAY -> from;
+                        case MONTH -> EZDate.monthPeriod(from.getYear(), from.getMonth());
+                        case YEAR -> EZDate.yearPeriod(from.getYear());
+                    });
+
         while(previousDate.isBefore(to)){
             EZDate newDate = null;
             if (period == PERIOD_INTERVAL.DAY) {

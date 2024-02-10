@@ -4,13 +4,16 @@ public class Price {
 
     public static final Price ZERO = new Price(0);
 
-    private Float value;
-    private boolean estimated;
+    private final Float value;
+    private final boolean estimated;
 
-    public Price(){}
+    public Price(){
+        this.value = null; // unknown value
+        this.estimated = false;
+    }
 
     public Price(Price price){
-        this.value = price.getValue();
+        this.value = price.getValue(); // unknown value
         this.estimated = price.estimated;
     }
 
@@ -20,11 +23,6 @@ public class Price {
 
     public Price(float value, boolean estimated){
         this.value = value;
-        this.estimated = estimated;
-    }
-
-    public Price(boolean estimated){
-        this.value = null; // no value at this date
         this.estimated = estimated;
     }
 
@@ -55,7 +53,7 @@ public class Price {
                 newValue = this.value - value.getValue();
             }
         }
-        return newValue == null ? new Price(estimated | value.isEstimated()) : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
     }
 
     public Price plus(Price value) {
@@ -73,7 +71,7 @@ public class Price {
                 newValue = this.value + value.getValue();
             }
         }
-        return newValue == null ? new Price(estimated | value.isEstimated()) : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
     }
 
     public Price multiply(Price value) {
@@ -91,7 +89,7 @@ public class Price {
                 newValue = this.value * value.getValue();
             }
         }
-        return newValue == null ? new Price(estimated | value.isEstimated()) : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
     }
 
     public Price divide(Price value) {
@@ -112,7 +110,7 @@ public class Price {
                 newValue = this.value / value.getValue();
             }
         }
-        return newValue == null ? new Price(estimated | value.isEstimated()) : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
     }
 
     public Price reverse(){

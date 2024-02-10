@@ -36,47 +36,36 @@ public class YahooTools extends ExternalSiteTools{
     private static final Logger logger = Logger.getLogger("YahooTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
-    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
             sharePrices.setLabel(ezShare.getEzName());
             EZDate from = listOfDates.get(0);
-            EZDate to = listOfDates.get(listOfDates.size() - 1);
-            try {
-                sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
-                    new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
-                            .fillPricesForAListOfDates();
-                });
-                return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
-            }
-            catch (Exception e){
-                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
-            }
+            sharePrices.setDevise(getDevise(reporting, cache, ezShare));
+            downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, rows -> {
+                new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, sharePrices)
+                        .fillPricesForAListOfDates();
+            });
+            return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Yahoo pour "+ezShare.getEzName());
     }
 
-    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) {
+    public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
             sharePrices.setLabel(ezShare.getEzName());
-            try {
-                sharePrices.setDevise(getDevise(reporting, cache, ezShare));
-                downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, to, rows -> {
-                    rows.map(YahooTools::createPriceAtDate)
-                            .filter(p -> p.getDate().isAfter(from) && p.getDate().isBeforeOrEquals(to))
-                            .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+            sharePrices.setDevise(getDevise(reporting, cache, ezShare));
+            downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, rows -> {
+                rows.map(YahooTools::createPriceAtDate)
+                        .filter(p -> p.getDate().isAfter(from) && p.getDate().isBeforeOrEquals(to))
+                        .forEach(p -> sharePrices.addPrice(p.getDate(), p));
 
-                });
-                long nbOfDays = from.nbOfDaysTo(to);
-                return checkResult(reporting, ezShare, sharePrices, nbOfDays);
-            }
-            catch (Exception e){
-                reporting.info("Pas de prix trouvé sur Yahoo pour l'action "+ezShare.getEzName()+" entre "+ from +" et "+ to+". Erreur: "+e.getMessage());
-            }
+            });
+            long nbOfDays = from.nbOfDaysTo(to);
+            return checkResult(reporting, ezShare, sharePrices, nbOfDays);
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Yahoo pour "+ezShare.getEzName());
     }
 
 
@@ -88,18 +77,21 @@ public class YahooTools extends ExternalSiteTools{
         return new PriceAtDate(EZDate.parseYYYMMDDDate(date, '-'), NumberUtils.str2Float((closePrice)), false);
     }
 
-    private static void downloadPricesThenProcessCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, EZDate to, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
+    private static void downloadPricesThenProcessCvsRows(Reporting reporting, HttpUtilCached cache, String yahooCode, EZDate from, ConsumerThatThrows<Stream<CsvRow>> rowsConsumer) throws Exception {
         if (!StringUtils.isBlank(yahooCode)) {
             //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/AMT?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
             // remove 3 days to the from date because of the WE, to be sure to have a data for the from date (and avoid a 0)
-            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.minusDays(3).toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
-            cache.get(reporting, "yahoo_history_"+yahooCode+"_"+from.toYYYYMMDD()+"-"+to.toYYYYMMDD(), url, inputStream -> {
+            EZDate today = EZDate.today();
+            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.minusDays(3).toEpochSecond()+"&period2="+today.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
+            cache.get(reporting, "yahoo_history_"+yahooCode+"_"+from.toYYYYMMDD()+"-"+today.toYYYYMMDD(), url, inputStream -> {
                 rowsConsumer.accept(
                         CsvUtil.load(inputStream, ",", 1)
                         .filter(row -> !row.get(0).equals("null") && !row.get(4).equals("null")));
                 return null;
             });
+            return;
         }
+        throw new HttpUtil.DownloadException("Dev error. Pas de code Yahoo "+yahooCode);
     }
 
 
@@ -125,7 +117,7 @@ public class YahooTools extends ExternalSiteTools{
                 return DeviseUtil.foundByCode(currency);
             });
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Yahoo pour "+ezShare.getEzName());
     }
 
     // For Later perhaps????
@@ -171,15 +163,18 @@ public class YahooTools extends ExternalSiteTools{
         });
     }
 
+    static public String getDividendsCacheName(EZShare ezShare, EZDate from){
+        return "yahoo_dividends_" + ezShare.getYahooCode() + "_" + from.toYYYYMMDD() + "_" + EZDate.today().toYYYYMMDD();
+    }
 
-    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws IOException {
+    static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())){
             //            https://query1.finance.yahoo.com/v8/finance/chart/4AB.F?formatted=true&crumb=9bPXKt3sPBQ&lang=en-US&region=US&includeAdjustedClose=true&interval=1d&period1=1356912000&period2=1671494400&events=capitalGain%7Cdiv%7Csplit&useYfid=true&corsDomain=finance.yahoo.com
 
-            String url = "https://query1.finance.yahoo.com/v7/finance/download/" + ezShare.getYahooCode() + "?period1="+ from.toEpochSecond()+"&period2="+to.toEpochSecond()+"&interval=1d&events=div";
+            EZDate today = EZDate.today();
+            String url = "https://query1.finance.yahoo.com/v7/finance/download/" + ezShare.getYahooCode() + "?period1="+ from.toEpochSecond()+"&period2="+today.toEpochSecond()+"&interval=1d&events=div";
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis "+url)) {
-                try {
-                    return cache.get(reporting, "yahoo_dividends_" + ezShare.getYahooCode() + "_" + from.toYYYYMMDD() + "_" + to.toYYYYMMDD(), url, inputStream -> {
+                    return cache.get(reporting, getDividendsCacheName(ezShare, from), url, inputStream -> {
                         List<CsvRow> rows = CsvUtil.load(inputStream, ",", 1)
                                 .collect(Collectors.toList());
 
@@ -198,14 +193,9 @@ public class YahooTools extends ExternalSiteTools{
                                 .sorted(Comparator.comparing(Dividend::getDate))
                                 .collect(Collectors.toList());
                     });
-                } catch (Exception e) {
-                    reporting.info("Error pendant la recherche du dividende avec: " + url + " - Erreur: " + e.getMessage() + e.getMessage());
-                    logger.log(Level.SEVERE, "Error pendant la recherche du dividende avec: " + url, e);
-                }
             }
         }
-
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Yahoo pour "+ezShare.getEzName());
     }
 
 
@@ -216,7 +206,7 @@ public class YahooTools extends ExternalSiteTools{
 
         Prices devisePrices = new Prices();
         devisePrices.setLabel(fromDevise.getSymbol()+" => "+toDevise.getSymbol());
-        downloadPricesThenProcessCvsRows(reporting, cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), listOfDates.get(listOfDates.size()-1), rows -> {
+        downloadPricesThenProcessCvsRows(reporting, cache, fromDevise.getCode()+toDevise.getCode()+"=X", listOfDates.get(0), rows -> {
             new PricesTools<>(rows, listOfDates, row -> EZDate.parseYYYMMDDDate(row.get(0), '-'), YahooTools::createPriceAtDate, devisePrices)
                     .fillPricesForAListOfDates();
         });

@@ -46,16 +46,16 @@ public class SeekingAlphaToolsTest {
 
 
     @Test
-    public void testSearchDividendeHistory() throws IOException {
+    public void testSearchDividendeHistory() throws Exception {
         EZShare action = new EZShare();
         action.setSeekingAlphaCode("WSR");
-        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2), EZDate.today());
+        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2));
         Assertions.assertTrue(dividends.size() > 12);
     }
 
 
     @Test
-    public void testSearchDividendeHistory2() throws IOException {
+    public void testSearchDividendeHistory2() throws Exception {
         EZShare action = new EZShare();
         List<String> l = new LinkedList<>();
         List.of("AOS", "WSR", "WPC", "IBM", "HP", "ABBV", "ABBV", "ABBV","ABBV","WBA", "WBA", "VZ", "UHT", "HP", "ABBV", "IBM", "UHT")
@@ -63,11 +63,11 @@ public class SeekingAlphaToolsTest {
                 action.setSeekingAlphaCode(sh);
                 List<Dividend> dividends = null;
                 try {
-                    dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2), EZDate.today());
+                    dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2));
                     if (dividends == null){
                         l.add(sh+"   ERROR 1 \n");
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     l.add(sh+"   ERROR 2\n");
                 }
         });

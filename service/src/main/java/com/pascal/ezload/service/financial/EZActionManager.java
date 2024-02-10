@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -246,17 +247,41 @@ public class EZActionManager {
     }
 
     // return null if not found
-    public List<Dividend> searchDividends(Reporting rep, EZShare ezShare, EZDate from, EZDate to) throws IOException {
+    public List<Dividend> searchDividends(Reporting rep, EZShare ezShare, EZDate from) throws Exception {
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
-            List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from, to);
-            if (dividends == null){
+            List<Dividend> dividends = null;
+            try {
+                if (cache.exists(YahooTools.getDividendsCacheName(ezShare, from))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
+                    dividends = YahooTools.searchDividends(reporting, cache, ezShare, from);
+                }
+                if (dividends == null){
+                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from));
+                }
+            }
+            catch (Exception e){
                 reporting.info("Tentative avec YahooFinance");
-                dividends = YahooTools.searchDividends(reporting, cache, ezShare, from, to);
+                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, from));
             }
             return dividends;
         }
     }
 
+    private static <R> R retryIfDownloadError(Reporting rep, int retry, SupplierThatThrow<R> f) throws Exception{
+        Exception lastError = null;
+        for (int i = 0; i < retry; i++) {
+            try {
+                R r = f.get();
+                rep.info("Succès après "+i+" essaie(s)");
+                return r;
+            } catch (Exception e) {
+                rep.info("Essaie n°"+i);
+                Sleep.waitSeconds(2);
+                lastError = e;
+            }
+        }
+        rep.info("Échec après "+retry+" essaies");
+        throw lastError;
+    }
 
     public List<String> computeActionErrors(Reporting rep, EZShare ezShare) throws IOException {
         try(Reporting reporting = rep.pushSection("Verification de l'action: "+ezShare.getEzName())){
@@ -279,17 +304,17 @@ public class EZActionManager {
             EZDate to = EZDate.today().minusDays(3); // do not take the current days, since the current price is not always up to date
             EZDate from = to.minusDays(12);
             try {
-                yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : YahooTools.getPrices(reporting, cache, ezShare, from, to);
+                yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, cache, ezShare, from, to));
             } catch (Exception e) {
             }
             Prices seekingPrices = null;
             try {
-                seekingPrices = StringUtils.isBlank(ezShare.getSeekingAlphaCode()) ? null : SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to);
+                seekingPrices = StringUtils.isBlank(ezShare.getSeekingAlphaCode()) ? null : retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to));
             } catch (Exception e) {
             }
             Prices googlePrices = null;
             try {
-                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : GoogleTools.getCurrentPrice(reporting, cache, ezShare.getGoogleCode());
+                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : retryIfDownloadError(rep, 2, () -> GoogleTools.getCurrentPrice(reporting, cache, ezShare.getGoogleCode()));
             }
             catch (Exception e){
             }
@@ -348,7 +373,7 @@ public class EZActionManager {
 
     public CurrencyMap getCurrencyMap(Reporting rep, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche de la conversion "+fromDevise+" vers "+toDevise)) {
-            return YahooTools.getCurrencyMap(reporting, cache, fromDevise, toDevise, listOfDates);
+            return retryIfDownloadError(rep, 2, () -> YahooTools.getCurrencyMap(reporting, cache, fromDevise, toDevise, listOfDates));
         }
     }
 
@@ -402,27 +427,37 @@ public class EZActionManager {
     }
 
 
-    public Prices getPrices(Reporting rep, EZShare ez, EZDate from, EZDate to) throws IOException {
+    public Prices getPrices(Reporting rep, EZShare ez, EZDate from, EZDate to) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
-            Prices prices = YahooTools.getPrices(reporting, cache, ez, from, to);
-            if (prices == null) {
-                prices = SeekingAlphaTools.getPrices(reporting, cache, ez, from, to);
+            Prices prices = null;
+            try {
+                if (cache.exists(SeekingAlphaTools.getPricesCacheName(ez, from))) {
+                    prices = SeekingAlphaTools.getPrices(reporting, cache, ez, from, to);
+                }
+                if (prices == null) {
+                    prices = retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, cache, ez, from, to));
+                }
             }
-            if (prices == null) {
-                reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
+            catch(Exception e){
+                prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ez, from, to));
             }
             return prices;
         }
     }
 
-    public Prices getPrices(Reporting rep, EZShare ez, List<EZDate> listOfDates) throws IOException {
+    public Prices getPrices(Reporting rep, EZShare ez, List<EZDate> listOfDates) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
-            Prices prices = YahooTools.getPrices(reporting, cache, ez, listOfDates);
-            if (prices == null) {
-                prices = SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates);
+            Prices prices = null;
+            try {
+                if (cache.exists(SeekingAlphaTools.getPricesCacheName(ez, listOfDates.get(0)))) {
+                    prices = SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates);
+                }
+                if (prices == null) {
+                    prices = retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, cache, ez, listOfDates));
+                }
             }
-            if (prices == null) {
-                reporting.error("Pas de prix trouvé pour l'action " + ez.getEzName());
+            catch(Exception e){
+                prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates));
             }
             return prices;
         }

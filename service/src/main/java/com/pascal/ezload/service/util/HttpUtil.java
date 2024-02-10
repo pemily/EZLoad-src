@@ -74,6 +74,9 @@ public class HttpUtil {
             }
         }
         try(InputStream in =response.body()) {
+            if (response.statusCode() / 100 != 2){
+                throw new DownloadException("Impossible to download data at "+urlStr+" status code:"+response.statusCode()+" \n"+IOUtils.toString(in, StandardCharsets.UTF_8));
+            }
             return f.apply(in);
         }
     }
@@ -160,4 +163,10 @@ public class HttpUtil {
         return list[userAgentIndex];
     }
 
+
+    public static class DownloadException extends Exception {
+        public DownloadException(String msg){
+            super(msg);
+        }
+    }
 }

@@ -35,8 +35,8 @@ public class PriceAtDate extends Price {
         this.date = date;
     }
 
-    public PriceAtDate(EZDate date, boolean estimated){
-        super(estimated);
+    public PriceAtDate(EZDate date){
+        super();
         this.date = date;
     }
 

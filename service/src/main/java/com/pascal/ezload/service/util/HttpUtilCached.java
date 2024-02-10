@@ -43,7 +43,9 @@ public class HttpUtilCached {
             File cache = new File(cacheDir + File.separator + format(cacheName) + ".json");
             if (cache.exists()) {
                 rep.info("Fichier de cache trouvé: "+cache.getAbsolutePath());
-                return toObjMapper.apply(FileUtil.read(cache));
+                try (InputStream in = FileUtil.read(cache)) {
+                    return toObjMapper.apply(in);
+                }
             }
             rep.info("Fichier de cache non trouvé, téléchargement des données");
             HttpUtil.downloadV2(url, requestProperties, inputStream -> {
@@ -51,7 +53,9 @@ public class HttpUtilCached {
                 return cache;
             });
             rep.info("Fin de téléchargement");
-            return toObjMapper.apply(FileUtil.read(cache));
+            try (InputStream in = FileUtil.read(cache)) {
+                return toObjMapper.apply(in);
+            }
         }
     }
 
@@ -79,4 +83,5 @@ public class HttpUtilCached {
     public String getContent(String cacheName) throws IOException {
         return FileUtil.file2String(cacheDir+File.separator+format(cacheName)+".json");
     }
+
 }

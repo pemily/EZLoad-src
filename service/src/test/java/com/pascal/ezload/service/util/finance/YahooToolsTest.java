@@ -171,8 +171,7 @@ public class YahooToolsTest {
     public void testSearchDividends() throws Exception {
         Optional<EZShare> action = YahooTools.searchAction(new LoggerReporting(), cache(), "US92936U1097");
         Assertions.assertEquals("W. P. Carey Inc.", action.get().getEzName());
-        List<Dividend> dividends = YahooTools.searchDividends(new LoggerReporting(), cache(), action.get(), EZDate.parseYYYMMDDDate("2021/01/01", '/'),
-                EZDate.parseYYYMMDDDate("2021/12/31", '/'));
+        List<Dividend> dividends = YahooTools.searchDividends(new LoggerReporting(), cache(), action.get(), EZDate.parseYYYMMDDDate("2021/01/01", '/'));
         Assertions.assertEquals(4, dividends.size());
         Assertions.assertEquals("1.048000", dividends.get(0).getAmount());
         Assertions.assertEquals("2021/03/30", dividends.get(0).getDate().toYYYYMMDD());

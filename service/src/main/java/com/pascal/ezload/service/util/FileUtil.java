@@ -35,7 +35,9 @@ public class FileUtil {
 
     public static String file2String(String file) throws IOException {
         if (! new File(file).exists()) return null;
-        return inputStream2String(new FileInputStream(file));
+        try (InputStream in = new FileInputStream(file)) {
+            return inputStream2String(in);
+        }
     }
 
     public static String inputStream2String(InputStream inputStream) throws IOException {
@@ -50,9 +52,9 @@ public class FileUtil {
 
     public static void string2file(String file, String content) throws IOException {
         new File(file).getParentFile().mkdirs();
-        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8);
-        fileWriter.write(content);
-        fileWriter.close();
+        try (OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8)) {
+            fileWriter.write(content);
+        }
     }
 
     public static void write(File file, InputStream content) throws IOException {

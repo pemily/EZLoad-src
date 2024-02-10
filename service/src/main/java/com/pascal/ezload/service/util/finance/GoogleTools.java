@@ -60,10 +60,10 @@ public class GoogleTools {
                         return prices;
                     }
                 }
-                return null;
+                throw new HttpUtil.DownloadException("Pas de Prix trouvé avec Google pour "+googleCode);
             });
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Google");
     }
 
 }
