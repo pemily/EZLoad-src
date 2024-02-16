@@ -1,120 +1,74 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.ShareIndex;
-import com.pascal.ezload.service.model.*;
+import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.service.model.Price;
+import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
-
-import static com.pascal.ezload.service.dashboard.config.ShareIndex.*;
 
 public class ShareIndexBuilder {
 
-    private final SharePriceBuilder.Result sharePriceResult;
-    private final PortfolioIndexBuilder.Result portfolioIndexResult;
-    private final CurrenciesIndexBuilder.Result currenciesResult;
-    private final ShareSelectionBuilder shareSelectionBuilder;
+    private final SharePriceBuilder sharePriceResult;
+    private final PortfolioIndexBuilder portfolioIndexResult;
+    private final CurrenciesIndexBuilder currenciesResult;
+    private final Reporting reporting;
+    private final List<EZDate> dates;
 
 
-    public ShareIndexBuilder(PortfolioIndexBuilder.Result portfolioIndexResult, SharePriceBuilder.Result sharePriceResult, CurrenciesIndexBuilder.Result currenciesResult, ShareSelectionBuilder shareSelectionBuilder){
+    public ShareIndexBuilder(Reporting reporting, List<EZDate> dates, PortfolioIndexBuilder portfolioIndexResult, SharePriceBuilder sharePriceResult, CurrenciesIndexBuilder currenciesResult){
+        this.reporting = reporting;
+        this.dates = dates;
         this.portfolioIndexResult = portfolioIndexResult;
         this.sharePriceResult = sharePriceResult;
         this.currenciesResult = currenciesResult;
-        this.shareSelectionBuilder = shareSelectionBuilder;
     }
 
 
-    public Result build(Reporting reporting, List<EZDate> dates, List<ChartIndex> indexSelection) {
-        Result result = new Result();
-        build(reporting, dates, indexSelection, result);
-        return result;
+    private Price get(ShareIndex shareIndex, EZShareEQ ezShare, EZDate date) {
+            return switch (shareIndex) {
+                case SHARE_PRICE -> sharePriceResult.getPricesToTargetDevise(reporting, ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_DIVIDEND -> sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                case SHARE_ANNUAL_DIVIDEND_YIELD -> sharePriceResult.getAnnualDividendYieldWithEstimates(reporting, ezShare).getPriceAt(date);
+                case SHARE_COUNT -> portfolioIndexResult.getDate2share2ShareNb(ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> {
+                        Price pru = portfolioIndexResult.getDate2share2PRUBrut(ezShare).getPriceAt(date);
+                        PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                        if (p == null || pru == null || pru.getValue() == 0) yield new Price();
+                        yield p.multiply(new Price(100)).divide(pru);
+                }
+                case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET -> {
+                        Price pru = portfolioIndexResult.getDate2share2PRUNet(ezShare).getPriceAt(date);
+                        PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                        if (p == null || pru == null || pru.getValue() == 0) yield new Price();
+                        yield p.multiply(new Price(100)).divide(pru);
+                }
+                case SHARE_PRU_BRUT -> portfolioIndexResult.getDate2share2PRUBrut(ezShare).getPriceAt(date);
+                case SHARE_PRU_NET -> portfolioIndexResult.getDate2share2PRUNet(ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_BUY_SOLD -> portfolioIndexResult.getDate2share2BuyOrSoldAmount(ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_BUY -> portfolioIndexResult.getDate2share2BuyAmount(ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_SOLD -> portfolioIndexResult.getDate2share2SoldAmount(ezShare).getPriceAt(date);
+            };
     }
 
 
-    private void build(Reporting reporting, List<EZDate> dates, List<ChartIndex> shareIndexesConfig, Result r) {
-        shareIndexesConfig
-                .forEach(si -> {
-                    if (si.getShareIndexConfig() != null) {
-                        ShareSelectionBuilder.Result shareSelectionResult = shareSelectionBuilder.build(si.getShareIndexConfig());
-                        r.chartIndexId2ShareSelection.put(si.getId(), shareSelectionResult);
+    private final Map<ShareIndex, Map<EZShareEQ, Prices>> shareIndex2share2TargetPrices = new HashMap<>();
 
-                        shareSelectionResult.getSelectedShares()
-                                .forEach(ezShare -> {
-                                    switch (si.getShareIndexConfig().getShareIndex()) {
-                                        case SHARE_PRICE -> addIndexInResult(r, SHARE_PRICE, ezShare, sharePriceResult.getPricesToTargetDevise(reporting, ezShare));
-                                        case SHARE_COUNT -> buildPricesAndSaveInResult(r, SHARE_COUNT, ezShare, portfolioIndexResult.getDate2share2ShareNb(), dates);
-                                        case CUMULABLE_SHARE_DIVIDEND -> addIndexInResult(r, CUMULABLE_SHARE_DIVIDEND, ezShare, sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare));
-                                        case SHARE_ANNUAL_DIVIDEND_YIELD -> addIndexInResult(r, SHARE_ANNUAL_DIVIDEND_YIELD, ezShare, sharePriceResult.getAnnualDividendYieldWithEstimates(reporting, ezShare));
-                                        case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> buildPricesAndSaveInResult(r, CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT, ezShare, portfolioIndexResult.getDate2share2PRUBrut(), dates,
-                                                (d, pru) -> {
-                                                    PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(d);
-                                                    if (p == null || pru == null || pru.getValue() == 0)
-                                                        return new PriceAtDate(d);
-                                                    Price newPrice = p.multiply(new Price(100)).divide(pru);
-                                                    return new PriceAtDate(d, newPrice);
-                                                });
-                                        case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET -> buildPricesAndSaveInResult(r, CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET, ezShare, portfolioIndexResult.getDate2share2PRUNet(), dates,
-                                                (d, pru) -> {
-                                                    PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(d);
-                                                    if (p == null || pru == null || pru.getValue() == 0)
-                                                        return new PriceAtDate(d);
-                                                    Price newPrice = p.multiply(new Price(100)).divide(pru);
-                                                    return new PriceAtDate(d, newPrice);
-                                                });
-                                        case SHARE_PRU_BRUT -> buildPricesAndSaveInResult(r, SHARE_PRU_BRUT, ezShare, portfolioIndexResult.getDate2share2PRUBrut(), dates);
-                                        case SHARE_PRU_NET -> buildPricesAndSaveInResult(r, SHARE_PRU_NET, ezShare, portfolioIndexResult.getDate2share2PRUNet(), dates);
-                                        case CUMULABLE_SHARE_BUY_SOLD -> buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY_SOLD, ezShare, portfolioIndexResult.getDate2share2BuyOrSoldAmount(), dates);
-                                        case CUMULABLE_SHARE_BUY -> buildPricesAndSaveInResult(r, CUMULABLE_SHARE_BUY, ezShare, portfolioIndexResult.getDate2share2BuyAmount(), dates);
-                                        case CUMULABLE_SHARE_SOLD -> buildPricesAndSaveInResult(r, CUMULABLE_SHARE_SOLD, ezShare, portfolioIndexResult.getDate2share2SoldAmount(), dates);
-                                        default -> throw new IllegalStateException("Missing case");
-                                    }
-                                });
-                    }
+    public Prices getShareIndex2TargetPrices(ShareIndex shareIndex, EZShareEQ ezShare) {
+        Map<EZShareEQ, Prices> share2Prices = shareIndex2share2TargetPrices.computeIfAbsent(shareIndex, si -> new HashMap<>());
+        return share2Prices.computeIfAbsent(ezShare, sh -> {
+            Prices prices = new Prices();
+            prices.setDevise(currenciesResult.getTargetDevise());
+            prices.setLabel(shareIndex.name()+" of "+ezShare.getEzName());
+            for (EZDate date : dates) {
+                Price value = get(shareIndex, ezShare, date);
+                prices.addPrice(value == null ? new PriceAtDate(date) : new PriceAtDate(date, value));
+            }
+            return prices;
         });
-    }
-
-    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare, Map<EZDate, Map<EZShareEQ, Price>> date2share2value, List<EZDate> dates) {
-        buildPricesAndSaveInResult(r, shareIndex, ezShare, date2share2value, dates, (d, v) -> v == null ? new PriceAtDate(d) : new PriceAtDate(d, v.getValue(), v.isEstimated()));
-    }
-
-    private void buildPricesAndSaveInResult(Result r, ShareIndex shareIndex, EZShareEQ ezShare, Map<EZDate, Map<EZShareEQ, Price>> date2share2value, List<EZDate> dates, BiFunction<EZDate, Price, PriceAtDate> valueTransformation) {
-        Prices prices = new Prices();
-        prices.setDevise(currenciesResult.getTargetDevise());
-        prices.setLabel(shareIndex.name()+" of "+ezShare.getEzName());
-        for (EZDate date : dates) {
-            Map<EZShareEQ, Price> share2value = date2share2value.get(date);
-            Price value = share2value.get(ezShare);
-            prices.addPrice(date, valueTransformation.apply(date, value));
-        }
-        addIndexInResult(r, shareIndex, ezShare, prices);
-    }
-
-
-    private void addIndexInResult(Result r, ShareIndex index, EZShare ezShare, Prices prices) {
-        if (prices != null) {
-            r.getShareIndex2TargetPrices().compute(index, (k, v) -> {
-                if (v == null)  v = new HashMap<>();
-                v.put(ezShare, prices);
-                return v; }
-            );
-        }
-    }
-
-
-    public static class Result {
-        private final Map<ShareIndex, Map<EZShare, Prices>> shareIndex2share2TargetPrices = new HashMap<>();
-        private final Map<String,  ShareSelectionBuilder.Result> chartIndexId2ShareSelection = new HashMap<>();
-
-        public ShareSelectionBuilder.Result getShareSelection(String chartIndexId){
-            return chartIndexId2ShareSelection.get(chartIndexId);
-        }
-
-        public Map<ShareIndex, Map<EZShare, Prices>> getShareIndex2TargetPrices() {
-            return shareIndex2share2TargetPrices;
-        }
     }
 }

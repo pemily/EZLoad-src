@@ -59,7 +59,7 @@ public class YahooTools extends ExternalSiteTools{
             downloadPricesThenProcessCvsRows(reporting, cache, ezShare.getYahooCode(), from, rows -> {
                 rows.map(YahooTools::createPriceAtDate)
                         .filter(p -> p.getDate().isAfter(from) && p.getDate().isBeforeOrEquals(to))
-                        .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+                        .forEach(sharePrices::addPrice);
 
             });
             long nbOfDays = from.nbOfDaysTo(to);

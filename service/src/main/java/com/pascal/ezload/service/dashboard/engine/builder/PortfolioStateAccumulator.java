@@ -41,9 +41,9 @@ public class PortfolioStateAccumulator {
     private EZDate selectedDate;
     private final List<EZDate> dates;
     private final List<PortfolioStateAtDate> result;
-    private final SharePriceBuilder.Result sharePriceBuilderResult;
+    private final SharePriceBuilder sharePriceBuilderResult;
 
-    public PortfolioStateAccumulator(Reporting reporting, List<EZDate> dates, SharePriceBuilder.Result sharePriceBuilderResult){
+    public PortfolioStateAccumulator(Reporting reporting, List<EZDate> dates, SharePriceBuilder sharePriceBuilderResult){
         this.reporting = reporting;
         this.dates = dates;
         this.sharePriceBuilderResult = sharePriceBuilderResult;

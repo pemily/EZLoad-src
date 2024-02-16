@@ -25,6 +25,7 @@ import com.pascal.ezload.service.dashboard.engine.builder.*;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
+import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.DeviseUtil;
@@ -171,29 +172,24 @@ public class DashboardManager {
 
             EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
-            CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise);
-            CurrenciesIndexBuilder.Result currenciesResult = currenciesIndexBuilder.build(dates);
-
-            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesResult);
-            SharePriceBuilder.Result sharePriceResult = sharePriceBuilder.build(reporting, dates);
-
-            PortfolioIndexBuilder portfolioIndexValuesBuilder = new PortfolioIndexBuilder(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesResult, sharePriceResult);
-            PortfolioIndexBuilder.Result portfolioResult = portfolioIndexValuesBuilder.build(reporting, dates, chartSettings.getExcludeBrokers(), chartSettings.getExcludeAccountTypes(),
-                    chartSettings.getIndexSelection());
-
-            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(portfolioResult, sharePriceResult, currenciesResult, new ShareSelectionBuilder(ezActionManager, portfolioResult));
-            ShareIndexBuilder.Result shareIndexResult = shareIndexBuilder.build(reporting, dates, chartSettings.getIndexSelection());
-
             PerfIndexBuilder perfIndexBuilder = new PerfIndexBuilder();
-            PerfIndexBuilder.Result perfIndexResult = perfIndexBuilder.build(reporting, chartSettings.getIndexSelection(), shareIndexResult, portfolioResult, currenciesResult);
+            CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise, dates);
+            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesIndexBuilder, dates);
+            PortfolioIndexBuilder portfolioIndexBuilder = new PortfolioIndexBuilder(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesIndexBuilder, sharePriceBuilder,
+                                                                                                reporting, dates, chartSettings.getExcludeBrokers(), chartSettings.getExcludeAccountTypes());
+            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(reporting, dates, portfolioIndexBuilder, sharePriceBuilder, currenciesIndexBuilder);
+            ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager, portfolioIndexBuilder);
+
+
+
 
             Colors colors = new Colors(chartSettings.getIndexSelection().size());
             List<ChartLine> allChartLines = new LinkedList<>();
             chartSettings.getIndexSelection()
                     .forEach(chartIndex -> {
-                        allChartLines.addAll(createCurrencyCharts(reporting, currenciesResult, perfIndexResult, colors, chartIndex));
-                        allChartLines.addAll(createShareCharts(shareIndexResult, perfIndexResult, colors, chartIndex));
-                        allChartLines.addAll(createPortfolioCharts(portfolioResult, perfIndexResult, colors, chartIndex));
+                        allChartLines.addAll(createCurrencyCharts(reporting, currenciesIndexBuilder, perfIndexBuilder, colors, chartIndex));
+                        allChartLines.addAll(createShareCharts(shareIndexBuilder, perfIndexBuilder, colors, chartIndex, shareSelectionBuilder));
+                        allChartLines.addAll(createPortfolioCharts(portfolioIndexBuilder, perfIndexBuilder, colors, chartIndex));
                     }
             );
 
@@ -220,14 +216,14 @@ public class DashboardManager {
 
 
 
-    private List<ChartLine> createPortfolioCharts(PortfolioIndexBuilder.Result portfolioResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createPortfolioCharts(PortfolioIndexBuilder portfolioResult, PerfIndexBuilder perfIndexResult, Colors colors, ChartIndex chartIndex) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartPortfolioIndexConfig portfolioIndexConfig = chartIndex.getPortfolioIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
         if (portfolioIndexConfig != null){
             PortfolioIndex index = portfolioIndexConfig.getPortfolioIndex();
-            Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices().get(index)
-                                                : perfIndexResult.getPortoflioPerfs(index, perfSettings);
+            Prices prices = perfSettings == null || !perfSettings.correctlyDefined() ? portfolioResult.getPortfolioIndex2TargetPrices(index)
+                                                : perfIndexResult.buildPerfPrices(portfolioResult.getPrices(index), perfSettings, index.isCumulable());
 
             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.PORTFOLIO;
             if (index == PortfolioIndex.CUMULABLE_DIVIDEND_REAL_YIELD_BRUT
@@ -240,45 +236,49 @@ public class DashboardManager {
         return allChartLines;
     }
 
-    private List<ChartLine> createShareCharts(ShareIndexBuilder.Result shareIndexResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createShareCharts(ShareIndexBuilder shareIndexResult, PerfIndexBuilder perfIndexResult, Colors colors, ChartIndex chartIndex, ShareSelectionBuilder shareSelectionBuilder) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartShareIndexConfig shareIndexConfig = chartIndex.getShareIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
+
         if (shareIndexConfig != null){
-            ShareIndex index = shareIndexConfig.getShareIndex();
-            Map<EZShare, Prices> share2Price = perfSettings == null || !perfSettings.correctlyDefined() ? shareIndexResult.getShareIndex2TargetPrices().get(index)
-                                                                    : perfIndexResult.getSharePerfs(index, perfSettings);
-            if (share2Price != null) {
-                Colors.ColorCode color = colors.nextColorCode();
-                shareIndexResult.getShareSelection(chartIndex.getId())
-                        .getSelectedShares()
-                        .forEach(share -> {
+            shareSelectionBuilder.getSelectedShares(shareIndexConfig.getShareSelection(), shareIndexConfig.getAdditionalShareGoogleCodeList())
+                    .forEach(ezShare -> {
+
+                        ShareIndex index = shareIndexConfig.getShareIndex();
+                        Prices sharePrices = perfSettings == null || !perfSettings.correctlyDefined() ? shareIndexResult.getShareIndex2TargetPrices(index, ezShare)
+                                : perfIndexResult.buildPerfPrices(shareIndexResult.getShareIndex2TargetPrices(index, ezShare), perfSettings, index.isCumulable());
+                        if (sharePrices != null) {
+                            Colors.ColorCode color = colors.nextColorCode();
                             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.SHARE;
                             if (index == ShareIndex.SHARE_COUNT) yAxis = ChartLine.Y_AxisSetting.NB;
                             else if (index == ShareIndex.SHARE_ANNUAL_DIVIDEND_YIELD
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET)
-                                    yAxis = ChartLine.Y_AxisSetting.PERCENT;
-                            allChartLines.add(createChartLine(share2Price.get(share), chartIndex.getId(), share.getEzName(),
+                                yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                            allChartLines.add(createChartLine(sharePrices, chartIndex.getId(), ezShare.getEzName(),
                                     computeYAxis(perfSettings, yAxis),
                                     color, getGraphStyle(chartIndex)));
-                        });
-            }
+                        }
+                    });
         }
         return allChartLines;
     }
 
-    private List<ChartLine> createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, PerfIndexBuilder.Result perfIndexResult, Colors colors, ChartIndex chartIndex) {
+    private List<ChartLine> createCurrencyCharts(Reporting reporting, CurrenciesIndexBuilder currenciesResult, PerfIndexBuilder perfIndexResult, Colors colors, ChartIndex chartIndex) {
         List<ChartLine> allChartLines = new LinkedList<>();
         CurrencyIndexConfig currencyIndexConfig = chartIndex.getCurrencyIndexConfig();
         ChartPerfSettings perfSettings = chartIndex.getPerfSettings();
         if (currencyIndexConfig != null){
             currenciesResult.getAllDevises().forEach(devise -> {
-                Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? currenciesResult.getDevisePrices(reporting, devise) : perfIndexResult.getDevisePerfs(devise, perfSettings);
-                if (p != null)
-                    allChartLines.add(createChartLine(p, chartIndex.getId(), devise.getSymbol()+" -> "+currenciesResult.getTargetDevise().getSymbol() ,
-                                                        computeYAxis(perfSettings, ChartLine.Y_AxisSetting.DEVISE),
-                                                        colors.nextColorCode(), getGraphStyle(chartIndex)));
+                if (!currenciesResult.getTargetDevise().equals(devise)) {
+                    Prices devisePrices = currenciesResult.getDevisePrices(reporting, devise);
+                    Prices p = perfSettings == null || !perfSettings.correctlyDefined() ? devisePrices : perfIndexResult.buildPerfPrices(devisePrices, perfSettings, false);
+                    if (p != null)
+                        allChartLines.add(createChartLine(p, chartIndex.getId(), devise.getSymbol() + " -> " + currenciesResult.getTargetDevise().getSymbol(),
+                                computeYAxis(perfSettings, ChartLine.Y_AxisSetting.DEVISE),
+                                colors.nextColorCode(), getGraphStyle(chartIndex)));
+                }
             });
         }
         return allChartLines;

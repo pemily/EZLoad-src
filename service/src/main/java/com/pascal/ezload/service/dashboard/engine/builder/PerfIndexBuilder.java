@@ -5,73 +5,16 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public class PerfIndexBuilder {
 
-    public Result build(Reporting reporting, List<ChartIndex> indexSelection, ShareIndexBuilder.Result shareIndexResult, PortfolioIndexBuilder.Result portfolioResult, CurrenciesIndexBuilder.Result currenciesResult) {
-        Result result = new Result();
-        indexSelection
-            .forEach(index -> {
-                if (index.getPerfSettings() != null && index.getPerfSettings().correctlyDefined()) {
-                    if (index.getShareIndexConfig() != null) {
-                        buildShareIndexes(shareIndexResult, index, result);
-                    }
-                    if (index.getPortfolioIndexConfig() != null) {
-                        buildPortfolioIndex(portfolioResult, index, result);
-                    }
-                    if (index.getCurrencyIndexConfig() != null) {
-                        buildCurrencyIndex(reporting, currenciesResult, index, result);
-                    }
-                }
-            });
 
-        return result;
-    }
-
-    private void buildCurrencyIndex(Reporting reporting, CurrenciesIndexBuilder.Result currenciesResult, ChartIndex index, Result result) {
-        ChartPerfSettings perfSettings = index.getPerfSettings();
-        currenciesResult.getAllDevises()
-                .stream()
-                .filter(devise -> !currenciesResult.getTargetDevise().equals(devise))
-                .forEach(devise -> {
-                    Prices pricesPerf = buildPerfPrices(currenciesResult.getDevisePrices(reporting, devise), perfSettings, init(), keepLast());
-                    result.put(devise, perfSettings, pricesPerf);
-                });
-    }
-
-    private void buildPortfolioIndex(PortfolioIndexBuilder.Result portfolioResult, ChartIndex index, Result result) {
-        ChartPortfolioIndexConfig indexConfig = index.getPortfolioIndexConfig();
-        ChartPerfSettings perfSettings = index.getPerfSettings();
-        Prices pricesPeriodResult;
-        if (indexConfig.getPortfolioIndex().isCumulable()){
-            pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), sum()); // we sum the data inside the period
-        }
-        else {
-            pricesPeriodResult = buildPerfPrices(portfolioResult.getPortfolioIndex2TargetPrices().get(indexConfig.getPortfolioIndex()), perfSettings, init(), keepLast()); // we always take the most recent data
-        }
-        result.put(indexConfig.getPortfolioIndex(), perfSettings, pricesPeriodResult);
-    }
-
-    private void buildShareIndexes(ShareIndexBuilder.Result shareIndexResult, ChartIndex index, Result result) {
-        ChartShareIndexConfig indexConfig = index.getShareIndexConfig();
-        ChartPerfSettings perfSettings = index.getPerfSettings();
-        Map<EZShare, Prices> share2Prices = shareIndexResult.getShareIndex2TargetPrices().get(indexConfig.getShareIndex());
-
-        share2Prices.forEach((key, value) -> {
-            Prices pricesPeriodResult;
-            if(indexConfig.getShareIndex().isCumulable()) {
-                pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), sum()); // we sum all the data inside the same period
-            }
-            else {
-                pricesPeriodResult = buildPerfPrices(value, perfSettings, init(), keepLast()); // we always take the most recent data
-            }
-
-            result.put(indexConfig.getShareIndex(), key, perfSettings, pricesPeriodResult);
-        });
+    public Prices buildPerfPrices(Prices prices, ChartPerfSettings perfSettings, boolean isCumulable){
+        return isCumulable ? buildPerfPrices(prices, perfSettings, init(), sum()) : // we sum all the data inside the same period
+                             buildPerfPrices(prices, perfSettings, init(), keepLast()); // we always take the most recent data
     }
 
     private static Supplier<Price> init() {
@@ -110,16 +53,14 @@ public class PerfIndexBuilder {
         pricesGrouped.setLabel(prices.getLabel()+" grouped by "+perfSettings.getPerfGroupedBy());
         // init Prices grouped to have the same number of values than the labels
         for (PriceAtDate priceAtDate : prices.getPrices()) {
-            pricesGrouped.addPrice(priceAtDate.getDate(), new PriceAtDate(priceAtDate.getDate()));
+            pricesGrouped.addPrice(new PriceAtDate(priceAtDate.getDate()));
         }
         do {
             Price currentValue = groupByFirstValueFct.get();
             EZDate lastPeriodDate = null;
             int lastPeriodIndex = -1;
-            boolean estimation = false;
             for (PriceAtDate priceAtDate : prices.getPrices()) {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
-                    estimation |= priceAtDate.isEstimated();
                     lastPeriodDate = priceAtDate.getDate();
                     currentValue = groupByFct.apply(currentValue, priceAtDate);
                 }
@@ -128,7 +69,7 @@ public class PerfIndexBuilder {
                 }
                 lastPeriodIndex++;
             }
-            pricesGrouped.replacePriceAt(lastPeriodIndex, lastPeriodDate, currentValue.getValue() == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
+            pricesGrouped.replacePriceAt(lastPeriodIndex, currentValue.getValue() == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(afterTodayPeriod));
@@ -180,7 +121,7 @@ public class PerfIndexBuilder {
 
                 previousValue = priceAtDate;
             }
-            result.addPrice(priceAtDate.getDate(), newPrice.getValue() == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
+            result.addPrice(newPrice.getValue() == null ? new PriceAtDate(priceAtDate.getDate()) : new PriceAtDate(priceAtDate.getDate(), newPrice));
         }
         return result;
     }
@@ -194,47 +135,4 @@ public class PerfIndexBuilder {
         };
     }
 
-
-    public static class Result{
-        private final Map<String, Map<EZShare, Prices>> sharePerfs = new HashMap<>();
-        private final Map<String, Prices> portfolioPerfs = new HashMap<>();
-        private final Map<String, Prices> devisePerfs = new HashMap<>();
-
-        public Map<EZShare, Prices> getSharePerfs(ShareIndex index, ChartPerfSettings perf) {
-            return sharePerfs.get(computeKey(index.name(), index.isCumulable(), perf));
-        }
-
-        public Prices getPortoflioPerfs(PortfolioIndex index, ChartPerfSettings perf){
-            return portfolioPerfs.get(computeKey(index.name(), index.isCumulable(), perf));
-        }
-
-        public Prices getDevisePerfs(EZDevise index, ChartPerfSettings perf){
-            return devisePerfs.get(computeKey(index.getCode(), false, perf));
-        }
-
-        private void put(ShareIndex index, EZShare share, ChartPerfSettings perf, Prices prices) {
-            this.sharePerfs.compute(computeKey(index.name(), index.isCumulable(), perf), (i, m) -> {
-               if (m == null){
-                   m = new HashMap<>();
-               }
-               m.put(share, prices);
-               return m;
-            });
-        }
-
-        private void put(PortfolioIndex index, ChartPerfSettings perf, Prices prices) {
-            this.portfolioPerfs.put(computeKey(index.name(), index.isCumulable(), perf), prices);
-        }
-
-        private void put(EZDevise index, ChartPerfSettings perf, Prices prices) {
-            this.devisePerfs.put(computeKey(index.getCode(), false, perf), prices);
-        }
-
-
-        private String computeKey(String indexName, boolean activeCumul, ChartPerfSettings perf){
-            if (perf.correctlyDefined())
-                return indexName+"/"+activeCumul+"/"+perf.getPerfFilter().name()+"/"+perf.getPerfGroupedBy().name();
-            return indexName;
-        }
-    }
 }

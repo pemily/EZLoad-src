@@ -38,7 +38,7 @@ public class CurrencyMap {
             this.factors = new Prices();
             this.factors.setDevise(from);
             this.factors.setLabel(getLabel());
-            factors.forEach(p -> this.factors.addPrice(p.getDate(), p));
+            factors.forEach(p -> this.factors.addPrice(p));
             lastFactor = factors.get(factors.size()-1).getValue();
         }
     }
@@ -71,7 +71,7 @@ public class CurrencyMap {
         Prices r = new Prices();
         r.setLabel(p.getLabel());
         r.setDevise(to);
-        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price, useLastFactor), price.isEstimated())));
+        p.getPrices().forEach(price -> r.addPrice(new PriceAtDate(price.getDate(), getTargetPrice(price, useLastFactor), price.isEstimated())));
         return r;
     }
 

@@ -120,7 +120,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                 return date.isAfter(from) && date.isBeforeOrEquals(to);
                             })
                             .map(SeekingAlphaTools::createPriceAtDate)
-                            .forEach(p -> sharePrices.addPrice(p.getDate(), p));
+                            .forEach(p -> sharePrices.addPrice(p));
                 });
                 long nbOfDays = from.nbOfDaysTo(to) / 7; // seeking alpha give only 1 value per week
                 return checkResult(reporting, ezShare, sharePrices, nbOfDays);
