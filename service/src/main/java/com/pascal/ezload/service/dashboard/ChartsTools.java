@@ -101,25 +101,25 @@ public class ChartsTools {
         return chart;
     }
 
-    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices){
         return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(pd -> {
-                                                                                            if (pd.getValue() == null || (removeZeroValues && pd.getValue() == 0)) return null;
+                                                                                            if (pd.getValue() == null || pd.getValue() == 0) return null;
                                                                                             float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
                                                                                             ChartLine.RichValue v = new ChartLine.RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
                                                                                             v.setValue(pd.getValue());
-                                                                                            String unité = prices.getDevise().getSymbol();
-                                                                                            if (YAxisSetting == ChartLine.Y_AxisSetting.PERCENT) unité="%";
-                                                                                            else if (YAxisSetting == ChartLine.Y_AxisSetting.NB) unité = "";
-                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+unité); // le label de la valeur
+                                                                                            String unit = prices.getDevise().getSymbol();
+                                                                                            if (YAxisSetting == ChartLine.Y_AxisSetting.PERCENT) unit="%";
+                                                                                            else if (YAxisSetting == ChartLine.Y_AxisSetting.NB) unit = "";
+                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+unit); // le label de la valeur
                                                                                             return v;
-                                                                                        }).collect(Collectors.toList()),
-                                removeZeroValues);
+                                                                                        }).collect(Collectors.toList())
+                                );
     }
 
-    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values, boolean removeZeroValues){
+    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);

@@ -3,6 +3,7 @@ package com.pascal.ezload.service.model;
 public class Price {
 
     public static final Price ZERO = new Price(0);
+    public static final Price CENT = new Price(100);
 
     private final Float value;
     private final boolean estimated;
@@ -13,8 +14,14 @@ public class Price {
     }
 
     public Price(Price price){
-        this.value = price.getValue(); // unknown value
-        this.estimated = price.estimated;
+        if (price.getValue() == null){
+            this.value = null; // unknown value
+            this.estimated = false;
+        }
+        else {
+            this.value = price.getValue(); // unknown value
+            this.estimated = price.estimated;
+        }
     }
 
     public Price(float value){
@@ -114,6 +121,6 @@ public class Price {
     }
 
     public Price reverse(){
-        return new Price(-value, estimated);
+        return value == null ? new Price() : new Price(-value, estimated);
     }
 }

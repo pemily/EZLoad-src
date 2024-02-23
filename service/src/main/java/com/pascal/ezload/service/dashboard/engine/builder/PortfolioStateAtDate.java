@@ -43,7 +43,9 @@ public class PortfolioStateAtDate {
     private final StateValue dividends;
 
     // rendement du portefeuille (basé sur le rendement annuel des actions et leur proportion (moyenne pondéré) a cette date)
-    private Price dividendYield;
+    private Price theoricalDividendYield;
+    // rendement du portefeuille rééel (basé sur le rendement des dividendes réellement percu pendant l'année et leur proportion a cette date
+    private Price realDividendYield;
 
     // les actions achetés (sans le details par actions)
     private final StateValue shareBuy;
@@ -54,10 +56,10 @@ public class PortfolioStateAtDate {
     // float because with some broker, you have some part of actions
     private final Map<EZShareEQ, Price> shareNb;
 
-    // le montant d'action acheté
+    // le montant d'action acheté (valeur positive)
     private final Map<EZShareEQ, Price> shareBuyDetails;
 
-    // le montant d'action vendu
+    // le montant d'action vendu (valeur positive)
     private final Map<EZShareEQ, Price> shareSoldDetails;
 
     //
@@ -89,7 +91,8 @@ public class PortfolioStateAtDate {
         inputOutput = new StateValue();
         dividends = new StateValue();
         portfolioValue = new Price();
-        dividendYield = new Price();
+        theoricalDividendYield = new Price();
+        realDividendYield = new Price();
         liquidity = new StateValue();
         creditImpot = new StateValue();
         shareNb = new HashMap<>();
@@ -110,7 +113,8 @@ public class PortfolioStateAtDate {
         this.inputOutput = new StateValue(previousState.inputOutput);
         this.dividends = new StateValue(previousState.dividends);
         this.portfolioValue = previousState.getPortfolioValue();
-        this.dividendYield = previousState.getDividendYield();
+        this.theoricalDividendYield = previousState.getTheoricalDividendYield();
+        this.realDividendYield = previousState.getRealDividendYield();
         this.liquidity = new StateValue(previousState.liquidity);
         this.creditImpot = new StateValue(previousState.creditImpot);
         this.shareBuy = new StateValue(previousState.shareBuy);
@@ -119,9 +123,9 @@ public class PortfolioStateAtDate {
         this.shareNb = new HashMap<>();
         this.shareNb.putAll(previousState.shareNb);
         this.shareSoldDetails = new HashMap<>();
-        this.shareSoldDetails.putAll(previousState.getShareSoldDetails());
+        //this.shareSoldDetails.putAll(previousState.getShareSoldDetails());
         this.shareBuyDetails = new HashMap<>();
-        this.shareBuyDetails.putAll(previousState.getShareBuyDetails());
+        //this.shareBuyDetails.putAll(previousState.getShareBuyDetails());
         this.sharePRBrut = new HashMap<>();
         this.sharePRBrut.putAll(previousState.sharePRBrut);
         this.sharePRUBrut = new HashMap<>();
@@ -153,11 +157,17 @@ public class PortfolioStateAtDate {
     public StateValue getDividends() {
         return dividends;
     }
-    public Price getDividendYield(){
-        return dividendYield;
+    public Price getTheoricalDividendYield(){
+        return theoricalDividendYield;
     }
-    public void setDividendYield(Price p){
-        this.dividendYield = p;;
+    public void setTheoricalDividendYield(Price p){
+        this.theoricalDividendYield = p;;
+    }
+    public Price getRealDividendYield(){
+        return realDividendYield;
+    }
+    public void setRealDividendYield(Price p){
+        this.realDividendYield = p;;
     }
     public Price getPortfolioValue(){
         return this.portfolioValue;

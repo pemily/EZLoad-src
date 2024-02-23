@@ -34,6 +34,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private Set<String> excludeBrokers = new HashSet<>();
     private Set<String> excludeAccountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
+    private ChartGroupedBy groupedBy;
     private List<ChartIndex> indexSelection = new LinkedList<>();
     private int height = 50;
     private int nbOfPoints = 200;
@@ -44,6 +45,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.title = chartSettings.title;
         this.excludeBrokers = chartSettings.excludeBrokers;
         this.excludeAccountTypes = chartSettings.excludeAccountTypes;
+        this.groupedBy = chartSettings.groupedBy;
         this.selectedStartDateSelection = chartSettings.selectedStartDateSelection;
         this.indexSelection = chartSettings.indexSelection;
         this.height = chartSettings.height;
@@ -64,6 +66,14 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public ChartGroupedBy getGroupedBy() {
+        return groupedBy;
+    }
+
+    public void setGroupedBy(ChartGroupedBy groupedBy) {
+        this.groupedBy = groupedBy;
     }
 
     public Set<String> getExcludeBrokers() {

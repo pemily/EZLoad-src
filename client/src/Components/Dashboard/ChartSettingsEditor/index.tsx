@@ -73,11 +73,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                 graphStyle: 'LINE',
                 portfolioIndexConfig: {
                     portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
-                },     
-                perfSettings: {
-                    perfGroupedBy: "DAILY",
-                    perfFilter: "VALUE"
-                }            
+                }        
             }
         chartIndex.description = getChartIndexDescription(chartSettings, chartIndex);
         chartIndex.label = getChartIndexTitle(chartSettings, chartIndex);        
@@ -119,6 +115,27 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans", "20 ans"]}
                                         description=""
                                         onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, false, () => {})}/>
+
+                        <ComboFieldWithCode id="GroupBy"
+                                                    label="Période"
+                                                    errorMsg={undefined}
+                                                    readOnly={props.readOnly}
+                                                    selectedCodeValue={props.chartSettings.groupedBy! }
+                                                    userValues={[                             
+                                                        'Par jour',                                
+                                                        'Par mois',
+                                                        'Par an'
+                                                    ]}
+                                                    codeValues={[
+                                                        'DAILY',
+                                                        'MONTHLY',                                    
+                                                        'YEARLY'
+                                                    ]}
+                                                    description=""
+                                                    onChange={newValue => 
+                                                        props.save({...props.chartSettings, groupedBy: newValue}, false, () => {})
+                                                    }/>            
+
 {
 /*
 Je désactive car je ne sais pas si j'active la devise USD:

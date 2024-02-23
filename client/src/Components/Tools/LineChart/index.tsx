@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { Chart, ChartIndex, ChartLine, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, ChartIndex, ChartLine, ChartSettings, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
@@ -31,14 +31,10 @@ export interface LineChartProps {
 }      
  
 
-const computeXPeriod = (chartIndexes : ChartIndex[] | undefined, chartLines: ChartLine[]) : 'day' | 'month' | 'year' => {
-    if (chartIndexes === undefined) return "year";
-
-    const allLabelLinesDisplayed : string[] = chartLines === undefined ? [] : chartLines.map(l => l.indexId!);
-    const chartIndexFiltered: ChartIndex[] = chartIndexes.filter(ci => allLabelLinesDisplayed.indexOf(ci.id!) != -1);
-
-    if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "DAILY").length > 0) return "day";
-    if (chartIndexFiltered.filter(ci => ci.perfSettings?.perfGroupedBy === "MONTHLY").length > 0) return "month";
+const computeXPeriod = (chartGroupBy : "DAILY" | "MONTHLY" | "YEARLY" | undefined) : 'day' | 'month' | 'year' => {
+    if (chartGroupBy === undefined) return "day";
+    if (chartGroupBy === "DAILY") return "day";
+    if (chartGroupBy === "MONTHLY") return "month";
     return "year";
 }
 
@@ -75,7 +71,7 @@ export function LineChart(props: LineChartProps){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
 
-    const computedPeriod = computeXPeriod(props.chart.indexSelection, props.chart.lines);
+    const computedPeriod = computeXPeriod(props.chart.groupedBy);
     const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels!);    
     const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            

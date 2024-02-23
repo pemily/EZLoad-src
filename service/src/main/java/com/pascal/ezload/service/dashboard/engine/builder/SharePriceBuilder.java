@@ -61,12 +61,13 @@ public class SharePriceBuilder {
             Price previousAnnualDiv = computeAnnualDividend(reporting, share, currentYear - 1, false);
             Price currentAnnualDiv = computeAnnualDividend(reporting, share, currentYear, false);
             if (previousAnnualDiv.getValue() != null && (currentAnnualDiv.getValue() == null || currentAnnualDiv.getValue() < previousAnnualDiv.getValue())) {
+                // le dividende de cette annéee n'a pas encore atteind le dividende de l'année derniere, donc je complete pour avoir une estimation
                 EZDate today = EZDate.today();
-
+                EZDate lastDayOfYear = new EZDate(today.getYear(), 12, 31);
                 PriceAtDate lastYearDividend = pricesWithEstimates.getPrices().get(pricesWithEstimates.getPrices().size()-1);
                 if (lastYearDividend == null || lastYearDividend.getDate().getYear() != today.getYear()) throw new RuntimeException("Il manque le dividende de cette année"+pricesWithEstimates.getPrices());
                 // le dividend qui manque pour atteindre le niveau de l'année dernière (+ le dividend du jour car je supprime cette donnée de la liste)
-                pricesWithEstimates.replacePriceAt(prices.getPrices().size()-1, new PriceAtDate(today,
+                pricesWithEstimates.replacePriceAt(prices.getPrices().size()-1, new PriceAtDate(lastDayOfYear,
                         previousAnnualDiv.getValue() - currentAnnualDiv.getValue() + lastYearDividend.getValue(), true));
             }
             return pricesWithEstimates;
@@ -148,12 +149,12 @@ public class SharePriceBuilder {
                     int year = currentDate.getYear();
                     Price annualDividend = computeAnnualDividend(reporting, share, year, true);
 
-                    Price rendement = new Price(0);
+                    Price rendement = Price.ZERO;
                     if (annualDividend.getValue() != null && annualDividend.getValue() > 0) {
                         Prices p = getPricesToTargetDevise(reporting, ezShare);
                         if (p != null) {
                             Price price = p.getPriceAt(currentDate);
-                            rendement = price.getValue()  == null || price.getValue() == 0 ? new Price() : annualDividend.multiply(new Price(100)).divide(price);
+                            rendement = price.getValue()  == null || price.getValue() == 0 ? new Price() : annualDividend.multiply(Price.CENT).divide(price);
 
                         }
                     }
@@ -171,7 +172,7 @@ public class SharePriceBuilder {
             Prices dividends = withEstimatesForCurrentYear ? getDividendsWithCurrentYearEstimates(reporting, ezShare) : getDividends(reporting, ezShare);
             EZDate today = EZDate.today();
 
-            Price annualDividend = new Price(0, year == today.getYear());
+            Price annualDividend = new Price(0, year >= today.getYear());
             if (dividends == null) return annualDividend;
 
             for (PriceAtDate p : dividends.getPrices()) {

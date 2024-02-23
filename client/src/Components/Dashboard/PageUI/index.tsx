@@ -54,10 +54,6 @@ export function PageUI(props: PageUIProps){
                                 portfolioIndexConfig: {
                                     portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
                                 },                                
-                                perfSettings: {
-                                    perfFilter: "VALUE",
-                                    perfGroupedBy: "DAILY"
-                                },
                                 currencyIndexConfig: undefined,
                                 shareIndexConfig: undefined,
                             };
@@ -68,6 +64,7 @@ export function PageUI(props: PageUIProps){
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                 targetDevise: 'EUR',
                                 indexSelection: [ chartIndex ],
+                                groupedBy: "DAILY"
                             };                            
                             chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
                             chartIndex.label = getChartIndexTitle(newChart, chartIndex);

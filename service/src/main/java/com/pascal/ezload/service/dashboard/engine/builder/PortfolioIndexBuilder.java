@@ -18,6 +18,9 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 
+import com.pascal.ezload.service.dashboard.config.ChartPerfFilter;
+import com.pascal.ezload.service.dashboard.config.ChartGroupedBy;
+import com.pascal.ezload.service.dashboard.config.ChartPerfSettings;
 import com.pascal.ezload.service.dashboard.config.PortfolioIndex;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
@@ -34,7 +37,8 @@ public class PortfolioIndexBuilder {
 
     private final List<Row> operations; // operations venant de MesOperations (Row est une representation de l'onglet Operation dans EZPortfolio)
     private final CurrenciesIndexBuilder currencies;
-    private final SharePriceBuilder sharePrices;
+    private final SharePriceBuilder sharePriceBuilder;
+    private final PerfIndexBuilder perfIndexBuilder;
     private final static EZDevise ezPortfolioDevise = DeviseUtil.EUR; // EZPortfolio sur google drive est en euro
 
     private final Reporting reporting;
@@ -43,57 +47,21 @@ public class PortfolioIndexBuilder {
     private final Set<String> excludeAccountType;
 
 
-    public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder currencies, SharePriceBuilder sharePrices, Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
+    public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder currencies, SharePriceBuilder sharePriceBuilder, PerfIndexBuilder perfIndexBuilder, Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
         this.operations = operations;
         this.currencies = currencies;
-        this.sharePrices = sharePrices;
+        this.sharePriceBuilder = sharePriceBuilder;
+        this.perfIndexBuilder = perfIndexBuilder;
         this.dates = dates;
         this.reporting = reporting;
         this.excludeBrokers = excludeBrokers;
         this.excludeAccountType = excludeAccountType;
     }
-/*
-    public Result build(){
-        Result r = new Result();
-        r.dates = dates;
-        if (operations != null)
-            buildPricesFor(reporting, excludeBrokers, excludeAccountType,
-                    chartSelection.stream()
-                            .map(ChartIndex::getPortfolioIndexConfig)
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toList()), r);
-        return r;
-    }
-
-
-    private void buildPricesFor(Reporting reporting, Set<String> excludeBrokers, Set<String> excludeAccountType, List<ChartPortfolioIndexConfig> chartIndexesConfig, Result r){
-
-
-        states.forEach(state -> {
-                    EZDate date = state.getDate();
-                    r.date2share2ShareNb.put(date, state.getShareNb());
-                    r.date2share2BuyAmount.put(date, state.getShareBuyDetails());
-                    r.date2share2SoldAmount.put(date, state.getShareSoldDetails());
-                    r.date2share2PRBrut.put(date, state.getSharePRBrut());
-                    r.date2share2PRUBrut.put(date, state.getSharePRUBrut());
-                    r.date2share2PRNet.put(date, state.getSharePRNet());
-                    r.date2share2PRUNet.put(date, state.getSharePRUNet());
-                    r.date2portfolioValue.put(date, state.getPortfolioValue());
-                    Map<EZShareEQ, Price> share2BuyOrSold = new HashMap<>(state.getShareBuyDetails()); // copy les achats
-                    state.getShareSoldDetails().forEach((key, value) -> share2BuyOrSold.put(key, share2BuyOrSold.getOrDefault(key, value.reverse() ))); // soustraie les ventes
-                    r.date2share2BuyOrSoldAmount.put(date, share2BuyOrSold); // Pas de conversion vers target devise car getShareBuyDetails & getShareSoldDetails sont deja convertis
-        });
-
-        chartIndexesConfig
-                .forEach(chartIndexConfig -> r.portfolioIndex2TargetPrices.put(chartIndexConfig.getPortfolioIndex(),
-                        createPricesFor(chartIndexConfig.getPortfolioIndex(), states, r)));
-    }*/
-
 
 
     // ezPortfolio operation contains all operations in target Devise
     private List<PortfolioStateAtDate> buildPortfolioValuesInTargetDevise(Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
-        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(reporting, dates, sharePrices);
+        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(reporting, dates, sharePriceBuilder);
 
         return acc.process(getFilteredOperationRowsAndSortInTargetDevise(reporting, operations.stream().filter(op -> op.getValueDate(MesOperations.DATE_COL) != null), excludeBrokers, excludeAccountType));
     }
@@ -193,25 +161,32 @@ public class PortfolioIndexBuilder {
             case CUMULABLE_BUY:
                 return state.getShareBuyDetails().values().stream().reduce(Price::plus).orElse(Price.ZERO);
             case ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT:
-                return state.getDividendYield();
+                return state.getTheoricalDividendYield();
             case CUMULABLE_DIVIDEND_REAL_YIELD_BRUT: {
-                Price valeurPortefeuille = getDate2PortfolioValue().getPriceAt(state.getDate());
-                // valeurPortefeuille = valeurPortefeuille.plus(state.getLiquidity().getCumulative());
-                return valeurPortefeuille.getValue() != null && valeurPortefeuille.getValue() > 0 ?  state.getDividends().getInstant()
-                        .multiply(new Price(100))
-                        .divide(valeurPortefeuille)
-                        : Price.ZERO;
+               return state.getRealDividendYield();
             }
-           /* case CROISSANCE_DU_PORTEFEUILLE: {
-                Price sum1 = 0;
-                Price sum2 = 0;
-                for (EZShareEQ share : shares){
-                    sum1 += getRatio(share)*getDividendAnnualYield(share)*getCroissanceOfAnnualDividienYeld(share);
-                    sum2 += getRatio(share)*getDividendAnnualYield(share);
-                }
+            case CROISSANCE_THEORIQUE_DU_PORTEFEUILLE: {
+                Price sum1 = new Price();
+                Price sum2 = new Price();
 
-                portfolioCroissance = sum1.divide(sum2);
-            } */
+                Price portfolioValue =  state.getPortfolioValue();
+                if (portfolioValue.getValue() != null && portfolioValue.getValue() > 0) {
+                    for (Map.Entry<EZShareEQ, Price> entry : state.getShareNb().entrySet()) {
+                        PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate());
+                        Price shareValue = price.multiply(entry.getValue());
+                        Price shareRatio = shareValue.divide(portfolioValue);
+                        Prices shareDividendAnnualYield = sharePriceBuilder.getAnnualDividendYieldWithEstimates(reporting, entry.getKey());
+                        Prices shareDividendAnnualCroissanceYield = perfIndexBuilder.buildPerfPrices(shareDividendAnnualYield, ChartPerfFilter.VARIATION_EN_PERCENT, false);
+                        Price shareDividendAnnualCroissanceYieldPriceAt = shareDividendAnnualCroissanceYield.getPriceAt(state.getDate()).divide(Price.CENT);
+                        Price shareDividendAnnualYieldPriceAt = shareDividendAnnualYield.getPriceAt(state.getDate()).divide(Price.CENT);
+                        sum1 = sum1.plus(shareRatio.multiply(shareDividendAnnualYieldPriceAt).multiply(shareDividendAnnualCroissanceYieldPriceAt));
+                        sum2 = sum2.plus(shareRatio.multiply(shareDividendAnnualYieldPriceAt));
+                    }
+
+                    return sum1.divide(sum2);
+                }
+                return new Price();
+            }
         }
         throw new IllegalStateException("Missing case: "+ portfolioIndex);
     }
@@ -240,10 +215,14 @@ public class PortfolioIndexBuilder {
         return date2share2BuyOrSoldAmount.computeIfAbsent(share, s -> buildPrices(state -> {
             Price buy = state.getShareBuyDetails().get(share);
             Price sold = state.getShareSoldDetails().get(share);
-            Price buyAndSold = buy;
-            if (buy != null && sold != null) buyAndSold = buy.minus(sold); // soustraie les ventes
-            else if (buy == null) buyAndSold = sold.reverse();
-            return buyAndSold == null ? new Price() : buyAndSold;
+            Price buyAndSold = new Price();
+            if (buy != null){
+                buyAndSold = buy.reverse();
+            }
+            if (sold != null){
+                buyAndSold = buyAndSold.plus(sold);
+            }
+            return buyAndSold;
         }));
     }
     public Prices getDate2share2PRBrut(EZShareEQ share) {
@@ -272,7 +251,8 @@ public class PortfolioIndexBuilder {
         Prices p = new Prices();
         getPortfolioValuesInTargetDevise().forEach(state -> {
             EZDate date = state.getDate();
-            p.addPrice(new PriceAtDate(date, mapping.apply(state)));
+            Price tmp = mapping.apply(state);
+            p.addPrice(new PriceAtDate(date, tmp == null ? new Price() : tmp));
         });
         return p;
     }

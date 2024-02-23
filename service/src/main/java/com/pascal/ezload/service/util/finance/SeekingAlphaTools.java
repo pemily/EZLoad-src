@@ -28,7 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,6 +39,9 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     // url qui peut etre interrsante pour la suite
     // https://seekingalpha.com/api/v3/metrics?filter[fields]=price_high_52w%2Cprice_low_52w%2Cdiv_rate_fwd%2Cdiv_rate_ttm%2Cdiv_yield_fwd%2Cdividend_yield%2Cshort_interest_percent_of_float%2Cmarketcap%2Cimpliedmarketcap&filter[slugs]=atd%3Aca&minified=false
 
+    static public String getDividendsCacheName(EZShare ezShare, EZDate from){
+        return "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + EZDate.today().toYYYYMMDD();
+    }
 
     // return null if the dividend cannot be downloaded for this action
     static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from) throws Exception {
@@ -51,7 +53,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
             String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
                 // wait(2);
-                    return cache.get(reporting, "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + EZDate.today(), url, props, inputStream -> {
+                    return cache.get(reporting, getDividendsCacheName(ezShare, from), url, props, inputStream -> {
                         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                         inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
                         Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);

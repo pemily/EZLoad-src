@@ -248,19 +248,25 @@ public class EZActionManager {
 
     // return null if not found
     public List<Dividend> searchDividends(Reporting rep, EZShare ezShare, EZDate from) throws Exception {
+        EZDate fixedFrom = from.toStartPeriodDate();
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
             List<Dividend> dividends = null;
             try {
-                if (cache.exists(YahooTools.getDividendsCacheName(ezShare, from))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
-                    dividends = YahooTools.searchDividends(reporting, cache, ezShare, from);
+                if (cache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
+                    dividends = YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom);
+                }
+                else {
+                    if (!cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))){
+                        System.out.println("test");
+                    }
                 }
                 if (dividends == null){
-                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, from));
+                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
                 }
             }
             catch (Exception e){
                 reporting.info("Tentative avec YahooFinance");
-                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, from));
+                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
             }
             return dividends;
         }

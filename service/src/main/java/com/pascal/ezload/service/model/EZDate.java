@@ -156,6 +156,14 @@ public class EZDate implements Comparable<EZDate> {
         return leadingZero(day)+"/"+leadingZero(month)+"/"+year;
     }
 
+    public EZDate toStartPeriodDate(){
+        if (isPeriod()) {
+            if (isYearlyPeriod()) return new EZDate(year, 1, 1); // yearly period
+            return new EZDate(year, month, 1);
+        }
+        return this;
+    }
+
     public String toYYYYMMDD(){
         if (isPeriod()) {
             if (isYearlyPeriod()) return year+"/12/31"; // yearly period

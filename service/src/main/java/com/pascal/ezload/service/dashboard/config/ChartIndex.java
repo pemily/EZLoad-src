@@ -11,15 +11,6 @@ public class ChartIndex {
     private ChartPortfolioIndexConfig portfolioIndexConfig;
     private ChartShareIndexConfig shareIndexConfig;
     private CurrencyIndexConfig currencyIndexConfig; // all currencies found will be shown
-    private ChartPerfSettings perfSettings; // peux etre null
-
-    public ChartPerfSettings getPerfSettings() {
-        return perfSettings;
-    }
-
-    public void setPerfSettings(ChartPerfSettings perfSettings) {
-        this.perfSettings = perfSettings;
-    }
 
     public ChartPortfolioIndexConfig getPortfolioIndexConfig() {
         return portfolioIndexConfig;

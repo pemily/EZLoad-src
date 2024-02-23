@@ -1,5 +1,7 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
+import com.pascal.ezload.service.dashboard.config.ChartPerfFilter;
+import com.pascal.ezload.service.dashboard.config.ChartPerfSettings;
 import com.pascal.ezload.service.dashboard.config.ShareIndex;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Price;
@@ -16,16 +18,18 @@ public class ShareIndexBuilder {
     private final SharePriceBuilder sharePriceResult;
     private final PortfolioIndexBuilder portfolioIndexResult;
     private final CurrenciesIndexBuilder currenciesResult;
+    private final PerfIndexBuilder perfIndexBuilder;
     private final Reporting reporting;
     private final List<EZDate> dates;
 
 
-    public ShareIndexBuilder(Reporting reporting, List<EZDate> dates, PortfolioIndexBuilder portfolioIndexResult, SharePriceBuilder sharePriceResult, CurrenciesIndexBuilder currenciesResult){
+    public ShareIndexBuilder(Reporting reporting, List<EZDate> dates, PortfolioIndexBuilder portfolioIndexResult, SharePriceBuilder sharePriceResult, CurrenciesIndexBuilder currenciesResult, PerfIndexBuilder perfIndexBuilder){
         this.reporting = reporting;
         this.dates = dates;
         this.portfolioIndexResult = portfolioIndexResult;
         this.sharePriceResult = sharePriceResult;
         this.currenciesResult = currenciesResult;
+        this.perfIndexBuilder = perfIndexBuilder;
     }
 
 
@@ -38,21 +42,24 @@ public class ShareIndexBuilder {
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> {
                         Price pru = portfolioIndexResult.getDate2share2PRUBrut(ezShare).getPriceAt(date);
                         PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
-                        if (p == null || pru == null || pru.getValue() == 0) yield new Price();
-                        yield p.multiply(new Price(100)).divide(pru);
+                        if (p == null || pru == null || pru.getValue() == null || pru.getValue() == 0) yield new Price();
+                        yield p.multiply(Price.CENT).divide(pru);
                 }
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET -> {
                         Price pru = portfolioIndexResult.getDate2share2PRUNet(ezShare).getPriceAt(date);
                         PriceAtDate p = sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
-                        if (p == null || pru == null || pru.getValue() == 0) yield new Price();
-                        yield p.multiply(new Price(100)).divide(pru);
+                        if (p == null || pru == null || pru.getValue() == null || pru.getValue() == 0) yield new Price();
+                        yield p.multiply(Price.CENT).divide(pru);
                 }
                 case SHARE_PRU_BRUT -> portfolioIndexResult.getDate2share2PRUBrut(ezShare).getPriceAt(date);
                 case SHARE_PRU_NET -> portfolioIndexResult.getDate2share2PRUNet(ezShare).getPriceAt(date);
                 case CUMULABLE_SHARE_BUY_SOLD -> portfolioIndexResult.getDate2share2BuyOrSoldAmount(ezShare).getPriceAt(date);
                 case CUMULABLE_SHARE_BUY -> portfolioIndexResult.getDate2share2BuyAmount(ezShare).getPriceAt(date);
                 case CUMULABLE_SHARE_SOLD -> portfolioIndexResult.getDate2share2SoldAmount(ezShare).getPriceAt(date);
-            };
+                case ACTION_CROISSANCE ->
+                    // ici on recalcule le meme buildPerfPrices pour chaque date, il faut faire un cache
+                    perfIndexBuilder.buildPerfPrices( sharePriceResult.getDividendsWithCurrentYearEstimates(reporting, ezShare), ChartPerfFilter.VARIATION_EN_PERCENT, false).getPriceAt(date);
+                };
     }
 
 

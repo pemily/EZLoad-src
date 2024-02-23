@@ -296,6 +296,12 @@ public class PortfolioStateAccumulator {
                             .reduce(Price::plus)
                             .orElse(Price.ZERO);
 
-        previousState.setDividendYield(yield);
+        previousState.setTheoricalDividendYield(yield);
+
+        previousState.setRealDividendYield(portfolioValue.getValue() != null && portfolioValue.getValue() > 0 ?  previousState.getDividends().getInstant()
+                                    .multiply(Price.CENT)
+                                    .divide(portfolioValue)
+                                    : Price.ZERO);
+
     }
 }

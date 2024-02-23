@@ -65,7 +65,7 @@ public class Prices {
             EZDate test = pricesList.get(i).getDate();
             if (date.contains(test) // si date est une periode ou est egale a test
                     || test.contains(date)
-                    || (!date.isPeriod() && !tmp.getDate().isPeriod() && date.isBeforeOrEquals(tmp.getDate()))
+                    || (!date.isPeriod() && !tmp.getDate().isPeriod() && date.isAfterOrEquals(tmp.getDate()))
             ) {
                 p = tmp;
                 break;

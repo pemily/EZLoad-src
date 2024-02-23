@@ -1,5 +1,6 @@
 package com.pascal.ezload.service.dashboard.config;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ChartShareIndexConfig {
@@ -9,7 +10,7 @@ public class ChartShareIndexConfig {
 
     // Sur quelles actions ?
     private ShareSelection shareSelection;
-    private Set<String> additionalShareGoogleCodeList;
+    private Set<String> additionalShareGoogleCodeList = new HashSet<>();
 
     public ShareIndex getShareIndex() {
         return shareIndex;

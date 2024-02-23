@@ -17,7 +17,7 @@
  */
 import { Box, Button, Text, Tab, Tabs, ThemeContext } from "grommet";
 import { useState } from "react";
-import { ChartIndex, ChartSettings, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, ChartPerfSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, ChartSettings, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboField } from '../../Tools/ComboField';
@@ -38,19 +38,6 @@ export interface ChartIndexMainEditorProps {
 export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: ChartIndex) : string {
     var result : string = "";
     var unitSuffix : string = "";
-
-    if (chartIndex.perfSettings?.perfFilter === "VALUE_VARIATION"){
-        // result = "±";
-        result = "Croissance "
-    }
-    else if (chartIndex.perfSettings?.perfFilter === "VARIATION_EN_PERCENT"){
-        // result = "±";
-        result = "Croissance "
-        unitSuffix = "%";
-    }
-    else if (chartIndex.perfSettings?.perfFilter === "CUMUL"){
-        // result = "∑";
-    }
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
@@ -76,6 +63,8 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Rendement du dividende sur PRU brut"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
                 result += "Rendement du dividende sur PRU net"; break;
+            case "ACTION_CROISSANCE":
+                result += "Croissance du dividende annuel"; break;
             default: result += "Missing case in getChartIndexTitle "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
@@ -107,19 +96,14 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
             case "CUMULABLE_GAIN_NET":
                 result += "Gain"; break;
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":            
-                result += "Rendement réel constaté"; break;
+                result += "Rendement réel constaté"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
                 result += "Rendement théorique du dividende annuel"; break;
+            case "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE":
+                result += "Croissance théorique du dividende annuel"; break;
             default: result += "Missing case in getChartIndexTitle "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }    
-
-    if (chartIndex.perfSettings?.perfGroupedBy === "MONTHLY"){
-        result += "/mois";
-    }
-    else if(chartIndex.perfSettings?.perfGroupedBy === "YEARLY"){
-        result += "/an";
-    }
 
     result += unitSuffix;
     
@@ -127,7 +111,7 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
 }
 
 export function getChartIndexDescription(chartSettings: ChartSettings, chartIndex: ChartIndex): string{
-    var result : string = "Affiche ";
+    var result : string = "Affiche la valeur ";
     var signOfDevise: string = "";
     switch(chartSettings.targetDevise!){
         case "EUR": signOfDevise = "€"; break;
@@ -139,23 +123,6 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
     }
 
     var suffix = "en "+signOfDevise+" ";
-    if (chartIndex.perfSettings?.perfFilter === "VALUE" || chartIndex.perfSettings?.perfFilter === "CUMUL"){
-        result+=" la valeur ";
-    }
-    else if (chartIndex.perfSettings?.perfFilter === "VALUE_VARIATION"){
-        result+=" la croissance ";        
-    }
-    else {
-        result+= " la croissance ";
-        var suffix = "en % ";
-    }
-    
-    if (chartIndex.perfSettings?.perfGroupedBy === "MONTHLY"){
-        result += "mensuelle ";
-    }
-    else if (chartIndex.perfSettings?.perfGroupedBy === "YEARLY"){
-        result += "annuelle ";
-    }
     result += suffix;
 
     if (isDefined(chartIndex.shareIndexConfig)){
@@ -182,6 +149,8 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "du rendement du dividende basé sur votre PRU brut (dividendes exclus) à la date détachement"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
                 result += "du rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement"; break;
+            case "ACTION_CROISSANCE":
+                result += "La croissance du dividende annuel de l'action"; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
@@ -216,40 +185,14 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "du rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
                 result += "du rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité"; break;    
+            case "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE":
+                result += "de la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille."; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }
     return applyEZLoadTextSignature(result.replace("  ", " "));
   }
   
-function isIndexCumulable(chartIndex: ChartIndex){
-    return chartIndex.shareIndexConfig?.shareIndex?.startsWith("CUMULABLE_") || chartIndex.portfolioIndexConfig?.portfolioIndex?.startsWith("CUMULABLE_");
-}
-
-function getDefaultPerfFilterForCumulableIndex(chartIndex: ChartIndex) : "CUMUL" | "VALUE"  {
-    if (isDefined(chartIndex.portfolioIndexConfig)){
-        // portfolioIndexConfig
-        switch(chartIndex.portfolioIndexConfig?.portfolioIndex){
-            case "CUMULABLE_ENTREES" :
-            case "CUMULABLE_SORTIES" :
-            case "CUMULABLE_BUY" :
-            case "CUMULABLE_SOLD" : 
-            case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT" :
-            case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
-                return "VALUE"; // Pas d'interet de voir le cumul
-        }        
-    }    
-    if (isDefined(chartIndex.shareIndexConfig)){        
-        switch(chartIndex.shareIndexConfig?.shareIndex){
-            case "CUMULABLE_SHARE_DIVIDEND" :
-            case "SHARE_ANNUAL_DIVIDEND_YIELD":
-            case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
-            case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
-                return "VALUE";
-        }
-    }            
-    return "CUMUL";
-}
 
 export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){                
     return (  
@@ -314,7 +257,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Vente d'actions", //////////////////Pas d'interet en cumulé
                                 "Gains",
                                 "Rendements réél",
-                                "Rendement théorique"
+                                "Rendement du dividende annuel théorique",
+                                "Croissance du portefeuille"
                             ]}
                             codeValues={[
                                 'VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
@@ -329,7 +273,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'CUMULABLE_SOLD',
                                 'CUMULABLE_GAIN_NET',
                                 'CUMULABLE_DIVIDEND_REAL_YIELD_BRUT',
-                                'ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT']}
+                                'ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT',
+                                'CROISSANCE_THEORIQUE_DU_PORTEFEUILLE']}
                             description=""
                             onChange={newValue => {
                                     const portfolioIndex : ChartPortfolioIndexConfig = {
@@ -337,16 +282,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                                                                         portfolioIndex: newValue,                                                            
                                                                                         };
                                     props.save({...props.chartIndex,
-                                                portfolioIndexConfig: portfolioIndex,
-                                                perfSettings: {
-                                                    ...props.chartIndex.perfSettings,
-                                                    perfFilter: newValue.startsWith('CUMULABLE_') ? getDefaultPerfFilterForCumulableIndex(
-                                                        {...props.chartIndex,
-                                                            portfolioIndexConfig: portfolioIndex 
-                                                        }
-                                                    ) : 'VALUE'
-                                                }
-                                        })
+                                                portfolioIndexConfig: portfolioIndex })
                                 }
                         }/>
                 )              
@@ -360,28 +296,30 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             userValues={[                             
                                 "Cours de l'action",
                                 "Nombre d'action",
-                                "Achats",
-                                "Ventes",
+                               // "Achats",
+                               // "Ventes",
                                 "Achats/Ventes",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
                                 "Dividendes Brut (Date de détachement)",
                                 "Rendement du dividende annuel",
                                 "Rendement du dividende sur PRU Net (Date de détachement)",
-                                "Rendement du dividende sur PRU Brut (Date de détachement)"
+                                "Rendement du dividende sur PRU Brut (Date de détachement)",
+                                "Croissance du dividende annuel"
                             ]}
                             codeValues={[
                                 'SHARE_PRICE',
                                 'SHARE_COUNT',                                    
-                                'CUMULABLE_SHARE_BUY',
-                                'CUMULABLE_SHARE_SOLD',
+                                //'CUMULABLE_SHARE_BUY',
+                                //'CUMULABLE_SHARE_SOLD',
                                 'CUMULABLE_SHARE_BUY_SOLD',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',
                                 'CUMULABLE_SHARE_DIVIDEND',
                                 'SHARE_ANNUAL_DIVIDEND_YIELD',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET',
-                                'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT'
+                                'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT',
+                                'ACTION_CROISSANCE'
                             ]}
                             description=""
                             onChange={newValue => {
@@ -390,16 +328,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                     shareIndex: newValue,                                                            
                                     };
                                 props.save({...props.chartIndex,
-                                                 shareIndexConfig: chartShareIndex,
-                                                perfSettings: {
-                                                    ...props.chartIndex.perfSettings,
-                                                    perfFilter: newValue.startsWith('CUMULABLE_') ? getDefaultPerfFilterForCumulableIndex(
-                                                        {...props.chartIndex,
-                                                            shareIndexConfig: chartShareIndex 
-                                                        })
-                                                        : 'VALUE'
-                                                }
-                                            })
+                                                 shareIndexConfig: chartShareIndex })
                                 }
                         }/>
                 )
@@ -474,74 +403,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                  )
                  }
 
-                </Box>
-                <Box direction="row">
-                    <ComboFieldWithCode id="AffichagePerf"
-                        label="Affiche"
-                        errorMsg={undefined}
-                        readOnly={props.readOnly}
-                        selectedCodeValue={ !isDefined(props.chartIndex.perfSettings?.perfFilter) ? 'VALUE' 
-                                                    :  isIndexCumulable(props.chartIndex) && (props.chartIndex.perfSettings?.perfFilter === 'CUMUL' || props.chartIndex.perfSettings?.perfFilter === 'VALUE') ? 
-                                                        'DEFAULT' :
-                                                         props.chartIndex.perfSettings?.perfFilter! }
-                        userValues={ [
-                                'La valeur',
-                                'La croissance',
-                                'La croissance en %',                                        
-                        ]}
-                        codeValues={
-                            isIndexCumulable(props.chartIndex) ? 
-                            [
-                                'DEFAULT',            // La Valeur defaut sera calculé au moment du save (voir onChange) Soit CUMUL, soit VALUE
-                                'VALUE_VARIATION',
-                                'VARIATION_EN_PERCENT',                                        
-                            ]
-                            :
-                            [
-                                'VALUE',                                                      
-                                'VALUE_VARIATION',
-                                'VARIATION_EN_PERCENT',                                        
-                            ]    
-                        }
-                        description=""
-                        onChange={newValue => 
-                            props.save({...props.chartIndex,
-                                perfSettings: {
-                                    ...props.chartIndex.perfSettings,
-                                    perfFilter: newValue === "DEFAULT" ? getDefaultPerfFilterForCumulableIndex(props.chartIndex) : newValue,                                            
-                                },
-                                graphStyle: 'BAR'
-                            })
-                    }/>                                
-                    <ComboFieldWithCode id="Perf"
-                            label="Période"
-                            errorMsg={undefined}
-                            readOnly={props.readOnly}
-                            selectedCodeValue={props.chartIndex.perfSettings?.perfGroupedBy! }
-                            userValues={[                             
-                                'Par jour',                                
-                                'Par mois',
-                                'Par an'
-                            ]}
-                            codeValues={[
-                                'DAILY',
-                                'MONTHLY',                                    
-                                'YEARLY'
-                            ]}
-                            description=""
-                            onChange={newValue => 
-                                props.save({...props.chartIndex, perfSettings: {
-                                                    ...props.chartIndex.perfSettings,
-                                                    perfGroupedBy: newValue,
-                                                    perfFilter: props.chartIndex.perfSettings?.perfFilter
-                                            },
-                                            graphStyle: 'BAR'
-                                        })
-                            }/>            
-
-                        
-                </Box>
-                
+                </Box>                
         </Box>
         </>
     );
