@@ -136,6 +136,39 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                         props.save({...props.chartSettings, groupedBy: newValue}, false, () => {})
                                                     }/>            
 
+                        <Box direction="row">
+                                <ComboFieldWithCode id="shareGroupSelection"
+                                    label="Groupe d'actions"
+                                    errorMsg={undefined}
+                                    readOnly={props.readOnly}
+                                    selectedCodeValue={props.chartSettings.shareSelection!}
+                                    userValues={[                             
+                                        "Les actions courrantes du portefeuille",
+                                        "Toutes les actions qui ont été présentent dans le portefeuille",
+                                        "Uniquement les actions sélectionnées individuellement"
+                                    ]}
+                                    codeValues={[                            
+                                    "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                                    ]}
+                                    description=""
+                                    onChange={newValue => 
+                                        props.save({...props.chartSettings, shareSelection: newValue}, false, () => {})}
+                                />
+
+                                <ComboMultipleWithCheckbox id="additionalShares"
+                                                        label="+ Actions individuelle"
+                                                        selectedCodeValues={props.chartSettings.additionalShareGoogleCodeList!}
+                                                        errorMsg={undefined}
+                                                        readOnly={false}
+                                                        userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
+                                                        codeValues={props.allEzShares.map(s => s.googleCode!)}
+                                                        description=""
+                                                        onChange={newValue  => props.save({...props.chartSettings, additionalShareGoogleCodeList: newValue }, false, () => {})}
+
+                                />
+                        </Box>   
+
+
 {
 /*
 Je désactive car je ne sais pas si j'active la devise USD:

@@ -64,7 +64,9 @@ export function PageUI(props: PageUIProps){
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
                                 targetDevise: 'EUR',
                                 indexSelection: [ chartIndex ],
-                                groupedBy: "DAILY"
+                                groupedBy: "DAILY",
+                                shareSelection: "CURRENT_SHARES",
+                                additionalShareGoogleCodeList: []
                             };                            
                             chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
                             chartIndex.label = getChartIndexTitle(newChart, chartIndex);

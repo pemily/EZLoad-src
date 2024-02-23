@@ -111,82 +111,70 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
 }
 
 export function getChartIndexDescription(chartSettings: ChartSettings, chartIndex: ChartIndex): string{
-    var result : string = "Affiche la valeur ";
-    var signOfDevise: string = "";
-    switch(chartSettings.targetDevise!){
-        case "EUR": signOfDevise = "€"; break;
-        case "USD": signOfDevise = "$"; break;
-        case "AUD": signOfDevise = "A$"; break;
-        case "CAD": signOfDevise = "C$"; break;        
-        case "CHF": signOfDevise = "CHF"; break;
-        default:  signOfDevise = chartSettings.targetDevise!;
-    }
-
-    var suffix = "en "+signOfDevise+" ";
-    result += suffix;
+    var result : string = "Affiche ";
 
     if (isDefined(chartIndex.shareIndexConfig)){
         switch (chartIndex.shareIndexConfig?.shareIndex){
             case "CUMULABLE_SHARE_BUY_SOLD":
-                result += "des achats et les ventes de l'action"; break;
+                result += "les achats et les ventes de l'action"; break;
             case "CUMULABLE_SHARE_BUY":
-                result += "des achats de l'action"; break;
+                result += "les achats d'action"; break;
             case "CUMULABLE_SHARE_SOLD":
-                result += "des ventes de l'action"; break;
+                result += "les ventes d'action"; break;
             case "SHARE_COUNT":
-                result += "de nombre d'action possédé"; break;
+                result += "le nombre d'action possédé"; break;
             case "CUMULABLE_SHARE_DIVIDEND":
-                result += "des dividendes à la date du détachement"; break;
+                result += "les dividendes à la date du détachement"; break;
             case "SHARE_ANNUAL_DIVIDEND_YIELD":
-                result += "du rendement du dividende annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
+                result += "le rendement du dividende annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
             case "SHARE_PRICE":
-                result += "du cours de l'action"; break;
+                result += "le cours de l'action"; break;
             case "SHARE_PRU_BRUT":
-                result += "du Prix de Revient Unitaire Brut (dividendes exclus)"; break; // utilise la date de paiement
+                result += "le Prix de Revient Unitaire Brut (dividendes exclus)"; break; // utilise la date de paiement
             case "SHARE_PRU_NET":
-                result += "du Prix de Revient Unitaire Net (dividendes inclus)"; break; // utilise la date de paiement
+                result += "le Prix de Revient Unitaire Net (dividendes inclus)"; break; // utilise la date de paiement
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
-                result += "du rendement du dividende basé sur votre PRU brut (dividendes exclus) à la date détachement"; break;
+                result += "le rendement du dividende basé sur votre PRU brut (dividendes exclus) à la date détachement"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET":                
-                result += "du rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement"; break;
+                result += "le rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement"; break;
             case "ACTION_CROISSANCE":
                 result += "La croissance du dividende annuel de l'action"; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
     if (isDefined(chartIndex.currencyIndexConfig)){
-        result += "des devises qui ont été utilisées dans le graphique.";
+        result += "les devises qui ont été utilisées dans le graphique.";
     }
     else if (isDefined(chartIndex.portfolioIndexConfig)){
         switch(chartIndex.portfolioIndexConfig?.portfolioIndex){
             case "CUMULABLE_SOLD":
-                result += "de la vente d'action"; break;
+                result += "la vente d'actions"; break;
             case "CUMULABLE_BUY":
-                result += "de l'achat d'action"; break;
+                result += "l'achat d'actions"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
-                result += "des crédit d'impôts depuis la date du début du graphique"; break;
+                result += "les crédit d'impôts depuis la date du début du graphique"; break;
             case "CUMULABLE_ENTREES":
-                result += "des dépôts de liquidités"; break;
+                result += "les dépôts de liquidités"; break;
             case "CUMULABLE_ENTREES_SORTIES":
-                result += "des dépôts et retraits des liquidités"; break;
+                result += "les dépôts et retraits des liquidités"; break;
             case "CUMULABLE_LIQUIDITE":
-                result += "des mouvements sur les liquidités (dépots, retraits, taxes, dividendes, etc...)"; break;
+                result += "les mouvements sur les liquidités (dépots, retraits, taxes, dividendes, etc...)"; break;
             case "CUMULABLE_PORTFOLIO_DIVIDENDES":
-                result += "des dividendes reçu (date de paiement)"; break;
+                result += "les dividendes reçu (date de paiement)"; break;
             case "CUMULABLE_SORTIES":
-                result += "des retraits de liquidités"; break;
+                result += "les retraits de liquidités"; break;
             case "VALEUR_PORTEFEUILLE":
-                result += "de la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
+                result += "la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
             case "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
-                result += "de votre portefeuille incluant les liquidités"; break;
+                result += "la valeur de votre portefeuille incluant les liquidités"; break;
             case "CUMULABLE_GAIN_NET":
-                result += "de vos gains (valeur du portefeuille - les liquidités investis)"; break;            
+                result += "vos gains (valeur du portefeuille - les liquidités investis)"; break;            
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":
-                result += "du rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
+                result += "le rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
-                result += "du rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité"; break;    
+                result += "le rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité"; break;    
             case "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE":
-                result += "de la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille."; break;
+                result += "la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille."; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
         }        
     }
@@ -222,8 +210,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                         currencyIndexConfig: undefined,
                                         shareIndexConfig: {
                                                 ...props.chartIndex.shareIndexConfig,
-                                                shareIndex: 'SHARE_PRICE',
-                                                shareSelection: "CURRENT_SHARES" // valeur par défaut
+                                                shareIndex: 'SHARE_PRICE'
                                                 }})                                    
                                 }
                                 else if (newValue === 'DEVISE'){
@@ -358,52 +345,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
             </Box>
 
             <Box margin={{ vertical: 'none', horizontal: 'large' }} >
-        
-            <Box direction="row">
-                {
-                isDefined(props.chartIndex.shareIndexConfig) && (
-                    <>
-                    <ComboFieldWithCode id="shareGroupSelection"
-                        label="Groupe d'actions"
-                        errorMsg={undefined}
-                        readOnly={props.readOnly}
-                        selectedCodeValue={!isDefined(props.chartIndex.shareIndexConfig?.shareSelection) ?
-                                                                            'CURRENT_SHARES': props.chartIndex.shareIndexConfig?.shareSelection! }
-                        userValues={[                             
-                            "Les actions courrantes du portefeuille",
-                            "Toutes les actions qui ont été présentent dans le portefeuille",
-                            "Uniquement les actions sélectionnées individuellement"
-                        ]}
-                        codeValues={[                            
-                           "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
-                        ]}
-                        description=""
-                        onChange={newValue => 
-                            props.save({...props.chartIndex, shareIndexConfig: {
-                                ...props.chartIndex.shareIndexConfig,
-                                shareSelection: newValue,                                
-                            }})
-                    }/>
-
-                    <ComboMultipleWithCheckbox id="additionalShares"
-                                            label="+ Actions individuelle"
-                                            selectedCodeValues={!isDefined(props.chartIndex.shareIndexConfig?.additionalShareGoogleCodeList) ? [] : props.chartIndex.shareIndexConfig?.additionalShareGoogleCodeList!}
-                                            errorMsg={undefined}
-                                            readOnly={false}
-                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
-                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
-                                            description=""
-                                            onChange={newValue  => props.save({...props.chartIndex, shareIndexConfig: {
-                                                ...props.chartIndex.shareIndexConfig,
-                                                additionalShareGoogleCodeList: newValue
-                                            }}
-
-                    )}/>
-                    </>        
-                 )
-                 }
-
-                </Box>                
+                     
         </Box>
         </>
     );

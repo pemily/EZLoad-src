@@ -184,7 +184,7 @@ public class DashboardManager {
             chartSettings.getIndexSelection()
                     .forEach(chartIndex -> {
                         allChartLines.addAll(createCurrencyCharts(reporting, chartSettings.getGroupedBy(), currenciesIndexBuilder, chartIndex));
-                        allChartLines.addAll(createShareCharts(chartSettings.getGroupedBy(), shareIndexBuilder, chartIndex, shareSelectionBuilder));
+                        allChartLines.addAll(createShareCharts(chartSettings, shareIndexBuilder, chartIndex, shareSelectionBuilder));
                         allChartLines.addAll(createPortfolioCharts(chartSettings.getGroupedBy(), portfolioIndexBuilder, chartIndex));
                     }
             );
@@ -236,12 +236,12 @@ public class DashboardManager {
         return allChartLines;
     }
 
-    private List<ChartLine> createShareCharts(ChartGroupedBy chartGroupBy, ShareIndexBuilder shareIndexResult, ChartIndex chartIndex, ShareSelectionBuilder shareSelectionBuilder) {
+    private List<ChartLine> createShareCharts(ChartSettings chartSettings, ShareIndexBuilder shareIndexResult, ChartIndex chartIndex, ShareSelectionBuilder shareSelectionBuilder) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartShareIndexConfig shareIndexConfig = chartIndex.getShareIndexConfig();
 
         if (shareIndexConfig != null){
-            shareSelectionBuilder.getSelectedShares(shareIndexConfig.getShareSelection(), shareIndexConfig.getAdditionalShareGoogleCodeList())
+            shareSelectionBuilder.getSelectedShares(chartSettings.getShareSelection(), chartSettings.getAdditionalShareGoogleCodeList())
                     .forEach(ezShare -> {
 
                         ShareIndex index = shareIndexConfig.getShareIndex();
@@ -256,7 +256,7 @@ public class DashboardManager {
                                 yAxis = ChartLine.Y_AxisSetting.PERCENT;
                             allChartLines.add(createChartLine(sharePrices, chartIndex.getId(), ezShare.getEzName(),
                                     computeYAxis(yAxis),
-                                    getGraphStyle(chartGroupBy, chartIndex)));
+                                    getGraphStyle(chartSettings.getGroupedBy(), chartIndex)));
                         }
                     });
         }

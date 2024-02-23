@@ -36,6 +36,12 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private StartDateSelection selectedStartDateSelection;
     private ChartGroupedBy groupedBy;
     private List<ChartIndex> indexSelection = new LinkedList<>();
+
+    // Sur quelles actions ?
+    private ShareSelection shareSelection;
+    private Set<String> additionalShareGoogleCodeList = new HashSet<>();
+
+
     private int height = 50;
     private int nbOfPoints = 200;
 
@@ -107,6 +113,22 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public void setSelectedStartDateSelection(StartDateSelection selectedStartDateSelection) {
         this.selectedStartDateSelection = selectedStartDateSelection;
+    }
+
+    public ShareSelection getShareSelection() {
+        return shareSelection;
+    }
+
+    public void setShareSelection(ShareSelection shareSelection) {
+        this.shareSelection = shareSelection;
+    }
+
+    public Set<String> getAdditionalShareGoogleCodeList() {
+        return additionalShareGoogleCodeList;
+    }
+
+    public void setAdditionalShareGoogleCodeList(Set<String> additionalShareGoogleCodeList) {
+        this.additionalShareGoogleCodeList = additionalShareGoogleCodeList;
     }
 
     public int getHeight() {
