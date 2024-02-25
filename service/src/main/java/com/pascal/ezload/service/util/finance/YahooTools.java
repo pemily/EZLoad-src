@@ -21,6 +21,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
+import net.sourceforge.htmlunit.xpath.operations.Div;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -183,11 +184,24 @@ public class YahooTools extends ExternalSiteTools{
                     2021-02-05,0.250000
                     2021-11-12,3.050000
                     2022-02-04,0.500000 */
-                        return rows.stream().map(r -> {
+                    List<Dividend> list = rows.stream().map(r -> {
                                     float value = NumberUtils.str2Float(r.get(1));
                                     EZDate date = EZDate.parseYYYMMDDDate(r.get(0), '-'); // date de detachement
-                                    return new Dividend(value, date, date, date, date, date, null, devise, false);
+                                    String key = ezShare.getYahooCode()+"_"+date.toYYYYMMDD();
+                                    Dividend fix = Corrections.get(key);
+                                    if (fix != null) return fix;
+                                    return autoFix(new Dividend(url, value, date, date, date, date, date, null, devise, false));
                                 })
+                                .collect(Collectors.toList());
+
+                    // Ajoute les corrections si il y en a
+                    List<Dividend> fixAdd = Additions.get(ezShare.getYahooCode());
+                    if (fixAdd != null) {
+                        list.addAll(fixAdd);
+                    }
+
+                    return list.stream()
+                                .filter(div -> div.getDate().isAfterOrEquals(from))
                                 .sorted(Comparator.comparing(Dividend::getDate))
                                 .collect(Collectors.toList());
                     });
@@ -212,4 +226,39 @@ public class YahooTools extends ExternalSiteTools{
         return new CurrencyMap(fromDevise, toDevise, devisePrices.getPrices());
     }
 
+
+    private static final Map<String, Dividend> Corrections = new HashMap<>();
+    private static final Map<String, List<Dividend>> Additions = new HashMap<>();
+    static {
+
+        // Bank of Nova Scotia: BNS.TO mauvaise date, dividende déplacé sur l'année suivante
+        //Corrections.put("BNS.TO_2015/12/31", fix(DeviseUtil.CAD, 0.7f, new EZDate(2016,1,5)));  fixé avec l'autoFix
+        //Corrections.put("BNS.TO_2016/12/29", fix(DeviseUtil.CAD, 0.74f, new EZDate(2017,1,3)));   fixé avec l'autoFix
+        //Corrections.put("BNS.TO_2017/12/29", fix(DeviseUtil.CAD, 0.79f, new EZDate(2018,1,2)));   fixé avec l'autoFix
+        //Corrections.put("BNS.TO_2018/12/31", fix(DeviseUtil.CAD, 0.85f, new EZDate(2019,1,2)));   fixé avec l'autoFix
+        //Corrections.put("BNS.TO_2021/12/31", fix(DeviseUtil.CAD, 1f, new EZDate(2022,1,1)));   fixé avec l'autoFix
+        Additions.put("BNS.TO", List.of(fix( DeviseUtil.CAD, 1.03f, new EZDate(2022,7,4))));
+
+
+        // Fix Dividend Broadcom
+        Corrections.put("AVGO_2018/03/21", fix(DeviseUtil.USD, 1.75f, new EZDate(2018,3,21)));
+        Corrections.put("AVGO_2018/06/19", fix(DeviseUtil.USD, 1.75f, new EZDate(2018,6,19)));
+
+    }
+
+    private static Dividend fix(EZDevise devise, float amount, EZDate date){
+        return new Dividend("Correction Yahoo", amount, date, date, date, date, date, null, devise, false);
+    }
+
+    private static Dividend autoFix(Dividend div){
+        // Yahoo donne la date: ex-div (equivalent chez seeking alpha) (cette date est la date a partir du moment ou on est exclu des dividendes si on a pas des actions)
+        // Revenue & dividende ainsi que la class seeking alpha prennent la date: record date, qui est quelques jour apres le ex-div date.
+        // si le ex-div date tombe a la fin de l'année, alors le record date est pour l'année suivante
+
+        if (div.getDate().getMonth() == 12 && div.getDate().getDay() >= 29){
+            EZDate date = new EZDate(div.getDate().getYear()+1, 1, 2); // je déplace à l'année suivante au 2 janvier
+            return new Dividend(div.getSource(), div.getAmount(), date, date, date, date, date, div.getFrequency(), div.getDevise(), false);
+        }
+        return div;
+    }
 }

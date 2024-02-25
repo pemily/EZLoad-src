@@ -14,9 +14,18 @@ public class PerfIndexBuilder {
         this.defaultGroupedBy = defaultGroupedBy;
     }
 
-    public Prices buildPerfPrices(Prices prices, ChartPerfFilter perfFilter, boolean isCumulable){
-        return isCumulable ? buildPerfPrices(prices, perfFilter, init(), sum()) : // we sum all the data inside the same period
-                             buildPerfPrices(prices, perfFilter, init(), keepLast()); // we always take the most recent data
+    public Prices buildPerfPrices(Prices prices, ChartPerfFilter perfFilter){
+        return computePerf(prices, perfFilter, prices);
+    }
+
+    public Prices buildGroupBy(Prices prices, boolean isCumulable){
+        return isCumulable ? createGroupedPrices(prices, defaultGroupedBy, init(), sum()) : // we sum all the data inside the same period
+                                createGroupedPrices(prices, defaultGroupedBy, init(), keepLast()); // we always take the most recent data
+    }
+
+    public Prices buildGroupBy(Prices prices, ChartGroupedBy groupedBy, boolean isCumulable){
+        return isCumulable ? createGroupedPrices(prices, groupedBy, init(), sum()) : // we sum all the data inside the same period
+                createGroupedPrices(prices, groupedBy, init(), keepLast()); // we always take the most recent data
     }
 
     private static Supplier<Price> init() {
@@ -31,36 +40,28 @@ public class PerfIndexBuilder {
         return Price::plus;
     }
 
-    private Prices buildPerfPrices(Prices prices, ChartPerfFilter perfFilter,
-                                   Supplier<Price> groupByFirstValueFct,
-                                   BiFunction<Price, Price, Price> groupByFct){
 
-        //Prices pricesGrouped = createGroupedPrices(prices, groupByFirstValueFct, groupByFct);
-
-        return computePerf(prices, perfFilter, prices);
-    }
-
-    private Prices createGroupedPrices(Prices prices, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
-        if (defaultGroupedBy == ChartGroupedBy.DAILY) return prices;
+    private Prices createGroupedPrices(Prices prices, ChartGroupedBy groupedBy, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
+        if (groupedBy == ChartGroupedBy.DAILY) return prices;
 
         PriceAtDate firstDate = prices.getPrices().get(0);
 
-        EZDate currentPeriod = createPeriod(defaultGroupedBy, firstDate.getDate()); // the first period to start
-        EZDate afterTodayPeriod = createPeriod(defaultGroupedBy, EZDate.today()).createNextPeriod(); // the end period we must reached
+        EZDate currentPeriod = createPeriod(groupedBy, firstDate.getDate()); // the first period to start
+        EZDate afterTodayPeriod = createPeriod(groupedBy, EZDate.today()).createNextPeriod(); // the end period we must reached
 
         // crée un Prices avec moins de valeur (les mois ou les années uniquement)
         // et avec les valeurs de la période (la somme, ou bien la dernière valeur)
         Prices pricesGrouped = new Prices();
         pricesGrouped.setDevise(prices.getDevise());
-        pricesGrouped.setLabel(prices.getLabel()+" grouped by "+defaultGroupedBy);
-        // init Prices grouped to have the same number of values than the labels
+        pricesGrouped.setLabel(prices.getLabel()+" grouped by "+groupedBy);
+    /*    // init Prices grouped to have the same number of values than the labels
         for (PriceAtDate priceAtDate : prices.getPrices()) {
             pricesGrouped.addPrice(new PriceAtDate(priceAtDate.getDate()));
-        }
+        }*/
         do {
             Price currentValue = groupByFirstValueFct.get();
             EZDate lastPeriodDate = null;
-            int lastPeriodIndex = -1;
+            //int lastPeriodIndex = -1;
             for (PriceAtDate priceAtDate : prices.getPrices()) {
                 if (currentPeriod.contains(priceAtDate.getDate())) {
                     lastPeriodDate = priceAtDate.getDate();
@@ -69,9 +70,9 @@ public class PerfIndexBuilder {
                 else if (lastPeriodDate != null){
                     break; // we can stop the loop there is nothing interresting after this date, the period is over
                 }
-                lastPeriodIndex++;
+            //    lastPeriodIndex++;
             }
-            pricesGrouped.replacePriceAt(lastPeriodIndex, currentValue.getValue() == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
+            pricesGrouped.addPrice(currentValue.getValue() == null ? new PriceAtDate(currentPeriod) : new PriceAtDate(currentPeriod, currentValue));
             currentPeriod = currentPeriod.createNextPeriod();
         }
         while (!currentPeriod.equals(afterTodayPeriod));

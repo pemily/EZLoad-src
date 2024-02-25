@@ -61,7 +61,7 @@ public class DashboardHandler {
     @GET
     @Path("/getDashboard")
     @Produces(MediaType.APPLICATION_JSON)
-    public DashboardData getDashboardData() throws Exception {
+    public synchronized DashboardData getDashboardData() throws Exception {
         DashboardData dashboardData = ezServerState.getDashboardData();
         if (dashboardData == null){
             SettingsManager settingsManager = SettingsManager.getInstance();
@@ -84,7 +84,7 @@ public class DashboardHandler {
     @GET
     @Path("/refresh")
     @Produces(MediaType.APPLICATION_JSON)
-    public EzProcess refreshDashboardData() throws Exception {
+    public synchronized EzProcess refreshDashboardData() throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps().validate();
         EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
@@ -110,7 +110,7 @@ public class DashboardHandler {
     @Path("/saveDashboardConfig")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<DashboardPage<ChartSettings>> saveDashboardConfig(List<DashboardPage<ChartSettings>> dashboardSettings) throws Exception {
+    public synchronized List<DashboardPage<ChartSettings>> saveDashboardConfig(List<DashboardPage<ChartSettings>> dashboardSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
         DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));

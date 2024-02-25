@@ -17,6 +17,10 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.TextPage;
+import com.gargoylesoftware.htmlunit.UnexpectedPage;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.File;
@@ -48,10 +52,25 @@ public class HttpUtilCached {
                 }
             }
             rep.info("Fichier de cache non trouvé, téléchargement des données");
-            HttpUtil.downloadV2(url, requestProperties, inputStream -> {
-                FileUtil.write(cache, inputStream);
-                return cache;
-            });
+            Page page = HttpUtil.getFromUrl(url, false);
+            if (page.getWebResponse().isSuccess()) {
+                if (page instanceof UnexpectedPage) {
+                    try (InputStream in = ((UnexpectedPage) page).getInputStream()) {
+                        FileUtil.write(cache, in);
+                    }
+                } else if (page instanceof TextPage) {
+                    FileUtil.string2file(cache, ((TextPage) page).getContent());
+                }
+                else {
+                    throw new RuntimeException("TEST SI ON RECOIT un autre type de page: "+page.getClass().getSimpleName()+" url: "+url);
+                }
+            }
+            else {
+                HttpUtil.downloadV2(url, requestProperties, inputStream -> {
+                    FileUtil.write(cache, inputStream);
+                    return cache;
+                });
+            }
             rep.info("Fin de téléchargement");
             try (InputStream in = FileUtil.read(cache)) {
                 return toObjMapper.apply(in);

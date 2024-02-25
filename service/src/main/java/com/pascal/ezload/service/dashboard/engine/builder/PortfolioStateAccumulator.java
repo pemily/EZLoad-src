@@ -73,8 +73,13 @@ public class PortfolioStateAccumulator {
     private void useSelectedDate() {
         // ici on connait enfin la date de notre state
         previousState.setDate(selectedDate);
+
         // on peut calculer les valeurs qui ne sont pas lié a une operation particuliere mais a toute les operations qui se retrouve dans la selectedDate
         computePortfolioValue(selectedDate);
+
+        // a faire apres le computePortfolioValue
+        computeGain();
+
         computePRU();
         computeDividendYield(selectedDate);
         // on ajoute le state dans le resultat
@@ -136,11 +141,11 @@ public class PortfolioStateAccumulator {
         // mets a jour les liquiditées en fonctions des opérations qui se sont déroulé
         if (addLiquidityAmount){
             Price amount = extractAmount(operation);
-            previousState.getLiquidity().plus(amount);
+            previousState.getLiquidity().add(amount);
         }
         if (minusLiquidityAmount) {
             Price amount = extractAmount(operation);
-            previousState.getLiquidity().minus(amount);
+            previousState.getLiquidity().subtract(amount);
         }
 
     }
@@ -152,12 +157,12 @@ public class PortfolioStateAccumulator {
 
     private void addCreditImpot(Row operation){
         Price newNb = extractAmount(operation);
-        previousState.getCreditImpot().plus(newNb);
+        previousState.getCreditImpot().add(newNb);
     }
 
     private void addDividend(Row operation) {
         Price newNb = extractAmount(operation);
-        previousState.getDividends().plus(newNb); // pour le portfeuille
+        previousState.getDividends().add(newNb); // pour le portfeuille
 
         String shareName = operation.getValueStr(MesOperations.ACTION_NAME_COL);
         if (!StringUtils.isBlank(shareName) && !ShareValue.isLiquidity(shareName)) {
@@ -171,14 +176,14 @@ public class PortfolioStateAccumulator {
 
     private void addInputQuantity(Row operation) {
         Price newNb = extractAmount(operation);
-        previousState.getInput().plus(newNb);
-        previousState.getInputOutput().plus(newNb);
+        previousState.getInput().add(newNb);
+        previousState.getInputOutput().add(newNb);
     }
 
     private void addOutputQuantity(Row operation) {
         Price newNb = extractAmount(operation);
-        previousState.getOutput().plus(newNb);
-        previousState.getInputOutput().minus(newNb);
+        previousState.getOutput().add(newNb);
+        previousState.getInputOutput().subtract(newNb);
     }
 
     private void soldShare(Row operation) {
@@ -189,7 +194,7 @@ public class PortfolioStateAccumulator {
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfSoldShare : oldValue.plus(nbOfSoldShare));
 
-        previousState.getShareSold().plus(amount); // le montant "global" (positif) des actions vendues
+        previousState.getShareSold().add(amount); // le montant "global" (positif) des actions vendues
 
         previousState.getShareSoldDetails()
                 .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue.plus(amount)); // le detail par actions
@@ -211,7 +216,7 @@ public class PortfolioStateAccumulator {
         previousState.getShareNb()
                 .compute(share, (sh, oldValue) -> oldValue == null ? nbOfBuyShare : oldValue.plus(nbOfBuyShare));
 
-        previousState.getShareBuy().plus(amount.reverse());// le montant "global" (positif) des actions achetées
+        previousState.getShareBuy().add(amount.reverse());// le montant "global" (positif) des actions achetées
 
         previousState.getShareBuyDetails()
                 .compute(share, (sh, oldValue) -> oldValue == null ? amount.reverse() : oldValue.minus(amount)); // le detail par actions
@@ -242,7 +247,7 @@ public class PortfolioStateAccumulator {
 
             */
 
-            previousState.getAllTaxes().plus(amount);
+            previousState.getAllTaxes().add(amount);
             return true; // processed
         }
         return false; // was not a taxe on a share, perhaps another taxe?
@@ -261,6 +266,13 @@ public class PortfolioStateAccumulator {
                                         })
                                         .reduce(Price::plus)
                                         .orElse(Price.ZERO));
+    }
+
+
+    private void computeGain(){
+        previousState.setGains(previousState.getPortfolioValue()
+                        .minus(previousState.getInputOutput().getCumulative())
+                        .plus(previousState.getLiquidity().getCumulative()));
     }
 
     private void computePRU(){
@@ -284,7 +296,7 @@ public class PortfolioStateAccumulator {
                             .map(e -> {
                                 Price nbOfShare = e.getValue();
                                 EZShareEQ share = e.getKey();
-                                PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getAnnualDividendYieldWithEstimates(reporting, share).getPriceAt(date);
+                                PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getRendementDividendeAnnuel(reporting, share).getPriceAt(date);
 
                                 PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(date);
                                 Price shareAmount = currentPrice.multiply(nbOfShare);
@@ -297,6 +309,7 @@ public class PortfolioStateAccumulator {
                             .orElse(Price.ZERO);
 
         previousState.setTheoricalDividendYield(yield);
+
 
         previousState.setRealDividendYield(portfolioValue.getValue() != null && portfolioValue.getValue() > 0 ?  previousState.getDividends().getInstant()
                                     .multiply(Price.CENT)

@@ -56,6 +56,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.indexSelection = chartSettings.indexSelection;
         this.height = chartSettings.height;
         this.nbOfPoints = chartSettings.nbOfPoints;
+        this.shareSelection = chartSettings.shareSelection;
+        this.additionalShareGoogleCodeList = chartSettings.additionalShareGoogleCodeList;
     }
 
     public String getTargetDevise() {

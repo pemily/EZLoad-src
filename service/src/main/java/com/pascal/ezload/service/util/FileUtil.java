@@ -51,7 +51,11 @@ public class FileUtil {
     }
 
     public static void string2file(String file, String content) throws IOException {
-        new File(file).getParentFile().mkdirs();
+        string2file(new File(file), content);
+    }
+
+    public static void string2file(File file, String content) throws IOException {
+        file.getParentFile().mkdirs();
         try (OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8)) {
             fileWriter.write(content);
         }

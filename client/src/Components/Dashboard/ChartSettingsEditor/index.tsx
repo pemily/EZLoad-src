@@ -148,7 +148,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         "Uniquement les actions sélectionnées individuellement"
                                     ]}
                                     codeValues={[                            
-                                    "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                                        "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
                                     ]}
                                     description=""
                                     onChange={newValue => 

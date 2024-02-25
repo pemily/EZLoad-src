@@ -49,7 +49,17 @@ public class SeekingAlphaToolsTest {
     public void testSearchDividendeHistory() throws Exception {
         EZShare action = new EZShare();
         action.setSeekingAlphaCode("WSR");
+        action.setCountryCode("US");
         List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(2));
+        Assertions.assertTrue(dividends.size() > 12);
+    }
+
+    @Test
+    public void testSearchDividendeHistoryBankOfNova() throws Exception {
+        EZShare action = new EZShare();
+        action.setSeekingAlphaCode("BNS:CA");
+        action.setCountryCode("CA");
+        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(10));
         Assertions.assertTrue(dividends.size() > 12);
     }
 

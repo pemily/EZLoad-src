@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.financial;
 
+import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.model.*;
@@ -255,11 +256,11 @@ public class EZActionManager {
                 if (cache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
                     dividends = YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom);
                 }
-                else {
-                    if (!cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))){
-                        System.out.println("test");
-                    }
+
+                if (dividends == null && !cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) {
+                    dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
                 }
+
                 if (dividends == null){
                     dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
                 }
@@ -346,9 +347,43 @@ public class EZActionManager {
                 logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
             }
 
+            try {
+                List<Dividend> dividends = YahooTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
+                checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "yahoo");
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes yahoo de l'action " + toString(ezShare), e);
+            }
+
+
+            try {
+                List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
+                checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "seekingAlpha");
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes seekingAlpha de l'action " + toString(ezShare), e);
+            }
             return errors;
         }
     }
+
+    private void checkPasDeBaisseDeDividendes(Reporting reporting, List<String> errors, EZShare ezShare, List<Dividend> dividends, String source) {
+        if (dividends != null) {
+            Prices allDivs = SharePriceBuilder.dividendPerYear(dividends);
+            // Check that the dividends are growing
+            float previousAmount = 0;
+            for (PriceAtDate p : allDivs.getPrices()) {
+                if ((p.getValue() == null && previousAmount > 0) || (p.getValue() != null && previousAmount > p.getValue())) {
+                    if (p.getDate().getYear() !=  EZDate.today().getYear()) {
+                        errors.add("Baisse de dividende pour l'action " + toString(ezShare) + " en " + p.getDate().getYear() + " de " + previousAmount + " à " + p.getValue() + ". Info venant de " + source);
+                    }
+                }
+                previousAmount = p.getValue() == null ? 0 : p.getValue();
+            }
+        }
+        else {
+            reporting.info("Pas de dividendes trouvé chez "+source+" pour "+toString(ezShare));
+        }
+    }
+
 
     private void checkPrices(EZShare ezShare, Reporting reporting, List<String> errors, Prices prices1, Prices prices2, String errorMessage) throws Exception {
         if (prices1 == null || prices2 == null) return;
@@ -385,11 +420,20 @@ public class EZActionManager {
 
 
     private String toString(EZShare action){
-        if (StringUtils.isBlank(action.getEzName())){
-            if (StringUtils.isBlank(action.getIsin())) return action.getGoogleCode() == null ? "" : action.getGoogleCode();
-            return action.getIsin() == null ? "" : action.getIsin();
+        String r = "";
+        if (!StringUtils.isBlank(action.getEzName())){
+            r+=action.getEzName();
         }
-        return action.getEzName() == null ? "" : action.getEzName();
+        if (!StringUtils.isBlank(action.getGoogleCode())) {
+            r += " googleCode: "+action.getGoogleCode();
+        }
+        if (!StringUtils.isBlank(action.getYahooCode())) {
+            r += " yahooCode: "+action.getYahooCode();
+        }
+        if (!StringUtils.isBlank(action.getSeekingAlphaCode())) {
+            r += " seekingAlphaCode: "+action.getSeekingAlphaCode();
+        }
+        return r;
     }
 
 

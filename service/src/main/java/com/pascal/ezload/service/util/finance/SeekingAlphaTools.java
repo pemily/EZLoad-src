@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
@@ -50,7 +51,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
             props.put("Accept-Encoding", "identity");
             props.put("User-Agent", HttpUtil.getUserAgent());
             props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
-            String url = "https://seekingalpha.com/api/v3/symbols/" + ezShare.getSeekingAlphaCode() + "/dividend_history?years=100";
+            String url = "https://seekingalpha.com/api/v3/symbols/" + URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8) + "/dividend_history?years=100";
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
                 // wait(2);
                     return cache.get(reporting, getDividendsCacheName(ezShare, from), url, props, inputStream -> {
@@ -80,9 +81,12 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                         frequency = Dividend.EnumFrequency.SEMESTRIEL;
                                     else if ("YEARLY".equals(freq))
                                         frequency = Dividend.EnumFrequency.ANNUEL;
+                                    // dans la frequency j'ai vu du OTHER chez Mastercard
 
                                     // Seeking alpha peut me donner des dividendes dans le futur si ils ont ete annoncé
-                                    return new Dividend(
+                                    Dividend fixed = Corrections.get(ezShare.getSeekingAlphaCode()+"_"+attributes.get("record_date"));
+                                    if (fixed != null) return fixed;
+                                    return new Dividend(url,
                                             NumberUtils.str2Float(attributes.get("amount").toString()),
                                             seekingAlphaDate(attributes.get("ex_date")),
                                             seekingAlphaDate(attributes.get("declare_date")),
@@ -93,6 +97,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                             devise,
                                             false);
                                 })
+                                .filter(d -> d.getDate().isAfterOrEquals(from))
                                 .collect(Collectors.toList());
                     });
             }
@@ -102,7 +107,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
     private static void wait(int nbSec){
         try {
-            Thread.sleep(nbSec*1000);
+            Thread.sleep(nbSec* 1000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -122,7 +127,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                 return date.isAfter(from) && date.isBeforeOrEquals(to);
                             })
                             .map(SeekingAlphaTools::createPriceAtDate)
-                            .forEach(p -> sharePrices.addPrice(p));
+                            .forEach(sharePrices::addPrice);
                 });
                 long nbOfDays = from.nbOfDaysTo(to) / 7; // seeking alpha give only 1 value per week
                 return checkResult(reporting, ezShare, sharePrices, nbOfDays);
@@ -165,7 +170,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
     private static PriceAtDate createPriceAtDate(Map.Entry<String, Object> entry) {
         Map<String, Number> value = (Map<String, Number>) entry.getValue();
-        String closePrice = value.get("open") + "";
+        String closePrice = value.get("close") + "";
         return new PriceAtDate(parseDate(entry), NumberUtils.str2Float(closePrice), false);
     }
 
@@ -186,12 +191,14 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
 
     static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws HttpUtil.DownloadException, IOException {
+        return DeviseUtil.foundByCountryCode(ezShare.getCountryCode());
+        /*
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String cacheName = "seekingalpha_devise_" + ezShare.getSeekingAlphaCode();
             String devise = null;
             if (!cache.exists(cacheName)) {
                 String url = "https://seekingalpha.com/symbol/" + ezShare.getSeekingAlphaCode();
-                HtmlPage result = HttpUtil.getFromUrl(url, false);
+                HtmlPage result = HttpUtil.getFromUrl(url, true);
                 for (DomElement iter : result.getDomElementDescendants()) {
                     String att = iter.getAttribute("data-test-id");
                     if (att.equals("symbol-description")) {
@@ -205,7 +212,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                     }
                 }
                 if (devise == null){
-                    throw new HttpUtil.DownloadException("Impossible de recuperer la devise sur l'url: "+url+" Text: \n"+result.getVisibleText());
+                    throw new HttpUtil.DownloadException("Impossible de recuperer la devise sur l'url: "+url+" Title: "+result.getTitleText()+" fullText:"+result.getVisibleText());
                 }
                 else cache.createCache(cacheName, devise);
             } else {
@@ -218,8 +225,21 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
             if (devise != null) return DeviseUtil.foundByCode(devise);
         }
-        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
+        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());*/
     }
 
 
+
+    private final static Map<String, Dividend> Corrections = new HashMap<>();
+    static {
+        // Erreur de dividende chez Mastercard, ils donnent 1.1 au lieu de 0.11
+        Corrections.put("MA_2014-01-09", new Dividend("Correction Seeking Alpha", 0.11f, new EZDate(2014,1,9),
+                                                                    new EZDate(2013,12,10),
+                                                                    new EZDate(2014,2,10),
+                                                                    new EZDate(2014,1,9),
+                                                                    new EZDate(2014,1,7),
+                                                                    Dividend.EnumFrequency.TRIMESTRIEL,
+                                                                    DeviseUtil.USD,
+                                                                    false));
+    }
 }

@@ -18,9 +18,6 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 
-import com.pascal.ezload.service.dashboard.config.ChartPerfFilter;
-import com.pascal.ezload.service.dashboard.config.ChartGroupedBy;
-import com.pascal.ezload.service.dashboard.config.ChartPerfSettings;
 import com.pascal.ezload.service.dashboard.config.PortfolioIndex;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
@@ -31,6 +28,7 @@ import com.pascal.ezload.service.util.DeviseUtil;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PortfolioIndexBuilder {
@@ -111,20 +109,6 @@ public class PortfolioIndexBuilder {
     private Set<EZShareEQ> allCurrentShares = null; // Toutes les actions que l'on possède actuellement
 
 
-    public Prices getPrices(PortfolioIndex portfolioIndex) {
-        return portfolioIndex2TargetPrices.computeIfAbsent(portfolioIndex, i -> {
-            Prices prices = new Prices();
-            prices.setDevise(currencies.getTargetDevise());
-            prices.setLabel(portfolioIndex.name());
-            PortfolioStateAtDate previousState = null;
-            for (PortfolioStateAtDate state : getPortfolioValuesInTargetDevise()) {
-                Price p = getTargetPrice(portfolioIndex, previousState, state);
-                prices.addPrice(new PriceAtDate(state.getDate(), p));
-                previousState = state;
-            }
-            return prices;
-        });
-    }
 
     private Price getTargetPrice(PortfolioIndex portfolioIndex, PortfolioStateAtDate previousState, PortfolioStateAtDate state) {
         switch (portfolioIndex){
@@ -134,13 +118,16 @@ public class PortfolioIndexBuilder {
                 return state.getInput().getInstant();
             case CUMULABLE_SORTIES:
                 return state.getOutput().getInstant();
-            case CUMULABLE_ENTREES_SORTIES:
-                return state.getInputOutput().getInstant();
+            case ENTREES_SORTIES:
+                return state.getInputOutput().getCumulative();
             case CUMULABLE_CREDIT_IMPOTS:
                 return state.getCreditImpot().getInstant();
             case CUMULABLE_LIQUIDITE:
                 // ici c'est le mouvement de liquidité sur la journée, pour avoir les liquidités disponible du jour il faut additionner toutes les cumulable entity depuis le début
                 return state.getLiquidity().getInstant();
+            case LIQUIDITE:
+                // ici c'est la somme des mouvements de liquidité
+                return state.getLiquidity().getCumulative();
             case VALEUR_PORTEFEUILLE:
                 return getDate2PortfolioValue().getPriceAt(state.getDate());
             case VALEUR_PORTEFEUILLE_WITH_LIQUIDITY: {
@@ -148,14 +135,17 @@ public class PortfolioIndexBuilder {
                 Price liquidity = state.getLiquidity().getCumulative();
                 return valeurPortefeuille.plus(liquidity);
             }
-            case CUMULABLE_GAIN_NET:
+            case CUMULABLE_GAINS_NET:
                 if (previousState == null) return Price.ZERO;
+                // le gain journalier
                 return getDate2PortfolioValue().getPriceAt(state.getDate())
                         .minus(getDate2PortfolioValue().getPriceAt(previousState.getDate()))
                         .minus(state.getShareBuy().getInstant())
                         .minus(state.getAllTaxes().getInstant())
                         .plus(state.getDividends().getInstant())
                         .plus(state.getShareSold().getInstant());
+            case GAINS_NET:
+                return state.getGains();
             case CUMULABLE_SOLD:
                 return state.getShareSoldDetails().values().stream().reduce(Price::plus).orElse(Price.ZERO);
             case CUMULABLE_BUY:
@@ -172,18 +162,21 @@ public class PortfolioIndexBuilder {
                 Price portfolioValue =  state.getPortfolioValue();
                 if (portfolioValue.getValue() != null && portfolioValue.getValue() > 0) {
                     for (Map.Entry<EZShareEQ, Price> entry : state.getShareNb().entrySet()) {
-                        PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate());
-                        Price shareValue = price.multiply(entry.getValue());
-                        Price shareRatio = shareValue.divide(portfolioValue);
-                        Prices shareDividendAnnualYield = sharePriceBuilder.getAnnualDividendYieldWithEstimates(reporting, entry.getKey());
-                        Prices shareDividendAnnualCroissanceYield = perfIndexBuilder.buildPerfPrices(shareDividendAnnualYield, ChartPerfFilter.VARIATION_EN_PERCENT, false);
-                        Price shareDividendAnnualCroissanceYieldPriceAt = shareDividendAnnualCroissanceYield.getPriceAt(state.getDate()).divide(Price.CENT);
-                        Price shareDividendAnnualYieldPriceAt = shareDividendAnnualYield.getPriceAt(state.getDate()).divide(Price.CENT);
-                        sum1 = sum1.plus(shareRatio.multiply(shareDividendAnnualYieldPriceAt).multiply(shareDividendAnnualCroissanceYieldPriceAt));
-                        sum2 = sum2.plus(shareRatio.multiply(shareDividendAnnualYieldPriceAt));
+                        if (entry.getValue().getValue() != 0) {// si le nb d'action est different de 0
+                            PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate());
+                            Price shareValue = price.multiply(entry.getValue());
+                            Price shareRatio = shareValue.divide(portfolioValue).multiply(Price.CENT);
+                            Prices shareDividendAnnualYield = sharePriceBuilder.getRendementDividendeAnnuel(reporting, entry.getKey());
+                            //Prices shareDividendAnnualCroissanceYield = perfIndexBuilder.buildPerfPrices(shareDividendAnnualYield, ChartPerfFilter.VARIATION_EN_PERCENT);
+
+                            Price shareDividendAnnualCroissancePriceAt = sharePriceBuilder.getCroissanceAnnuelDuDividendeWithEstimates(reporting, entry.getKey()).getPriceAt(state.getDate()); // shareDividendAnnualCroissanceYield.getPriceAt(state.getDate()).divide(Price.CENT);
+                            Price shareDividendAnnualRendementPriceAt = shareDividendAnnualYield.getPriceAt(state.getDate()); //shareDividendAnnualYield.getPriceAt(state.getDate()).divide(Price.CENT);
+                            sum1 = sum1.plus(shareRatio.multiply(shareDividendAnnualRendementPriceAt).multiply(shareDividendAnnualCroissancePriceAt));
+                            sum2 = sum2.plus(shareRatio.multiply(shareDividendAnnualRendementPriceAt));
+                        }
                     }
 
-                    return sum1.divide(sum2);
+                    return sum2.getValue() == null || sum2.getValue() == 0 ? new Price() : sum1.divide(sum2);
                 }
                 return new Price();
             }
@@ -191,8 +184,19 @@ public class PortfolioIndexBuilder {
         throw new IllegalStateException("Missing case: "+ portfolioIndex);
     }
 
-    public Prices getPortfolioIndex2TargetPrices(PortfolioIndex index) {
-        return portfolioIndex2TargetPrices.computeIfAbsent(index, i -> getPrices(index));
+    public Prices getPortfolioIndex2TargetPrices(PortfolioIndex portfolioIndex) {
+        return portfolioIndex2TargetPrices.computeIfAbsent(portfolioIndex, i -> {
+                    Prices prices = new Prices();
+                    prices.setDevise(currencies.getTargetDevise());
+                    prices.setLabel(portfolioIndex.name());
+                    PortfolioStateAtDate previousState = null;
+                    for (PortfolioStateAtDate state : getPortfolioValuesInTargetDevise()) {
+                        Price p = getTargetPrice(portfolioIndex, previousState, state);
+                        prices.addPrice(new PriceAtDate(state.getDate(), p));
+                        previousState = state;
+                    }
+                    return prices;
+                });
     }
     // Attention!! Ce ne sont pas des Prices mais des nombres d'actions
     public Prices getDate2share2ShareNb(EZShareEQ share) {
@@ -272,7 +276,7 @@ public class PortfolioIndexBuilder {
         if (allCurrentShares == null) {
             allCurrentShares = new HashSet<>();
             PortfolioStateAtDate lastState = getPortfolioValuesInTargetDevise().get(getPortfolioValuesInTargetDevise().size()-1);
-            allCurrentShares.addAll(lastState.getShareNb().keySet());
+            allCurrentShares.addAll(lastState.getShareNb().entrySet().stream().filter(s -> s.getValue().getValue() > 0).map(s -> s.getKey()).collect(Collectors.toList()));
         }
         return allCurrentShares;
     }

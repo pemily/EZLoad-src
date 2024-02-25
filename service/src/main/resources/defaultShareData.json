@@ -142,10 +142,10 @@
     {
       "ezName" : "Bank of Nova Scotia",
       "googleCode" : "TSE:BNS",
-      "yahooCode" : "BNS",
+      "yahooCode" : "BNS.TO",
       "isin" : "CA0641491075",
       "countryCode" : "CA",
-      "seekingAlphaCode" : "BNS"
+      "seekingAlphaCode" : "BNS:CA"
     },
     {
       "ezName" : "Best Buy",
@@ -225,10 +225,10 @@
     {
       "ezName" : "Canadian Natural Resources",
       "googleCode" : "TSE:CNQ",
-      "yahooCode" : "CNQ",
+      "yahooCode" : "CNQ.TO",
       "isin" : "CA1363851017",
       "countryCode" : "CA",
-      "seekingAlphaCode" : "CNQ"
+      "seekingAlphaCode" : "CNQ:CA"
     },
     {
       "ezName" : "Cardinal Health",
@@ -378,10 +378,10 @@
     {
       "ezName" : "Enbridge",
       "googleCode" : "NYSE:ENB",
-      "yahooCode" : "ENB",
+      "yahooCode" : "ENB.TO",
       "isin" : "CA29250N1050",
-      "countryCode" : "US",
-      "seekingAlphaCode" : "ENB"
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "ENB:CA"
     },
     {
       "ezName" : "Equasens",
@@ -626,6 +626,7 @@
     {
       "ezName" : "NET LEASE OFFICE PROPERTIES",
       "googleCode" : "NYSE:NLOP",
+      "yahooCode" : "NLOP",
       "isin" : "US64110Y1082",
       "countryCode" : "US",
       "type" : "stock",

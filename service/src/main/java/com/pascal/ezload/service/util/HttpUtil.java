@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.IOUtils;
@@ -109,7 +110,7 @@ public class HttpUtil {
     }
 
 
-    public static HtmlPage getFromUrl(String url, boolean enableJavascript) throws IOException {
+    public static Page getFromUrl(String url, boolean enableJavascript) throws IOException {
         try (final WebClient webClient = new WebClient()) {
             // Ignorer les avertissements et les erreurs JavaScript, si nécessaire
             webClient.getOptions().setJavaScriptEnabled(enableJavascript);
@@ -120,8 +121,7 @@ public class HttpUtil {
             webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
             // Récupérer la page HTML
-            HtmlPage page = webClient.getPage(url);
-            return page;
+            return webClient.getPage(url);
         }
     }
 

@@ -144,7 +144,7 @@ public abstract class DividendsAlgo {
                 // prends le 1er + everyNMonth mois
                 nextDividendsDate = new EZDate(previousDate.getYear(), Math.min(previousDate.getMonth() + everyNMonth, 12), previousDate.getDay());
             }
-            Dividend nextDividend = new Dividend(lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, Dividend.EnumFrequency.SEMESTRIEL, lastDividend.getDevise(), true);
+            Dividend nextDividend = new Dividend(lastDividend.getSource(), lastDividend.getAmount(), nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, nextDividendsDate, Dividend.EnumFrequency.SEMESTRIEL, lastDividend.getDevise(), true);
             dividends.add(nextDividend);
         }
 

@@ -35,7 +35,7 @@ public class DeviseUtil {
     public static final EZDevise GBX = new EZDevise("GBX", "£"); // non present sur le site, mais ezportfolio utilse gbx
     public static final EZDevise HKD = new EZDevise("HKD", "HK$");
     public static final EZDevise INR = new EZDevise("INR", "₹");
-    public static final EZDevise ISK = new EZDevise("ISK", "krona"); // cette monaie n'a pas de symbol court
+    public static final EZDevise ISK = new EZDevise("ISK", "krona"); // cette monnaie n'a pas de symbol court
     public static final EZDevise JPY = new EZDevise("JPY", "¥");
     public static final EZDevise KRW = new EZDevise("KRW", "₩");
     public static final EZDevise NOK = new EZDevise("NOK", "Kr");
@@ -89,5 +89,70 @@ public class DeviseUtil {
         catch (BRException e){
             return foundByCode(symbolOrCode);
         }
+    }
+
+    public static EZDevise foundByCountryCode(String countryCode){
+        switch (countryCode){
+            case "US":// États-Unis
+                return DeviseUtil.USD;
+            case "CA": // Canada
+                return DeviseUtil.CAD;
+            case "FR": // France
+            case "DE": // Allemagne
+            case "ES":// Espagne
+            case "IT": // Italie
+            case "AT":// Autriche
+            case "BE":// Belgique
+            case "FI": // Finlande
+            case "IE":// Irlande
+            case "LT": // Lituanie
+            case "LU":// Luxembourg
+            case "LV": // Lettonie
+            case "NL": // Pays-Bas
+            case "PT": // Portugal
+            case "SK":// Slovaquie
+            case "SI": // Slovénie
+            case "EE":// Estonie
+            case "GR": // Grèce
+            case "CY": // Chypre
+            case "MT": // Malte
+            case "MC":// Monaco
+            case "SM": // Saint-Marin
+            case "VA":// Vatican
+                 return DeviseUtil.EUR;
+            case "AU": // Australie
+                return AUD;
+            case "CH": // Suisse
+                return CHF;
+            case "CN":// Chine
+                return CNY;
+            case "DK": // Danemark
+                return DKK;
+            case "GB":// Royaume-Uni
+                return GBP;
+            case "HK": // Hong Kong
+                return HKD;
+            case "IN":// Inde
+                return INR;
+            case "IS":// Islande
+                return ISK;
+            case "JP": // Japon
+                return JPY;
+            case "KR": // Corée du Sud
+                return KRW;
+            case "NO":// Norvège
+                return NOK;
+            case "NZ":// Nouvelle-Zélande
+                return NZD;
+            case "SE":// Suède
+                return SEK;
+            case "SG": // Singapour
+                return SGD;
+            case "TW": // Taïwan
+                return TWD;
+            case "ZA": // Afrique du Sud
+                return ZAR;
+        }
+        throw new BRException("Devise from country Code "+countryCode+" not found");
     }
 }

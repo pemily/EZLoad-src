@@ -81,9 +81,9 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Crédit d'impots"; break;
             case "CUMULABLE_ENTREES":
                 result += "Entrées"; break;
-            case "CUMULABLE_ENTREES_SORTIES":
+            case "ENTREES_SORTIES":
                 result += "Entrées/Sorties"; break;
-            case "CUMULABLE_LIQUIDITE":
+            case "LIQUIDITE":
                 result += "Liquidités"; break;
             case "CUMULABLE_PORTFOLIO_DIVIDENDES":
                 result += "Dividendes"; break;
@@ -93,8 +93,10 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
                 result += "Valeurs des actions"; break;
             case "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
                 result += "Valeur du portefeuille"; break;
-            case "CUMULABLE_GAIN_NET":
-                result += "Gain"; break;
+//            case "CUMULABLE_GAIN_NET":
+//                result += "Gain"; break;
+            case "GAINS_NET":
+                result += "Gains latents"; break;
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":            
                 result += "Rendement réel constaté"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
@@ -126,7 +128,7 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "les dividendes à la date du détachement"; break;
             case "SHARE_ANNUAL_DIVIDEND_YIELD":
-                result += "le rendement du dividende annuel (Pour l'année en cours, le dividende annuel est repris de l'année précédente)"; break;
+                result += "le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte"; break;
             case "SHARE_PRICE":
                 result += "le cours de l'action"; break;
             case "SHARE_PRU_BRUT":
@@ -155,8 +157,8 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "les crédit d'impôts depuis la date du début du graphique"; break;
             case "CUMULABLE_ENTREES":
                 result += "les dépôts de liquidités"; break;
-            case "CUMULABLE_ENTREES_SORTIES":
-                result += "les dépôts et retraits des liquidités"; break;
+            case "ENTREES_SORTIES":
+                result += "les dépôts et retraits des liquidités. Correspond à vos investissement"; break;
             case "CUMULABLE_LIQUIDITE":
                 result += "les mouvements sur les liquidités (dépots, retraits, taxes, dividendes, etc...)"; break;
             case "CUMULABLE_PORTFOLIO_DIVIDENDES":
@@ -167,8 +169,10 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "la somme de vos actifs (les liquidités ne sont pas intégrées)"; break;
             case "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY":
                 result += "la valeur de votre portefeuille incluant les liquidités"; break;
-            case "CUMULABLE_GAIN_NET":
-                result += "vos gains (valeur du portefeuille - les liquidités investis)"; break;            
+//            case "CUMULABLE_GAIN_NET":
+//                result += "vos gains latents (valeur du portefeuille - les achats - les taxes + les ventes + les dividendes)"; break;            
+            case "GAINS_NET":
+                result += "vos gains latents (valeur du portefeuille - les achats - les taxes + les ventes + les dividendes)"; break;                            
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":
                 result += "le rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
@@ -235,14 +239,12 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Valeurs de votre portefeuille avec les liquidités",                                
                                 "Valeurs de votre portefeuille d'actions",
                                 "Liquidités", 
-                                "Dépots de liquidités", /////////////Pas d'interet en cumulé
-                                "Retraits de liquidités", /////////////// Pas d'interet en cumulé
                                 "Dépots/Retraits de liquidités",
                                 "Crédit d'impôts",
                                 "Dividendes reçu",
                                 "Achat d'actions", //////////////////Pas d'interet en cumulé
                                 "Vente d'actions", //////////////////Pas d'interet en cumulé
-                                "Gains",
+                                "Gains latents",                                
                                 "Rendements réél",
                                 "Rendement du dividende annuel théorique",
                                 "Croissance du portefeuille"
@@ -250,15 +252,14 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             codeValues={[
                                 'VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
                                 'VALEUR_PORTEFEUILLE',
-                                'CUMULABLE_LIQUIDITE',
-                                'CUMULABLE_ENTREES',
-                                'CUMULABLE_SORTIES',
-                                'CUMULABLE_ENTREES_SORTIES',
+                                'LIQUIDITE',                                
+                                'ENTREES_SORTIES',
                                 'CUMULABLE_CREDIT_IMPOTS',                                    
                                 'CUMULABLE_PORTFOLIO_DIVIDENDES',
                                 'CUMULABLE_BUY',
                                 'CUMULABLE_SOLD',
-                                'CUMULABLE_GAIN_NET',
+                                //'CUMULABLE_GAIN_NET',
+                                'GAINS_NET',
                                 'CUMULABLE_DIVIDEND_REAL_YIELD_BRUT',
                                 'ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT',
                                 'CROISSANCE_THEORIQUE_DU_PORTEFEUILLE']}
@@ -283,8 +284,6 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             userValues={[                             
                                 "Cours de l'action",
                                 "Nombre d'action",
-                               // "Achats",
-                               // "Ventes",
                                 "Achats/Ventes",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
@@ -297,8 +296,6 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             codeValues={[
                                 'SHARE_PRICE',
                                 'SHARE_COUNT',                                    
-                                //'CUMULABLE_SHARE_BUY',
-                                //'CUMULABLE_SHARE_SOLD',
                                 'CUMULABLE_SHARE_BUY_SOLD',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',

@@ -85,6 +85,8 @@ public class PortfolioStateAtDate {
 
     private final StateValue allTaxes; // toutes les taxes au niveau du portefeuille
 
+    private Price gains; // valeur du portefeuille - les inputs/outputs
+
     public PortfolioStateAtDate() {
         input = new StateValue();
         output = new StateValue();
@@ -105,6 +107,7 @@ public class PortfolioStateAtDate {
         shareBuy = new StateValue();
         shareSold = new StateValue();
         allTaxes = new StateValue();
+        gains = new Price();
     }
 
     public PortfolioStateAtDate(PortfolioStateAtDate previousState) {
@@ -134,6 +137,7 @@ public class PortfolioStateAtDate {
         this.sharePRNet.putAll(previousState.sharePRNet);
         this.sharePRUNet = new HashMap<>();
         this.sharePRUNet.putAll(previousState.sharePRUNet);
+        this.gains = new Price();
     }
 
     public EZDate getDate() {
@@ -203,6 +207,9 @@ public class PortfolioStateAtDate {
         return creditImpot;
     }
 
+    public Price getGains() { return gains; }
+    public void setGains(Price p){ gains = p; }
+
     public static class StateValue {
         private Price cumulative; // from the begin of the world
         private Price instant; // difference with the previous value
@@ -231,13 +238,13 @@ public class PortfolioStateAtDate {
             return instant;
         }
 
-        public StateValue plus(Price p) {
+        public StateValue add(Price p) {
             this.instant = instant.plus(p);
             this.cumulative = cumulative.plus(p);
             return this;
         }
 
-        public StateValue minus(Price p) {
+        public StateValue subtract(Price p) {
             this.instant = instant.minus(p);
             this.cumulative = cumulative.minus(p);
             return this;

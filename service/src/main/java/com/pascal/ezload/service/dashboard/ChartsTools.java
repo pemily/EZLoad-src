@@ -101,11 +101,12 @@ public class ChartsTools {
         return chart;
     }
 
-    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices){
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
         return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(pd -> {
-                                                                                            if (pd.getValue() == null || pd.getValue() == 0) return null;
+                                                                                            if (pd.getValue() == null ) return null;
+                                                                                            if (removeZeroValues && pd.getValue() == 0) return null;
                                                                                             float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
                                                                                             ChartLine.RichValue v = new ChartLine.RichValue();
                                                                                             v.setEstimated(pd.isEstimated());

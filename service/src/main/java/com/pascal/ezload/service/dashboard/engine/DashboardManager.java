@@ -147,6 +147,9 @@ public class DashboardManager {
                 case FROM_MY_FIRST_OPERATION:
                     if (portfolio != null && portfolio.getAllOperations().getExistingOperations().size() >= 1) {
                         startDate = portfolio.getAllOperations().getExistingOperations().get(1).getValueDate(MesOperations.DATE_COL);
+                        if (startDate.isAfter(today.minusYears(1))){
+                            startDate = today.minusYears(1);
+                        }
                     } else {
                         startDate = today.minusYears(1);
                     }
@@ -170,7 +173,7 @@ public class DashboardManager {
 
             PerfIndexBuilder perfIndexBuilder = new PerfIndexBuilder(chartSettings.getGroupedBy());
             CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise, dates);
-            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesIndexBuilder, dates);
+            SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesIndexBuilder, perfIndexBuilder, dates);
             PortfolioIndexBuilder portfolioIndexBuilder = new PortfolioIndexBuilder(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesIndexBuilder,
                                                                                                 sharePriceBuilder, perfIndexBuilder,
                                                                                                 reporting, dates, chartSettings.getExcludeBrokers(), chartSettings.getExcludeAccountTypes());
@@ -289,7 +292,7 @@ public class DashboardManager {
         if (graphStyle == GraphStyle.BAR){
             lineStyle = ChartLine.LineStyle.BAR_STYLE;
         }
-        ChartLine chartLine = ChartsTools.createChartLine(lineStyle, yAxis, lineTitle, prices);
+        ChartLine chartLine = ChartsTools.createChartLine(lineStyle, yAxis, lineTitle, prices, false);
         chartLine.setLineStyle(lineStyle);
         chartLine.setIndexId(indexId);
         return chartLine;
