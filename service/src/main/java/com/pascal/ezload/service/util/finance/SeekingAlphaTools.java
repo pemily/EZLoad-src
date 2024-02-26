@@ -17,14 +17,19 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.google.api.client.json.gson.GsonFactory;
+import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 import org.apache.commons.io.IOUtils;
+import org.jsoup.nodes.Document;
+import org.openqa.selenium.WebElement;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +43,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     // url qui peut etre interrsante pour la suite
-    // https://seekingalpha.com/api/v3/metrics?filter[fields]=price_high_52w%2Cprice_low_52w%2Cdiv_rate_fwd%2Cdiv_rate_ttm%2Cdiv_yield_fwd%2Cdividend_yield%2Cshort_interest_percent_of_float%2Cmarketcap%2Cimpliedmarketcap&filter[slugs]=atd%3Aca&minified=false
+    // https://seekingalpha.com/api/v3/metrics?filter[fields]=price_high_52w%2Cprice_low_52w%2Cdiv_rate_fwd%2Cdiv_rate_ttm%2Cdiv_yield_fwd%2Cdividend_yield%2Cshort_interest_percent_of_float%2Cmarketcap%2Cimpliedmarketcap&filter[slugs]=atd:ca&minified=false
 
     static public String getDividendsCacheName(EZShare ezShare, EZDate from){
         return "seekingAlpha_dividends_" + ezShare.getSeekingAlphaCode() + "_" + from.toYYYYMMDD() + "_" + EZDate.today().toYYYYMMDD();
@@ -103,14 +108,6 @@ public class SeekingAlphaTools extends ExternalSiteTools {
             }
         }
         throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
-    }
-
-    private static void wait(int nbSec){
-        try {
-            Thread.sleep(nbSec* 1000L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -190,8 +187,9 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
-    static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws HttpUtil.DownloadException, IOException {
-        return DeviseUtil.foundByCountryCode(ezShare.getCountryCode());
+    static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
+        if (ezShare.getSeekingAlphaCode().endsWith(":CA")) return DeviseUtil.CAD;
+        else return DeviseUtil.USD;
         /*
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
             String cacheName = "seekingalpha_devise_" + ezShare.getSeekingAlphaCode();
@@ -227,7 +225,6 @@ public class SeekingAlphaTools extends ExternalSiteTools {
         }
         throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());*/
     }
-
 
 
     private final static Map<String, Dividend> Corrections = new HashMap<>();

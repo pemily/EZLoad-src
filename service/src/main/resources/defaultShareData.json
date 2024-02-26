@@ -38,10 +38,10 @@
     {
       "ezName" : "Air Liquide",
       "googleCode" : "EPA:AI",
-      "yahooCode" : "AI",
+      "yahooCode" : "AI.PA",
       "isin" : "FR0000120073",
       "countryCode" : "FR",
-      "seekingAlphaCode" : "AI"
+      "seekingAlphaCode" : "AIQUF"
     },
     {
       "ezName" : "Air Products",
@@ -126,10 +126,9 @@
     {
       "ezName" : "BAE Systems",
       "googleCode" : "LON:BA",
-      "yahooCode" : "BA",
+      "yahooCode" : "BA.L",
       "isin" : "GB0002634946",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "BA"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Bank Ozk",
@@ -183,10 +182,9 @@
     {
       "ezName" : "British American Tobaccos",
       "googleCode" : "LON:BATS",
-      "yahooCode" : "BTAFF",
+      "yahooCode" : "BATS.L",
       "isin" : "US1104481072",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "BTAFF"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Broadcom",
@@ -531,10 +529,9 @@
     {
       "ezName" : "Legal & General",
       "googleCode" : "LON:LGEN",
-      "yahooCode" : "LGGNF",
+      "yahooCode" : "LGEN.L",
       "isin" : "GB0005603997",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "LGGNF"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Legrand",

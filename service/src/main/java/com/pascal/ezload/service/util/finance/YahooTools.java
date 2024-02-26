@@ -226,6 +226,21 @@ public class YahooTools extends ExternalSiteTools{
         return new CurrencyMap(fromDevise, toDevise, devisePrices.getPrices());
     }
 
+    private static Dividend fix(EZDevise devise, float amount, EZDate date){
+        return new Dividend("Correction Yahoo", amount, date, date, date, date, date, null, devise, false);
+    }
+
+    private static Dividend autoFix(Dividend div){
+        // Yahoo donne la date: ex-div (equivalent chez seeking alpha) (cette date est la date a partir du moment ou on est exclu des dividendes si on a pas des actions)
+        // Revenue & dividende ainsi que la class seeking alpha prennent la date: record date, qui est quelques jour apres le ex-div date.
+        // si le ex-div date tombe a la fin de l'année, alors le record date est pour l'année suivante
+
+        if (div.getDate().getMonth() == 12 && div.getDate().getDay() >= 28){
+            EZDate date = new EZDate(div.getDate().getYear()+1, 1, 2); // je déplace à l'année suivante au 2 janvier
+            return new Dividend(div.getSource(), div.getAmount(), date, date, date, date, date, div.getFrequency(), div.getDevise(), false);
+        }
+        return div;
+    }
 
     private static final Map<String, Dividend> Corrections = new HashMap<>();
     private static final Map<String, List<Dividend>> Additions = new HashMap<>();
@@ -244,21 +259,24 @@ public class YahooTools extends ExternalSiteTools{
         Corrections.put("AVGO_2018/03/21", fix(DeviseUtil.USD, 1.75f, new EZDate(2018,3,21)));
         Corrections.put("AVGO_2018/06/19", fix(DeviseUtil.USD, 1.75f, new EZDate(2018,6,19)));
 
+        // WMT Wallmart
+        Corrections.put("WMT_2017/12/07", fix(DeviseUtil.USD, 0f, new EZDate(2017, 12, 7))); // Mise a 0 du dividende (suppression d'une ligne)
+
+        // ATD.TO
+        Additions.put("ATD.TO", List.of(fix(DeviseUtil.CAD, 0.0875f, new EZDate(2021, 8,9))));
+
+        // OR Osisko Gold Royalties Ltd  -- Dec 30, 2019
+        Corrections.put("OR_2019/12/30", fix(DeviseUtil.USD, 0.038f, new EZDate(2019, 12, 8)));
+
+        // ARG.PA
+        Corrections.put("ARG.PA_2015/04/07", fix(DeviseUtil.EUR, 0.85f, new EZDate(2015, 4, 7)));
+
+        // AUB.PA
+        // https://rendementbourse.com/aub-aubay/dividendes
+        Corrections.put("AUB.PA_2017/05/12", fix(DeviseUtil.EUR, 0f, new EZDate(2017,5,12))); // delete
+
+        // BBY
+        Corrections.put("BBY_2016/03/15", fix(DeviseUtil.USD, 0.23f, new EZDate(2016,3,15)));
     }
 
-    private static Dividend fix(EZDevise devise, float amount, EZDate date){
-        return new Dividend("Correction Yahoo", amount, date, date, date, date, date, null, devise, false);
-    }
-
-    private static Dividend autoFix(Dividend div){
-        // Yahoo donne la date: ex-div (equivalent chez seeking alpha) (cette date est la date a partir du moment ou on est exclu des dividendes si on a pas des actions)
-        // Revenue & dividende ainsi que la class seeking alpha prennent la date: record date, qui est quelques jour apres le ex-div date.
-        // si le ex-div date tombe a la fin de l'année, alors le record date est pour l'année suivante
-
-        if (div.getDate().getMonth() == 12 && div.getDate().getDay() >= 29){
-            EZDate date = new EZDate(div.getDate().getYear()+1, 1, 2); // je déplace à l'année suivante au 2 janvier
-            return new Dividend(div.getSource(), div.getAmount(), date, date, date, date, date, div.getFrequency(), div.getDevise(), false);
-        }
-        return div;
-    }
 }

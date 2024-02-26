@@ -17,21 +17,22 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.gargoylesoftware.htmlunit.Page;
+import com.pascal.ezload.service.config.MainSettings;
+import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.HttpUtilCached;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSeleniumHelper;
+import com.pascal.ezload.service.util.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,10 +60,15 @@ public class SeekingAlphaToolsTest {
         EZShare action = new EZShare();
         action.setSeekingAlphaCode("BNS:CA");
         action.setCountryCode("CA");
-        List<Dividend> dividends = SeekingAlphaTools.searchDividends(new LoggerReporting(), cache(), action, EZDate.today().minusYears(10));
+
+
+        String conf = SettingsManager.searchConfigFilePath();
+        SettingsManager settingsManager = new SettingsManager(conf);
+        MainSettings mainSettings = settingsManager.loadProps();
+
+        List<Dividend> dividends = SeekingAlphaTools.searchDividends2(mainSettings.getChrome(), new LoggerReporting(), cache(), action, EZDate.today().minusYears(10));
         Assertions.assertTrue(dividends.size() > 12);
     }
-
 
     @Test
     public void testSearchDividendeHistory2() throws Exception {

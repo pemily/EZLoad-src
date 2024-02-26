@@ -338,7 +338,7 @@ public class EZActionManager {
             if (StringUtils.isBlank(ezShare.getYahooCode()) && StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
                 errors.add(toString(ezShare) + ": Un des codes Yahoo ou SeekingAlpha doit être remplis");
             }
-
+/*
             try {
                 checkPrices(ezShare, reporting, errors, yahooPrices, seekingPrices, "Le code Yahoo & SeekingAlpha ne semblent pas être pas la meme action");
                 checkPrices(ezShare, reporting, errors, yahooPrices, googlePrices, "Le code Yahoo & Google ne semblent pas être pas la meme action");
@@ -346,7 +346,7 @@ public class EZActionManager {
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
             }
-
+*/
             try {
                 List<Dividend> dividends = YahooTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
                 checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "yahoo");
@@ -373,7 +373,9 @@ public class EZActionManager {
             for (PriceAtDate p : allDivs.getPrices()) {
                 if ((p.getValue() == null && previousAmount > 0) || (p.getValue() != null && previousAmount > p.getValue())) {
                     if (p.getDate().getYear() !=  EZDate.today().getYear()) {
-                        errors.add("Baisse de dividende pour l'action " + toString(ezShare) + " en " + p.getDate().getYear() + " de " + previousAmount + " à " + p.getValue() + ". Info venant de " + source);
+                        if (!errorsToIgnore.contains(ezShare.getGoogleCode()+" "+p.getDate().getYear())) {
+                            errors.add("Baisse de dividende pour l'action " + toString(ezShare) + " en " + p.getDate().getYear() + " de " + previousAmount + " à " + p.getValue() + ". Info venant de " + source);
+                        }
                     }
                 }
                 previousAmount = p.getValue() == null ? 0 : p.getValue();
@@ -383,7 +385,6 @@ public class EZActionManager {
             reporting.info("Pas de dividendes trouvé chez "+source+" pour "+toString(ezShare));
         }
     }
-
 
     private void checkPrices(EZShare ezShare, Reporting reporting, List<String> errors, Prices prices1, Prices prices2, String errorMessage) throws Exception {
         if (prices1 == null || prices2 == null) return;
@@ -406,7 +407,7 @@ public class EZActionManager {
                 float diff = Math.abs(price1InEuro - price2InEuro);
                 float percentOfDiff = diff * 100.f / price1InEuro;
                 if (percentOfDiff > 6) { // si la difference est plus grande que 6% c'est surement pas la meme action (attention il y a des differences a l'ouverture des marché, des sites ne sont pas a jour en meme temps)
-                    errors.add(toString(ezShare) + ": " + errorMessage);
+                    errors.add(toString(ezShare) + ": " + errorMessage+ " => "+todayPrice1.getValue()+prices1.getDevise().getSymbol()+" at "+todayPrice1.getDate()+" vs "+todayPrice2.getValue()+prices2.getDevise().getSymbol()+" at "+todayPrice2.getDate()+" difference: "+diff+" pourcentage de diff: "+percentOfDiff);
                 }
             }
         }
@@ -512,4 +513,16 @@ public class EZActionManager {
             return prices;
         }
     }
+
+
+    private final static Set<String> errorsToIgnore = new HashSet<>();
+    static {
+        errorsToIgnore.add("NYSE:EOG 2023"); // dividendes exceptionnels
+        errorsToIgnore.add("EPA:AUB"); // la société à baisse ses dividendes
+        errorsToIgnore.add("NYSE:ACN"); // la société en 2019 est passé de dividende semiannuel au quarter en le versant début janvier
+        errorsToIgnore.add("LON:BA"); // baisse de dividende en 2021 https://rendementbourse.com/ba-bae-systems-plc-ord-2-5p/dividendes
+        errorsToIgnore.add("NYSE:BAH"); // dividendes exceptionnels
+        errorsToIgnore.add("TTE"); // dividendes exceptionnels
+    }
+
 }
