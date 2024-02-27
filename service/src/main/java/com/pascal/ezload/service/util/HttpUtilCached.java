@@ -43,16 +43,19 @@ public class HttpUtilCached {
     public <R> R get(Reporting reporting, String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
         return get(reporting, cacheName, url, () -> {
                     Page page = HttpUtil.getFromUrl(url, false);
-                    if (!(page instanceof HtmlPage) && page.getWebResponse().isSuccess()) {
+                    if (page.getWebResponse().isSuccess()) {
                         if (page instanceof UnexpectedPage) {
                             return ((UnexpectedPage) page).getInputStream();
                         } else if (page instanceof TextPage) {
                             return new ByteArrayInputStream(((TextPage) page).getContent().getBytes(StandardCharsets.UTF_8));
-                        } else {
+                        } else if (page instanceof HtmlPage) {
+                            throw new RuntimeException("Html Page don't know what to do");
+                        }
+                        else {
                             throw new RuntimeException("TEST SI ON RECOIT un autre type de page: " + page.getClass().getSimpleName() + " url: " + url);
                         }
                     } else {
-                        return HttpUtil.downloadV2(url, requestProperties, inputStream -> inputStream);
+                        return HttpUtil.downloadV2(url, null, inputStream -> inputStream);
                     }
                 }, toObjMapper);
     }

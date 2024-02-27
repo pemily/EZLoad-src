@@ -26,14 +26,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 public class HttpUtil {
@@ -55,15 +54,8 @@ public class HttpUtil {
         IOUtils.copy(new URL(url), output);
     }
 
-    public static <R> R downloadV2(String urlStr, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_2) // Spécifie la version HTTP
-                .GET()
-                .uri(URI.create(urlStr));
-
-        if (requestProperties != null) requestProperties.forEach(requestBuilder::header);
-
-        HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
+    public static <R> R downloadV2(String urlStr, List<String[]> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
+        HttpResponse<InputStream> response = httpGET(urlStr, requestProperties);
         if (response.statusCode() == 302 || response.statusCode() == 303){
             // redirect
             String newLocation = response.headers().firstValue("location").orElse(null);
@@ -80,6 +72,18 @@ public class HttpUtil {
             }
             return f.apply(in);
         }
+    }
+
+    public static HttpResponse<InputStream> httpGET(String urlStr, List<String[]> requestProperties) throws IOException, InterruptedException {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_2) // Spécifie la version HTTP
+                .GET()
+                .uri(URI.create(urlStr));
+
+        if (requestProperties != null) requestProperties.forEach(h -> requestBuilder.header(h[0], h[1]));
+
+        HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
+        return response;
     }
 
     public static <R> R download(String urlStr, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
@@ -109,7 +113,6 @@ public class HttpUtil {
         }
     }
 
-
     public static Page getFromUrl(String url, boolean enableJavascript) throws IOException {
         try (final WebClient webClient = new WebClient()) {
             // Ignorer les avertissements et les erreurs JavaScript, si nécessaire
@@ -119,6 +122,7 @@ public class HttpUtil {
             webClient.getOptions().setPopupBlockerEnabled(true);
             webClient.getOptions().setFetchPolyfillEnabled(true);
             webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
 
             // Récupérer la page HTML
             return webClient.getPage(url);

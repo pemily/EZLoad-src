@@ -17,26 +17,25 @@
  */
 package com.pascal.ezload.service.util.finance;
 
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.html.*;
 import com.google.api.client.json.gson.GsonFactory;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 import org.apache.commons.io.IOUtils;
-import org.jsoup.nodes.Document;
-import org.openqa.selenium.WebElement;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 public class SeekingAlphaTools extends ExternalSiteTools {
     private static final Logger logger = Logger.getLogger("SeekingAlphaTools");
@@ -52,14 +51,30 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     // return null if the dividend cannot be downloaded for this action
     static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from) throws Exception {
         if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            Map<String, String> props = new HashMap<>();
-            props.put("Accept-Encoding", "identity");
-            props.put("User-Agent", HttpUtil.getUserAgent());
-            props.put("accept-language", "en-US,en;q=0.9,fr-FR;q=0.8,fr;q=0.7");
-            String url = "https://seekingalpha.com/api/v3/symbols/" + URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8) + "/dividend_history?years=100";
+            List<String[]> header= new LinkedList<>();
+
+            header.add(new String[]{ "sec-ch-ua","\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\""});
+            header.add(new String[]{ "sec-ch-ua-mobile","?0"});
+            header.add(new String[]{ "sec-ch-ua-platform", "\"Windows\""});
+            header.add(new String[]{ "upgrade-insecure-requests","1"});
+            header.add(new String[]{ "user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"});
+            header.add(new String[]{ "accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"});
+            header.add(new String[]{ "sec-fetch-site","none"});
+            header.add(new String[]{ "sec-fetch-mode","navigate"});
+            header.add(new String[]{ "sec-fetch-user","?1"});
+            header.add(new String[]{ "sec-fetch-dest","document"});
+            header.add(new String[]{ "accept-encoding","gzip, deflate, br"});
+            header.add(new String[]{ "accept-language","fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"});
+            String realUrl = "https://seekingalpha-com.translate.goog/api/v3/symbols/"+URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8)+"/dividend_history?group_by=quarterly&sort=-date&_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp";
+            String url = realUrl.replace("-com.translate.goog", ".com");
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
-                // wait(2);
-                    return cache.get(reporting, getDividendsCacheName(ezShare, from), url, props, inputStream -> {
+                    return cache.get(reporting, getDividendsCacheName(ezShare, from), url,
+                            () -> {
+                                HttpResponse<InputStream> resp = HttpUtil.httpGET(realUrl, header);
+                                if (resp.statusCode() != 200) throw new RuntimeException("Error when downloading "+url);
+                                return new GZIPInputStream(resp.body());
+                            },
+                            inputStream -> {
                         String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
                         inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
                         Map<String, Object> top = (Map<String, Object>) gsonFactory.fromInputStream(inputStream, Map.class);
@@ -110,6 +125,13 @@ public class SeekingAlphaTools extends ExternalSiteTools {
         throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
     }
 
+    private static void wait(int sec){
+        try {
+            Thread.sleep(sec* 1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     // SeekingAlpha site fait de l'echantillonage et ne donne pas les chiffres exact
     public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, EZDate from, EZDate to) throws Exception {
