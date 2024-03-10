@@ -60,7 +60,18 @@ public class DashboardManager {
         }
 
         try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
-            return JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
+            List<DashboardPage<ChartSettings>> r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
+            if (r.isEmpty() || (r.size() == 1 && r.get(0).getCharts().isEmpty())) {
+                // recopy le default
+                try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
+                    FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
+            }
+            return r;
         }
         catch (Exception e){
             e.printStackTrace();
