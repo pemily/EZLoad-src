@@ -25,6 +25,7 @@ import com.pascal.ezload.service.sources.Reporting;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,10 +38,10 @@ public class HttpUtilCached {
     }
 
     public <R> R get(Reporting reporting, String cacheName, String url, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
-        return get(reporting, cacheName, url, ( Map<String, String>)null, toObjMapper);
+        return get(reporting, cacheName, url, HttpUtil.chromeHeader(), toObjMapper);
     }
 
-    public <R> R get(Reporting reporting, String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
+    public <R> R get(Reporting reporting, String cacheName, String url, List<String[]> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
         return get(reporting, cacheName, url, () -> {
                     Page page = HttpUtil.getFromUrl(url, false);
                     if (page.getWebResponse().isSuccess()) {
@@ -55,7 +56,7 @@ public class HttpUtilCached {
                             throw new RuntimeException("TEST SI ON RECOIT un autre type de page: " + page.getClass().getSimpleName() + " url: " + url);
                         }
                     } else {
-                        return HttpUtil.downloadV2(url, null, inputStream -> inputStream);
+                        return HttpUtil.downloadV2(url, requestProperties, inputStream -> inputStream);
                     }
                 }, toObjMapper);
     }
@@ -78,6 +79,11 @@ public class HttpUtilCached {
             rep.info("Fin de téléchargement");
             try (InputStream in = FileUtil.read(cache)) {
                 return toObjMapper.apply(in);
+            }
+            catch(Exception e){
+                // Impossible de lire le fichier, je l'efface du cache
+                cache.delete();
+                throw e;
             }
         }
     }

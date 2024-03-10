@@ -42,7 +42,7 @@ public class PerfIndexBuilder {
 
 
     private Prices createGroupedPrices(Prices prices, ChartGroupedBy groupedBy, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
-        if (groupedBy == ChartGroupedBy.DAILY) return prices;
+        if (groupedBy == ChartGroupedBy.DAILY || prices.getPrices().isEmpty()) return prices;
 
         PriceAtDate firstDate = prices.getPrices().get(0);
 

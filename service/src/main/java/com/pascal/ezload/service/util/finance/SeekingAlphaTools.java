@@ -28,10 +28,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,27 +47,28 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
     // return null if the dividend cannot be downloaded for this action
     static public List<Dividend> searchDividends(Reporting rep, HttpUtilCached cache, EZShare ezShare, EZDate from) throws Exception {
-        if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-            List<String[]> header= new LinkedList<>();
+        if (!StringUtils.isBlank(ezShare.getSeekingAlphaCode())
+                && !codeToIgnoreInDividend.contains(ezShare.getSeekingAlphaCode())
+                &&
+                    (ezShare.getCountryCode().equals("US") // au final pour ne pas avoir de pb de conversion de monnaie, je ne garde que les valeurs qui sont en dollar sans conversion
+                            //|| ezShare.getCountryCode().equals("CA") // je ne suis pas sur a 100% qu'il ne faut pas faire une conversion ici
+                            || ezShare.getGoogleCode().startsWith("NYSE:")
+                            || isUSD(rep, cache, ezShare)
+                            // Pourquoi faire ca?? Je ne suis pas sur mais:
+                            // je pense que les dividendes des actions européenne (les non USD) sont enregistré avec la valeur de la devise à la date du dividende,
+                            // donc il faudrait convertir chaque dividende vers la monnaie originale avec le cours de cette devise à la date du dividende
+                            // pb, je ne connais pas la devise originale
+                    )
 
-            header.add(new String[]{ "sec-ch-ua","\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\""});
-            header.add(new String[]{ "sec-ch-ua-mobile","?0"});
-            header.add(new String[]{ "sec-ch-ua-platform", "\"Windows\""});
-            header.add(new String[]{ "upgrade-insecure-requests","1"});
-            header.add(new String[]{ "user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"});
-            header.add(new String[]{ "accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"});
-            header.add(new String[]{ "sec-fetch-site","none"});
-            header.add(new String[]{ "sec-fetch-mode","navigate"});
-            header.add(new String[]{ "sec-fetch-user","?1"});
-            header.add(new String[]{ "sec-fetch-dest","document"});
-            header.add(new String[]{ "accept-encoding","gzip, deflate, br"});
-            header.add(new String[]{ "accept-language","fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"});
+
+        ) {
+            List<String[]> chromeHeader = HttpUtil.chromeHeader();
             String realUrl = "https://seekingalpha-com.translate.goog/api/v3/symbols/"+URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8)+"/dividend_history?group_by=quarterly&sort=-date&_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp";
             String url = realUrl.replace("-com.translate.goog", ".com");
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
                     return cache.get(reporting, getDividendsCacheName(ezShare, from), url,
                             () -> {
-                                HttpResponse<InputStream> resp = HttpUtil.httpGET(realUrl, header);
+                                HttpResponse<InputStream> resp = HttpUtil.httpGET(realUrl, chromeHeader);
                                 if (resp.statusCode() != 200) throw new RuntimeException("Error when downloading "+url);
                                 return new GZIPInputStream(resp.body());
                             },
@@ -83,7 +81,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                         List<Map<String, Object>> history = (List<Map<String, Object>>) top.get("data");
                         if (history == null || history.size() == 0) return null;
                         EZDevise devise = getDevise(reporting, cache, ezShare);
-                        return history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
+                        List<Dividend> result = history.stream().map(dividend -> (Map<String, Object>) dividend.get("attributes"))
                                 .filter(attributes -> attributes.get("amount") != null
                                         && attributes.get("year") != null)
                                 .map(attributes -> {
@@ -99,15 +97,20 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                         frequency = Dividend.EnumFrequency.TRIMESTRIEL;
                                     else if ("SEMIANNUAL".equals(freq))
                                         frequency = Dividend.EnumFrequency.SEMESTRIEL;
-                                    else if ("YEARLY".equals(freq))
+                                    else if ("YEARLY".equals(freq)|| "ANNUAL".equals(freq))
                                         frequency = Dividend.EnumFrequency.ANNUEL;
                                     // dans la frequency j'ai vu du OTHER chez Mastercard
+
+                                    if (Objects.equals(attributes.get("type"), "Special")){
+                                        // if the type is special, there are sometime error where the frequency is MONTHLY (check MAIN share)
+                                        frequency = Dividend.EnumFrequency.EXCEPTIONEL;
+                                    }
 
                                     // Seeking alpha peut me donner des dividendes dans le futur si ils ont ete annoncé
                                     Dividend fixed = Corrections.get(ezShare.getSeekingAlphaCode()+"_"+attributes.get("record_date"));
                                     if (fixed != null) return fixed;
                                     return new Dividend(url,
-                                            NumberUtils.str2Float(attributes.get("amount").toString()),
+                                            NumberUtils.str2Float(attributes.get("adjusted_amount").toString()), // sur l'action AOS & MKC, le dividende amount est faux, il faut prendre le adjusted
                                             seekingAlphaDate(attributes.get("ex_date")),
                                             seekingAlphaDate(attributes.get("declare_date")),
                                             seekingAlphaDate(attributes.get("pay_date")),
@@ -117,12 +120,32 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                             devise,
                                             false);
                                 })
+                                .collect(Collectors.toList());
+                        // Ajoute les corrections si il y en a
+                        List<Dividend> fixAdd = Additions.get(ezShare.getSeekingAlphaCode());
+                        if (fixAdd != null) {
+                            result.addAll(fixAdd);
+                        }
+                        return result.stream()
                                 .filter(d -> d.getDate().isAfterOrEquals(from))
+                                .filter(div -> div.getAmount() > 0)
                                 .collect(Collectors.toList());
                     });
             }
         }
         throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
+    }
+
+    private static boolean isUSD(Reporting rep, HttpUtilCached cache, EZShare ezShare) {
+        try {
+            return ezShare.getGoogleCode().startsWith("NYSE:")
+                    || YahooTools.getDevise(rep, cache, ezShare) == DeviseUtil.USD
+                    || YahooTools.getDevise(rep, cache, ezShare) == DeviseUtil.CAD;
+        }
+        catch(Exception e){
+            return false;
+        }
+
     }
 
     private static void wait(int sec){
@@ -249,10 +272,12 @@ public class SeekingAlphaTools extends ExternalSiteTools {
     }
 
 
+    private static final Map<String, List<Dividend>> Additions = new HashMap<>();
     private final static Map<String, Dividend> Corrections = new HashMap<>();
+    private final static Set<String> codeToIgnoreInDividend = new HashSet<>();
     static {
         // Erreur de dividende chez Mastercard, ils donnent 1.1 au lieu de 0.11
-        Corrections.put("MA_2014-01-09", new Dividend("Correction Seeking Alpha", 0.11f, new EZDate(2014,1,9),
+        Corrections.put("MA_2014-01-09", new Dividend("Correction Seeking Alpha MA", 0.11f, new EZDate(2014,1,9),
                                                                     new EZDate(2013,12,10),
                                                                     new EZDate(2014,2,10),
                                                                     new EZDate(2014,1,9),
@@ -260,5 +285,52 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                                                                     Dividend.EnumFrequency.TRIMESTRIEL,
                                                                     DeviseUtil.USD,
                                                                     false));
+
+        Corrections.put("STE_2019-06-12", new Dividend("Correction Seeking Alpha STE", 0.34f, new EZDate(2019, 6,11),
+                                                                    new EZDate(2019,5,14),
+                                                                    new EZDate(2019,6,28),
+                                                                    new EZDate(2019,6,12),
+                                                                    new EZDate(2019,6,11),
+                                                                    Dividend.EnumFrequency.TRIMESTRIEL, // Marqué Other sur le site seeking alpha
+                                                                    DeviseUtil.USD,
+                                                                    false));
+
+        Additions.put("MAIN", List.of(fix(DeviseUtil.USD, 0.205f, new EZDate(2020,12,25), Dividend.EnumFrequency.MENSUEL)));
+
+
+        Corrections.put("HESAF_2022-04-26", fix(DeviseUtil.USD, 5.8867f, new EZDate(2022, 4,25),
+                                                                    new EZDate(2022,4,26),
+                                                                    new EZDate(2022,4,27),
+                                                                    new EZDate(2022,2,18),
+                                                                    Dividend.EnumFrequency.SEMESTRIEL)); // Marqué Other sur le site seeking alpha
+        Corrections.put("HESAF_2017-06-09", fix(DeviseUtil.USD, 2.5238f, new EZDate(2017, 6,8),
+                                                                    new EZDate(2017,6,9),
+                                                                    new EZDate(2017,6,12),
+                                                                    new EZDate(2017,6,10),
+                                                                    Dividend.EnumFrequency.SEMESTRIEL)); // Marqué Other sur le site seeking alpha
+        Corrections.put("HESAF_2015-03-04", fix(DeviseUtil.USD, 1.6777f, new EZDate(2015, 3,3),
+                                                                    new EZDate(2015,3,4),
+                                                                    new EZDate(2015,3,5),
+                                                                    new EZDate(2015,6,30),
+                                                                    Dividend.EnumFrequency.SEMESTRIEL)); // Marqué Other sur le site seeking alpha
+
+        Corrections.put("MKC_2020-04-13", fix(DeviseUtil.USD, 0.31f, new EZDate(2020,4,9),
+                                                                    new EZDate(2020,4,13),
+                                                                    new EZDate(2020,4,27),
+                                                                    new EZDate(2020,4,1),
+                                                                    Dividend.EnumFrequency.TRIMESTRIEL)); // Marqué Other sur le site seeking alpha
+
+        codeToIgnoreInDividend.add("IPSEF"); // Tout faux par rapport au fichier de bertrand
+        codeToIgnoreInDividend.add("BOUYF"); // Je ne suis pas sur que ce soit la bonne action pour bouygues (EN.PA sur yahoo)
+        codeToIgnoreInDividend.add("AIQUF"); // peu de dividende de juste par rapport a bertrand, je fais des corections sur le yahoo
+    }
+
+
+    private static Dividend fix(EZDevise devise, float amount, EZDate date, Dividend.EnumFrequency freq){
+        return new Dividend("Correction SeekingAlpha", amount, date, date, date, date, date, freq, devise, false);
+    }
+
+    private static Dividend fix(EZDevise devise, float amount, EZDate exdivDate, EZDate recordDate, EZDate payDate, EZDate declareDate, Dividend.EnumFrequency freq){
+        return new Dividend("Correction SeekingAlpha", amount, exdivDate, declareDate, payDate, recordDate, exdivDate, freq, devise, false);
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.financial;
 
+import com.gargoylesoftware.htmlunit.javascript.host.svg.SVGEllipseElement;
 import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
@@ -253,21 +254,22 @@ public class EZActionManager {
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
             List<Dividend> dividends = null;
             try {
-                if (cache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
-                    dividends = YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom);
+                if (cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
+                    dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom);
                 }
 
-                if (dividends == null && !cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) {
+                if (dividends == null && !cache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom)) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+                }
+
+                if (dividends == null && !StringUtils.isBlank(ezShare.getYahooCode())){
                     dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
                 }
 
-                if (dividends == null){
-                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
-                }
             }
             catch (Exception e){
                 reporting.info("Tentative avec YahooFinance");
-                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+                dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
             }
             return dividends;
         }
@@ -321,7 +323,7 @@ public class EZActionManager {
             }
             Prices googlePrices = null;
             try {
-                googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : retryIfDownloadError(rep, 2, () -> GoogleTools.getCurrentPrice(reporting, cache, ezShare.getGoogleCode()));
+   //             googlePrices = StringUtils.isBlank(ezShare.getGoogleCode()) ? null : retryIfDownloadError(rep, 2, () -> GoogleTools.getCurrentPrice(reporting, cache, ezShare.getGoogleCode()));
             }
             catch (Exception e){
             }
@@ -333,7 +335,7 @@ public class EZActionManager {
                 errors.add(toString(ezShare) + ": Le code SeekingAlpha ne fonctionne pas");
             }
             if (googlePrices == null && !StringUtils.isBlank(ezShare.getGoogleCode())) {
-                errors.add(toString(ezShare) + ": Le code Google ne fonctionne pas");
+ //               errors.add(toString(ezShare) + ": Le code Google ne fonctionne pas");
             }
             if (StringUtils.isBlank(ezShare.getYahooCode()) && StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
                 errors.add(toString(ezShare) + ": Un des codes Yahoo ou SeekingAlpha doit être remplis");
@@ -347,34 +349,33 @@ public class EZActionManager {
                 logger.log(Level.SEVERE, "Erreur lors du chargement des prix de l'action " + toString(ezShare), e);
             }
 */
-            try {
-                List<Dividend> dividends = YahooTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
-                checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "yahoo");
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes yahoo de l'action " + toString(ezShare), e);
-            }
-
 
             try {
                 List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
                 checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "seekingAlpha");
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes seekingAlpha de l'action " + toString(ezShare), e);
+                try {
+                    List<Dividend> dividends = YahooTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
+                    checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "yahoo");
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes sur seekingAlpha & yahoo de l'action " + toString(ezShare), e);
+                }
             }
+
             return errors;
         }
     }
 
     private void checkPasDeBaisseDeDividendes(Reporting reporting, List<String> errors, EZShare ezShare, List<Dividend> dividends, String source) {
-        if (dividends != null) {
-            Prices allDivs = SharePriceBuilder.dividendPerYear(dividends);
+        if (dividends != null && !dividends.isEmpty()) {
+            Prices allDivs = SharePriceBuilder.dividendPerYear(dividends, SharePriceBuilder.DIVIDEND_SELECTION.ONLY_REGULAR);
             // Check that the dividends are growing
             float previousAmount = 0;
             for (PriceAtDate p : allDivs.getPrices()) {
                 if ((p.getValue() == null && previousAmount > 0) || (p.getValue() != null && previousAmount > p.getValue())) {
                     if (p.getDate().getYear() !=  EZDate.today().getYear()) {
-                        if (!errorsToIgnore.contains(ezShare.getGoogleCode()+" "+p.getDate().getYear())) {
-                            errors.add("Baisse de dividende pour l'action " + toString(ezShare) + " en " + p.getDate().getYear() + " de " + previousAmount + " à " + p.getValue() + ". Info venant de " + source);
+                        if (!errorsToIgnore.contains(ezShare.getGoogleCode()+"_"+p.getDate().getYear())) {
+                            errors.add("Baisse de dividende pour l'action " + toString(ezShare) + " en " + p.getDate().getYear() + " de " + previousAmount + allDivs.getDevise()+" à " + p.getValue() + allDivs.getDevise()+ ". Info venant de " + source);
                         }
                     }
                 }
@@ -517,12 +518,30 @@ public class EZActionManager {
 
     private final static Set<String> errorsToIgnore = new HashSet<>();
     static {
-        errorsToIgnore.add("NYSE:EOG 2023"); // dividendes exceptionnels
-        errorsToIgnore.add("EPA:AUB"); // la société à baisse ses dividendes
-        errorsToIgnore.add("NYSE:ACN"); // la société en 2019 est passé de dividende semiannuel au quarter en le versant début janvier
-        errorsToIgnore.add("LON:BA"); // baisse de dividende en 2021 https://rendementbourse.com/ba-bae-systems-plc-ord-2-5p/dividendes
-        errorsToIgnore.add("NYSE:BAH"); // dividendes exceptionnels
-        errorsToIgnore.add("TTE"); // dividendes exceptionnels
+        errorsToIgnore.add("EPA:FDJ_2021");
+
+        errorsToIgnore.add("NYSE:ACN_2019"); // la société en 2019 est passé de dividende semiannuel au quarter en le versant début janvier
+        errorsToIgnore.add("TSE:BNS_2016");
+        errorsToIgnore.add("TSE:BNS_2019");
+        errorsToIgnore.add("TSE:BNS_2022");
+
+
+        // Pour moi ca baisse, pas pour bertrand, bizarre...
+        errorsToIgnore.add("EPA:INEA_2016");
+        errorsToIgnore.add("EPA:TTE_2015");
+        errorsToIgnore.add("EPA:TTE_2019");
+        errorsToIgnore.add("EPA:TTE_2021");
+        errorsToIgnore.add("EPA:TTE_2022");
+        errorsToIgnore.add("EPA:AUB_2020"); // la société à baisse ses dividendes (Pas dans le table de bertrand mais j'ai des doutes, sur plusieurs site on voit la baisse) https://fr.investing.com/equities/aubay-dividends
+        errorsToIgnore.add("EPA:AUB_2023");
+        errorsToIgnore.add("LON:BA_2021"); // baisse de dividende en 2021 https://rendementbourse.com/ba-bae-systems-plc-ord-2-5p/dividendes
+        errorsToIgnore.add("EPA:RMS_2020");
+
+        // Baisse réelle du dividende confirmé (bertrand la sortie de la liste)
+        errorsToIgnore.add("NYSE:WPC_2023");
+        errorsToIgnore.add("BME:ENG_2015");
+        errorsToIgnore.add("BME:ENG_2022");
+
     }
 
 }

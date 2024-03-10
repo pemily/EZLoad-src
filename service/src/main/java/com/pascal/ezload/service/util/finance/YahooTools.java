@@ -94,7 +94,7 @@ public class YahooTools extends ExternalSiteTools{
     }
 
 
-    static private EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
+    static public EZDevise getDevise(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/EURUSD=X?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
             String url = "https://query1.finance.yahoo.com/v8/finance/chart/"+ezShare.getYahooCode();
@@ -202,6 +202,7 @@ public class YahooTools extends ExternalSiteTools{
 
                     return list.stream()
                                 .filter(div -> div.getDate().isAfterOrEquals(from))
+                                .filter(div -> div.getAmount() > 0)
                                 .sorted(Comparator.comparing(Dividend::getDate))
                                 .collect(Collectors.toList());
                     });
@@ -230,12 +231,16 @@ public class YahooTools extends ExternalSiteTools{
         return new Dividend("Correction Yahoo", amount, date, date, date, date, date, null, devise, false);
     }
 
+    private static Dividend fix(EZDevise devise, float amount, EZDate date, Dividend.EnumFrequency freq){
+        return new Dividend("Correction Yahoo", amount, date, date, date, date, date, freq, devise, false);
+    }
+
     private static Dividend autoFix(Dividend div){
         // Yahoo donne la date: ex-div (equivalent chez seeking alpha) (cette date est la date a partir du moment ou on est exclu des dividendes si on a pas des actions)
         // Revenue & dividende ainsi que la class seeking alpha prennent la date: record date, qui est quelques jour apres le ex-div date.
         // si le ex-div date tombe a la fin de l'année, alors le record date est pour l'année suivante
 
-        if (div.getDate().getMonth() == 12 && div.getDate().getDay() >= 28){
+        if (div.getDate().getMonth() == 12 && div.getDate().getDay() > 28){ // > 28 sinon BATS.L en 2017 va etre pris pour 2018
             EZDate date = new EZDate(div.getDate().getYear()+1, 1, 2); // je déplace à l'année suivante au 2 janvier
             return new Dividend(div.getSource(), div.getAmount(), date, date, date, date, date, div.getFrequency(), div.getDevise(), false);
         }
@@ -254,6 +259,7 @@ public class YahooTools extends ExternalSiteTools{
         //Corrections.put("BNS.TO_2021/12/31", fix(DeviseUtil.CAD, 1f, new EZDate(2022,1,1)));   fixé avec l'autoFix
         Additions.put("BNS.TO", List.of(fix( DeviseUtil.CAD, 1.03f, new EZDate(2022,7,4))));
 
+        Additions.put("IPSEF", List.of(fix(DeviseUtil.USD, 0.85f, new EZDate(2017,6,2))));
 
         // Fix Dividend Broadcom
         Corrections.put("AVGO_2018/03/21", fix(DeviseUtil.USD, 1.75f, new EZDate(2018,3,21)));
@@ -273,10 +279,59 @@ public class YahooTools extends ExternalSiteTools{
 
         // AUB.PA
         // https://rendementbourse.com/aub-aubay/dividendes
+        // https://fr.investing.com/equities/aubay-dividends <= 1er lien qui mene au suivant:
+        // https://fr.investing.com/pro/ENXTPA:AUB/dividends?entry=invpro_banner_financial_statements <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< a creuser attention pas de cookies
         Corrections.put("AUB.PA_2017/05/12", fix(DeviseUtil.EUR, 0f, new EZDate(2017,5,12))); // delete
+
+        // LOR.F
+        Corrections.put("LOR.F_2020/04/28", fix(DeviseUtil.EUR, 0f, new EZDate(2020,4,28))); // delete
 
         // BBY
         Corrections.put("BBY_2016/03/15", fix(DeviseUtil.USD, 0.23f, new EZDate(2016,3,15)));
+
+        Corrections.put("EN.PA_2020/05/05", fix(DeviseUtil.EUR, 0, new EZDate(2020,5,5))); // peut etre un div exceptionnel?
+
+        Corrections.put("HEN3.DE_2020/06/18", fix(DeviseUtil.EUR, 0, new EZDate(2020, 6, 18)));
+
+        // AI.PA AirLiquide Aucun dividende n'est juste par rapport a bertrand :(
+        Corrections.put("AI.PA_2023/05/15", fix(DeviseUtil.EUR, 3.20f, new EZDate(2023,5,15)));
+        Corrections.put("AI.PA_2022/05/16", fix(DeviseUtil.EUR, 2.95f, new EZDate(2022,5,16)));
+        Corrections.put("AI.PA_2021/05/17", fix(DeviseUtil.EUR, 2.90f, new EZDate(2021,5,17)));
+        Corrections.put("AI.PA_2020/05/11", fix(DeviseUtil.EUR, 2.75f, new EZDate(2020,5,11)));
+        Corrections.put("AI.PA_2019/05/20", fix(DeviseUtil.EUR, 2.70f, new EZDate(2019,5,20)));
+        Corrections.put("AI.PA_2018/05/28", fix(DeviseUtil.EUR, 2.65f, new EZDate(2018,5,28)));
+        Corrections.put("AI.PA_2017/05/15", fix(DeviseUtil.EUR, 2.65f, new EZDate(2017,5,15)));
+        Corrections.put("AI.PA_2016/05/23", fix(DeviseUtil.EUR, 2.60f, new EZDate(2016,5,23)));
+        Corrections.put("AI.PA_2015/05/18", fix(DeviseUtil.EUR, 2.60f, new EZDate(2015,5,18)));
+        Corrections.put("AI.PA_2014/05/16", fix(DeviseUtil.EUR, 2.55f, new EZDate(2014,5,16)));
+        Corrections.put("AI.PA_2013/05/16", fix(DeviseUtil.EUR, 2.55f, new EZDate(2013,5,16)));
+        Corrections.put("AI.PA_2012/05/11", fix(DeviseUtil.EUR, 2.50f, new EZDate(2012,5,11)));
+        Corrections.put("AI.PA_2011/05/11", fix(DeviseUtil.EUR, 2.50f, new EZDate(2011,5,11)));
+        Corrections.put("AI.PA_2010/05/12", fix(DeviseUtil.EUR, 2.35f, new EZDate(2010,5,12)));
+        Corrections.put("AI.PA_2009/05/13", fix(DeviseUtil.EUR, 2.25f, new EZDate(2009,5,13)));
+        Corrections.put("AI.PA_2008/06/02", fix(DeviseUtil.EUR, 0, new EZDate(2008,6,2))); // present sur yahoo, peut etre des dividendes exceptionnel ? dans le doute, je mets 0
+        Corrections.put("AI.PA_2008/05/14", fix(DeviseUtil.EUR, 2.25f, new EZDate(2008,5,14)));
+        Corrections.put("AI.PA_2007/06/01", fix(DeviseUtil.EUR, 0, new EZDate(2007,6,1))); // present sur yahoo, peut etre des dividendes exceptionnel ? dans le doute, je mets 0
+        Corrections.put("AI.PA_2007/05/15", fix(DeviseUtil.EUR, 2.25f, new EZDate(2007,5,15)));
+        Corrections.put("AI.PA_2006/06/01", fix(DeviseUtil.EUR, 0, new EZDate(2006,6,1))); // present sur yahoo, peut etre des dividendes exceptionnel ? dans le doute, je mets 0
+        Corrections.put("AI.PA_2006/05/16", fix(DeviseUtil.EUR, 2.05f, new EZDate(2006,5,16)));
+        Corrections.put("AI.PA_2005/06/01", fix(DeviseUtil.EUR, 0, new EZDate(2005,6,1))); // present sur yahoo, peut etre des dividendes exceptionnel ? dans le doute, je mets 0
+        Corrections.put("AI.PA_2005/05/17", fix(DeviseUtil.EUR, 2.00f, new EZDate(2005,5,17)));
+
+        // BATS.L
+        Corrections.put("BATS.L_2017/12/28", fix(DeviseUtil.GBX, 0, new EZDate(2017,12,28)));// pour se rapprocher du montant de bertrand
+
+        Corrections.put("PAT.PA_2016/06/24", fix(DeviseUtil.EUR, 1f, new EZDate(2016,6,24)));// pour se rapprocher du montant de bertrand
+        Corrections.put("PAT.PA_2015/07/14", fix(DeviseUtil.EUR, 0.85f, new EZDate(2015,7,14)));// pour se rapprocher du montant de bertrand
+
+        Corrections.put("ENG.MC_2020/07/07", fix(DeviseUtil.EUR, 0.96f, new EZDate(2020,7,7)));// pour se rapprocher du montant de bertrand
+
+        Corrections.put("HESAF_2015/06/04",  fix(DeviseUtil.USD, 1.6342f, new EZDate(2015,6,4)));
+        Additions.put("HESAF_2015/06/04",  List.of(fix(DeviseUtil.USD, 5.6350f, new EZDate(2015,6,4), Dividend.EnumFrequency.EXCEPTIONEL)));
+
+        Corrections.put("LR.PA_2015/06/02", fix(DeviseUtil.EUR, 1.10f, new EZDate(2015,6,2)));
+        Corrections.put("LR.PA_2016/05/31", fix(DeviseUtil.EUR, 1.15f, new EZDate(2016,5,31)));
+        Corrections.put("LR.PA_2017/06/02", fix(DeviseUtil.EUR, 1.19f, new EZDate(2017,6,2)));
     }
 
 }

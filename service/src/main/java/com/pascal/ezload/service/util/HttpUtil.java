@@ -32,6 +32,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,8 +83,7 @@ public class HttpUtil {
 
         if (requestProperties != null) requestProperties.forEach(h -> requestBuilder.header(h[0], h[1]));
 
-        HttpResponse<InputStream> response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
-        return response;
+        return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofInputStream());
     }
 
     public static <R> R download(String urlStr, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> f) throws Exception {
@@ -129,6 +129,24 @@ public class HttpUtil {
         }
     }
 
+
+    public static List<String[]> chromeHeader() {
+        List<String[]> header= new LinkedList<>();
+
+        header.add(new String[]{ "sec-ch-ua","\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\""});
+        header.add(new String[]{ "sec-ch-ua-mobile","?0"});
+        header.add(new String[]{ "sec-ch-ua-platform", "\"Windows\""});
+        header.add(new String[]{ "upgrade-insecure-requests","1"});
+        header.add(new String[]{ "user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"});
+        header.add(new String[]{ "accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"});
+        header.add(new String[]{ "sec-fetch-site","none"});
+        header.add(new String[]{ "sec-fetch-mode","navigate"});
+        header.add(new String[]{ "sec-fetch-user","?1"});
+        header.add(new String[]{ "sec-fetch-dest","document"});
+        header.add(new String[]{ "accept-encoding","gzip, deflate, br"});
+        header.add(new String[]{ "accept-language","fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7"});
+        return header;
+    }
 
 
     private static int userAgentIndex = 0;

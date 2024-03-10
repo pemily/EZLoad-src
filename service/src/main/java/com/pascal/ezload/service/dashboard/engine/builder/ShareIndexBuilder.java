@@ -34,18 +34,18 @@ public class ShareIndexBuilder {
     private Price get(ShareIndex shareIndex, EZShareEQ ezShare, EZDate date) {
             return switch (shareIndex) {
                 case SHARE_PRICE -> sharePriceBuilder.getPricesToTargetDevise(reporting, ezShare).getPriceAt(date);
-                case CUMULABLE_SHARE_DIVIDEND -> sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                case CUMULABLE_SHARE_DIVIDEND -> sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ALL).getPriceAt(date);
                 case SHARE_ANNUAL_DIVIDEND_YIELD -> sharePriceBuilder.getRendementDividendeAnnuel(reporting, ezShare).getPriceAt(date);
                 case SHARE_COUNT -> portfolioIndexBuilder.getDate2share2ShareNb(ezShare).getPriceAt(date);
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> {
                         Price pru = portfolioIndexBuilder.getDate2share2PRUBrut(ezShare).getPriceAt(date);
-                        PriceAtDate p = sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                        PriceAtDate p = sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ONLY_REGULAR).getPriceAt(date);
                         if (p == null || pru == null || pru.getValue() == null || pru.getValue() == 0) yield new Price();
                         yield p.multiply(Price.CENT).divide(pru);
                 }
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET -> {
                         Price pru = portfolioIndexBuilder.getDate2share2PRUNet(ezShare).getPriceAt(date);
-                        PriceAtDate p = sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare).getPriceAt(date);
+                        PriceAtDate p = sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ONLY_REGULAR).getPriceAt(date);
                         if (p == null || pru == null || pru.getValue() == null || pru.getValue() == 0) yield new Price();
                         yield p.multiply(Price.CENT).divide(pru);
                 }

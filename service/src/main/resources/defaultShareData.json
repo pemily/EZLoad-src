@@ -176,8 +176,7 @@
       "googleCode" : "EPA:EN",
       "yahooCode" : "EN.PA",
       "isin" : "FR0000120503",
-      "countryCode" : "FR",
-      "seekingAlphaCode" : "BOUYF"
+      "countryCode" : "FR"
     },
     {
       "ezName" : "British American Tobaccos",
@@ -369,6 +368,7 @@
       "yahooCode" : "ENG.MC",
       "isin" : "ES0130960018",
       "countryCode" : "ES",
+      "seekingAlphaCode": "ENGGF",
       "type" : "stock",
       "industry" : "Utilities—Regulated Gas",
       "sector" : "Utilities"
@@ -483,8 +483,7 @@
       "googleCode" : "EPA:IPN",
       "yahooCode" : "IPSEF",
       "isin" : "FR0010259150",
-      "countryCode" : "FR",
-      "seekingAlphaCode" : "IPSEF"
+      "countryCode" : "FR"
     },
     {
       "ezName" : "Johnson&Johnson",
@@ -505,10 +504,10 @@
     {
       "ezName" : "L'Oréal",
       "googleCode" : "EPA:OR",
-      "yahooCode" : "OR",
+      "yahooCode" : "LOR.F",
       "isin" : "FR0000120321",
       "countryCode" : "FR",
-      "seekingAlphaCode" : "OR"
+      "seekingAlphaCode" : "LRLCF"
     },
     {
       "ezName" : "L3 Harris Technologies",

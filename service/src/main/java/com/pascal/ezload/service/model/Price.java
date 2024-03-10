@@ -1,10 +1,14 @@
 package com.pascal.ezload.service.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Price {
 
     public static final Price ZERO = new Price(0);
     public static final Price CENT = new Price(100);
 
+    private Map<String, Tag> tags = null;
     private final Float value;
     private final boolean estimated;
 
@@ -22,6 +26,7 @@ public class Price {
             this.value = price.getValue(); // unknown value
             this.estimated = price.estimated;
         }
+        this.tags = price.tags == null ? null : new HashMap<>(tags);
     }
 
     public Price(float value){
@@ -37,12 +42,22 @@ public class Price {
         return value;
     }
 
+    public void addTag(String key, Tag value){
+        if (tags == null) tags = new HashMap<>();
+        tags.put(key, value);
+    }
+
+    public Tag getTag(String key){
+        if (tags == null) return null;
+        return tags.get(key);
+    }
+
     public boolean isEstimated(){
         return estimated;
     }
 
     public String toString(){
-        return (estimated ? " estimated" : "")+" value: "+ value;
+        return (estimated ? " estimated" : "")+" value: "+ value + " Tags: "+tags;
     }
 
     public Price minus(Price value) {
