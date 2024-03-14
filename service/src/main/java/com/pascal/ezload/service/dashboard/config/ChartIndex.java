@@ -5,6 +5,7 @@ public class ChartIndex {
     private String id;
     private String label;
     private String description;
+    private String colorLine; // rgba(255,99,132,1);
     private GraphStyle graphStyle = GraphStyle.LINE;
 
     // It's a oneOf (only one of those value below are set, others are null)
@@ -66,5 +67,14 @@ public class ChartIndex {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+
+    public String getColorLine() {
+        return colorLine;
+    }
+
+    public void setColorLine(String colorLine) {
+        this.colorLine = colorLine;
     }
 }

@@ -2,7 +2,7 @@ import { Box, Button, Text, Carousel, Card, Collapsible, ThemeContext, Anchor } 
 import { useState, useEffect, useRef } from "react";
 import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close, Checkbox, CheckboxSelected, StrikeThrough } from 'grommet-icons';
 import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
+import { ezApi, jsonCall, saveDashboardConfig, isDefined } from '../../../ez-api/tools';
 import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -14,7 +14,6 @@ import { ComboMultiple } from "../../Tools/ComboMultiple";
 import { ComboField } from "../../Tools/ComboField";
 
 
-
 export interface ChartUIProps {    
     readOnly: boolean;    
     chart: Chart; 
@@ -23,40 +22,56 @@ export interface ChartUIProps {
     deleteChartUI: (afterSave: () => void) => void
 }      
 
-function getIndexIdsWithCounter(chartLines : ChartLine[]|undefined, chartIndexes: ChartIndex[]) : { indexId:string, count: number, label: string}[]{
-    const allDistinctIds : { indexId:string, count: number, label: string}[] = [];
-    if (chartLines === undefined) return [];
-    chartLines.forEach(l => {
-        const i = allDistinctIds.map(l2 => l2.indexId).indexOf(l.indexId!)
-        if (i == -1){
-            const label = chartIndexes.filter(ci => ci.id === l.indexId)[0]?.label;
-            allDistinctIds.push({indexId: l.indexId!, count: 1, label: label === undefined ? "[INDEX LABEL DELETED]" : label})
-        }
-        else {
-            allDistinctIds[i] = {
-                ...allDistinctIds[i],
-                count: allDistinctIds[i].count + 1
-            }
-        }
-    })        
-    return allDistinctIds;
+
+interface ChartLineWithIndex extends ChartLine {
+    index: ChartIndex;
 }
 
-function selectIndexLine(currentLines: ChartLine[], allLines: ChartLine[], selectedLineTitle: string|undefined, selectedIndexId: string) : ChartLine[]{
-    return currentLines.filter(l => l.indexId !== selectedIndexId).concat(allLines.filter(line => line.indexId === selectedIndexId && line.title === selectedLineTitle))    
+function buildLineWithIndex(chartProps: ChartUIProps) : ChartLineWithIndex[]{
+    return chartProps.chart.lines!.map(line => { return {
+        ...line,
+        index: chartProps.chart.indexSelection!.filter(index => index.id === line.indexId)[0]
+    }})
 }
 
-function initializeLines(chart: Chart) : Chart{
-    const allIndexIds:string[] = getIndexIdsWithCounter(chart.lines!, chart.indexSelection!).filter(l => l.count == 1).map(l => l.indexId);
-    return {
-        ...chart, 
-        lines: chart.lines?.filter(l => allIndexIds.indexOf(l.indexId!) !== -1)
-    }
+function containsShareIndex(chartProps:ChartUIProps) : boolean {
+    return chartProps.chart.indexSelection!
+                .filter(indexSelect => indexSelect.shareIndexConfig !== undefined)
+                .length > 0;
 }
+
 
 export function ChartUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);    
-    const [filteredChart, setFilteredChart] = useState<Chart>(initializeLines(props.chart));    
+    const [filteredChart, setFilteredChart] = useState<Chart>(props.chart);    
+    const [selectedShare, setSelectedShare] = useState<string|undefined>(undefined);
+    const [allIndexedLines] = useState<ChartLineWithIndex[]>(buildLineWithIndex(props));
+
+    function getIndex(indexId: string) : ChartIndex {
+        return props.chart.indexSelection?.filter(i => i.id === indexId)[0]!
+    }
+
+    function selectShare(selectedShare: string|undefined) : void{
+        setFilteredChart({
+            ...filteredChart,
+            lines: filteredChart.lines!.filter(l => !isDefined(getIndex(l.indexId!).shareIndexConfig)).concat(allIndexedLines.filter(line => line.title === selectedShare && filteredChart.lines?.map(l => l.indexId).indexOf(line.indexId) !== -1))
+        })
+    }
+
+    function selectIndex(index: ChartIndex){
+        setFilteredChart({
+            ...filteredChart, 
+            lines: filteredChart.lines!.concat(allIndexedLines.filter(line => line.indexId === index.id && (!isDefined(line.index.shareIndexConfig) || line.title === selectedShare)))
+        })
+    }
+
+    function unselectIndex(index: ChartIndex){
+        setFilteredChart({
+            ...filteredChart, 
+            lines: filteredChart.lines!.filter(l =>  l.indexId != index.id)
+        })
+    }
+
     return (
         <>
 
@@ -78,52 +93,40 @@ export function ChartUI(props: ChartUIProps){
                     
                     <Box direction="column">
                         <Box alignSelf="center" direction="row" alignContent="center" flex="grow" align="center" gap="medium">
-                            {
-                                // Affiche les legends soit une combo si plusieurs lignes ont le meme indexLabel, soit un simple button si un seul indexLabel est present
-                                getIndexIdsWithCounter(props.chart.lines!, props.chart.indexSelection!)
-                                    .map((l,i) => {
-                                        const firstChartLine: ChartLine = props.chart.lines?.filter(l2 => l2.indexId === l.indexId)[0]!;
-                                        if (l.count == 1){                                            
+                            {                                
+                                // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
+                                containsShareIndex(props) && 
+                                    (<Box gap="none" margin="none" direction="row" align="center">                                       
+                                        <ComboField id='indexLabelFilterCombo'   
+                                            readOnly={false}
+                                            description=""
+                                            errorMsg=""                                
+                                            value={undefined}
+                                            values={props.chart.lines === undefined ? [""] : Array.from(new Set([""].concat(allIndexedLines.filter(line => isDefined(line.index.shareIndexConfig)).map(line => line.title!))))}
+                                            onChange={newValue => {
+                                                setSelectedShare(newValue);
+                                                selectShare(newValue)
+                                            }}/>
+                                    </Box>)
+                            }
+                            {                            
+                                props.chart.indexSelection!
+                                    .map((l,i) => {                                                   
                                             return (<Anchor key={'indexLabelFilter'+i}                                                                   
-                                                            size="small" icon={<Checkbox size='small' color="black" 
-                                                                        style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0 ?  "white" : firstChartLine.colorLine }}/>} 
+                                                            size="small" icon={<Checkbox size='small' color="black"
+                                                                        style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.id).length === 0 ?  "white" : l.colorLine }}/>} 
                                                                         gap="xsmall" margin="none"
                                                                         label={l.label} 
-                                                                        onClick={() =>{ 
-                                                                            if (filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0) {
-                                                                                setFilteredChart({...filteredChart, 
-                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, firstChartLine.title, l.indexId)
-                                                                                })
+                                                                        onClick={() =>{       
+                                                                            if (filteredChart.lines?.filter(l2 => l2.indexId === l.id).length === 0) {
+                                                                                selectIndex(l)
                                                                             }
                                                                             else {
-                                                                                setFilteredChart({...filteredChart, 
-                                                                                    lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, undefined, l.indexId)
-                                                                                })
+                                                                                unselectIndex(l)
                                                                             }
                                                                         }}/>);
                                             
-                                        }                                        
-                                        return (          
-                                            <Box key={'indexLabelFilter'+i} gap="none" margin="none" direction="row" align="center">
-                                                <Checkbox size='small' color="black"
-                                                    style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.indexId).length === 0 ?  "white" : firstChartLine.colorLine }}
-                                                />
-                                                <ComboField id={'indexLabelFilterCombo'+i}                                                                                                  
-                                                    label={l.label}
-                                                    readOnly={false}
-                                                    description=""
-                                                    errorMsg=""                                
-                                                    value={undefined}
-                                                    values={props.chart.lines === undefined ? [""] : [""].concat(props.chart.lines.filter(l2 => l2.indexId === l.indexId).map(l2 => l2.title!))}
-                                                    onChange={newValue => {
-                                                        setFilteredChart({
-                                                            ...filteredChart,                                                    
-                                                            lines: selectIndexLine(filteredChart.lines!, props.chart.lines!, newValue, l.indexId)
-                                                        })
-                                                    }}/>
-                                            </Box>
-                                        );
-                                    })
+                                        })
                             }
                         </Box>
                         <Box height={(props.chart.height)+"vh"}>     

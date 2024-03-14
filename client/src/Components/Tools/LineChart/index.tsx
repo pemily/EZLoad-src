@@ -60,7 +60,11 @@ export function LineChart(props: LineChartProps){
     const lineIsVisible : boolean[] = [];    
 
    // const chartRef = useRef<ChartJS|undefined>(undefined); // https://reacthustle.com/blog/how-to-customize-events-in-chartjs-3-with-react?expand_article=1
-    
+   function getIndex(indexId: string) : ChartIndex {
+     return props.chart.indexSelection?.filter(i => i.id === indexId)[0]!
+   } 
+
+
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
             lineIsVisible[i] = true; // props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
@@ -79,6 +83,7 @@ export function LineChart(props: LineChartProps){
                                                                     computedPeriod === "month" ? chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
                                                                     chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);            
 
+            const lineIndex : ChartIndex = getIndex(chartLine.indexId!);
             if (chartLine.lineStyle === "BAR_STYLE"){
                 var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
                     type: 'bar',             
@@ -89,12 +94,12 @@ export function LineChart(props: LineChartProps){
                     backgroundColor: (ctx: any, v: any) => {
                         // affiche les valeurs estimé en transparence
                         if (richValuesFiltered?.at(ctx.dataIndex)?.estimated)
-                            return chartLine.colorLine?.substring(0,chartLine.colorLine?.lastIndexOf(','))+',0.2)'
-                        return chartLine.colorLine;
+                            return lineIndex.colorLine?.substring(0,lineIndex.colorLine?.lastIndexOf(','))+',0.2)'
+                        return lineIndex.colorLine;
                     },
                     yAxisID: chartLine.yaxisSetting,                    
                     borderWidth: 0,    
-                    borderColor: chartLine.colorLine,
+                    borderColor: lineIndex.colorLine,
                     inflateAmount: 3
                 };  
                 return conf;     
@@ -105,8 +110,8 @@ export function LineChart(props: LineChartProps){
              label: chartLine.title,
              data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
              tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
-             borderColor: chartLine.colorLine,
-             backgroundColor: chartLine.colorLine,
+             borderColor: lineIndex.colorLine,
+             backgroundColor: lineIndex.colorLine,
              borderWidth: 1,
              yAxisID: chartLine.yaxisSetting,
              fill: false,

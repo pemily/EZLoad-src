@@ -192,21 +192,19 @@ public class DashboardManager {
             ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager, portfolioIndexBuilder);
 
 
-
+            Colors colors = new Colors(chartSettings.getIndexSelection().size());
 
             List<ChartLine> allChartLines = new LinkedList<>();
             chartSettings.getIndexSelection()
                     .forEach(chartIndex -> {
+                        ChartLine.LineStyle lineStyle = getLineStyle(chartSettings.getGroupedBy(), chartIndex);
+                        float transparency = lineStyle == ChartLine.LineStyle.BAR_STYLE ? 0.6f : 1f;
+                        chartIndex.setColorLine(colors.nextColorCode().getColor(transparency));
                         allChartLines.addAll(createCurrencyCharts(reporting, chartSettings.getGroupedBy(), currenciesIndexBuilder, chartIndex));
                         allChartLines.addAll(createShareCharts(chartSettings, shareIndexBuilder, chartIndex, shareSelectionBuilder));
                         allChartLines.addAll(createPortfolioCharts(chartSettings.getGroupedBy(), portfolioIndexBuilder, chartIndex));
                     }
             );
-            Colors colors = new Colors(allChartLines.size());
-            allChartLines.forEach(chartLine -> {
-                float transparency = chartLine.getLineStyle() == ChartLine.LineStyle.BAR_STYLE ? 0.6f : 1f;
-                chartLine.setColorLine(colors.nextColorCode().getColor(transparency));
-            });
 
 
             Chart chart = ChartsTools.createChart(chartSettings, dates);
@@ -243,9 +241,10 @@ public class DashboardManager {
                 || index == PortfolioIndex.ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT
                 || index == PortfolioIndex.CROISSANCE_THEORIQUE_DU_PORTEFEUILLE) yAxis = ChartLine.Y_AxisSetting.PERCENT;
 
+            ChartLine.LineStyle lineStyle = getLineStyle(chartGroupBy, chartIndex);
             allChartLines.add(createChartLine(prices, chartIndex.getId(), chartIndex.getLabel(),
                                         computeYAxis(yAxis),
-                                         getGraphStyle(chartGroupBy, chartIndex)));
+                                        lineStyle));
         }
         return allChartLines;
     }
@@ -268,9 +267,10 @@ public class DashboardManager {
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET
                                     || index == ShareIndex.ACTION_CROISSANCE)
                                 yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                            ChartLine.LineStyle lineStyle = getLineStyle(chartSettings.getGroupedBy(), chartIndex);
                             allChartLines.add(createChartLine(sharePrices, chartIndex.getId(), ezShare.getEzName(),
                                     computeYAxis(yAxis),
-                                    getGraphStyle(chartSettings.getGroupedBy(), chartIndex)));
+                                    lineStyle));
                         }
                     });
         }
@@ -284,13 +284,24 @@ public class DashboardManager {
             currenciesResult.getAllDevises().forEach(devise -> {
                 if (!currenciesResult.getTargetDevise().equals(devise)) {
                     Prices p = currenciesResult.getDevisePrices(reporting, devise);
-                    if (p != null)
+                    if (p != null) {
+                        ChartLine.LineStyle lineStyle = getLineStyle(chartGroupBy, chartIndex);
                         allChartLines.add(createChartLine(p, chartIndex.getId(), devise.getSymbol() + " -> " + currenciesResult.getTargetDevise().getSymbol(),
-                                computeYAxis(ChartLine.Y_AxisSetting.DEVISE), getGraphStyle(chartGroupBy, chartIndex)));
+                                computeYAxis(ChartLine.Y_AxisSetting.DEVISE), lineStyle));
+                    }
                 }
             });
         }
         return allChartLines;
+    }
+
+    private ChartLine.LineStyle getLineStyle(ChartGroupedBy chartGroupBy, ChartIndex chartIndex) {
+        ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
+        GraphStyle graphStyle = getGraphStyle(chartGroupBy, chartIndex);
+        if (graphStyle == GraphStyle.BAR){
+            lineStyle = ChartLine.LineStyle.BAR_STYLE;
+        }
+        return lineStyle;
     }
 
 
@@ -298,13 +309,8 @@ public class DashboardManager {
         return axisByDefault;
     }
 
-    private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, GraphStyle graphStyle){
-        ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
-        if (graphStyle == GraphStyle.BAR){
-            lineStyle = ChartLine.LineStyle.BAR_STYLE;
-        }
+    private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, ChartLine.LineStyle lineStyle){
         ChartLine chartLine = ChartsTools.createChartLine(lineStyle, yAxis, lineTitle, prices, false);
-        chartLine.setLineStyle(lineStyle);
         chartLine.setIndexId(indexId);
         return chartLine;
     }
