@@ -1,16 +1,11 @@
-import { Box, Button, Text, Carousel, Card, Collapsible, Tab } from "grommet";
-import { useState, useEffect, useRef } from "react";
-import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, saveDashboardConfig } from '../../../ez-api/tools';
-import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
+import { Box, Button } from "grommet";
+import { useState } from "react";
+import { Add } from 'grommet-icons';
+import { Chart, ChartSettings, EzShareData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
 
-import { LineChart } from '../../Tools/LineChart';
 import { ChartUI } from "../ChartUI";
-import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { backgrounds } from "grommet-theme-hpe";
 
 
 export interface PageUIProps {    

@@ -1,16 +1,12 @@
-import { Box, Button, Text, Carousel, Card, Collapsible, ThemeContext, Anchor } from "grommet";
-import { useState, useEffect, useRef } from "react";
-import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close, Checkbox, CheckboxSelected, StrikeThrough } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, saveDashboardConfig, isDefined } from '../../../ez-api/tools';
-import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
+import { Box, Button, Text, Collapsible, Anchor } from "grommet";
+import { useState } from "react";
+import { Trash, Configure, ZoomIn, ZoomOut, Close, Checkbox } from 'grommet-icons';
+import { Chart, ChartSettings, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { isDefined } from '../../../ez-api/tools';
+import { ChartSettingsEditor } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { backgrounds } from "grommet-theme-hpe";
-import { ComboFieldWithCode } from "../../Tools/ComboFieldWithCode";
-import { ComboMultipleWithCheckbox } from "../../Tools/ComboMultipleWithCheckbox";
-import { ComboMultiple } from "../../Tools/ComboMultiple";
 import { ComboField } from "../../Tools/ComboField";
 
 

@@ -16,14 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { Chart, ChartIndex, ChartLine, ChartSettings, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
-import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
+import { isDefined } from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
-import { ComboFieldWithCode } from "../ComboFieldWithCode";
-import { useRef } from "react";
 
 export interface LineChartProps {
     chart: Chart;        

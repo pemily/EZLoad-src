@@ -15,17 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Tab, Tabs, ThemeContext } from "grommet";
-import { useState } from "react";
-import { ChartIndex, ChartSettings, ChartPortfolioIndexConfig, CurrencyIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
-import { stream, ezApi, valued, isDefined, isTextContainsEZLoadSignature, applyEZLoadTextSignature, updateEZLoadTextWithSignature} from '../../../ez-api/tools';
-import { TextField } from '../../Tools/TextField';
-import { ComboField } from '../../Tools/ComboField';
+import { Box } from "grommet";
+import { ChartIndex, ChartSettings, ChartPortfolioIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { isDefined, applyEZLoadTextSignature} from '../../../ez-api/tools';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
-import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
-import { TextAreaField } from "../../Tools/TextAreaField";
-import { ComboMultiple } from "../../Tools/ComboMultiple";
-import { ca, is } from "date-fns/locale";
 
 export interface ChartIndexMainEditorProps {    
     chartSettings: ChartSettings;

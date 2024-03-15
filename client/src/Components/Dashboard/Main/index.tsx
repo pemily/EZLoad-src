@@ -15,17 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Text, Carousel, Card, Collapsible, Tabs, Tab, ThemeContext, Stack } from "grommet";
-import { useState, useEffect, useRef } from "react";
-import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous, Close } from 'grommet-icons';
-import { Chart, EzProcess, ChartSettings, ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, saveDashboardConfig, isDefined } from '../../../ez-api/tools';
-import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
-import { LineChart } from '../../Tools/LineChart';
+import { Box, Button, Text, Collapsible, Tabs, Tab, ThemeContext } from "grommet";
+import { useState, } from "react";
+import { Add, Refresh, Trash, Configure, Close } from 'grommet-icons';
+import { ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { saveDashboardConfig, isDefined } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { backgrounds } from "grommet-theme-hpe";
-import { ChartUI } from "../ChartUI";
 import { PageUI } from "../PageUI";
 import { TextField } from "../../Tools/TextField";
 

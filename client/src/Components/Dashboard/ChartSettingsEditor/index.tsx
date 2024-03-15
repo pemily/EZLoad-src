@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Tab, Tabs, ThemeContext } from "grommet";
-import { Add, Refresh, Trash, Configure, ZoomIn, ZoomOut, Previous } from 'grommet-icons';
+import { Box, Button, Tab, Tabs } from "grommet";
+import { Trash } from 'grommet-icons';
 import { useState } from "react";
-import { ChartIndex, ChartSettings, EZShare, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, ChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
-import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
 import { TextAreaField } from "../../Tools/TextAreaField";
