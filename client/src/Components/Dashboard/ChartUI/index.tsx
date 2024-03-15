@@ -28,7 +28,8 @@ interface ChartLineWithIndex extends ChartLine {
 }
 
 function buildLineWithIndex(chartProps: ChartUIProps) : ChartLineWithIndex[]{
-    return chartProps.chart.lines!.map(line => { return {
+    if (!chartProps.chart.lines) return [];
+    return chartProps.chart.lines.map(line => { return {
         ...line,
         index: chartProps.chart.indexSelection!.filter(index => index.id === line.indexId)[0]
     }})
@@ -36,7 +37,7 @@ function buildLineWithIndex(chartProps: ChartUIProps) : ChartLineWithIndex[]{
 
 function containsShareIndex(chartProps:ChartUIProps) : boolean {
     return chartProps.chart.indexSelection!
-                .filter(indexSelect => indexSelect.shareIndexConfig !== undefined)
+                .filter(indexSelect => isDefined(indexSelect.shareIndexConfig))
                 .length > 0;
 }
 

@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
 import com.pascal.ezload.service.util.Checkable;
 import com.pascal.ezload.service.util.StringValue;
 
@@ -40,6 +41,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
     // Sur quelles actions ?
     private ShareSelection shareSelection;
     private Set<String> additionalShareGoogleCodeList = new HashSet<>();
+    private String algoEstimationCroissance = SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO.MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS.name();
 
 
     private int height = 50;
@@ -58,6 +60,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.nbOfPoints = chartSettings.nbOfPoints;
         this.shareSelection = chartSettings.shareSelection;
         this.additionalShareGoogleCodeList = chartSettings.additionalShareGoogleCodeList;
+        this.algoEstimationCroissance = chartSettings.algoEstimationCroissance;
     }
 
     public String getTargetDevise() {
@@ -147,6 +150,14 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public void setNbOfPoints(int nbOfPoints) {
         this.nbOfPoints = nbOfPoints;
+    }
+
+    public String getAlgoEstimationCroissance() {
+        return algoEstimationCroissance;
+    }
+
+    public void setAlgoEstimationCroissance(String algoEstimationCroissance) {
+        this.algoEstimationCroissance = algoEstimationCroissance;
     }
 
     public ChartSettings validate() {

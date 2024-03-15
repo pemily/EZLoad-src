@@ -182,13 +182,15 @@ public class DashboardManager {
 
             EZDevise targetDevise = DeviseUtil.foundByCode(chartSettings.getTargetDevise());
 
+            SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO estimation_croissance_current_year_algo = SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO.valueOf(chartSettings.getAlgoEstimationCroissance());
+
             PerfIndexBuilder perfIndexBuilder = new PerfIndexBuilder(chartSettings.getGroupedBy());
             CurrenciesIndexBuilder currenciesIndexBuilder = new CurrenciesIndexBuilder(ezActionManager, targetDevise, dates);
             SharePriceBuilder sharePriceBuilder = new SharePriceBuilder(ezActionManager, currenciesIndexBuilder, perfIndexBuilder, dates);
             PortfolioIndexBuilder portfolioIndexBuilder = new PortfolioIndexBuilder(portfolio == null ? new LinkedList<>() : portfolio.getAllOperations().getExistingOperations(), currenciesIndexBuilder,
                                                                                                 sharePriceBuilder, perfIndexBuilder,
-                                                                                                reporting, dates, chartSettings.getExcludeBrokers(), chartSettings.getExcludeAccountTypes());
-            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(reporting, dates, portfolioIndexBuilder, sharePriceBuilder, currenciesIndexBuilder, perfIndexBuilder);
+                                                                                                reporting, dates, chartSettings.getExcludeBrokers(), chartSettings.getExcludeAccountTypes(), estimation_croissance_current_year_algo);
+            ShareIndexBuilder shareIndexBuilder = new ShareIndexBuilder(reporting, dates, portfolioIndexBuilder, sharePriceBuilder, currenciesIndexBuilder, perfIndexBuilder, estimation_croissance_current_year_algo);
             ShareSelectionBuilder shareSelectionBuilder = new ShareSelectionBuilder(ezActionManager, portfolioIndexBuilder);
 
 

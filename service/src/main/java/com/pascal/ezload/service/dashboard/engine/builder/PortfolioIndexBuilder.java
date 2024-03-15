@@ -43,9 +43,11 @@ public class PortfolioIndexBuilder {
     private final List<EZDate> dates;
     private final Set<String> excludeBrokers;
     private final Set<String> excludeAccountType;
+    private final SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO algoEstimationCroissance;
 
 
-    public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder currencies, SharePriceBuilder sharePriceBuilder, PerfIndexBuilder perfIndexBuilder, Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
+    public PortfolioIndexBuilder(List<Row> operations, CurrenciesIndexBuilder currencies, SharePriceBuilder sharePriceBuilder, PerfIndexBuilder perfIndexBuilder,
+                                 Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType, SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO algoEstimationCroissance){
         this.operations = operations;
         this.currencies = currencies;
         this.sharePriceBuilder = sharePriceBuilder;
@@ -54,12 +56,13 @@ public class PortfolioIndexBuilder {
         this.reporting = reporting;
         this.excludeBrokers = excludeBrokers;
         this.excludeAccountType = excludeAccountType;
+        this.algoEstimationCroissance = algoEstimationCroissance;
     }
 
 
     // ezPortfolio operation contains all operations in target Devise
     private List<PortfolioStateAtDate> buildPortfolioValuesInTargetDevise(Reporting reporting, List<EZDate> dates, Set<String> excludeBrokers, Set<String> excludeAccountType){
-        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(reporting, dates, sharePriceBuilder);
+        PortfolioStateAccumulator acc = new PortfolioStateAccumulator(reporting, dates, sharePriceBuilder, algoEstimationCroissance);
 
         return acc.process(getFilteredOperationRowsAndSortInTargetDevise(reporting, operations.stream().filter(op -> op.getValueDate(MesOperations.DATE_COL) != null), excludeBrokers, excludeAccountType));
     }
@@ -166,10 +169,10 @@ public class PortfolioIndexBuilder {
                             PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate());
                             Price shareValue = price.multiply(entry.getValue());
                             Price shareRatio = shareValue.divide(portfolioValue).multiply(Price.CENT);
-                            Prices shareDividendAnnualYield = sharePriceBuilder.getRendementDividendeAnnuel(reporting, entry.getKey());
+                            Prices shareDividendAnnualYield = sharePriceBuilder.getRendementDividendeAnnuel(reporting, entry.getKey(), algoEstimationCroissance);
                             //Prices shareDividendAnnualCroissanceYield = perfIndexBuilder.buildPerfPrices(shareDividendAnnualYield, ChartPerfFilter.VARIATION_EN_PERCENT);
 
-                            Price shareDividendAnnualCroissancePriceAt = sharePriceBuilder.getCroissanceAnnuelDuDividendeWithEstimates(reporting, entry.getKey()).getPriceAt(state.getDate()); // shareDividendAnnualCroissanceYield.getPriceAt(state.getDate()).divide(Price.CENT);
+                            Price shareDividendAnnualCroissancePriceAt = sharePriceBuilder.getCroissanceAnnuelDuDividendeWithEstimates(reporting, entry.getKey(), algoEstimationCroissance).getPriceAt(state.getDate()); // shareDividendAnnualCroissanceYield.getPriceAt(state.getDate()).divide(Price.CENT);
                             Price shareDividendAnnualRendementPriceAt = shareDividendAnnualYield.getPriceAt(state.getDate()); //shareDividendAnnualYield.getPriceAt(state.getDate()).divide(Price.CENT);
                             sum1 = sum1.plus(shareRatio.multiply(shareDividendAnnualRendementPriceAt).multiply(shareDividendAnnualCroissancePriceAt));
                             sum2 = sum2.plus(shareRatio.multiply(shareDividendAnnualRendementPriceAt));

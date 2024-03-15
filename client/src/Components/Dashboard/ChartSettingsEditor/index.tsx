@@ -168,6 +168,24 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                 />
                         </Box>   
 
+                        <ComboFieldWithCode id="AlgoCroissance"
+                                                    label="Algorithme pour l'estimation de la croissance de l'année en cours"
+                                                    errorMsg={undefined}
+                                                    readOnly={props.readOnly}
+                                                    selectedCodeValue={props.chartSettings.algoEstimationCroissance! }
+                                                    codeValues={[                             
+                                                        'MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS',
+                                                        'MINIMAL_CROISSANCE_OF_LAST_TEN_YEARS'
+                                                    ]}
+                                                    userValues={[
+                                                        'Utiliser la formule de Revenue & Dividendes (plus petite moyenne sur 1, 5 et 10 ans)',
+                                                        'Utiliser la plus petite croissance des 10 dernières années'                                                        
+                                                    ]}
+                                                    description=""
+                                                    onChange={newValue => 
+                                                        props.save({...props.chartSettings, algoEstimationCroissance: newValue}, false, () => {})
+                                                    }/>    
+
 
 {
 /*

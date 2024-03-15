@@ -42,11 +42,13 @@ public class PortfolioStateAccumulator {
     private final List<EZDate> dates;
     private final List<PortfolioStateAtDate> result;
     private final SharePriceBuilder sharePriceBuilderResult;
+    private final SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO algoEstimationCroissance;
 
-    public PortfolioStateAccumulator(Reporting reporting, List<EZDate> dates, SharePriceBuilder sharePriceBuilderResult){
+    public PortfolioStateAccumulator(Reporting reporting, List<EZDate> dates, SharePriceBuilder sharePriceBuilderResult, SharePriceBuilder.ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO algoEstimationCroissance){
         this.reporting = reporting;
         this.dates = dates;
         this.sharePriceBuilderResult = sharePriceBuilderResult;
+        this.algoEstimationCroissance = algoEstimationCroissance;
         result = new ArrayList<>(dates.size());
     }
 
@@ -296,7 +298,7 @@ public class PortfolioStateAccumulator {
                             .map(e -> {
                                 Price nbOfShare = e.getValue();
                                 EZShareEQ share = e.getKey();
-                                PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getRendementDividendeAnnuel(reporting, share).getPriceAt(date);
+                                PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getRendementDividendeAnnuel(reporting, share, algoEstimationCroissance).getPriceAt(date);
 
                                 PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(date);
                                 Price shareAmount = currentPrice.multiply(nbOfShare);
