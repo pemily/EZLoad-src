@@ -17,7 +17,6 @@
  */
 package com.pascal.ezload.service.financial;
 
-import com.gargoylesoftware.htmlunit.javascript.host.svg.SVGEllipseElement;
 import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
@@ -30,7 +29,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;

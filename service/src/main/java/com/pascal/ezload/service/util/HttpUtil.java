@@ -17,10 +17,9 @@
  */
 package com.pascal.ezload.service.util;
 
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.IOUtils;
+import org.htmlunit.Page;
+import org.htmlunit.WebClient;
 
 import java.io.BufferedInputStream;
 import java.io.File;

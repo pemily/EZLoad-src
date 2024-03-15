@@ -17,17 +17,15 @@
  */
 package com.pascal.ezload.service.util;
 
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.TextPage;
-import com.gargoylesoftware.htmlunit.UnexpectedPage;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.pascal.ezload.service.sources.Reporting;
+import org.htmlunit.Page;
+import org.htmlunit.TextPage;
+import org.htmlunit.UnexpectedPage;
+import org.htmlunit.html.HtmlPage;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 public class HttpUtilCached {
 

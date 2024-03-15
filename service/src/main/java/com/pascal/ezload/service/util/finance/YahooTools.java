@@ -21,7 +21,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
-import net.sourceforge.htmlunit.xpath.operations.Div;
 
 import java.util.*;
 import java.util.logging.Logger;

@@ -17,29 +17,22 @@
  */
 package com.pascal.ezload.service.util.finance;
 
-import com.gargoylesoftware.htmlunit.Page;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSeleniumHelper;
-import com.pascal.ezload.service.util.*;
+import com.pascal.ezload.service.util.HttpUtil;
+import com.pascal.ezload.service.util.HttpUtilCached;
+import com.pascal.ezload.service.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.CookieManager;
-import java.net.http.HttpResponse;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
+import java.util.LinkedList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SeekingAlphaToolsTest {
 
