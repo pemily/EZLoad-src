@@ -58,7 +58,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-proposal-private-property-in-object": "^7.3.2",
     "@types/i18next-xhr-backend": "^1.4.2",
     "@types/styled-components": "^5.1.34",
     "i18next-json-sync": "^2.3.1",
