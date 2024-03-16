@@ -178,7 +178,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                     ]}
                                                     userValues={[
                                                         'Utiliser la formule de Revenue & Dividendes (plus petite moyenne sur 1, 5 et 10 ans)',
-                                                        'Utiliser la plus petite croissance des 10 dernières années'                                                        
+                                                        'Utiliser la plus petite croissance des 10 dernières années (methode plus péssimiste)'                                                        
                                                     ]}
                                                     description=""
                                                     onChange={newValue => 
