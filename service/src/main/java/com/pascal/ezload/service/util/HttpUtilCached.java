@@ -18,12 +18,14 @@
 package com.pascal.ezload.service.util;
 
 import com.pascal.ezload.service.sources.Reporting;
+import org.htmlunit.Page;
+import org.htmlunit.TextPage;
+import org.htmlunit.UnexpectedPage;
+import org.htmlunit.html.HtmlPage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class HttpUtilCached {
 
@@ -34,23 +36,53 @@ public class HttpUtilCached {
     }
 
     public <R> R get(Reporting reporting, String cacheName, String url, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
-        return get(reporting, cacheName, url, null, toObjMapper);
+        return get(reporting, cacheName, url, HttpUtil.chromeHeader(), toObjMapper);
     }
 
-    public <R> R get(Reporting reporting, String cacheName, String url, Map<String, String> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
+    public <R> R get(Reporting reporting, String cacheName, String url, List<String[]> requestProperties, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
+        return get(reporting, cacheName, url, () -> {
+                    Page page = HttpUtil.getFromUrl(url, false);
+                    if (page.getWebResponse().isSuccess()) {
+                        if (page instanceof UnexpectedPage) {
+                            return ((UnexpectedPage) page).getInputStream();
+                        } else if (page instanceof TextPage) {
+                            return new ByteArrayInputStream(((TextPage) page).getContent().getBytes(StandardCharsets.UTF_8));
+                        } else if (page instanceof HtmlPage) {
+                            throw new RuntimeException("Html Page don't know what to do");
+                        }
+                        else {
+                            throw new RuntimeException("TEST SI ON RECOIT un autre type de page: " + page.getClass().getSimpleName() + " url: " + url);
+                        }
+                    } else {
+                        return HttpUtil.downloadV2(url, requestProperties, inputStream -> inputStream);
+                    }
+                }, toObjMapper);
+    }
+
+
+
+    public <R> R get(Reporting reporting, String cacheName, String url, SupplierThatThrow<InputStream> noCacheFunction, FunctionThatThrow<InputStream, R> toObjMapper) throws Exception {
         try(Reporting rep = reporting.pushSection("Recherche de "+cacheName+" url: "+url)) {
             File cache = new File(cacheDir + File.separator + format(cacheName) + ".json");
             if (cache.exists()) {
                 rep.info("Fichier de cache trouvé: "+cache.getAbsolutePath());
-                return toObjMapper.apply(FileUtil.read(cache));
+                try (InputStream in = FileUtil.read(cache)) {
+                    return toObjMapper.apply(in);
+                }
             }
             rep.info("Fichier de cache non trouvé, téléchargement des données");
-            HttpUtil.download(url, requestProperties, inputStream -> {
-                FileUtil.write(cache, inputStream);
-                return cache;
-            });
+            try (InputStream in = noCacheFunction.get()){
+                FileUtil.write(cache, in);
+            }
             rep.info("Fin de téléchargement");
-            return toObjMapper.apply(FileUtil.read(cache));
+            try (InputStream in = FileUtil.read(cache)) {
+                return toObjMapper.apply(in);
+            }
+            catch(Exception e){
+                // Impossible de lire le fichier, je l'efface du cache
+                cache.delete();
+                throw e;
+            }
         }
     }
 
@@ -78,4 +110,5 @@ public class HttpUtilCached {
     public String getContent(String cacheName) throws IOException {
         return FileUtil.file2String(cacheDir+File.separator+format(cacheName)+".json");
     }
+
 }

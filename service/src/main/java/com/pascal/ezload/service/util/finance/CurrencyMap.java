@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.EZDevise;
 import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
@@ -27,6 +28,7 @@ public class CurrencyMap {
 
     private final EZDevise from, to;
     private Prices factors;
+    private Float lastFactor;
 
 
     public CurrencyMap(EZDevise from, EZDevise to, List<PriceAtDate> factors){
@@ -36,7 +38,8 @@ public class CurrencyMap {
             this.factors = new Prices();
             this.factors.setDevise(from);
             this.factors.setLabel(getLabel());
-            factors.forEach(p -> this.factors.addPrice(p.getDate(), p));
+            factors.forEach(p -> this.factors.addPrice(p));
+            lastFactor = factors.get(factors.size()-1).getValue();
         }
     }
 
@@ -44,12 +47,12 @@ public class CurrencyMap {
         return from.getSymbol() + " -> " + to.getSymbol();
     }
 
-    public float getTargetPrice(PriceAtDate fromPrice){
+    public float getTargetPrice(PriceAtDate fromPrice, boolean useLastFactor /* le taux du jour quelque soit la date */){
         if (from.equals(to)) {
-            return fromPrice.getPrice();
+            return fromPrice.getValue();
         }
-        PriceAtDate factor = factors.getPriceAt(fromPrice.getDate());
-        return fromPrice.getPrice()*factor.getPrice();
+        Float factor = useLastFactor ? lastFactor : factors.getPriceAt(fromPrice.getDate()).getValue();
+        return fromPrice.getValue()*factor;
     }
 
     public Prices getFactors(){
@@ -64,12 +67,18 @@ public class CurrencyMap {
         return to;
     }
 
-    public Prices convertPricesToTarget(Prices p) {
+    public Prices convertPricesToTarget(Prices p, boolean useLastFactor) {
         Prices r = new Prices();
         r.setLabel(p.getLabel());
         r.setDevise(to);
-        p.getPrices().forEach(price -> r.addPrice(price.getDate(), new PriceAtDate(price.getDate(), getTargetPrice(price))));
+        p.getPrices().forEach(price -> r.addPrice(new PriceAtDate(price.getDate(), getTargetPrice(price, useLastFactor), price.isEstimated())));
         return r;
+    }
+
+    public Float convertPriceToTarget(EZDate date, Float valueAtFromDevise){
+        if (valueAtFromDevise == null || factors == null) return valueAtFromDevise; // if factors == null => fromdevise & target devise are identical
+        PriceAtDate factor = factors.getPriceAt(date);
+        return valueAtFromDevise * factor.getValue();
     }
 
     public String toString(){

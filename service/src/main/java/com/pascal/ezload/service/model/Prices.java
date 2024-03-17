@@ -22,8 +22,7 @@ import java.util.*;
 public class Prices {
 
     private String label;
-    private Map<EZDate, PriceAtDate> pricesMap = new HashMap<>(); // must be ordered
-    private List<PriceAtDate> pricesList = new ArrayList<>();
+    private final ArrayList<PriceAtDate> pricesList = new ArrayList<>();
     private EZDevise devise;
 
     public EZDevise getDevise() {
@@ -38,30 +37,42 @@ public class Prices {
         return Collections.unmodifiableList(pricesList);
     }
 
+    public Prices(){}
+
+    public Prices(Prices p){
+        this.label = p.label;
+        this.devise = p.devise;
+        pricesList.addAll(p.pricesList);
+    }
+
     // must be ordered when calling this method
     // la date et le price.getDate() peuvent etre different (dans les graphes, si je demande le prix un dimanche, j'aurais la date du vendredi)
-    public void addPrice(EZDate date, PriceAtDate price){
+    public void addPrice(PriceAtDate price){
         if (price.getDate() == null) return;
-        pricesList.add(new PriceAtDate(date, price.getPrice()));
-        pricesMap.put(date, price);
+        pricesList.add(price);
+    }
+
+    public void replacePriceAt(int index, PriceAtDate priceAtDate) {
+        pricesList.set(index, priceAtDate);
     }
 
     // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
     public PriceAtDate getPriceAt(EZDate date){
-        PriceAtDate p = pricesMap.get(date);
-        if (p == null) {
-            // test jusqu'a 20 jours de moins
-            EZDate test = date.yesterday();
-            for (int i = 0; i < 20; i++) {
-                p = pricesMap.get(test);
-                if (p != null) break;
-                test = test.yesterday();
+        PriceAtDate p = null;
+        // on parcours la liste en sens inverse
+        for (int i = pricesList.size() - 1 ; i >= 0; i--) {
+            PriceAtDate tmp = pricesList.get(i);
+            EZDate test = pricesList.get(i).getDate();
+            if (date.contains(test) // si date est une periode ou est egale a test
+                    || test.contains(date)
+                    || (!date.isPeriod() && !tmp.getDate().isPeriod() && date.isAfterOrEquals(tmp.getDate()))
+            ) {
+                p = tmp;
+                break;
             }
         }
         if (p == null){
-            p = new PriceAtDate();
-            p.setDate(date);
-            p.setPrice(0f);
+            p = new PriceAtDate(date);
         }
         return p;
     }
@@ -77,4 +88,6 @@ public class Prices {
     public String toString(){
         return label+" ("+devise+")";
     }
+
+
 }

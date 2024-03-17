@@ -17,7 +17,6 @@
  */
 import { useState, useEffect } from "react";
 import { Box, Select, FormField } from "grommet";
-import { valued } from '../../../ez-api/tools';
 
 
 export interface ComboMultipleProps {

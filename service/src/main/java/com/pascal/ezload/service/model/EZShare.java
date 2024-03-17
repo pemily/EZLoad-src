@@ -21,6 +21,8 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
 import com.pascal.ezload.service.util.CountryUtil;
 
+import java.util.Objects;
+
 /**
  * Si l'action a ete cree depuis la 1ere lecture d'un nouveau EZPortfolio, elle aura un ticker Google mais pas le ISIN
  * Si l'action a ete cree depuis une recherche BourseDirect, elle aura un ISIN
@@ -30,7 +32,8 @@ import com.pascal.ezload.service.util.CountryUtil;
 public class EZShare implements ActionData {
     public static final String NEW_SHARE = "NEW";
 
-    private String ezName; // the name from the user preference
+    private String ezName; // the name from the shareData.json
+    private String alternativeName; // found in EZPortfolio when loading it
     private String googleCode; // the full name = marketPlace.googleFinanceCode + ticker, example: NYSE:WPC, EPA:RUI
     private String yahooCode; // can be null if ISIN not found
     private String isin; // can be null for the share coming from the EZPortfolio (during the initialization), they will be selected to be invalid in EZActionManager
@@ -56,6 +59,14 @@ public class EZShare implements ActionData {
 
     public void setEzName(String ezName) {
         this.ezName = ezName != null ? ezName.trim() : null;
+    }
+
+    public String getAlternativeName(){
+        return alternativeName;
+    }
+
+    public void setAlternativeName(String alternativeName){
+        this.alternativeName = alternativeName != null ? alternativeName.trim() : null ;
     }
 
     public String getGoogleCode() {
@@ -139,5 +150,17 @@ public class EZShare implements ActionData {
 
     public String toString(){
         return ezName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // il faut utiliser EZShareEQ a la place
+       throw new IllegalStateException("EZShare equals cannot be used"); // je n'ai pas mis de contraintes sur les nom ou code :(
+    }
+
+    @Override
+    public int hashCode() {
+        // il faut utiliser EZShareEQ a la place
+        throw new IllegalStateException("EZShare equals cannot be used"); // je n'ai pas mis de contraintes sur les nom ou code :(
     }
 }

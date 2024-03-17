@@ -27,7 +27,7 @@ public class ChartLine {
         BAR_STYLE
     }
 
-    public enum AxisSetting {
+    public enum Y_AxisSetting {
         PERCENT, // des pourcentages
         PORTFOLIO, // des gros nombres (valeurs du portefeuille)
         DEVISE, // la valeur des devises (des petits nombres autour de 1)
@@ -36,11 +36,11 @@ public class ChartLine {
     }
 
     private String title;
+    private String indexId;// the reference to the index Id, all chartLines with the same indexId will be grouped together
     private List<Float> values; // if null, valuesWithLabel will be used
-    private List<ValueWithLabel> valuesWithLabel;
-    private String colorLine; // rgba(255,99,132,1);
+    private List<RichValue> richValues;
     private LineStyle lineStyle; // optionnel, pour configurer une autre echelle sur l'axe des Y (et pour faire la distinction entre pourcentage/devise par exemple)
-    private AxisSetting axisSetting;
+    private Y_AxisSetting yAxisSetting;
 
     public String getTitle() {
         return title;
@@ -50,6 +50,9 @@ public class ChartLine {
         this.title = title;
     }
 
+    public String getIndexId(){ return indexId; }
+    public void setIndexId(String indexId) { this.indexId = indexId; }
+
     public List<Float> getValues() {
         return values;
     }
@@ -58,20 +61,12 @@ public class ChartLine {
         this.values = values;
     }
 
-    public List<ValueWithLabel> getValuesWithLabel() {
-        return valuesWithLabel;
+    public List<RichValue> getRichValues() {
+        return richValues;
     }
 
-    public void setValuesWithLabel(List<ValueWithLabel> valuesWithLabel) {
-        this.valuesWithLabel = valuesWithLabel;
-    }
-
-    public String getColorLine() {
-        return colorLine;
-    }
-
-    public void setColorLine(String colorLine) {
-        this.colorLine = colorLine;
+    public void setRichValues(List<RichValue> valuesWithLabel) {
+        this.richValues = valuesWithLabel;
     }
 
     public LineStyle getLineStyle() {
@@ -83,21 +78,22 @@ public class ChartLine {
     }
 
 
-    public AxisSetting getAxisSetting() {
-        return axisSetting;
+    public Y_AxisSetting getYAxisSetting() {
+        return yAxisSetting;
     }
 
-    public void setAxisSetting(AxisSetting axisSetting) {
-        this.axisSetting = axisSetting;
+    public void setYAxisSetting(Y_AxisSetting YAxisSetting) {
+        this.yAxisSetting = YAxisSetting;
     }
 
     public String toString(){
         return title;
     }
 
-    public static class ValueWithLabel {
+    public static class RichValue {
         private String label;
         private Float value;
+        private boolean estimated;
 
         public String getLabel() {
             return label;
@@ -113,6 +109,14 @@ public class ChartLine {
 
         public void setValue(Float value) {
             this.value = value;
+        }
+
+        public boolean isEstimated() {
+            return estimated;
+        }
+
+        public void setEstimated(boolean estimated) {
+            this.estimated = estimated;
         }
     }
 }

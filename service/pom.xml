@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.pascal.ezload</groupId>
         <artifactId>EZLoadRoot</artifactId>
-        <version>2.5</version>
+        <version>2.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -126,8 +126,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>14</source>
+                    <target>14</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -234,9 +234,8 @@
         </dependency>
 
         <dependency>
-            <groupId>net.sourceforge.htmlunit</groupId>
+            <groupId>org.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
-            <version>2.70.0</version>
         </dependency>
     </dependencies>
 </project>

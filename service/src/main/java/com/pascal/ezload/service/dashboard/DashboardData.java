@@ -17,26 +17,55 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.DashboardPage;
+
 import java.util.List;
 
 public class DashboardData {
 
-    private List<Chart> charts;
-    private DashboardSettings dashboardSettings;
+    private List<DashboardPage<Chart>> pages;
+    private List<EzShareData> shareGoogleCodeAndNames;
 
-    public List<Chart> getCharts() {
-        return charts;
+    public List<DashboardPage<Chart>> getPages() {
+        return pages;
     }
 
-    public void setCharts(List<Chart> charts) {
-        this.charts = charts;
+    public void setPages(List<DashboardPage<Chart>> pages) {
+        this.pages = pages;
     }
 
-    public DashboardSettings getDashboardSettings() {
-        return dashboardSettings;
+    public List<EzShareData> getShareGoogleCodeAndNames() {
+        return shareGoogleCodeAndNames;
     }
 
-    public void setDashboardSettings(DashboardSettings dashboardSettings) {
-        this.dashboardSettings = dashboardSettings;
+    public void setShareGoogleCodeAndNames(List<EzShareData> shareGoogleCodeAndNames) {
+        this.shareGoogleCodeAndNames = shareGoogleCodeAndNames;
+    }
+
+    public static class EzShareData {
+        private String googleCode, shareName;
+
+        public EzShareData(String googleCode, String shareName){
+            this.googleCode = googleCode;
+            this.shareName = shareName;
+        }
+
+        public EzShareData(){}
+
+        public String getShareName() {
+            return shareName;
+        }
+
+        public void setShareName(String shareName) {
+            this.shareName = shareName;
+        }
+
+        public String getGoogleCode() {
+            return googleCode;
+        }
+
+        public void setGoogleCode(String googleCode) {
+            this.googleCode = googleCode;
+        }
     }
 }

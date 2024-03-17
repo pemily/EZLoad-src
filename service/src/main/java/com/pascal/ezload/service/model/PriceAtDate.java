@@ -17,35 +17,34 @@
  */
 package com.pascal.ezload.service.model;
 
-public class PriceAtDate {
+public class PriceAtDate extends Price {
 
-    private float price;
     private EZDate date;
 
-    public PriceAtDate(){}
+    public PriceAtDate(){
+        super();
+    }
 
-    public PriceAtDate(EZDate date, float price){
+    public PriceAtDate(EZDate date, Price price){
+        super(price);
         this.date = date;
-        this.price = price;
     }
 
-    public float getPrice() {
-        return price;
+    public PriceAtDate(EZDate date, float price, boolean estimated){
+        super(price, estimated);
+        this.date = date;
     }
 
-    public void setPrice(float price) {
-        this.price = price;
+    public PriceAtDate(EZDate date){
+        super();
+        this.date = date;
     }
 
     public EZDate getDate() {
         return date;
     }
 
-    public void setDate(EZDate date) {
-        this.date = date;
-    }
-
     public String toString(){
-        return date.toString()+" price: "+price;
+        return date.toString()+super.toString();
     }
 }

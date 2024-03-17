@@ -30,11 +30,11 @@ import java.util.stream.Stream;
 class PricesTools<PD>  {
 
     private int listOfDatesIndex = 0;
-    private List<EZDate> listOfDates;
-    private Function<PD, EZDate> getDate;
-    private Function<PD, PriceAtDate> createPriceAtDate;
-    private Prices pricesResult;
-    private Stream<PD> allPrices;
+    private final List<EZDate> listOfDates;
+    private final Function<PD, EZDate> getDate;
+    private final Function<PD, PriceAtDate> createPriceAtDate;
+    private final Prices pricesResult;
+    private final Stream<PD> allPrices;
     private PD previousPrice = null;
     private EZDate searchedDate = null;
 
@@ -48,7 +48,7 @@ class PricesTools<PD>  {
     }
 
 
-    public void fillPricesForAListOfDates(Reporting reporting) {
+    public void fillPricesForAListOfDates() {
         listOfDatesIndex = -1;
         setNextSearchedDate();
         allPrices
@@ -72,7 +72,7 @@ class PricesTools<PD>  {
             EZDate previousPriceDate = previousPrice == null ? null : getDate.apply(previousPrice);
 
             if (previousPriceDate != null && searchedDate.isBefore(previousPriceDate)){
-                pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0));
+                pricesResult.addPrice(new PriceAtDate(searchedDate, 0, false));
                 setNextSearchedDate();
             }
             else{
@@ -83,8 +83,12 @@ class PricesTools<PD>  {
 
     private void setNextSearchedDate(){
         listOfDatesIndex++;
-        if (listOfDatesIndex < listOfDates.size())
+        if (listOfDatesIndex < listOfDates.size()) {
             searchedDate = listOfDates.get(listOfDatesIndex);
+            if (searchedDate.isPeriod()){
+                searchedDate = searchedDate.endPeriodDate();
+            }
+        }
         else
             searchedDate = null;
 
@@ -97,17 +101,17 @@ class PricesTools<PD>  {
     }
 
     private void useCurrent(PD current){
-        pricesResult.addPrice(searchedDate, createPriceAtDate.apply(current));
+        pricesResult.addPrice(createPriceAtDate.apply(current));
         setNextSearchedDate();
     }
 
 
     private void usePrevious(){
         if (previousPrice != null){
-            pricesResult.addPrice(searchedDate, createPriceAtDate.apply(previousPrice));
+            pricesResult.addPrice(createPriceAtDate.apply(previousPrice));
         }
         else{
-            pricesResult.addPrice(searchedDate, new PriceAtDate(searchedDate, 0));
+            pricesResult.addPrice(new PriceAtDate(searchedDate, 0, false));
         }
         setNextSearchedDate();
     }

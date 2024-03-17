@@ -59,7 +59,8 @@ export function App(){
     const [operationIgnored, setOperationIgnored] = useState<string[]>([]);
     const [allProfiles, setAllProfiles] = useState<string[]>([]);
     const [allShares, setAllShares] = useState<ActionWithMsg|undefined>(undefined); 
-
+    const [dashboardData, setDashboardData] = useState<DashboardData|undefined>(undefined);
+    
     const followProcess = (process: EzProcess|undefined) => {
         if (process) {   
             setProcessLaunchFail(false);
@@ -221,6 +222,25 @@ export function App(){
             .catch(e => console.error(e));
     }
 
+    function getDashboard(): void | PromiseLike<void> {     
+        return jsonCall(ezApi.dashboard.getDashboardData())
+            .then(r => {
+                setDashboardData(r);
+            })
+            .catch((error) => {
+                console.error("Error while loading DashboardData", error);
+            });
+    }
+
+    function refreshDashboardData(): void {
+        jsonCall(ezApi.dashboard.refreshDashboardData())
+                .then(followProcess)
+                .catch((error) => {
+                    console.error("Error while loading DashboardData", error);
+                });                
+    }
+
+
 
     useEffect(() => {
         setInterval(() => ezApi.home.ping(), 20000);    // every 20 seconds call the ping
@@ -313,10 +333,11 @@ export function App(){
             }        
             { mainSettings && ezProfil && !isConfigUrl() &&
             (<Box fill>
-                <Tabs justify="center" flex activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
+                <Tabs justify="center" activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
                         <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
-                                        followProcess={followProcess}
+                                        dashboardData={dashboardData}
+                                        refreshDashboard={refreshDashboardData}                                        
                                         actionWithMsg={actionWithMsg}/>
                     </Tab>
                     <Tab title="Relevés" icon={<Command size='small'/>}>
@@ -443,7 +464,7 @@ export function App(){
                                     Une tâche est en cours d'execution. Veuillez patientez...</Text></Box>)}     
                             { <ViewLog 
                                     ezProcess={lastProcess}    
-                                    processFinished={() => reloadAllData()}/>                            
+                                    processFinished={() => reloadAllData().then(r => getDashboard())}/>                            
                             }
                             { mainSettings && !processRunning && (<Text margin="large">Vous pouvez retourner à l''onglet de départ</Text>) }
                         </Box>

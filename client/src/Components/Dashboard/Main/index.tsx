@@ -15,56 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea, Grid, Layer } from "grommet";
-import { useState, useRef, useEffect } from "react";
-import { Add, Download, Refresh, Menu, Trash, Configure, Expand, Contract, ZoomIn, ZoomOut } from 'grommet-icons';
-import { AuthInfo, Chart, EzProcess, ChartSettings, DashboardData, DashboardSettings, EZShare, ActionWithMsg } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
-import { ChartSettingsEditor, accountTypes, brokers } from '../ChartSettingsEditor';
-import { LineChart } from '../../Tools/LineChart';
+import { Box, Button, Text, Collapsible, Tabs, Tab, ThemeContext } from "grommet";
+import { useState, } from "react";
+import { Add, Refresh, Trash, Configure, Close } from 'grommet-icons';
+import { ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { saveDashboardConfig, isDefined } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { PageUI } from "../PageUI";
+import { TextField } from "../../Tools/TextField";
 
 
 export interface DashboardMainProps {
     enabled: boolean;
     processRunning: boolean;
+    dashboardData: DashboardData|undefined;
     actionWithMsg: ActionWithMsg|undefined;
-    followProcess: (process: EzProcess|undefined) => void;
+    refreshDashboard: () => void;
 }      
 
-export function DashboardMain(props: DashboardMainProps){    
-    const [dashConfig, setDashConfig] = useState<DashboardSettings>({});
-    const [dashCharts, setDashCharts] = useState<Chart[]|undefined>([]);
-    const [configIndexEdited, setConfigIndexEdit] = useState<number>(-1);
-    const [readOnly, setReadOnly] = useState<boolean>(props.processRunning && props.enabled);
-
-    function reloadDashboard(): void | PromiseLike<void> {        
-        return jsonCall(ezApi.dashboard.getDashboardData())
-            .then(r => {
-                setDashConfig(r.dashboardSettings);
-                setDashCharts(r.charts);
-            })
-            .catch((error) => {
-                console.error("Error while loading DashboardData", error);
-            });
-    }
-
-    function refresh(): void {
-        setReadOnly(true);
-        jsonCall(ezApi.dashboard.refreshDashboardData())
-                .then(props.followProcess)
-                .then(r => reloadDashboard)
-                .catch((error) => {
-                    console.error("Error while loading DashboardData", error);
-                });                
-    }
-
-    useEffect(() => {
-        // will be executed when props.enable will become true 
-        setReadOnly(props.processRunning && props.enabled);
-        if (!readOnly) reloadDashboard();
-    }, [ props.enabled, props.processRunning ]);
+export function DashboardMain(props: DashboardMainProps){        
+    const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
+    const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]|undefined>(props.dashboardData?.pages);    
+    const [editPages, setPageEdition] = useState<boolean>(false);
 
     if (!props.enabled){
         return (            
@@ -72,126 +45,103 @@ export function DashboardMain(props: DashboardMainProps){
                 Initialisation. Veuillez patientez...</Text></Box>
         );
     }
- 
-    return (                
-        <Box>
-        { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (            
+     
+    return (
+        <>
+            { props.actionWithMsg?.errors && props.actionWithMsg.errors.length > 0 && (
                 <Box background="status-critical"><Text alignSelf="center" margin="xsmall">
-                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box> 
-            )
-        }  
-        { !readOnly && (!dashCharts || dashCharts.length === 0) && (            
-                <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                    Cliquez sur "Rafraichir" pour charger vos données</Text></Box> 
-            )
-        }    
-        { (!dashConfig.chartSettings || dashConfig.chartSettings?.length) == 0 && (            
-                <Box background="status-warning"><Text alignSelf="center" margin="xsmall">
-                    Cliquez sur "Nouveau" pour créer un nouveau Graphique</Text></Box> 
-            )
-        }    
-        
-        <Box alignSelf="end" margin="small" direction="row">
-            <Button size="small" icon={<Refresh size='small' />}
-                disabled={readOnly || !dashConfig.chartSettings || dashConfig.chartSettings?.length == 0}
-                label="Rafraichir" onClick={() => refresh()} />   
+                    Aller dans Configuration/Liste d'actions pour renseigner les paramètres de vos actions</Text></Box>
+            )}
 
-            <Button size="small" icon={<Add size='small' />}
-                label="Nouveau" onClick={() => {
-                    // init
-                    const newChart: ChartSettings = {
-                        accountTypes: accountTypes,
-                        brokers: brokers,
-                        title: 'Titre à changer',
-                        additionalShareNames: [],
-                        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
-                        targetDevise: 'EUR',
+            <Box pad="small" direction="row" width="100%" justify="end">
+                { isDefined(dashboardPages) && (<Button size="small" alignSelf="end" icon={editPages ? <Close size='small' /> : <Configure size='small' />} margin="none" label="" onClick={() =>  {setPageEdition(!editPages)}} />)}
+                <Button size="small" alignSelf="end" icon={<Refresh size='small' />}
+                                disabled={props.processRunning}
+                                label="Rafraichir" onClick={() => props.refreshDashboard()} />
+            
+                                                            
+            </Box>
 
-                        indexSelection: ['TEN_WITH_MOST_IMPACTS']
-                    };
-                    
-                    saveDashboardConfig(dashConfig.chartSettings ? {...dashConfig, chartSettings: [...dashConfig.chartSettings, newChart]} 
-                                                                 : {...dashConfig, chartSettings: [newChart]}
-                                        , r => {
-                                            setDashConfig(r); 
-                                            setConfigIndexEdit(dashConfig.chartSettings!.length)
-                                        });                    
-                }} />   
-        </Box>
-
-        <Box width="100%" height="75vh" pad="small" >            
-            {
-                dashCharts?.map((chart, index) => {                    
-                    return (                        
-                        <Box width="100%" height={(dashConfig?.chartSettings?.[index]?.height)+"vh"}
-                                          pad="small" border="all" margin="xxsmall" background="white" flex="grow">
-                            <Box direction="row" margin="small">
-                                <Box flex="grow" direction="column" alignSelf="center">
-                                    <Text alignSelf="center"  margin="0">{chart.mainTitle}</Text>
-                                </Box>
-                                    <Box  direction="row" alignSelf="end"  margin="0" pad="0">
-                                        <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                                plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
-                                                                                                                    { ...c, height: c.height!+10 }
-                                                                                                                    : c ) }
-                                                                                                            , r => setDashConfig(r)) }/>
-                                        <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                                plain={true} label="" onClick={() => saveDashboardConfig({...dashConfig, 
-                                                                                                                chartSettings: dashConfig.chartSettings?.map((c,i) => i === index ? 
-                                                                                                                    { ...c, height: c.height!-10 }
-                                                                                                                    : c ) }
-                                                                                                            , r => setDashConfig(r)) }/>                                        <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
-                                                plain={true} label="" onClick={() =>  setConfigIndexEdit(index)}/>
-                                        <Button fill={false} size="small" alignSelf="start" icon={<Trash size='small' />} gap="xxsmall" margin="xxsmall"
-                                                plain={true} label="" onClick={() =>{
-                                                    confirmAlert({
-                                                        title: 'Etes vous sûr de vouloir supprimer ce graphique?',                                                        
-                                                        buttons: [
-                                                          {
-                                                            label: 'Oui',
-                                                            onClick: () => {
-                                                                setDashCharts(dashCharts.filter((c,i) => i !== index));
-                                                                saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.filter((c,i) => i !== index) }
-                                                                                    , r => setDashConfig(r));                                                     
-                                                            }
-                                                          },
-                                                          {
-                                                            label: 'Non',
-                                                            onClick: () => {}
-                                                          }
-                                                        ]
-                                                      });
-                                                }}/>
-                                    </Box>
-                            </Box>
-                            <LineChart chart={chart}/>
+                {  dashboardPages && dashboardPages.length > 0 && (    
+                    <Collapsible open={!editPages}>
+                    <ThemeContext.Extend
+                    value={{
+                        tabs: {                                
+                            gap: 'none',
+                            header: {
+                                background: 'background-back',                  
+                                extend: 'padding: 4px;',                  
+                            },
+                        },
+                    }}>
+                        <Box margin="small">
+                            <Tabs>           
+                                {
+                                    dashboardPages.map((page, pageIndex) => (
+                                        <Tab title={page.title} key={"page"+pageIndex}>
+                                        <PageUI allEzShare={allEzShares} 
+                                                readOnly={props.processRunning}
+                                                dashboardPage={page}
+                                                savePageUI={(newPage, keepLines, afterSave) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), keepLines, afterSavePage => {
+                                                    setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? (keepLines ? newPage : afterSavePage[i]) : p));
+                                                    afterSave();
+                                                })}
+                                                />              
+                                        </Tab>                      
+                                    ))
+                                }
+                            </Tabs> 
                         </Box>
-                    );
-                })                
-            }            
-        </Box>
-   
+                    </ThemeContext.Extend>
+                    </Collapsible>)
+                }
 
-        { configIndexEdited != -1 && dashConfig.chartSettings  && configIndexEdited < dashConfig.chartSettings.length && (
-            <Layer full position="center" margin="large" onClickOutside={() => setConfigIndexEdit(-1)}  onEsc={() => setConfigIndexEdit(-1)} >
-                <Box margin="medium" height="large" align="center" alignContent="stretch" overflow="auto">
-                    <ChartSettingsEditor
-                        allShares={props.actionWithMsg?.actions ? props.actionWithMsg.actions : []}
-                        chartSettings={dashConfig.chartSettings[configIndexEdited]}
-                        save={newChartSettsValue => 
-                            saveDashboardConfig({...dashConfig, chartSettings: dashConfig.chartSettings?.map((obj, i) => i === configIndexEdited ? newChartSettsValue : obj)}, setDashConfig)}
-                    />
-                </Box>                 
-                <Box direction="row" margin="small" alignSelf="end" alignContent="end" >                        
-                        <Button alignSelf="center" size="small" margin="small" label="Fermer" onClick={() => 
-                            {   
-                                setConfigIndexEdit(-1); 
-                                refresh()}
+                
+                { dashboardPages && editPages && (
+                    <Box  margin={{horizontal: "xlarge", vertical:"medium"}} pad="xsmall">
+                     { dashboardPages.map((page, pageIndex) => (
+                        <Box direction="row" >
+                            <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
+                            readOnly={props.processRunning} value={page.title} label="" onChange={newValue => {
+                                const f: DashboardPageChart[] = dashboardPages.map((p,i) => i === pageIndex ? 
+                                                                {
+                                                                    ...p,
+                                                                    title: newValue
+                                                                } : p);
+                                saveDashboardConfig(f, true, afterSave => setDashboardPages(f));
+                            }
                             }/>
+                            <Button fill={false} icon={<Trash size='medium' color="status-critical"/>} gap="none" margin="none" pad="0"
+                                            label="" onClick={() =>{
+                                                confirmAlert({
+                                                    title: 'Etes vous sûr de vouloir supprimer cette page?',
+                                                    message: 'Tous les graphiques contenu dans cette page seront perdu.',
+                                                    buttons: [
+                                                    {
+                                                        label: 'Oui',
+                                                        onClick: () => { saveDashboardConfig(dashboardPages.filter((p, i) => i !== pageIndex),
+                                                                                 true, afterSave => setDashboardPages(dashboardPages.filter((p, i) => i !== pageIndex))) }
+                                                    },
+                                                    {
+                                                        label: 'Non',
+                                                        onClick: () => {}
+                                                    }
+                                                    ]
+                                                });
+                                            }}/>
+
+                        </Box>
+                     )) }
+                    <Button margin="medium" size="small" alignSelf="start" icon={<Add size='small' />}
+                                disabled={props.processRunning}
+                                label="Nouvelle Page" 
+                                onClick={() => saveDashboardConfig([...dashboardPages, {title: "Titre à changer"}], true,
+                                                     afterSave => setDashboardPages([...dashboardPages, {title: "Titre à changer"}]))} />
+            
                     </Box>
-            </Layer>
-        ) }        
-        </Box>
-    ); 
+                )}
+
+            </>
+    )
+    
 }

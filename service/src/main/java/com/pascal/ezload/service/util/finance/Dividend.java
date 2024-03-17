@@ -22,57 +22,66 @@ import com.pascal.ezload.service.model.EZDevise;
 
 public class Dividend {
 
-        public enum EnumFrequency { MENSUEL, TRIMESTRIEL, SEMESTRIEL, ANNUEL, EXCEPTIONEL }
-        float amount;
-        EZDate detachementDate;
-        EZDate declareDate;
-        EZDate payDate;
-        EZDate recordDate;
-        EZDate date;
-        EnumFrequency frequency;
-        EZDevise devise;
+    public enum EnumFrequency { MENSUEL, TRIMESTRIEL, SEMESTRIEL, ANNUEL, EXCEPTIONEL }
+    private final boolean estimated;
+    private final float amount;
+    private final EZDate detachmentDate;
+    private final EZDate declareDate;
+    private final EZDate payDate;
+    private final EZDate recordDate;
+    private final EZDate date;
+    private final EnumFrequency frequency;
+    private final EZDevise devise;
+    private final String source;
 
-        public Dividend(float amount, EZDate detachementDate, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, EnumFrequency frequency, EZDevise devise) {
-            this.amount = amount;
-            this.detachementDate = detachementDate;
-            this.declareDate = declareDate;
-            this.payDate = payDate;
-            this.recordDate = recordDate;
-            this.date = date;
-            this.frequency = frequency;
-            this.devise = devise;
-        }
 
-        public float getAmount() {
-            return amount;
-        }
-
-        public EZDate getDetachementDate() {
-            return detachementDate;
-        }
-
-        public EZDate getDeclareDate() {
-            return declareDate;
-        }
-
-        public EZDate getPayDate() {
-            return payDate;
-        }
-
-        public EZDate getRecordDate() {
-            return recordDate;
-        }
-
-        public EZDate getDate() {
-            return date;
-        }
-
-        public EnumFrequency getFrequency() {
-            return frequency;
-        }
-
-        public EZDevise getDevise(){
-            return devise;
-        }
-
+    public Dividend(String source, float amount, EZDate detachmentDate, EZDate declareDate, EZDate payDate, EZDate recordDate, EZDate date, EnumFrequency frequency, EZDevise devise, boolean estimated) {
+        this.amount = amount;
+        this.detachmentDate = detachmentDate;
+        this.declareDate = declareDate;
+        this.payDate = payDate;
+        this.recordDate = recordDate;
+        this.date = date;
+        this.frequency = frequency;
+        this.devise = devise;
+        this.estimated = estimated;
+        this.source = source;
     }
+
+    public String getSource(){ return source; }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public EZDate getDetachmentDate() {
+        return detachmentDate;
+    }
+
+    public EZDate getDeclareDate() {
+        return declareDate;
+    }
+
+    public EZDate getPayDate() {
+        return payDate;
+    }
+
+    public EZDate getRecordDate() {
+        return recordDate;
+    }
+
+    public EZDate getDate() {
+        return date;
+    }
+
+    public EnumFrequency getFrequency() {
+        return frequency;
+    }
+
+    public EZDevise getDevise(){
+        return devise;
+    }
+
+    public boolean isEstimated() { return estimated; }
+
+}

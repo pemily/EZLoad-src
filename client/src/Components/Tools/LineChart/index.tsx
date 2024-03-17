@@ -15,50 +15,90 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea } from "grommet";
-import { useState, useRef } from "react";
-import { Download } from 'grommet-icons';
-import { Chart, ChartLine, AuthInfo, EzProcess, EzProfil, ValueWithLabel } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion } from '../../../ez-api/tools';
+import { Box } from "grommet";
+import { Chart, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
-
+import { isDefined } from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
-import { createNextState } from "@reduxjs/toolkit";
 
 export interface LineChartProps {
-    chart: Chart;    
+    chart: Chart;        
+    showLegend: boolean;
 }      
+ 
 
+const computeXPeriod = (chartGroupBy : "DAILY" | "MONTHLY" | "YEARLY" | undefined) : 'day' | 'month' | 'year' => {
+    if (chartGroupBy === undefined) return "day";
+    if (chartGroupBy === "DAILY") return "day";
+    if (chartGroupBy === "MONTHLY") return "month";
+    return "year";
+}
+
+const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', timeLabels: Label[]) : object[] => {    
+    if (computedPeriod === 'month') {        
+        const r : number[] = timeLabels.filter(l => l.endOfMonth).map(t => {            
+            return t.time!;            
+        });
+        return r as any[] as object[];
+    }
+    else if (computedPeriod === 'year') {
+        const r : string[] = timeLabels.filter(l => l.endOfYear).map(t => {            
+            const d = new Date(t.time!);
+            return d.getFullYear()+'';
+        });
+        return r as any[] as object[];
+    }    
+    return timeLabels.map(l => l.time) as any[] as object[];
+}
 
 export function LineChart(props: LineChartProps){
     const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
-    const lineIsVisible : boolean[] = [];
-    const [browserFileVisible, setBrowserFileVisible] = useState<boolean>(false);
+    const lineIsVisible : boolean[] = [];    
+
+   // const chartRef = useRef<ChartJS|undefined>(undefined); // https://reacthustle.com/blog/how-to-customize-events-in-chartjs-3-with-react?expand_article=1
+   function getIndex(indexId: string) : ChartIndex {
+     return props.chart.indexSelection?.filter(i => i.id === indexId)[0]!
+   } 
+
 
     if (props.chart.lines) {
         for (var i = 0; i < props.chart.lines?.length ; i++){
-            lineIsVisible[i] = props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
+            lineIsVisible[i] = true; // props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
         }
     }
 
     if (!props.chart.lines){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
-    
-    const lines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
+
+    const computedPeriod = computeXPeriod(props.chart.groupedBy);
+    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels!);    
+    const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
         {            
+            const richValuesFiltered : RichValue[] | undefined = !isDefined(chartLine.richValues) ? undefined : computedPeriod === "day" ? chartLine.richValues :
+                                                                    computedPeriod === "month" ? chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
+                                                                    chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);            
+
+            const lineIndex : ChartIndex = getIndex(chartLine.indexId!);
             if (chartLine.lineStyle === "BAR_STYLE"){
                 var conf : ChartDataset<any, DefaultDataPoint<ChartType>> = {    
                     type: 'bar',             
                     hidden: !lineIsVisible[index],
                     label: chartLine.title,
-                    data: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
-                    tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
-                    borderColor: chartLine.colorLine,
-                    backgroundColor: chartLine.colorLine,
-                    yAxisID: chartLine.axisSetting              
+                    data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
+                    tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
+                    backgroundColor: (ctx: any, v: any) => {
+                        // affiche les valeurs estimé en transparence
+                        if (richValuesFiltered?.at(ctx.dataIndex)?.estimated)
+                            return lineIndex.colorLine?.substring(0,lineIndex.colorLine?.lastIndexOf(','))+',0.2)'
+                        return lineIndex.colorLine;
+                    },
+                    yAxisID: chartLine.yaxisSetting,                    
+                    borderWidth: 0,    
+                    borderColor: lineIndex.colorLine,
+                    inflateAmount: 3
                 };  
                 return conf;     
             }
@@ -66,14 +106,18 @@ export function LineChart(props: LineChartProps){
              type: 'line',          
              hidden: !lineIsVisible[index],    
              label: chartLine.title,
-             data: chartLine.values === null ?  chartLine.valuesWithLabel?.map(v => v.value) : chartLine.values,
-             tooltips: chartLine.values === null ? chartLine.valuesWithLabel?.map(v => v.label) : undefined,
-             borderColor: chartLine.colorLine,
-             backgroundColor: chartLine.colorLine,
+             data: richValuesFiltered?.map(v => isDefined(v) ? v.value : undefined),
+             tooltips: richValuesFiltered?.map(v => isDefined(v) ? v.label : undefined),
+             borderColor: lineIndex.colorLine,
+             backgroundColor: lineIndex.colorLine,
              borderWidth: 1,
-             yAxisID: chartLine.axisSetting,        
+             yAxisID: chartLine.yaxisSetting,
              fill: false,
-             cubicInterpolationMode: 'monotone', 
+             cubicInterpolationMode: 'monotone',
+             segment: {
+                // affiche les valeurs estimé en pointillé
+                borderDash: (ctx: any, value: any) => richValuesFiltered?.at(ctx.p1DataIndex)?.estimated || richValuesFiltered?.at(ctx.p2DataIndex)?.estimated ? [1,4] : undefined
+             },
              tension: 0.4, // le niveau de courbure    
              pointStyle: 'circle',
              pointRadius: 1,// la taille du point
@@ -84,42 +128,48 @@ export function LineChart(props: LineChartProps){
 
 
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
-        labels: props.chart.labels,
-        datasets: lines
+        labels: finalLabels,
+        datasets: finalLines
     };
 
+    
     const options: ChartOptions ={
         responsive: true, // pour que le canvas s'agrandisse/diminue quand on resize la fenetre
         maintainAspectRatio: false,
         interaction: {
-            mode: 'x', // on suit la sourie sur l'axe des X pour afficher les infos des courbes
-            intersect: false, // false: affiche les infos du points dès que la souris est sur un axe            
+            mode: "nearest", // on suit la sourie sur l'axe des X pour afficher les infos des courbes
+            intersect: false, // false: affiche les infos du points dès que la souris est sur un axe                                                
+            axis: "xy",
         },
         plugins: {
             title: {
                 display: false,
-                text: props.chart.mainTitle
+                text: props.chart.title
             },
             tooltip: {
                 enabled: true,
-                position: "nearest",                
+                position: "nearest",     
+                titleAlign: 'center',
                 callbacks: {
                     label: function(context: any) {
                         // https://www.chartjs.org/docs/latest/configuration/tooltip.html    
                         if (context.raw === null || context.raw === undefined) 
                             return "";
-                        if (context.dataset.tooltips){
-                            const valueWithLabel : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
-                            if (valueWithLabel.indexOf(":") == -1)
-                                return context.dataset.label+': '+valueWithLabel;
-                            return context.dataset.label+' '+valueWithLabel;
+                        if (context.dataset.tooltips){                            
+                            const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
+                            /* if (richValue.indexOf(":") === -1)
+                                return context.dataset.label+': '+richValue; */
+                            return richValue;
                         }
-                        return context.dataset.label+': '+context.raw;
+                        // ajout de l'unité automatiquement                        
+                        return context.dataset.label+': '+context.formattedValue
+                                                    +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 
+                                                            context.dataset.yAxisID === 'NB' ? '' : ' '+props.chart.axisId2titleY?.Y_AXIS_TITLE);
                     }
                 }
             },
             legend: {
-                display: true,                
+                display: props.showLegend,                
                 position: 'top' as const,               
                 onClick: function(e: any, legendItem: LegendItem, legend: LegendElement<any>) {
                     // Afffiche/Cache toutes les courbes qui on le meme nom de legend d'un seul coup
@@ -131,7 +181,7 @@ export function LineChart(props: LineChartProps){
                     // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
                     let hidden = lineIsVisible[legendItem.datasetIndex!]; //  !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;                            
                     ci.data.datasets?.forEach((dataset: ChartDataset<any,any>, datasetIndex: number) => {
-                        if (dataset.label == legendItem.text) {
+                        if (dataset.label === legendItem.text) {
                             ci.getDatasetMeta(datasetIndex).hidden = hidden;                
                             lineIsVisible[datasetIndex] =  !hidden;
                         }
@@ -158,7 +208,7 @@ export function LineChart(props: LineChartProps){
                         });
                         return result;
                     }                    
-                },                
+                },   
             }
         },
         scales: {
@@ -167,77 +217,77 @@ export function LineChart(props: LineChartProps){
                 // https://github.com/chartjs/chartjs-adapter-date-fns
                type: "time",
                time: {
-                    unit: "month",                                        
-               },
+                    unit: computedPeriod === "day" ? "month" : computedPeriod,          
+                    tooltipFormat: computedPeriod === "day" ? "dd/MM/yyyy" : computedPeriod === "month" ? "MM/yyyy" : "yyyy"
+               },               
                adapters: { 
                     date: {
-                      locale: fr, 
-                    },
-               },                 
+                      locale: fr,                       
+                    },                    
+               },             
                display: true,
                title: {
-                    display: true,
+                    display: true,                    
                     text: props.chart.axisId2titleX!['x']
-               },
+               },               
                ticks: {
-                    // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-                   /* callback: function(val, index) {                        
-                        var d = this.getLabelForValue(index).split("/");                                                
-                        
-                        return d[1]+'-'+d[2].substring(2);
-                    },*/
-                    source: "auto",
+                    source: "labels",
                     maxRotation: 0, // Disabled rotation for performance
-                    autoSkip: true,                    
-                    autoSkipPadding: 25,
+                    autoSkip: true,         
+                    autoSkipPadding: 25,                    
                     crossAlign: "near",
-                    align: 'start'
+                    align: 'start',
 
                },
                grid: {
                     drawBorder: false,
-                    color: '#000000',                    
+                    color: '#000000',                                        
                }
-            },
+            },          
             PERCENT: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "PERCENT").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                   display: true,
                   text: '%'
-                }
+                },
             },
             PORTFOLIO: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "PORTFOLIO").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                }
+                },        
             },        
             NB: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "NB").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: false
-                }
+                },
             },                         
             SHARE: {
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "SHARE").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
                 position: 'left',
+                beginAtZero: true,
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                }
+                },
             },                      
             DEVISE:{
                 type: 'linear',
-                display: props.chart.lines.filter(l => l.axisSetting === "DEVISE").length > 0,
+                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
                 position: 'right',
+                beginAtZero: true,
                 title: {
                   display: true,
                   text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
@@ -245,7 +295,7 @@ export function LineChart(props: LineChartProps){
                 // grid line settings
                 grid: {
                     drawOnChartArea: false, // only want the grid lines for one axis to show up
-                },                
+                },             
             }
         }
     }
@@ -254,6 +304,6 @@ export function LineChart(props: LineChartProps){
     ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
 
     return (
-        <ReactChartJS type="line" data={config}  options={options} />           
+        <ReactChartJS type="line" data={config}  options={options} />                   
     ); 
 }

@@ -17,72 +17,166 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChartsTools {
+    public enum PERIOD_INTERVAL {
+        DAY, MONTH, YEAR
+    }
 
-    public static List<EZDate> getDatesSample(EZDate from, EZDate to, int nbOfPoint){
-        if (nbOfPoint < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
-        long nbOfTotalDays = from.nbOfDaysTo(to);
-        if (nbOfTotalDays+1 < nbOfPoint) nbOfPoint = (int) nbOfTotalDays;
 
-        var allDates = new ArrayList<EZDate>(nbOfPoint);
-
-        nbOfPoint = nbOfPoint - 1; // because I add the last one at the end
-        float intervalSpace = ((float)nbOfTotalDays / (float)nbOfPoint );
-
-        for (int i = 0; i < nbOfPoint; i++){
-            allDates.add(from.plusDays((int)(intervalSpace * (float)i)));
+    public static List<EZDate> getDatesSample(EZDate from, EZDate to, PERIOD_INTERVAL period, int approximativeNbOfPoints){
+        if (approximativeNbOfPoints < 3) throw new IllegalArgumentException("NbOfPoint must be greater than 2");
+        int intervalSpace = 0;
+        if (period == PERIOD_INTERVAL.DAY) {
+            long nbOfTotalDates = from.nbOfDaysTo(to);
+            if (nbOfTotalDates + 1 < approximativeNbOfPoints) approximativeNbOfPoints = (int) nbOfTotalDates;
+            intervalSpace = Math.round((float) nbOfTotalDates / (float) approximativeNbOfPoints);
+            if (intervalSpace > 25) intervalSpace = 25;
+            if (intervalSpace == 0) intervalSpace = 1;
         }
-        allDates.add(to);
+
+        EZDate previousDate = from;
+        if (period == PERIOD_INTERVAL.MONTH){
+            previousDate = EZDate.monthPeriod(from.getYear(), from.getMonth());
+        }
+        else if (period == PERIOD_INTERVAL.YEAR){
+            previousDate = EZDate.yearPeriod(from.getYear());
+        }
+
+
+        List<EZDate> allDates = new ArrayList<>();
+        allDates.add(switch (period){
+                        case DAY -> from;
+                        case MONTH -> EZDate.monthPeriod(from.getYear(), from.getMonth());
+                        case YEAR -> EZDate.yearPeriod(from.getYear());
+                    });
+
+        while(previousDate.isBefore(to)){
+            EZDate newDate = null;
+            if (period == PERIOD_INTERVAL.DAY) {
+                newDate = previousDate.plusDays(intervalSpace);
+                if (newDate.plusDays(intervalSpace).getMonth() != newDate.getMonth()){
+                    // la prochaine date on changera de mois, donc le newDate va etre placé sur le dernier jour du mois:
+                    newDate = new EZDate(newDate.getYear(), newDate.getMonth(), newDate.lengthOfMonth());
+                }
+                if (newDate.isAfter(to)){
+                    newDate = to;
+                }
+            }
+            else if (period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR) {
+                newDate = previousDate.createNextPeriod();
+
+            }
+            allDates.add(newDate);
+            previousDate = newDate;
+        }
 
         return allDates;
     }
 
-    public static Chart createChart(List<EZDate> dates) {
-        Chart chart = new Chart();
-        chart.setLabels(dates.stream().map(ChartsTools::date2Label).collect(Collectors.toList()));
+    public static Chart createChart(ChartSettings chartSettings, List<EZDate> dates) {
+        Chart chart = new Chart(chartSettings);
+
+        List<ChartsTools.Label> r = new LinkedList<>();
+        EZDate previousDate = null;
+        for (EZDate d : dates){
+            if (previousDate != null){
+                r.add(ChartsTools.date2Label(previousDate,
+                        previousDate.getMonth() != d.getMonth() || previousDate.getYear() != d.getYear(),
+                        previousDate.getYear() != d.getYear()));
+            }
+            previousDate = d;
+        }
+        if (previousDate != null){
+            r.add(ChartsTools.date2Label(previousDate, true, true));
+        }
+
+        chart.setLabels(r);
         return chart;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, Prices prices){
-        return createChartLine(chart, lineStyle, axisSetting, lineTitle, prices.getPrices()
-                .stream()
-                .map(PriceAtDate::getPrice).collect(Collectors.toList()));
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+        return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
+                                                                                        .stream()
+                                                                                        .map(pd -> {
+                                                                                            if (pd.getValue() == null ) return null;
+                                                                                            if (removeZeroValues && pd.getValue() == 0) return null;
+                                                                                            float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
+                                                                                            ChartLine.RichValue v = new ChartLine.RichValue();
+                                                                                            v.setEstimated(pd.isEstimated());
+                                                                                            v.setValue(pd.getValue());
+                                                                                            String unit = prices.getDevise().getSymbol();
+                                                                                            if (YAxisSetting == ChartLine.Y_AxisSetting.PERCENT) unit="%";
+                                                                                            else if (YAxisSetting == ChartLine.Y_AxisSetting.NB) unit = "";
+                                                                                            v.setLabel(pd.getDate().toEzPortoflioDate()+": "+roundValue+unit); // le label de la valeur
+                                                                                            return v;
+                                                                                        }).collect(Collectors.toList())
+                                );
     }
 
-    public static ChartLine createChartLineWithLabels(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<ChartLine.ValueWithLabel> values){
-        if (chart.getLabels().size() != values.size()){
-            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
-        }
+    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValuesWithLabel(values);
-        chartLine.setAxisSetting(axisSetting);
-        chart.getLines().add(chartLine);
+        chartLine.setRichValues(values);
+        chartLine.setYAxisSetting(YAxisSetting);
         return chartLine;
     }
 
-    public static ChartLine createChartLine(Chart chart, ChartLine.LineStyle lineStyle, ChartLine.AxisSetting axisSetting, String lineTitle, List<Float> values){
-        if (chart.getLabels().size() != values.size()){
-            throw new IllegalStateException("La liste "+lineTitle+" n'a pas le meme nombre d'elements que les labels");
-        }
+    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<Float> values, boolean removeZeroValues){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
-        chartLine.setValues(values);
-        chartLine.setAxisSetting(axisSetting);
-        chart.getLines().add(chartLine);
+        chartLine.setValues(values.stream().map(f -> (f == null || (f == 0 && removeZeroValues)) ? null : f).collect(Collectors.toList()));
+        chartLine.setYAxisSetting(YAxisSetting);
         return chartLine;
     }
 
-    public static long date2Label(EZDate date){
-        return date.toEpochSecond()*1000;
+    public static Label date2Label(EZDate date, boolean endOfMonth, boolean endOfYear){
+        Label l = new Label(date);
+        l.setEndOfMonth(endOfMonth);
+        l.setEndOfYear(endOfYear);
+        return l;
+    }
+
+    public static class Label {
+        private long time;
+        private boolean endOfMonth;
+        private boolean endOfYear;
+
+        public Label(){}
+        public Label(EZDate date){
+            this.time = date.toEpochSecond()*1000;
+        }
+
+        public long getTime() {
+            return time;
+        }
+
+        public void setTime(long time) {
+            this.time = time;
+        }
+
+        public boolean isEndOfMonth() {
+            return endOfMonth;
+        }
+
+        public void setEndOfMonth(boolean endOfMonth) {
+            this.endOfMonth = endOfMonth;
+        }
+
+        public boolean isEndOfYear() {
+            return endOfYear;
+        }
+
+        public void setEndOfYear(boolean endOfYear) {
+            this.endOfYear = endOfYear;
+        }
     }
 }

@@ -21,13 +21,17 @@ import com.pascal.ezload.service.model.*;
 import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.*;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.http.HttpResponse;
+
 public class GoogleTools {
 
     public static String googleCodeReversed(String googleCode) {
         // ezPortfolio contien: NASDAQ: TSLA, mais la recherche utilise: TSLA:NASDAQ
         if (googleCode == null) return null;
-        String codes[] = StringUtils.divide(googleCode, ':');
-        if (codes.length > 1){
+        String[] codes = StringUtils.divide(googleCode, ':');
+        if (codes != null){
             return codes[1]+":"+codes[0];
         }
         return googleCode;
@@ -35,35 +39,38 @@ public class GoogleTools {
 
 
     // Warning, only the today date is inside this Prices list
-    static public Prices getCurrentPrice(Reporting reporting, HttpUtilCached cache, EZShare ezShare) throws Exception {
-        if (!StringUtils.isBlank(ezShare.getGoogleCode())) {
-            String url = "https://www.google.com/finance/quote/"+googleCodeReversed(ezShare.getGoogleCode());
+    static public Prices getCurrentPrice(Reporting reporting, HttpUtilCached cache, String googleCode) throws Exception {
+        if (!StringUtils.isBlank(googleCode)) {
+            String url = "https://www.google.com/finance/quote/"+googleCodeReversed(googleCode);
             long cachePerMinute =  EZDate.today().toEpochSecond()/60;
-            return cache.get(reporting, "google_quote_"+ezShare.getGoogleCode()+"_"+cachePerMinute, url, inputStream -> {
-                String page = FileUtil.inputStream2String(inputStream);
-                // <div class="YMlKec fxKbKc">299,68&nbsp;$</div>
-                String[] data = StringUtils.divide(page, "<div class=\"YMlKec fxKbKc\">");
-                if (data != null && data.length == 2) {
-                    data = StringUtils.divide(data[1], "</div>");
-                    if (data != null) {
-                        String deviseStr = data[0].charAt(0)+"";  // data[0] can be $1354 or GBX 46854
-                        int firstSeparator = data[0].indexOf(160);
-                        if (firstSeparator != -1){
-                            deviseStr = data[0].substring(0, firstSeparator);
+            return cache.get(reporting, "google_quote_"+googleCode+"_"+cachePerMinute, url,
+                    () -> HttpUtil.downloadV2(url, HttpUtil.chromeHeader(), inputStream -> inputStream),
+                inputStream -> {
+                    String page = FileUtil.inputStream2String(inputStream);
+                    // <div class="YMlKec fxKbKc">299,68&nbsp;$</div>
+                    String[] data = StringUtils.divide(page, "<div class=\"YMlKec fxKbKc\">");
+                    if (data != null && data.length == 2) {
+                        data = StringUtils.divide(data[1], "</div>");
+                        if (data != null) {
+                            String deviseStr = data[0].charAt(0)+"";  // data[0] can be $1354 or GBX 46854
+                            int firstSeparator = data[0].indexOf(160);
+                            if (firstSeparator != -1){
+                                deviseStr = data[0].substring(0, firstSeparator);
+                            }
+                            EZDevise devise = DeviseUtil.foundBySymbolOrCode(deviseStr);
+                            Prices prices = new Prices();
+                            EZDate today = EZDate.today();
+                            prices.setLabel(googleCode+" (Prix du jour uniquement)");
+                            prices.setDevise(devise);
+                            prices.addPrice(new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(deviseStr.length())), false));
+                            return prices;
                         }
-                        EZDevise devise = DeviseUtil.foundBySymbolOrCode(deviseStr);
-                        Prices prices = new Prices();
-                        EZDate today = EZDate.today();
-                        prices.setLabel(ezShare.getEzName()+" (Prix du jour uniquement)");
-                        prices.setDevise(devise);
-                        prices.addPrice(today, new PriceAtDate(today, NumberUtils.str2Float(data[0].substring(deviseStr.length()))));
-                        return prices;
                     }
+                    throw new HttpUtil.DownloadException("Pas de Prix trouvé avec Google pour "+googleCode);
                 }
-                return null;
-            });
+            );
         }
-        return null;
+        throw new HttpUtil.DownloadException("Pas de code Google");
     }
 
 }

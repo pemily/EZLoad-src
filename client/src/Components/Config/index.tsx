@@ -15,16 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Anchor, Tab, Tabs, Box, Heading, Form, Button, Text, CheckBox, Table, TableHeader, TableRow, TableCell, TableBody, Markdown, Layer, FileInput } from "grommet";
+import { Tab, Tabs, Box, Button } from "grommet";
 import { Add, LineChart, Configure } from 'grommet-icons';
-import { saveEzProfile, savePassword, jsonCall, ezApi, getChromeVersion, valued, saveMainSettings } from '../../ez-api/tools';
 import { MainSettings, AuthInfo, EZShare, ActionWithMsg, EzProcess, BourseDirectEZAccountDeclaration, EzProfil } from '../../ez-api/gen-api/EZLoadApi';
 import { useState  } from "react";
-import { TextField } from '../Tools/TextField';
-import { ComboField } from '../Tools/ComboField';
-import { ConfigStartDate } from '../ConfigStartDate';
-import { Help } from '../Tools/Help';
-import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { ConfigPortfolioConnection } from "../ConfigPortfolioConnection";
 import { ShareValues } from "../ShareValues";

@@ -74,7 +74,7 @@ export function ViewLog(props: ViewLogProps) {
     return (<Box id="ProcessOutput" pad="medium" >   
             <Text margin="small" size="xlarge" alignSelf="center">{valued(props.ezProcess?.title)}</Text>
             <Text>{valued(props.ezProcess?.logFile)}</Text>
-            { (props.ezProcess === "") && (
+            { props.ezProcess === undefined && (
                 <Text>Pas de tâche en cours</Text>
               )}                        
               <Fragment>

@@ -74,9 +74,9 @@ public class ProcessManager {
                     try {
                         processLogger.header(processLogger.getReporting().escape(title));
                         runnable.run(processLogger);
-                    } catch (Exception e) {
-                        processLogger.getReporting().error(e);
+                    } catch (Throwable e) {
                         e.printStackTrace();
+                        processLogger.getReporting().error(e);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

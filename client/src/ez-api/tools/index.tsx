@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardSettings } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPageChartSettings, Chart, ChartSettings } from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -30,6 +30,9 @@ export function valued(v: string|undefined|null) : string {
   return v ? v : "";
 }
 
+export function isDefined(v: any) : boolean {
+  return v !== undefined && v !== null;
+}
 
 export function jsonCall(promise: Promise<HttpResponse<any, any>>):  Promise<any> {
     return promise.then(httpResponse => {
@@ -47,6 +50,30 @@ export function textCall(promise: Promise<HttpResponse<any, any>>):  Promise<str
 }
 
 
+// return true if the text contains the EZLoad signature => the user did not touch it
+export function isTextContainsEZLoadSignature(text: string | undefined | null) : boolean{
+  if (text === undefined || text === null || text.trim().length === 0){
+      return true;
+  }
+  return text.startsWith(" ") && text.endsWith("\t ");
+}
+
+export function applyEZLoadTextSignature(text: string) : string {
+  var result = text;
+  if (!text.startsWith(" ")){
+      result = " "+result;
+  }
+  if (!text.endsWith("\t ")){
+      result = result  + "\t ";
+  }
+  return result;
+}
+
+
+// Pour ne pas risquer de supprimer la signature, si il y en a une
+export function updateEZLoadTextWithSignature(oldValue: string | undefined | null, newValue: string) : string {
+  return newValue.trim() === oldValue?.trim() ? oldValue : newValue
+}
  
 // onText return true if it wants to stop the streaming
 export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (value: string) => boolean, onDone: () => void): Promise<any>{    
@@ -77,9 +104,23 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-export function saveDashboardConfig(dashConfig: DashboardSettings, updModel: (dashConfig: DashboardSettings) => void){      
-  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig))
-    .then(r => updModel(r))
+function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {  
+  var c: Chart = {
+      ...chart,
+      lines: undefined,
+      labels: undefined,
+      axisId2titleX: undefined
+  };
+  delete c.lines;
+  delete c.labels;
+  delete c.axisId2titleX;
+  delete c.axisId2titleY;
+  return c;
+}
+
+export function saveDashboardConfig(dashConfig: DashboardPageChartSettings[], keepLines: boolean, updModel: (dashConfig: DashboardPageChartSettings[]) => void){        
+  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => { return {...page, charts: page.charts?.map(chart2ChartSettings)}})))
+    .then(r => updModel(keepLines ? dashConfig : r))
     .catch(e => console.error("Save Dashboard Error: ", e));
 }
 
@@ -102,6 +143,9 @@ export function savePassword(courtier: 'BourseDirect', username: string|undefine
     .catch(e => console.error("Save Password Error: ", e));
 }
 
+export function genUUID(){
+  return crypto.randomUUID();
+}
 
 export function getChromeVersion() : string {
   let pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);

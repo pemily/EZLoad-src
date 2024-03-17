@@ -17,32 +17,31 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.ChartSettings;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class Chart {
+public class Chart extends ChartSettings {
 
-    private String mainTitle;
     private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
-    private List<Object> labels = new LinkedList<>();
+    private List<ChartsTools.Label> labels = new LinkedList<>();
     private List<ChartLine> lines = new LinkedList<>();
 
-    public List<Object> getLabels() {
+    public Chart(ChartSettings chartSettings){
+        super(chartSettings);
+    }
+
+    public Chart(){}
+
+    public List<ChartsTools.Label> getLabels() {
         return labels;
     }
 
-    public void setLabels(List<Object> labels) {
+    public void setLabels(List<ChartsTools.Label> labels) {
         this.labels = labels;
-    }
-
-    public String getMainTitle() {
-        return mainTitle;
-    }
-
-    public void setMainTitle(String mainTitle) {
-        this.mainTitle = mainTitle;
     }
 
     public Map<String, String> getAxisId2titleX() {
@@ -68,4 +67,5 @@ public class Chart {
     public void setLines(List<ChartLine> lines) {
         this.lines = lines;
     }
+
 }

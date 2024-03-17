@@ -20,7 +20,7 @@ import { Box, Layer, Anchor, Spinner, Button, Text, TextArea } from "grommet";
 import { Catalog } from 'grommet-icons';
 import { TextAreaField } from '../../Tools/TextAreaField';
 import { CommonFunctions} from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, textCall, ruleToFilePath } from '../../../ez-api/tools';
+import { ezApi, jsonCall, textCall } from '../../../ez-api/tools';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 

@@ -60,14 +60,11 @@ public class ChromeDriverTools {
     }
 
     private static String getOsName(){
-        switch (OSUtil.getOS()) {
-            case WINDOWS: return "win32";
-            case MAC: return "mac64";
-            case LINUX: return "linux64";
-            case SOLARIS:
-            case OTHER:
-            default:
-                throw new IllegalStateException("Your OS is not supported!");
-        }
+        return switch (OSUtil.getOS()) {
+            case WINDOWS -> "win32";
+            case MAC -> "mac64";
+            case LINUX -> "linux64";
+            case SOLARIS, OTHER -> throw new IllegalStateException("Your OS is not supported!");
+        };
     }
 }

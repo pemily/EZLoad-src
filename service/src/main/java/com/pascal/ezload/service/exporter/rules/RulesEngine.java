@@ -332,11 +332,11 @@ public class RulesEngine {
                 // recherche les dividendes sur seekingalpha
                 Optional<EZShare> ezAction = mainSettings.getEzLoad().getEZActionManager(settingsManager).getFromGoogleTicker(ezPortefeuilleEdition.getTickerGoogleFinance());
                 if (ezAction.isEmpty()) return false;
-                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager(settingsManager).searchDividends(reporting, ezAction.get(), EZDate.today().minusYears(2), EZDate.today());
+                List<Dividend> dividends = mainSettings.getEzLoad().getEZActionManager(settingsManager).searchDividends(reporting, ezAction.get(), EZDate.today().minusYears(2));
                 if (dividends == null) return false;
 
                 if (ezProfil.getAnnualDividend().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)
-                    result |= new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
+                    result = new AnnualDividendsAlgo().compute(reporting, ezPortefeuilleEdition, ezProfil.getAnnualDividend(), dividends);
 
                 if (ezProfil.getDividendCalendar().getYearSelector() != MainSettings.EnumAlgoYearSelector.DISABLED)
                     result |= new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);

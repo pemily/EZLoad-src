@@ -15,23 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Anchor, Button, Text, TextArea, Grid, Layer, Calendar, CheckBox, Heading } from "grommet";
-import { useState, useRef, useEffect } from "react";
-import { Add, Download, SchedulePlay } from 'grommet-icons';
-import { AuthInfo, Chart, EzProcess, EzProfil, DashboardData, ChartSettings, EZShare } from '../../../ez-api/gen-api/EZLoadApi';
-import { ezApi, jsonCall, getChromeVersion, saveDashboardConfig } from '../../../ez-api/tools';
+import { Box, Button, Card, CardBody, CardHeader, Tab, Tabs } from "grommet";
+import { Trash } from 'grommet-icons';
+import { useState } from "react";
+import { ChartIndex, ChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
-import { CheckBoxField } from '../../Tools/CheckBoxField';
-import { ComboField } from '../../Tools/ComboField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
-import { ComboMultiple } from '../../Tools/ComboMultiple';
-import { LineChart } from '../../Tools/LineChart';
+import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
+import { TextAreaField } from "../../Tools/TextAreaField";
+import { ChartIndexMainEditor, getChartIndexDescription, getChartIndexTitle } from "../ChartIndexMainEditor";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 export interface ChartSettingsEditorProps {    
     chartSettings: ChartSettings;
-    allShares: EZShare[];
-    save: (chartSettings: ChartSettings) => void;
+    allEzShares: EzShareData[];    
+    readOnly: boolean;
+    save: (chartSettings: ChartSettings, keepLines: boolean, afterSave: () => void) => void;
 }      
+
+
 export const brokers = ["Autre",
                             "Axa Banque",
                             "Binck",
@@ -60,200 +64,251 @@ export const brokers = ["Autre",
 export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assurance-Vie"];
 
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
-
-
-    function organizeIndexes(newValue: any[]): any[]{    
-        if (newValue.indexOf('CURRENT_SHARES') !== -1
-             && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('CURRENT_SHARES') === -1)){
-                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'ALL_SHARES');
-        }
-        else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
-             && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
-                newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
-        }
-        else if (newValue.indexOf('ALL_SHARES') !== -1
-            && (!props.chartSettings.indexSelection || props.chartSettings.indexSelection.indexOf('ALL_SHARES') === -1)){
-                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
-        }
-        return newValue;        
-    }
-
-    function organizePerfIndexes(newValue: any[]): any[]{    
-       /* if (newValue.indexOf('CURRENT_SHARES') !== -1
-             && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('CURRENT_SHARES') === -1)){
-                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'ALL_SHARES');
-        }
-        else if (newValue.indexOf('TEN_WITH_MOST_IMPACTS') !== -1
-             && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('TEN_WITH_MOST_IMPACTS') === -1)){
-                newValue = newValue.filter(f => f !== 'CURRENT_SHARES' && f !== 'ALL_SHARES');
-        }
-        else if (newValue.indexOf('ALL_SHARES') !== -1
-            && (!props.chartSettings.perfIndexSelection || props.chartSettings.perfIndexSelection.indexOf('ALL_SHARES') === -1)){
-                newValue = newValue.filter(f => f !== 'TEN_WITH_MOST_IMPACTS' && f !== 'CURRENT_SHARES');
-        }*/
-        return newValue;        
-    }
+    const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
+    function nouvelIndice() : ChartIndex {
+        const chartIndex : ChartIndex = {       
+                id: genUUID(),
+                graphStyle: 'LINE',
+                portfolioIndexConfig: {
+                    portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+                }        
+            }
+        chartIndex.description = getChartIndexDescription(chartIndex);
+        chartIndex.label = getChartIndexTitle(chartIndex);        
+        return chartIndex;
+    }
+
     return (            
-        <Box direction="column" margin="small" pad="none" alignSelf="start" width="95%">
-            <TextField id="title" label="Titre"
-                    value={props.chartSettings.title}
-                    isRequired={true}                     
-                    readOnly={false}                    
-                    onChange={newValue => props.save({...props.chartSettings, title: newValue})}/>
-            
-            <ComboFieldWithCode id="startDateSelection"
-                            label="Date de début du Graphe"
-                            errorMsg={undefined}
-                            readOnly={false}
-                            selectedCodeValue={props.chartSettings.selectedStartDateSelection ? props.chartSettings.selectedStartDateSelection : 'FROM_MY_FIRST_OPERATION'}
-                            codeValues={['FROM_MY_FIRST_OPERATION', 'ONE_YEAR','TWO_YEAR','THREE_YEAR','FIVE_YEAR','TEN_YEAR']}                            
-                            userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans"]}
-                            description=""
-                            onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue})}/>
+        <Box direction="column" alignSelf="start" width="95%" >
+            <Tabs activeIndex={indiceIndex} justify="start"
+                            onActive={(nextIndex) => {                                    
+                                    if (nextIndex > props.chartSettings.indexSelection!.length) {
+                                        // on clique sur +
+                                        props.save(
+                                            {...props.chartSettings,
+                                                indexSelection: props.chartSettings.indexSelection === undefined ?
+                                                                [nouvelIndice()] : [...props.chartSettings.indexSelection, nouvelIndice()]
+                                            }, false, () => { setIndiceIndex(nextIndex); }
+                                        )
+                                    }
+                                    else setIndiceIndex(nextIndex);
+                                }                                
+            }>
+                <Tab title="Graphique" >
+                    <Box pad={{ vertical: 'none', horizontal: 'small' }}>
+                        <TextField id="title" label="Titre"
+                                value={props.chartSettings.title}
+                                isRequired={true}                     
+                                readOnly={false}                    
+                                onChange={newValue => {
+                                    props.save({...props.chartSettings, title: newValue}, true, () => {});
+                                }}/>
+                        
+                        <ComboFieldWithCode id="startDateSelection"
+                                        label="Date de début du Graphique"
+                                        errorMsg={undefined}
+                                        readOnly={false}
+                                        selectedCodeValue={props.chartSettings.selectedStartDateSelection ? props.chartSettings.selectedStartDateSelection : 'FROM_MY_FIRST_OPERATION'}
+                                        codeValues={['FROM_MY_FIRST_OPERATION', 'ONE_YEAR','TWO_YEARS','THREE_YEARS','FIVE_YEARS','TEN_YEARS', 'TWENTY_YEARS']}                            
+                                        userValues={["Début de mes Opérations", "1 an", "2 ans", "3 ans", "5 ans", "10 ans", "20 ans"]}
+                                        description=""
+                                        onChange={newValue  => props.save({...props.chartSettings, selectedStartDateSelection: newValue}, false, () => {})}/>
+
+                        <ComboFieldWithCode id="GroupBy"
+                                                    label="Période"
+                                                    errorMsg={undefined}
+                                                    readOnly={props.readOnly}
+                                                    selectedCodeValue={props.chartSettings.groupedBy! }
+                                                    userValues={[                             
+                                                        'Par jour',                                
+                                                        'Par mois',
+                                                        'Par an'
+                                                    ]}
+                                                    codeValues={[
+                                                        'DAILY',
+                                                        'MONTHLY',                                    
+                                                        'YEARLY'
+                                                    ]}
+                                                    description=""
+                                                    onChange={newValue => 
+                                                        props.save({...props.chartSettings, groupedBy: newValue}, false, () => {})
+                                                    }/>            
 
 
-            <ComboField id="devise"
-                                label="Devise du Graphe"
-                                value={props.chartSettings.targetDevise ? props.chartSettings.targetDevise : "EUR"}
-                                errorMsg={undefined}
-                                readOnly={false}
-                                values={[ "EUR", "USD", "AUD", "CAD", "CHF"]}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue})}/>
+{
+/*
+Je désactive car je ne sais pas si j'active la devise USD:
+1/ est ce que le cours de l'action doit etre montré avec le montant * le cours de la devise du jour? 
+2/ est ce que les achat du passé doivent etre convertis imméditatement avec le cours de la devise d'aujourd'hui ou du passé? 
+                        <ComboField id="devise"
+                                            label="Devise du Graphique"
+                                            value={props.chartSettings.targetDevise ? props.chartSettings.targetDevise : "EUR"}
+                                            errorMsg={undefined}
+                                            readOnly={false}
+                                            values={[ "EUR", "USD", "AUD", "CAD", "CHF"]}
+                                            description=""
+                                            onChange={newValue  => props.save({...props.chartSettings, targetDevise: newValue}, false, () => {})}/>
+ 
+*/}
+                        <ComboMultipleWithCheckbox id="accountType"
+                                            label="Exclure le type de compte (Béta)"
+                                            selectedCodeValues={props.chartSettings.excludeAccountTypes ? props.chartSettings.excludeAccountTypes : accountTypes}                            
+                                            errorMsg={undefined}
+                                            readOnly={false}
+                                            userValues={accountTypes}                                
+                                            codeValues={accountTypes}
+                                            description=""
+                                            onChange={newValue  => props.save({...props.chartSettings, excludeAccountTypes: newValue}, false, () => {})}/>
 
+                        <ComboMultipleWithCheckbox id="brokers"
+                                            label="Exclure les courtiers (Béta)"
+                                            selectedCodeValues={props.chartSettings.excludeBrokers ? props.chartSettings.excludeBrokers : brokers}                            
+                                            errorMsg={undefined}
+                                            readOnly={false}
+                                            codeValues={brokers}
+                                            userValues={brokers}
+                                            description=""
+                                            onChange={newValue  => props.save({...props.chartSettings, excludeBrokers: newValue}, false, () => {})}/>
+                    
+                    <Card pad='10px' margin='10px'  background="light-1">
+                        <CardHeader>Paramètres globaux pour les indices</CardHeader>
+                        <CardBody>
+                            <Box direction="row">
+                                    <ComboFieldWithCode id="shareGroupSelection"
+                                        label="Groupe d'actions"
+                                        errorMsg={undefined}
+                                        readOnly={props.readOnly}
+                                        selectedCodeValue={props.chartSettings.shareSelection!}
+                                        userValues={[                             
+                                            "Les actions courrantes du portefeuille",
+                                            "Toutes les actions qui ont été présentent dans le portefeuille",
+                                            "Uniquement les actions sélectionnées individuellement"
+                                        ]}
+                                        codeValues={[                            
+                                            "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                                        ]}
+                                        description=""
+                                        onChange={newValue => 
+                                            props.save({...props.chartSettings, shareSelection: newValue}, false, () => {})}
+                                    />
 
-            <ComboMultiple id="accountType"
-                                label="Type de compte"
-                                selectedCodeValues={props.chartSettings.accountTypes ? props.chartSettings.accountTypes : accountTypes}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                userValues={accountTypes}                                
-                                codeValues={accountTypes}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, accountTypes: newValue})}/>
+                                    <ComboMultipleWithCheckbox id="additionalShares"
+                                                            label="+ Actions individuelle"
+                                                            selectedCodeValues={props.chartSettings.additionalShareGoogleCodeList!}
+                                                            errorMsg={undefined}
+                                                            readOnly={false}
+                                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
+                                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
+                                                            description=""
+                                                            onChange={newValue  => props.save({...props.chartSettings, additionalShareGoogleCodeList: newValue }, false, () => {})}
 
-            <ComboMultiple id="brokers"
-                                label="Courtiers"
-                                selectedCodeValues={props.chartSettings.brokers ? props.chartSettings.brokers : brokers}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                codeValues={brokers}
-                                userValues={brokers}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, brokers: newValue})}/>
-            
+                                    />
+                            </Box>   
 
-            <ComboMultiple id="PortfolioValues"
-                                label="Indexes"
-                                errorMsg={undefined}
-                                readOnly={false}
-                                selectedCodeValues={props.chartSettings.indexSelection ? props.chartSettings.indexSelection : []}                            
-                                userValues={[ 
-                                    // selection des actions
-                                    'Vos actions actuelles',
-                                    'Vos 10 plus grosses actions actuelles',
-                                    'Toutes les actions qui ont été dans votre portefeuille',
-                                    
-                                    // Sur le portefeuille
-                                    'Somme des valeurs d\'actions en portefeuille + les liquidités',
-                                    'Somme des valeurs d\'actions en portefeuille sans les liquidités',                                    
-                                    'Liquidité',
-                                    'Crédit d\'impots cumulés',
-                                    'Entrées/Sorties',
-                                    'Entrées/Sorties cumulés',
-                                    'Dividendes perçus cumulés',
-                                    'Dividendes perçus',
-                                    'Devises',
-                                    'Achats', // achat dans le portefeuille
-                                    'Ventes', // ventes dans le portefeuille
+                            <Box direction="row">
+                                <ComboFieldWithCode id="AlgoCroissance"
+                                                            label="Algorithme à utiliser pour la croissance de l'année en cours"
+                                                            errorMsg={undefined}
+                                                            readOnly={props.readOnly}
+                                                            selectedCodeValue={props.chartSettings.algoEstimationCroissance! }
+                                                            codeValues={[                             
+                                                                'MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS',
+                                                                'MINIMAL_CROISSANCE_OF_LAST_TEN_YEARS'
+                                                            ]}
+                                                            userValues={[
+                                                                'Utiliser la formule de Revenue & Dividendes (plus petite moyenne sur 1, 5 et 10 ans)',
+                                                                'Utiliser la plus petite croissance des 10 dernières années (methode plus péssimiste)'                                                        
+                                                            ]}
+                                                            description=""
+                                                            onChange={newValue => 
+                                                                props.save({...props.chartSettings, algoEstimationCroissance: newValue}, false, () => {})
+                                    }/>    
+                            </Box>
+                        </CardBody>
+                    </Card>
+                    </Box>
+                </Tab>    
+                {
+                    props.chartSettings.indexSelection?.map((chartIndex, chartIndexPosition) => {
+                        return (
+                            <Tab title={chartIndex.label} key={'chartIndex'+chartIndexPosition}>
+                                <Box pad={{ vertical: 'none', horizontal: 'small' }}>
+                                    <Box direction="row">
+                                        <TextField id="ezChartIndexLabel" value={chartIndex.label}                                                                
+                                            isRequired={true}     
+                                            description="Titre"
+                                            readOnly={props.readOnly}
+                                            onChange={newValue => 
+                                                props.save({...props.chartSettings, 
+                                                    indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
+                                                        {...chartIndex, label: newValue},
+                                                        ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
+                                                    ]
+                                                }, false, () => {})
+                                        }/> 
+                                        <Button fill={false} alignSelf="center" icon={<Trash size="small" color="status-critical"/>} disabled={props.chartSettings.indexSelection?.length! <= 1}
+                                                plain={true} label="" onClick={() =>{
+                                                    confirmAlert({
+                                                        title: 'Etes vous sûr de vouloir supprimer cet Indice?',                                                        
+                                                        buttons: [
+                                                        {
+                                                            label: 'Oui',
+                                                            onClick: () => {
+                                                                props.save({...props.chartSettings, 
+                                                                    indexSelection: props.chartSettings.indexSelection?.filter((c,i) => i !== chartIndexPosition)}, false, () => {
+                                                                        setIndiceIndex(indiceIndex === props.chartSettings.indexSelection!.length ? indiceIndex -1 : indiceIndex)
+                                                                    })
+                                                            }
+                                                        },
+                                                        {
+                                                            label: 'Non',
+                                                            onClick: () => {}
+                                                        }
+                                                        ]
+                                                    });
+                                                }}/>                                        
+                                    </Box>
+                                    <TextAreaField id="ezChartIndexDescription" value={chartIndex.description}                                                                
+                                        readOnly={props.readOnly}
+                                        description="Description"
+                                        onChange={newValue => 
+                                            props.save({...props.chartSettings, 
+                                                indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
+                                                    {...chartIndex, description: updateEZLoadTextWithSignature(chartIndex.description, newValue) },
+                                                    ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
+                                                ]
+                                            }, true, () => {})
+                                    }/>
 
-                                    // Sur les actions
-                                    'Nb Actions',
-                                    'Cours des valeurs sélectionnées',
-                                    'Achats & Ventes des valeurs sélectionnées',
-                                    'Dividende par action des valeurs sélectionnées (date de détachement)',
-                                    'Rendement du dividende au détachement (des valeurs sélectionnées)',
-                                    'Prix de reviens (PRU)',
-                                    'Prix de reviens incluant les dividendes (PRUD)']}
-                                codeValues={[
-                                    'CURRENT_SHARES',
-                                    'TEN_WITH_MOST_IMPACTS',                                    
-                                    'ALL_SHARES',
-                                    'INSTANT_VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
-                                    'INSTANT_VALEUR_PORTEFEUILLE_WITHOUT_LIQUIDITY',
-                                    'INSTANT_LIQUIDITE',                                    
-                                    'CUMUL_CREDIT_IMPOTS',
-                                    'INSTANT_ENTREES_SORTIES',
-                                    'CUMUL_ENTREES_SORTIES',
-                                    'INSTANT_DIVIDENDES',
-                                    'CUMUL_DIVIDENDES',
-                                    'CURRENCIES',
-                                    'BUY',
-                                    'SOLD',
-                                    'SHARE_COUNT',
-                                    'SHARE_PRICES',
-                                    'SHARE_BUY_SOLD_WITH_DETAILS',
-                                    'SHARE_DIVIDEND_PER_ACTION',
-                                    'SHARE_DIVIDEND_YIELD',
-                                    'SHARE_PRU',
-                                    'SHARE_PRU_WITH_DIVIDEND']}
-                                description=""
-                                onChange={newValue => 
-                                    props.save({...props.chartSettings, indexSelection: organizeIndexes(newValue)})
-                                }/>
-
-
-
-            <ComboMultiple id="PortfolioValues"
-                                label="Indexes de Performance"
-                                errorMsg={undefined}
-                                readOnly={false}
-                                selectedCodeValues={props.chartSettings.perfIndexSelection ? props.chartSettings.perfIndexSelection : []}                            
-                                userValues={[                                    
-                                    'Perf journalière de la valeur du portefeuille en %',
-                                    'Perf mensuelle de la valeur du portefeuille en %',
-                                    'Perf annnuelle de la valeur du portefeuille en %',                                    
-                                    'Perf journalière de la valeur du portefeuille depuis le 1er jour du graphique en %',
-                                    'Perf journalière de la valeur du portefeuille en €',
-                                    'Perf mensuelle de la valeur du portefeuille en €',
-                                    'Perf annnuelle de la valeur du portefeuille en €',
-                                    'Perf journalière de la valeur du portefeuille depuis le 1er jour du graphique en €',
-                                    'Croissance de vos valeurs actuelles depuis le 1er jour du graphique']}
-                                codeValues={[                                    
-                                    'PERF_DAILY_PORTEFEUILLE',
-                                    'PERF_MENSUEL_PORTEFEUILLE',
-                                    'PERF_ANNUEL_PORTEFEUILLE',
-                                    'PERF_TOTAL_PORTEFEUILLE',
-                                    'PERF_PLUS_MOINS_VALUE_DAILY',
-                                    'PERF_PLUS_MOINS_VALUE_MENSUEL',
-                                    'PERF_PLUS_MOINS_VALUE_ANNUEL',
-                                    'PERF_PLUS_MOINS_VALUE_TOTAL',
-                                    'PERF_CROISSANCE_CURRENT_SHARES'
-                                ]}
-                                description=""
-                                onChange={newValue => 
-                                    props.save({...props.chartSettings, perfIndexSelection: organizePerfIndexes(newValue)})
-                                }/>
-
-
-
-            <ComboMultiple id="shareNames"
-                                label="Valeur d'Actions"
-                                selectedCodeValues={props.chartSettings.additionalShareNames ? props.chartSettings.additionalShareNames : []}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                userValues={props.allShares ? props.allShares.map(ezShare => ezShare.ezName!) : []}
-                                codeValues={props.allShares ? props.allShares.map(ezShare => ezShare.ezName!) : []}
-                                description=""
-                                onChange={newValue  => props.save({...props.chartSettings, additionalShareNames: newValue})}/>
-
-            
-
-
+                                    <ChartIndexMainEditor                        
+                                        chartSettings={props.chartSettings}                
+                                        allEzShares={props.allEzShares}
+                                        chartIndex={chartIndex}
+                                        readOnly={props.readOnly}                                        
+                                        save={(newChartIndex)  => 
+                                            props.save({...props.chartSettings, 
+                                                indexSelection: [...props.chartSettings.indexSelection!.slice(0, chartIndexPosition),
+                                                    {
+                                                        ...newChartIndex,
+                                                        label: isTextContainsEZLoadSignature(newChartIndex.label) ? 
+                                                                    getChartIndexTitle(newChartIndex) : newChartIndex.label,
+                                                        description: isTextContainsEZLoadSignature(newChartIndex.description) ? 
+                                                                        getChartIndexDescription(newChartIndex) : newChartIndex.description
+                                                    },     
+                                                    ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
+                                                ]
+                                            }, false, () => {})}/>           
+                                          
+                                </Box>
+                            </Tab>
+                        )}               
+                    )
+                }
+                <Tab title="+">
+                </Tab> 
+            </Tabs>
         </Box>
-
-        
     );
  
     

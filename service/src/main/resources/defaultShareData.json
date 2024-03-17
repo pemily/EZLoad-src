@@ -38,10 +38,10 @@
     {
       "ezName" : "Air Liquide",
       "googleCode" : "EPA:AI",
-      "yahooCode" : "AI",
+      "yahooCode" : "AI.PA",
       "isin" : "FR0000120073",
       "countryCode" : "FR",
-      "seekingAlphaCode" : "AI"
+      "seekingAlphaCode" : "AIQUF"
     },
     {
       "ezName" : "Air Products",
@@ -126,10 +126,9 @@
     {
       "ezName" : "BAE Systems",
       "googleCode" : "LON:BA",
-      "yahooCode" : "BA",
+      "yahooCode" : "BA.L",
       "isin" : "GB0002634946",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "BA"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Bank Ozk",
@@ -142,10 +141,10 @@
     {
       "ezName" : "Bank of Nova Scotia",
       "googleCode" : "TSE:BNS",
-      "yahooCode" : "BNS",
+      "yahooCode" : "BNS.TO",
       "isin" : "CA0641491075",
       "countryCode" : "CA",
-      "seekingAlphaCode" : "BNS"
+      "seekingAlphaCode" : "BNS:CA"
     },
     {
       "ezName" : "Best Buy",
@@ -177,16 +176,14 @@
       "googleCode" : "EPA:EN",
       "yahooCode" : "EN.PA",
       "isin" : "FR0000120503",
-      "countryCode" : "FR",
-      "seekingAlphaCode" : "BOUYF"
+      "countryCode" : "FR"
     },
     {
       "ezName" : "British American Tobaccos",
       "googleCode" : "LON:BATS",
-      "yahooCode" : "BTAFF",
+      "yahooCode" : "BATS.L",
       "isin" : "US1104481072",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "BTAFF"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Broadcom",
@@ -225,10 +222,10 @@
     {
       "ezName" : "Canadian Natural Resources",
       "googleCode" : "TSE:CNQ",
-      "yahooCode" : "CNQ",
+      "yahooCode" : "CNQ.TO",
       "isin" : "CA1363851017",
       "countryCode" : "CA",
-      "seekingAlphaCode" : "CNQ"
+      "seekingAlphaCode" : "CNQ:CA"
     },
     {
       "ezName" : "Cardinal Health",
@@ -371,6 +368,7 @@
       "yahooCode" : "ENG.MC",
       "isin" : "ES0130960018",
       "countryCode" : "ES",
+      "seekingAlphaCode": "ENGGF",
       "type" : "stock",
       "industry" : "Utilities—Regulated Gas",
       "sector" : "Utilities"
@@ -378,10 +376,10 @@
     {
       "ezName" : "Enbridge",
       "googleCode" : "NYSE:ENB",
-      "yahooCode" : "ENB",
+      "yahooCode" : "ENB.TO",
       "isin" : "CA29250N1050",
-      "countryCode" : "US",
-      "seekingAlphaCode" : "ENB"
+      "countryCode" : "CA",
+      "seekingAlphaCode" : "ENB:CA"
     },
     {
       "ezName" : "Equasens",
@@ -485,8 +483,7 @@
       "googleCode" : "EPA:IPN",
       "yahooCode" : "IPSEF",
       "isin" : "FR0010259150",
-      "countryCode" : "FR",
-      "seekingAlphaCode" : "IPSEF"
+      "countryCode" : "FR"
     },
     {
       "ezName" : "Johnson&Johnson",
@@ -507,10 +504,10 @@
     {
       "ezName" : "L'Oréal",
       "googleCode" : "EPA:OR",
-      "yahooCode" : "OR",
+      "yahooCode" : "LOR.F",
       "isin" : "FR0000120321",
       "countryCode" : "FR",
-      "seekingAlphaCode" : "OR"
+      "seekingAlphaCode" : "LRLCF"
     },
     {
       "ezName" : "L3 Harris Technologies",
@@ -531,10 +528,9 @@
     {
       "ezName" : "Legal & General",
       "googleCode" : "LON:LGEN",
-      "yahooCode" : "LGGNF",
+      "yahooCode" : "LGEN.L",
       "isin" : "GB0005603997",
-      "countryCode" : "UK",
-      "seekingAlphaCode" : "LGGNF"
+      "countryCode" : "UK"
     },
     {
       "ezName" : "Legrand",
@@ -626,6 +622,7 @@
     {
       "ezName" : "NET LEASE OFFICE PROPERTIES",
       "googleCode" : "NYSE:NLOP",
+      "yahooCode" : "NLOP",
       "isin" : "US64110Y1082",
       "countryCode" : "US",
       "type" : "stock",
