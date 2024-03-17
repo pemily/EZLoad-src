@@ -28,7 +28,7 @@ export interface ChartIndexMainEditorProps {
     allEzShares: EzShareData[];
 }      
 
-export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: ChartIndex) : string {
+export function getChartIndexTitle(chartIndex: ChartIndex) : string {
     var result : string = "";
     var unitSuffix : string = "";
 
@@ -105,7 +105,7 @@ export function getChartIndexTitle(chartSettings: ChartSettings, chartIndex: Cha
     return applyEZLoadTextSignature(result);
 }
 
-export function getChartIndexDescription(chartSettings: ChartSettings, chartIndex: ChartIndex): string{
+export function getChartIndexDescription(chartIndex: ChartIndex): string{
     var result : string = "Affiche ";
 
     if (isDefined(chartIndex.shareIndexConfig)){
@@ -146,6 +146,8 @@ export function getChartIndexDescription(chartSettings: ChartSettings, chartInde
                 result += "la vente d'actions"; break;
             case "CUMULABLE_BUY":
                 result += "l'achat d'actions"; break;
+            case "LIQUIDITE": 
+                result += "Les liquidités"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
                 result += "les crédit d'impôts depuis la date du début du graphique"; break;
             case "CUMULABLE_ENTREES":

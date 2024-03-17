@@ -66,7 +66,7 @@ export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assur
 export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
     const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
-    function nouvelIndice(chartSettings: ChartSettings) : ChartIndex {
+    function nouvelIndice() : ChartIndex {
         const chartIndex : ChartIndex = {       
                 id: genUUID(),
                 graphStyle: 'LINE',
@@ -74,8 +74,8 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                     portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
                 }        
             }
-        chartIndex.description = getChartIndexDescription(chartSettings, chartIndex);
-        chartIndex.label = getChartIndexTitle(chartSettings, chartIndex);        
+        chartIndex.description = getChartIndexDescription(chartIndex);
+        chartIndex.label = getChartIndexTitle(chartIndex);        
         return chartIndex;
     }
 
@@ -88,7 +88,7 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                         props.save(
                                             {...props.chartSettings,
                                                 indexSelection: props.chartSettings.indexSelection === undefined ?
-                                                                [nouvelIndice(props.chartSettings)] : [...props.chartSettings.indexSelection, nouvelIndice(props.chartSettings)]
+                                                                [nouvelIndice()] : [...props.chartSettings.indexSelection, nouvelIndice()]
                                             }, false, () => { setIndiceIndex(nextIndex); }
                                         )
                                     }
@@ -292,9 +292,9 @@ Je désactive car je ne sais pas si j'active la devise USD:
                                                     {
                                                         ...newChartIndex,
                                                         label: isTextContainsEZLoadSignature(newChartIndex.label) ? 
-                                                                    getChartIndexTitle(props.chartSettings, newChartIndex) : newChartIndex.label,
+                                                                    getChartIndexTitle(newChartIndex) : newChartIndex.label,
                                                         description: isTextContainsEZLoadSignature(newChartIndex.description) ? 
-                                                                        getChartIndexDescription(props.chartSettings, newChartIndex) : newChartIndex.description
+                                                                        getChartIndexDescription(newChartIndex) : newChartIndex.description
                                                     },     
                                                     ...props.chartSettings.indexSelection!.slice(chartIndexPosition+1)
                                                 ]

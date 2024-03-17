@@ -2,6 +2,7 @@ import { Box, Button, Text, Collapsible, Anchor } from "grommet";
 import { useState } from "react";
 import { Trash, Configure, ZoomIn, ZoomOut, Close, Checkbox } from 'grommet-icons';
 import { Chart, ChartSettings, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { getChartIndexDescription } from '../ChartIndexMainEditor';
 import { isDefined } from '../../../ez-api/tools';
 import { ChartSettingsEditor } from '../ChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
@@ -40,7 +41,7 @@ function containsShareIndex(chartProps:ChartUIProps) : boolean {
 
 export function ChartUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);    
-    const [filteredChart, setFilteredChart] = useState<Chart>(props.chart);    
+    const [filteredChart, setFilteredChart] = useState<Chart>( containsShareIndex(props) ? {...props.chart, lines:[]} : props.chart);    
     const [selectedShare, setSelectedShare] = useState<string|undefined>(undefined);
     const [allIndexedLines] = useState<ChartLineWithIndex[]>(buildLineWithIndex(props));
 
@@ -121,7 +122,9 @@ export function ChartUI(props: ChartUIProps){
                                                                             else {
                                                                                 unselectIndex(l)
                                                                             }
-                                                                        }}/>);
+                                                                        }}
+                                                                        title={getChartIndexDescription(l)}
+                                                                        />);
                                             
                                         }))
                             }

@@ -269,6 +269,13 @@ public class DashboardManager {
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET
                                     || index == ShareIndex.ACTION_CROISSANCE)
                                 yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                            else if (index == ShareIndex.CUMULABLE_SHARE_BUY_SOLD
+                                        || index == ShareIndex.CUMULABLE_SHARE_BUY
+                                        || index == ShareIndex.CUMULABLE_SHARE_SOLD
+                            ) {
+                                yAxis = ChartLine.Y_AxisSetting.PORTFOLIO;
+                            }
+
                             ChartLine.LineStyle lineStyle = getLineStyle(chartSettings.getGroupedBy(), chartIndex);
                             allChartLines.add(createChartLine(sharePrices, chartIndex.getId(), ezShare.getEzName(),
                                     computeYAxis(yAxis),

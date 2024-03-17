@@ -224,10 +224,10 @@ public class PortfolioIndexBuilder {
             Price sold = state.getShareSoldDetails().get(share);
             Price buyAndSold = new Price();
             if (buy != null){
-                buyAndSold = buy.reverse();
+                buyAndSold = buy;
             }
             if (sold != null){
-                buyAndSold = buyAndSold.plus(sold);
+                buyAndSold = buyAndSold.minus(sold);
             }
             return buyAndSold;
         }));

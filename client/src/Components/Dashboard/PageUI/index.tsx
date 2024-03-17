@@ -18,7 +18,6 @@ export interface PageUIProps {
 export function PageUI(props: PageUIProps){
     const [edition, setEdition] = useState<boolean>(false);
 
-
     return (    
         <Box width="100%" pad="medium">            
             <Box width="100%">
@@ -27,7 +26,7 @@ export function PageUI(props: PageUIProps){
                 {
                     props.dashboardPage.charts?.map((chart, index) => {
                         return (
-                            <ChartUI key={"chartUI"+index}
+                            <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+chart.title+index}
                                     deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
                                     saveChartUI={(chartUi: ChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : 
                                         chartUi) }, keepLines, afterSave)}}
@@ -63,8 +62,8 @@ export function PageUI(props: PageUIProps){
                                 shareSelection: "CURRENT_SHARES",
                                 additionalShareGoogleCodeList: []
                             };                            
-                            chartIndex.description = getChartIndexDescription(newChart, chartIndex)                            
-                            chartIndex.label = getChartIndexTitle(newChart, chartIndex);
+                            chartIndex.description = getChartIndexDescription(chartIndex)                            
+                            chartIndex.label = getChartIndexTitle(chartIndex);
                             props.savePageUI({
                                                 ...props.dashboardPage,
                                                 charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]
