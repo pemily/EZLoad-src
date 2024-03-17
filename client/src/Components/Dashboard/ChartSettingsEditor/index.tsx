@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box, Button, Tab, Tabs } from "grommet";
+import { Box, Button, Card, CardBody, CardHeader, Tab, Tabs } from "grommet";
 import { Trash } from 'grommet-icons';
 import { useState } from "react";
 import { ChartIndex, ChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
@@ -135,56 +135,6 @@ export function ChartSettingsEditor(props: ChartSettingsEditorProps){
                                                         props.save({...props.chartSettings, groupedBy: newValue}, false, () => {})
                                                     }/>            
 
-                        <Box direction="row">
-                                <ComboFieldWithCode id="shareGroupSelection"
-                                    label="Groupe d'actions"
-                                    errorMsg={undefined}
-                                    readOnly={props.readOnly}
-                                    selectedCodeValue={props.chartSettings.shareSelection!}
-                                    userValues={[                             
-                                        "Les actions courrantes du portefeuille",
-                                        "Toutes les actions qui ont été présentent dans le portefeuille",
-                                        "Uniquement les actions sélectionnées individuellement"
-                                    ]}
-                                    codeValues={[                            
-                                        "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
-                                    ]}
-                                    description=""
-                                    onChange={newValue => 
-                                        props.save({...props.chartSettings, shareSelection: newValue}, false, () => {})}
-                                />
-
-                                <ComboMultipleWithCheckbox id="additionalShares"
-                                                        label="+ Actions individuelle"
-                                                        selectedCodeValues={props.chartSettings.additionalShareGoogleCodeList!}
-                                                        errorMsg={undefined}
-                                                        readOnly={false}
-                                                        userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
-                                                        codeValues={props.allEzShares.map(s => s.googleCode!)}
-                                                        description=""
-                                                        onChange={newValue  => props.save({...props.chartSettings, additionalShareGoogleCodeList: newValue }, false, () => {})}
-
-                                />
-                        </Box>   
-
-                        <ComboFieldWithCode id="AlgoCroissance"
-                                                    label="Algorithme pour l'estimation de la croissance de l'année en cours"
-                                                    errorMsg={undefined}
-                                                    readOnly={props.readOnly}
-                                                    selectedCodeValue={props.chartSettings.algoEstimationCroissance! }
-                                                    codeValues={[                             
-                                                        'MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS',
-                                                        'MINIMAL_CROISSANCE_OF_LAST_TEN_YEARS'
-                                                    ]}
-                                                    userValues={[
-                                                        'Utiliser la formule de Revenue & Dividendes (plus petite moyenne sur 1, 5 et 10 ans)',
-                                                        'Utiliser la plus petite croissance des 10 dernières années (methode plus péssimiste)'                                                        
-                                                    ]}
-                                                    description=""
-                                                    onChange={newValue => 
-                                                        props.save({...props.chartSettings, algoEstimationCroissance: newValue}, false, () => {})
-                                                    }/>    
-
 
 {
 /*
@@ -220,6 +170,63 @@ Je désactive car je ne sais pas si j'active la devise USD:
                                             userValues={brokers}
                                             description=""
                                             onChange={newValue  => props.save({...props.chartSettings, excludeBrokers: newValue}, false, () => {})}/>
+                    
+                    <Card pad='10px' margin='10px'  background="light-1">
+                        <CardHeader>Paramètres globaux pour les indices</CardHeader>
+                        <CardBody>
+                            <Box direction="row">
+                                    <ComboFieldWithCode id="shareGroupSelection"
+                                        label="Groupe d'actions"
+                                        errorMsg={undefined}
+                                        readOnly={props.readOnly}
+                                        selectedCodeValue={props.chartSettings.shareSelection!}
+                                        userValues={[                             
+                                            "Les actions courrantes du portefeuille",
+                                            "Toutes les actions qui ont été présentent dans le portefeuille",
+                                            "Uniquement les actions sélectionnées individuellement"
+                                        ]}
+                                        codeValues={[                            
+                                            "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                                        ]}
+                                        description=""
+                                        onChange={newValue => 
+                                            props.save({...props.chartSettings, shareSelection: newValue}, false, () => {})}
+                                    />
+
+                                    <ComboMultipleWithCheckbox id="additionalShares"
+                                                            label="+ Actions individuelle"
+                                                            selectedCodeValues={props.chartSettings.additionalShareGoogleCodeList!}
+                                                            errorMsg={undefined}
+                                                            readOnly={false}
+                                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
+                                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
+                                                            description=""
+                                                            onChange={newValue  => props.save({...props.chartSettings, additionalShareGoogleCodeList: newValue }, false, () => {})}
+
+                                    />
+                            </Box>   
+
+                            <Box direction="row">
+                                <ComboFieldWithCode id="AlgoCroissance"
+                                                            label="Algorithme à utiliser pour la croissance de l'année en cours"
+                                                            errorMsg={undefined}
+                                                            readOnly={props.readOnly}
+                                                            selectedCodeValue={props.chartSettings.algoEstimationCroissance! }
+                                                            codeValues={[                             
+                                                                'MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS',
+                                                                'MINIMAL_CROISSANCE_OF_LAST_TEN_YEARS'
+                                                            ]}
+                                                            userValues={[
+                                                                'Utiliser la formule de Revenue & Dividendes (plus petite moyenne sur 1, 5 et 10 ans)',
+                                                                'Utiliser la plus petite croissance des 10 dernières années (methode plus péssimiste)'                                                        
+                                                            ]}
+                                                            description=""
+                                                            onChange={newValue => 
+                                                                props.save({...props.chartSettings, algoEstimationCroissance: newValue}, false, () => {})
+                                    }/>    
+                            </Box>
+                        </CardBody>
+                    </Card>
                     </Box>
                 </Tab>    
                 {

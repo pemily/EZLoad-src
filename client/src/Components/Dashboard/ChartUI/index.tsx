@@ -92,7 +92,7 @@ export function ChartUI(props: ChartUIProps){
                         <Box alignSelf="center" direction="row" alignContent="center" flex="grow" align="center" gap="medium">
                             {                                
                                 // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
-                                containsShareIndex(props) && 
+                                (props.chart.lines !== undefined && props.chart.lines.length > 0) && containsShareIndex(props) && 
                                     (<Box gap="none" margin="none" direction="row" align="center">                                       
                                         <ComboField id='indexLabelFilterCombo'   
                                             readOnly={false}
@@ -107,7 +107,7 @@ export function ChartUI(props: ChartUIProps){
                                     </Box>)
                             }
                             {                            
-                                props.chart.indexSelection!
+                                 (props.chart.lines !== undefined && props.chart.lines.length > 0) && (props.chart.indexSelection!
                                     .map((l,i) => {                                                   
                                             return (<Anchor key={'indexLabelFilter'+i}                                                                   
                                                             size="small" icon={<Checkbox size='small' color="black"
@@ -123,7 +123,7 @@ export function ChartUI(props: ChartUIProps){
                                                                             }
                                                                         }}/>);
                                             
-                                        })
+                                        }))
                             }
                         </Box>
                         <Box height={(props.chart.height)+"vh"}>     
