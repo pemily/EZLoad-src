@@ -4,6 +4,11 @@
 
 
 ## Historique 
+### Version 2.6
+* Ajout des indices "rendement" & "croissance"
+* Amélioration de l'extraction des dividendes
+* Correction de bugs
+
 ### Version 2.5
 * Amélioration de la détection des devises
 * Pré-initialisation des graphiques du dashboard
@@ -11,13 +16,12 @@
 * Correction de bugs
 
 ### Version 2.4
-* Ajout des courbes avec les dividendes
-* Ajout des courbes avec le PRU
+* Ajout des indices dividendes & PRU
 * Correction de bugs
 
 ### Version 2.3
-* Ajout de la courbe du portefeuille avec et sans les liquidités
-* Ajout de la courbe des Achats/Ventes intégrés aux valeurs sélectionnés
+* Ajout de l'indice du portefeuille avec et sans les liquidités
+* Ajout de l'indice des Achats/Ventes intégrés aux valeurs sélectionnés
 
 ### Version 2.2
 * Correction d'un problème de calcul sur la liquidité
