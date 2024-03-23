@@ -43,8 +43,8 @@ export function BourseDirect(props: BourseDirectProps){
             <Box direction="row">
                 <Anchor margin="medium" target="BourseDirect" href="http://www.boursedirect.com" label="BourseDirect" />
                 { props.profileName
-                    && (<Anchor alignSelf="center" onClick={e => setBrowserFileVisible(true)}
-                             color="brand" href={props.profileName} label="Voir les relevés téléchargés"/>)}
+                    && (<Anchor alignSelf="center" onClick={() => { setBrowserFileVisible(true) } } 
+                             color="brand" label="Voir les relevés téléchargés"/>)}
             </Box>
             
           <Button alignSelf="start" margin="medium"

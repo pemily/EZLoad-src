@@ -70,7 +70,7 @@ public class ExplorerHandler {
         MainSettings mainSettings = settingsManager.loadProps();
         String ezProfilName = SettingsManager.getActiveEzProfileName(mainSettings);
         String subDir = StringUtils.isBlank(dir) ? "" : (dir.startsWith(".") || dir.startsWith("..") ? "" : File.separator+dir);
-        File file = new File(settingsManager.getDownloadDir(ezProfilName, EnumEZBroker.BourseDirect));
+        File file = new File(settingsManager.getDownloadDir(ezProfilName, EnumEZBroker.BourseDirect)+subDir);
         if (file.isDirectory()){
             return Arrays.stream(file.listFiles())
                     .map(f -> f.isDirectory() ? new Item(f.getName(), true) : new Item(f.getName(), false))

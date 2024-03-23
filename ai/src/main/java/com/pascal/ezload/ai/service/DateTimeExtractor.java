@@ -1,5 +1,5 @@
 /**
- * ezService - EZLoad an automatic loader for EZPortfolio
+ * ai - EZLoad an automatic loader for EZPortfolio
  * Copyright © 2021 EMILY Pascal (pascal.emily@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,32 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard.engine.tag;
+package com.pascal.ezload.ai.service;
 
-import com.pascal.ezload.service.model.PriceAtDate;
-import com.pascal.ezload.service.model.Tag;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 
-public class DividendInfo implements Tag {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-    public DividendInfo(TYPE type, PriceAtDate amount){
-        this.type = type;
-        this.amount = amount;
-    }
+public interface DateTimeExtractor {
 
-    public enum TYPE {
-        EXCEPTIONAL, REGULAR
-    }
+    @UserMessage("Extract date from {{it}}")
+    LocalDate extractDateFrom(String text);
 
-    private PriceAtDate amount;
-    private TYPE type; // can be null
+    @UserMessage("Extract time from {{text}}")
+    LocalTime extractTimeFrom(@V("text") String text);
 
-
-    public PriceAtDate getAmount() {
-        return amount;
-    }
-
-    public TYPE getType() {
-        return type;
-    }
+    @UserMessage("Extract date and time from {{it}}")
+    LocalDateTime extractDateTimeFrom(String text);
 
 }

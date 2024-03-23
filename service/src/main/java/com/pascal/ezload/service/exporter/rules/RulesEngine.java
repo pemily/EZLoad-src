@@ -313,8 +313,7 @@ public class RulesEngine {
             EzProfil ezProfil = settingsManager.getActiveEzProfil(mainSettings);
             computeDividendCalendarAndAnnual(settingsManager, mainSettings, ezProfil, reporting, ezPortefeuilleEdition);
         } catch (Exception e) {
-            ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
-            logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
+           logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
         }
 
         // store the result into the ezdata element (for future usage in the UI, in case it need it)
@@ -342,7 +341,9 @@ public class RulesEngine {
                     result |= new DividendsCalendar().compute(reporting, ezPortefeuilleEdition, ezProfil.getDividendCalendar(), dividends);
 
             } catch (Exception e) {
-                ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
+                // Je ne met pas dans addError, sinon l'operation ne peut pas etre chargé et l'interface me demande si je veux ignorer l'operation.
+                // là non, je ne veux pas ignorer, je ne ferais pas la mise a jour du calendrier des dividendes ce qui est moins grave que d'ignorer une operation
+                // ezPortefeuilleEdition.addError("Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance()+" ("+e.getMessage()+")");
                 logger.log(Level.SEVERE, "Problème lors de la recherche des dividendes de "+ ezPortefeuilleEdition.getTickerGoogleFinance(), e);
             }
         }
