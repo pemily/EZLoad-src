@@ -4,6 +4,9 @@
 
 
 ## Historique 
+### Version 2.7
+* Correction de bugs
+
 ### Version 2.6
 * Ajout des indices "rendement" & "croissance"
 * Amélioration de l'extraction des dividendes
