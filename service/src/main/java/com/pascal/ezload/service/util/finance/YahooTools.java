@@ -207,7 +207,7 @@ public class YahooTools extends ExternalSiteTools{
                     });
             }
         }
-        throw new HttpUtil.DownloadException("Pas de code Yahoo pour "+ezShare.getEzName());
+        return null;
     }
 
 
