@@ -133,7 +133,7 @@ public class SeekingAlphaTools extends ExternalSiteTools {
                     });
             }
         }
-        throw new HttpUtil.DownloadException("Pas de code SeekingAlpha pour "+ezShare.getEzName());
+        return null;
     }
 
     private static boolean isUSD(Reporting rep, HttpUtilCached cache, EZShare ezShare) {

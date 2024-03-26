@@ -285,7 +285,7 @@ export function App(){
                                                         ...mainSettings,
                                                         activeEzProfilName: profile
                                                     }))
-                                                    .then(r => reloadAllData())
+                                                    .then(r => reloadAllData())                                                    
                                                     .catch(e => console.error(e))
                             }
                             deleteProfile={(profile) => {
