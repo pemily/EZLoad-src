@@ -241,7 +241,8 @@ public class DashboardManager {
             ChartLine.Y_AxisSetting yAxis = ChartLine.Y_AxisSetting.PORTFOLIO;
             if (index == PortfolioIndex.CUMULABLE_DIVIDEND_REAL_YIELD_BRUT
                 || index == PortfolioIndex.ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT
-                || index == PortfolioIndex.CROISSANCE_THEORIQUE_DU_PORTEFEUILLE) yAxis = ChartLine.Y_AxisSetting.PERCENT;
+                || index == PortfolioIndex.CROISSANCE_THEORIQUE_DU_PORTEFEUILLE
+                || index == PortfolioIndex.CUMULABLE_PERFORMANCE_PORTEFEUILLE) yAxis = ChartLine.Y_AxisSetting.PERCENT;
 
             ChartLine.LineStyle lineStyle = getLineStyle(chartGroupBy, chartIndex);
             allChartLines.add(createChartLine(prices, chartIndex.getId(), chartIndex.getLabel(),
@@ -267,7 +268,9 @@ public class DashboardManager {
                             else if (index == ShareIndex.SHARE_ANNUAL_DIVIDEND_YIELD
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET
-                                    || index == ShareIndex.ACTION_CROISSANCE)
+                                    || index == ShareIndex.ACTION_CROISSANCE
+                                    || index == ShareIndex.CUMULABLE_PERFORMANCE_ACTION
+                                    || index == ShareIndex.CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS)
                                 yAxis = ChartLine.Y_AxisSetting.PERCENT;
                             else if (index == ShareIndex.CUMULABLE_SHARE_BUY_SOLD
                                         || index == ShareIndex.CUMULABLE_SHARE_BUY

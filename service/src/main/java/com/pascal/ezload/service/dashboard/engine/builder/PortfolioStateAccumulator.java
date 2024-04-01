@@ -140,7 +140,7 @@ public class PortfolioStateAccumulator {
             }
             default -> throw new IllegalStateException("Missing case");
         }
-        // mets a jour les liquiditées en fonctions des opérations qui se sont déroulé
+        // mets a jour les liquidités en fonctions des opérations qui se sont déroulé
         if (addLiquidityAmount){
             Price amount = extractAmount(operation);
             previousState.getLiquidity().add(amount);
@@ -263,7 +263,7 @@ public class PortfolioStateAccumulator {
                                             Price nbOfShare = e.getValue();
                                             if (nbOfShare.getValue() == 0) return Price.ZERO;
                                             Prices prices = sharePriceBuilderResult.getPricesToTargetDevise(reporting, e.getKey());
-                                            Price price = prices == null ? Price.ZERO : prices.getPriceAt(date);
+                                            Price price = prices == null ? Price.ZERO : prices.getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                                             return nbOfShare.multiply(price);
                                         })
                                         .reduce(Price::plus)
@@ -300,7 +300,7 @@ public class PortfolioStateAccumulator {
                                 EZShareEQ share = e.getKey();
                                 PriceAtDate annualDividendYieldPrice = sharePriceBuilderResult.getRendementDividendeAnnuel(reporting, share, algoEstimationCroissance).getPriceAt(date);
 
-                                PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(date);
+                                PriceAtDate currentPrice = sharePriceBuilderResult.getPricesToTargetDevise(reporting, share).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                                 Price shareAmount = currentPrice.multiply(nbOfShare);
 
                                 Price ratioOfShareAmountOnPortfolio = portfolioValue.getValue() == null || portfolioValue.getValue() == 0 ? new Price() : shareAmount.divide(portfolioValue);

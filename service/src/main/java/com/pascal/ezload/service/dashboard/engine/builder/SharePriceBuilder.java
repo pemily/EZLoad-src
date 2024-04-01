@@ -52,6 +52,8 @@ public class SharePriceBuilder {
     }
 
     private final Map<EZShareEQ, Prices> shares2TargetPrices = new HashMap<>();
+    private final Map<EZShareEQ, Prices> perf2TargetPrices = new HashMap<>();
+    private final Map<EZShareEQ, Prices> perfWithDividends2TargetPrices = new HashMap<>();
     private final Map<String, Prices> share2RealDividendsTargetPrices = new HashMap<>(); // les dividendes reellement recu a la date de detachement
     private final Map<String, Prices> share2DividendsWithEstimatesTargetPrices = new HashMap<>(); // avec l'estimation sur l'année en cours
     private final Map<String, Prices> share2HistoricalDividendsTargetPrices = new HashMap<>(); // historique avec l'estimation sur l'année en cours
@@ -85,6 +87,44 @@ public class SharePriceBuilder {
         });
     }
 
+    public Prices getPerformance(Reporting reporting, EZShareEQ share) {
+        return perf2TargetPrices.computeIfAbsent(share, ezShare -> {
+            try {
+                Prices prices = getPricesToTargetDevise(reporting, share);
+                return perfIndexBuilder.buildPerfPrices(prices, ChartPerfFilter.VARIATION_EN_PERCENT);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Prices getPerformanceWithDividends(Reporting reporting, EZShareEQ share) {
+        return perfWithDividends2TargetPrices.computeIfAbsent(share, ezShare -> {
+            try {
+                Prices prices = getPricesToTargetDevise(reporting, share);
+                Prices dividends = getDividends(reporting, share, DIVIDEND_SELECTION.ALL);
+                Prices pricesWithDividends = new Prices(prices);
+                PriceAtDate previousDate = null;
+                for (int i = 0; i < pricesWithDividends.getPrices().size(); i++){
+                    PriceAtDate p = pricesWithDividends.getPrices().get(i);
+                    PriceAtDate finalPreviousDate = previousDate;
+                    double div = dividends.getPrices()
+                                        .stream()
+                                        .filter(d -> d.getValue() != null)
+                                        .filter(d -> d.getDate().isBeforeOrEquals(p.getDate())
+                                                    && (finalPreviousDate == null || d.getDate().isAfter(finalPreviousDate.getDate())))
+                                        .mapToDouble(d -> (double) d.getValue())
+                                        .sum();
+                    pricesWithDividends.replacePriceAt(i, new PriceAtDate(p.getDate(), p.plus(new Price((float)div))));
+                    previousDate = p;
+                }
+                return perfIndexBuilder.buildPerfPrices(pricesWithDividends, ChartPerfFilter.VARIATION_EN_PERCENT);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public Prices getHistoricalDividends(Reporting reporting, EZShareEQ share, int nbOfPastYears, DIVIDEND_SELECTION dividendSelection){
         return share2HistoricalDividendsTargetPrices.computeIfAbsent(share.getEzName()+"_"+nbOfPastYears+"_"+dividendSelection, ezShare -> getHistoricalDividendes(reporting, share, nbOfPastYears, dividendSelection));
     }
@@ -103,7 +143,7 @@ public class SharePriceBuilder {
         int currentYear = EZDate.today().getYear();
         Price previousAnnualDiv = getAnnualDividend(reporting, share, currentYear - 1, false, DIVIDEND_SELECTION.ONLY_REGULAR, algoEstimationCroissance);
         Prices croissance = getCroissanceAnnuelDuDividendeWithEstimates(reporting, share, algoEstimationCroissance);
-        PriceAtDate croissanceAnneeCourrante = croissance.getPriceAt(EZDate.today());
+        PriceAtDate croissanceAnneeCourrante = croissance.getPriceAt(EZDate.yearPeriod(EZDate.today().getYear()));
         Price estimatedDivForCurrentYear = previousAnnualDiv.plus(previousAnnualDiv.multiply(croissanceAnneeCourrante.divide(Price.CENT)));
 
         // TODO PASCAL ici pour estimer le dividende de l'année en cours, je rajoute a la derniere année, le min de la croissance
@@ -167,7 +207,13 @@ public class SharePriceBuilder {
                         for (EZDate currentDate : datesParam) {
                             PriceAtDate dividendFound = extractDividendForCurrentDate(dividends, previousDate, currentDate, dividendSelection);
 
-                            EZDate date = dividendFound != null ? dividendFound.getDate() : currentDate;
+                            EZDate date = dividendFound != null ?
+                                                dividendFound.getDate()
+                                                : currentDate.isPeriod() ?
+                                                        currentDate.endPeriodDate().isAfter(EZDate.today()) ?
+                                                                EZDate.today()
+                                                                : currentDate.endPeriodDate()
+                                                        : currentDate;
 
                             float value = 0f;
                             if (dividendFound != null && dividendFound.getValue() > 0) {
@@ -245,7 +291,7 @@ public class SharePriceBuilder {
                 if (annualDividend.getValue() != null && annualDividend.getValue() > 0) {
                     Prices p = getPricesToTargetDevise(reporting, share);
                     if (p != null) {
-                        Price price = p.getPriceAt(currentDate);
+                        Price price = p.getPriceAt(currentDate, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                         rendement = price.getValue()  == null || price.getValue() == 0 ? new Price() : annualDividend.multiply(Price.CENT).divide(price);
 
                     }

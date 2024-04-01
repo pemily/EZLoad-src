@@ -15,39 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard.engine.tag;
+package com.pascal.ezload.service.model;
 
-import com.pascal.ezload.service.model.PriceAtDate;
-import com.pascal.ezload.service.model.Tag;
-
-public class DividendInfo implements Tag {
-
-    public DividendInfo(TYPE type, PriceAtDate amount){
-        this.type = type;
-        this.amount = amount;
-    }
-
-    public enum TYPE {
-        EXCEPTIONAL, REGULAR
-    }
-
-    private PriceAtDate amount;
-    private TYPE type; // can be null
-
-
-    public PriceAtDate getAmount() {
-        return amount;
-    }
-
-    public TYPE getType() {
-        return type;
-    }
-
-    @Override
-    public String toString() {
-        return "DividendInfo{" +
-                "amount=" + amount +
-                ", type=" + type +
-                '}';
-    }
+public enum Period {
+    DAILY,
+    MONTHLY, // depuis le début du mois
+    YEARLY, // depuis le début de l'année calendaire
 }

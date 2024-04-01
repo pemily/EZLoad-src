@@ -32,6 +32,7 @@ public enum PortfolioIndex {
     CUMULABLE_DIVIDEND_REAL_YIELD_BRUT(true), // le rendement réel du portefeuille en %
     ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT(false), //  rendement théorique du portefeuille sur le dividend annuel
     CROISSANCE_THEORIQUE_DU_PORTEFEUILLE(false), // la croissance comme le calcul le site revenue et dividende
+    CUMULABLE_PERFORMANCE_PORTEFEUILLE(true), // La performance du portefeuille en %
     // TODO ADD CUMULABLE_TAXES
 
     ENTREES_SORTIES(false), // Entrées/Sorties (ajouts en positif, retraits en négatif) (CUMULABLE_ENTREES - CUMULABLE_SORTIES)

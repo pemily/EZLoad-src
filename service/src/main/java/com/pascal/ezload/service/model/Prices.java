@@ -17,13 +17,23 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.service.dashboard.config.ChartGroupedBy;
+import com.pascal.ezload.service.dashboard.engine.builder.PerfIndexBuilder;
+
 import java.util.*;
 
 public class Prices {
 
+    public enum PERIOD_ALGO {
+        TAKE_LAST_PERIOD_VALUE,
+        SUM_ALL_VALUES_IN_PERIOD
+    }
+
     private String label;
     private final ArrayList<PriceAtDate> pricesList = new ArrayList<>();
     private EZDevise devise;
+
+    private Period period; // automatically fill when the first priceAtDate is added
 
     public EZDevise getDevise() {
         return devise;
@@ -42,6 +52,7 @@ public class Prices {
     public Prices(Prices p){
         this.label = p.label;
         this.devise = p.devise;
+        p.getPrices().forEach(this::checkPeriod);
         pricesList.addAll(p.pricesList);
     }
 
@@ -50,14 +61,30 @@ public class Prices {
     public void addPrice(PriceAtDate price){
         if (price.getDate() == null) return;
         pricesList.add(price);
+        checkPeriod(price);
+    }
+
+    private void checkPeriod(PriceAtDate price) {
+        if (period == null)
+            period = price.getDate().getPeriod();
+        else if (period != price.getDate().getPeriod())
+            throw new IllegalStateException("You cannot mix period dates in the same prices list");
     }
 
     public void replacePriceAt(int index, PriceAtDate priceAtDate) {
+        checkPeriod(priceAtDate);
         pricesList.set(index, priceAtDate);
     }
 
     // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
     public PriceAtDate getPriceAt(EZDate date){
+        if (period != null && date.getPeriod() != period){
+            throw new IllegalStateException("Prices list "+period+" and given date "+date+" don't have the same types");
+        }
+        return getLatestValueInPeriodOrAtDate(date);
+    }
+
+    private PriceAtDate getLatestValueInPeriodOrAtDate(EZDate date) {
         PriceAtDate p = null;
         // on parcours la liste en sens inverse
         for (int i = pricesList.size() - 1 ; i >= 0; i--) {
@@ -75,6 +102,44 @@ public class Prices {
             p = new PriceAtDate(date);
         }
         return p;
+    }
+
+    // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
+    public PriceAtDate getPriceAt(EZDate date, PERIOD_ALGO algo){
+        if (period != null && date.getPeriod() == period){
+            // Prices list and given date share the same period
+            return getPriceAt(date);
+        }
+        else {
+            // est ce que je dois checker si Prices list est de type YEARLY et la date est DAY ou l'inverse?? une incompatiblité dans un sens?
+            if (algo == PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE) {
+                return getLatestValueInPeriodOrAtDate(date);
+            }
+            if (algo == PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD && date.getPeriod() == Period.DAILY && period == Period.DAILY){
+                return getLatestValueInPeriodOrAtDate(date);
+            }
+            if (algo == PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD) {
+                PerfIndexBuilder perfIndexBuilder = null;
+                Prices newPrices = null;
+                if (date.getPeriod() == Period.YEARLY){
+                    perfIndexBuilder = new PerfIndexBuilder(ChartGroupedBy.YEARLY);
+                    newPrices = perfIndexBuilder.buildGroupBy(this, true);
+                }
+                else if (date.getPeriod() == Period.MONTHLY && period != Period.YEARLY){
+                    perfIndexBuilder = new PerfIndexBuilder(ChartGroupedBy.MONTHLY);
+                    newPrices = perfIndexBuilder.buildGroupBy(this, true);
+                }
+                else if (date.getPeriod() == Period.DAILY && period == Period.DAILY){
+                    newPrices = this;
+                }
+                else {
+                    throw new IllegalStateException("Should not occur");
+                }
+
+                return newPrices.getPriceAt(date);
+            }
+            throw new IllegalStateException("TODO");
+        }
     }
 
     public String getLabel() {

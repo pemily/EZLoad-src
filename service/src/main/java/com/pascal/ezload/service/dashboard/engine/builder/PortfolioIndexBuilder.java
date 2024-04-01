@@ -142,11 +142,21 @@ public class PortfolioIndexBuilder {
                 if (previousState == null) return Price.ZERO;
                 // le gain journalier
                 return getDate2PortfolioValue().getPriceAt(state.getDate())
-                        .minus(getDate2PortfolioValue().getPriceAt(previousState.getDate()))
                         .minus(state.getShareBuy().getInstant())
                         .minus(state.getAllTaxes().getInstant())
                         .plus(state.getDividends().getInstant())
-                        .plus(state.getShareSold().getInstant());
+                        .plus(state.getShareSold().getInstant())
+                        .minus(getDate2PortfolioValue().getPriceAt(previousState.getDate()));
+            case CUMULABLE_PERFORMANCE_PORTEFEUILLE:
+                if (previousState == null || getDate2PortfolioValue().getPriceAt(previousState.getDate()).getValue() == 0) return Price.ZERO;
+                return  getDate2PortfolioValue().getPriceAt(state.getDate())
+                        .minus(state.getShareBuy().getInstant())
+                        .minus(state.getAllTaxes().getInstant())
+                        .plus(state.getDividends().getInstant())
+                        .plus(state.getShareSold().getInstant())
+                        .multiply(Price.CENT)
+                        .divide(getDate2PortfolioValue().getPriceAt(previousState.getDate()))
+                        .minus(Price.CENT);
             case GAINS_NET:
                 return state.getGains();
             case CUMULABLE_SOLD:
@@ -166,7 +176,7 @@ public class PortfolioIndexBuilder {
                 if (portfolioValue.getValue() != null && portfolioValue.getValue() > 0) {
                     for (Map.Entry<EZShareEQ, Price> entry : state.getShareNb().entrySet()) {
                         if (entry.getValue().getValue() != 0) {// si le nb d'action est different de 0
-                            PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate());
+                            PriceAtDate price = sharePriceBuilder.getPricesToTargetDevise(reporting, entry.getKey()).getPriceAt(state.getDate(), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                             Price shareValue = price.multiply(entry.getValue());
                             Price shareRatio = shareValue.divide(portfolioValue).multiply(Price.CENT);
                             Prices shareDividendAnnualYield = sharePriceBuilder.getRendementDividendeAnnuel(reporting, entry.getKey(), algoEstimationCroissance);

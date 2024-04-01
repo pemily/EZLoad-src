@@ -144,6 +144,10 @@ public class EZDate implements Comparable<EZDate> {
         return year;
     }
 
+    public Period getPeriod(){
+        return isMonthlyPeriod() ? Period.MONTHLY : isYearlyPeriod() ? Period.YEARLY : Period.DAILY;
+    }
+
     public String toEzPortoflioDate(){
         if (isPeriod()) {
             if (isYearlyPeriod()){

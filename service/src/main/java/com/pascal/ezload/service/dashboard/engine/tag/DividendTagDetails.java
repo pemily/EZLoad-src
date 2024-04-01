@@ -39,4 +39,11 @@ public class DividendTagDetails implements Tag {
     public float regularAmount(){
         return (float) details.stream().filter(d -> d.getType() != DividendInfo.TYPE.EXCEPTIONAL).mapToDouble(d -> d.getAmount().getValue()).sum();
     }
+
+    @Override
+    public String toString() {
+        return "DividendTagDetails{" +
+                "details=" + details +
+                '}';
+    }
 }
