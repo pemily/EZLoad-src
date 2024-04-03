@@ -25,6 +25,8 @@ public enum ShareIndex {
     SHARE_PRU_NET(false), // le PRU en incluant les dividendes
     SHARE_ANNUAL_DIVIDEND_YIELD(false), // rendement en %
 
+    CUMULABLE_PERFORMANCE_ACTION(true), // la performance du prix de l'action en %
+    CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS(true), // la performance du prix de l'action en % en incluant les dividendes
     // TODO ADD CUMULABLE_SHARE_TAXES, SHARE_PRU_BRUT
 
     @Deprecated

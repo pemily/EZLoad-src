@@ -4,6 +4,9 @@
 
 
 ## Historique 
+### Version 2.7.2
+* Correction de bugs
+
 ### Version 2.7.1
 * Correction de bugs
 

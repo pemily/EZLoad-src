@@ -46,6 +46,10 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "Dividendes"; break;
             case "SHARE_PRICE":
                 result += "Prix"; break;
+            case "CUMULABLE_PERFORMANCE_ACTION":
+                result += "Performance"; break;
+            case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
+                result += "Performance dividende inclus"; break;
             case "SHARE_PRU_BRUT":
                 result += "PRU"; break;
             case "SHARE_PRU_NET":
@@ -70,6 +74,8 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "Ventes"; break;
             case "CUMULABLE_BUY":
                 result += "Achats"; break;
+            case "CUMULABLE_PERFORMANCE_PORTEFEUILLE": 
+                result += "Performance"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
                 result += "Crédit d'impots"; break;
             case "CUMULABLE_ENTREES":
@@ -91,7 +97,7 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
             case "GAINS_NET":
                 result += "Gains latents"; break;
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":            
-                result += "Rendement réel constaté"; break;        
+                result += "Rendement du dividende réellement constaté"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
                 result += "Rendement théorique du dividende annuel"; break;
             case "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE":
@@ -124,6 +130,10 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte"; break;
             case "SHARE_PRICE":
                 result += "le cours de l'action"; break;
+            case "CUMULABLE_PERFORMANCE_ACTION":
+                result += "la performance du cours de l'action"; break;
+            case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
+                result += "la performance du cours de l'action incluant les dividendes"; break;
             case "SHARE_PRU_BRUT":
                 result += "le Prix de Revient Unitaire Brut (dividendes exclus)"; break; // utilise la date de paiement
             case "SHARE_PRU_NET":
@@ -146,6 +156,8 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "la vente d'actions"; break;
             case "CUMULABLE_BUY":
                 result += "l'achat d'actions"; break;
+            case "CUMULABLE_PERFORMANCE_PORTEFEUILLE":
+                result += "la performance du portefeuille"; break;                            
             case "LIQUIDITE": 
                 result += "Les liquidités"; break;
             case "CUMULABLE_CREDIT_IMPOTS":
@@ -169,9 +181,9 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
             case "GAINS_NET":
                 result += "vos gains latents (valeur du portefeuille - les achats - les taxes + les ventes + les dividendes)"; break;                            
             case "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT":
-                result += "le rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)"; break;        
+                result += "le rendement des dividendes réellement constaté de votre portefeuille (basé sur les dividendes brut réellement perçu et la valeur de votre portefeuille avec les liquidités)"; break;        
             case "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT":
-                result += "le rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité"; break;    
+                result += "le rendement des dividendes annuel de votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel total alors qu'il ne sera pas obligatoirement perçu dans son intégralité si vous n'avez pas d'actions"; break;    
             case "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE":
                 result += "la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille."; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.portfolioIndexConfig?.portfolioIndex;
@@ -239,10 +251,11 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Dividendes reçu",
                                 "Achat d'actions", //////////////////Pas d'interet en cumulé
                                 "Vente d'actions", //////////////////Pas d'interet en cumulé
-                                "Gains latents",                                
-                                "Rendements réél",
-                                "Rendement du dividende annuel théorique",
-                                "Croissance du portefeuille"
+                                "Gains latents",        
+                                "Performance du Portefeuille",
+                                "Rendements réél du dividende global du portefeuille",
+                                "Rendement théorique du dividende annuel du portefeuille",
+                                "Croissance du dividende global du portefeuille"
                             ]}
                             codeValues={[
                                 'VALEUR_PORTEFEUILLE_WITH_LIQUIDITY',
@@ -251,10 +264,11 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'ENTREES_SORTIES',
                                 'CUMULABLE_CREDIT_IMPOTS',                                    
                                 'CUMULABLE_PORTFOLIO_DIVIDENDES',
-                                'CUMULABLE_BUY',
+                                'CUMULABLE_BUY',                                
                                 'CUMULABLE_SOLD',
                                 //'CUMULABLE_GAIN_NET',
                                 'GAINS_NET',
+                                'CUMULABLE_PERFORMANCE_PORTEFEUILLE',
                                 'CUMULABLE_DIVIDEND_REAL_YIELD_BRUT',
                                 'ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT',
                                 'CROISSANCE_THEORIQUE_DU_PORTEFEUILLE']}
@@ -279,6 +293,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             userValues={[                             
                                 "Cours de l'action",
                                 "Nombre d'action",
+                                "Performance",
+                                "Performance dividendes inclus",
                                 "Achats/Ventes",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
@@ -290,7 +306,9 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             ]}
                             codeValues={[
                                 'SHARE_PRICE',
-                                'SHARE_COUNT',                                    
+                                'SHARE_COUNT',        
+                                'CUMULABLE_PERFORMANCE_ACTION',                                          
+                                'CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS',                  
                                 'CUMULABLE_SHARE_BUY_SOLD',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',
