@@ -53,10 +53,10 @@ public class ShareIndexBuilder {
 
     private Price get(ShareIndex shareIndex, EZShareEQ ezShare, EZDate date) {
             return switch (shareIndex) {
-                case SHARE_PRICE -> sharePriceBuilder.getPricesToTargetDevise(reporting, ezShare).getPriceAt(date);
+                case SHARE_PRICE -> sharePriceBuilder.getPricesToTargetDevise(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 case CUMULABLE_SHARE_DIVIDEND -> sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ALL, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case SHARE_ANNUAL_DIVIDEND_YIELD -> sharePriceBuilder.getRendementDividendeAnnuel(reporting, ezShare, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
-                case SHARE_COUNT -> portfolioIndexBuilder.getDate2share2ShareNb(ezShare).getPriceAt(date);
+                case SHARE_COUNT -> portfolioIndexBuilder.getDate2share2ShareNb(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> {
                         Price pru = portfolioIndexBuilder.getDate2share2PRUBrut(ezShare).getPriceAt(date);
                         PriceAtDate p = sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ONLY_REGULAR, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
@@ -69,13 +69,13 @@ public class ShareIndexBuilder {
                         if (p == null || pru == null || pru.getValue() == null || pru.getValue() == 0) yield new Price();
                         yield p.multiply(Price.CENT).divide(pru);
                 }
-                case SHARE_PRU_BRUT -> portfolioIndexBuilder.getDate2share2PRUBrut(ezShare).getPriceAt(date);
-                case SHARE_PRU_NET -> portfolioIndexBuilder.getDate2share2PRUNet(ezShare).getPriceAt(date);
-                case CUMULABLE_SHARE_BUY_SOLD -> portfolioIndexBuilder.getDate2share2BuyOrSoldAmount(ezShare).getPriceAt(date);
-                case CUMULABLE_PERFORMANCE_ACTION -> sharePriceBuilder.getPerformance(reporting, ezShare).getPriceAt(date);
-                case CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS -> sharePriceBuilder.getPerformanceWithDividends(reporting, ezShare).getPriceAt(date);
-                case CUMULABLE_SHARE_BUY -> portfolioIndexBuilder.getDate2share2BuyAmount(ezShare).getPriceAt(date);
-                case CUMULABLE_SHARE_SOLD -> portfolioIndexBuilder.getDate2share2SoldAmount(ezShare).getPriceAt(date);
+                case SHARE_PRU_BRUT -> portfolioIndexBuilder.getDate2share2PRUBrut(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
+                case SHARE_PRU_NET -> portfolioIndexBuilder.getDate2share2PRUNet(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
+                case CUMULABLE_SHARE_BUY_SOLD -> portfolioIndexBuilder.getDate2share2BuyOrSoldAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
+                case CUMULABLE_PERFORMANCE_ACTION -> sharePriceBuilder.getPerformance(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
+                case CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS -> sharePriceBuilder.getPerformanceWithDividends(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
+                case CUMULABLE_SHARE_BUY -> portfolioIndexBuilder.getDate2share2BuyAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
+                case CUMULABLE_SHARE_SOLD -> portfolioIndexBuilder.getDate2share2SoldAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case ACTION_CROISSANCE -> sharePriceBuilder.getCroissanceAnnuelDuDividendeWithEstimates(reporting, ezShare, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 };
     }

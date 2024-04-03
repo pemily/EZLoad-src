@@ -86,9 +86,9 @@ const genSecurityFile = () : String =>  `
 - Cliquez sur "**Créer**"
 - Attendre quelques secondes que la création se termine correctement
 
-#### Etape 2 - Configuration de l'écran de consentement
+#### Etape 2 - Configuration de l'écran d'autorisation
 - Aller <a href="https://console.cloud.google.com/apis/credentials?folder=&organizationId=&project=ezload" target="install">**Ici**</a>
-- Cliquez sur "**Configurer L'écran de consentement**"
+- Cliquez sur "**Configurer L'écran d'autorisation**"
 - Selectionnez "**Externes**"  
     _(Cette application ne sera jamais publié, elle restera en test et seul vous pourrez y acceder)_
     - Cliquez sur "**Créer**"       
@@ -105,7 +105,7 @@ const genSecurityFile = () : String =>  `
 
 #### Etape 4 - Utilisateurs tests
 - Cliquez sur "**ADD USERS**"
-- Entrez **Votre Adresse Email** et Enregistrer
+- Entrez **Votre Adresse Email** dans la fenetre "Ajouter des utilisateurs" et cliquez sur 'Ajouter'
 - Cliquez sur "**Enregistrer et continuer**"
 
 #### Etape 5 - Creation du fichier d'authentification
