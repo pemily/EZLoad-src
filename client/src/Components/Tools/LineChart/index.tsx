@@ -26,6 +26,7 @@ import { fr } from 'date-fns/locale';
 export interface LineChartProps {
     chart: Chart;        
     showLegend: boolean;
+    demo: boolean;
 }      
  
 
@@ -158,11 +159,21 @@ export function LineChart(props: LineChartProps){
                         if (context.dataset.tooltips){                            
                             const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
                             /* if (richValue.indexOf(":") === -1)
-                                return context.dataset.label+': '+richValue; */
-                            return richValue;
+                                return context.dataset.label+': '+richValue; */                            
+                            var richVal = richValue;  
+                            if (props.demo && context.dataset.yAxisID == 'PORTFOLIO') 
+                                richVal = "10 000€ (demo)";
+                            else if (props.demo && context.dataset.yAxisID == 'NB') 
+                                richVal = "1 000 (demo)";
+                            return richVal;
                         }
-                        // ajout de l'unité automatiquement                        
-                        return context.dataset.label+': '+context.formattedValue
+                        // ajout de l'unité automatiquement                    
+                        var val = context.formattedValue;  
+                        if (props.demo && context.dataset.yAxisID == 'PORTFOLIO') 
+                            val = "10 000€ (demo)";
+                        else if (props.demo && context.dataset.yAxisID == 'NB') 
+                            val = "1 000 (demo)";
+                        return context.dataset.label+': '+val
                                                     +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 
                                                             context.dataset.yAxisID === 'NB' ? '' : ' '+props.chart.axisId2titleY?.Y_AXIS_TITLE);
                     }
@@ -236,7 +247,7 @@ export function LineChart(props: LineChartProps){
                     autoSkip: true,         
                     autoSkipPadding: 25,                    
                     crossAlign: "near",
-                    align: 'start',
+                    align: 'start',                    
 
                },
                grid: {
@@ -262,7 +273,13 @@ export function LineChart(props: LineChartProps){
                 title: {
                     display: true,
                     text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                },        
+                },    
+                ticks: {
+                    color: 'black',
+                    backdropColor: 'black',
+                    showLabelBackdrop: props.demo
+                }    
+                
             },        
             NB: {
                 type: 'linear',
@@ -272,6 +289,11 @@ export function LineChart(props: LineChartProps){
                 title: {
                     display: false
                 },
+                ticks: {
+                    color: 'black',
+                    backdropColor: 'black',
+                    showLabelBackdrop: props.demo
+                }    
             },                         
             SHARE: {
                 type: 'linear',

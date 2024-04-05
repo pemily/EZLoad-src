@@ -27,6 +27,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 export interface PageUIProps {    
     readOnly: boolean;    
+    demo: boolean;
     dashboardPage: DashboardPageChart; 
     allEzShare: EzShareData[];
     savePageUI: (page: DashboardPageChart, keepLines: boolean, afterSave: () => void) => void
@@ -47,7 +48,8 @@ export function PageUI(props: PageUIProps){
                                     deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
                                     saveChartUI={(chartUi: ChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : 
                                         chartUi) }, keepLines, afterSave)}}
-                                    readOnly={props.readOnly}                                            
+                                    readOnly={props.readOnly}              
+                                    demo={props.demo}                              
                                     chart={chart}
                                     allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
                             />

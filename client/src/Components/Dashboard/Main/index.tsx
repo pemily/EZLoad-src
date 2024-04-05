@@ -28,6 +28,7 @@ import { TextField } from "../../Tools/TextField";
 
 export interface DashboardMainProps {
     enabled: boolean;
+    demo: boolean;
     processRunning: boolean;
     dashboardData: DashboardData|undefined;
     actionWithMsg: ActionWithMsg|undefined;
@@ -81,6 +82,7 @@ export function DashboardMain(props: DashboardMainProps){
                                         <Tab title={page.title} key={"page"+pageIndex}>
                                         <PageUI allEzShare={allEzShares} 
                                                 readOnly={props.processRunning}
+                                                demo={props.demo}
                                                 dashboardPage={page}
                                                 savePageUI={(newPage, keepLines, afterSave) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), keepLines, afterSavePage => {
                                                     setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? (keepLines ? newPage : afterSavePage[i]) : p));

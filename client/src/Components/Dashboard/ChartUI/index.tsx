@@ -30,6 +30,7 @@ import { ComboField } from "../../Tools/ComboField";
 
 export interface ChartUIProps {    
     readOnly: boolean;    
+    demo: boolean;
     chart: Chart; 
     allEzShare: EzShareData[];
     saveChartUI: (chart: ChartSettings, keepLines: boolean, afterSave: () => void) => void
@@ -149,7 +150,7 @@ export function ChartUI(props: ChartUIProps){
                         <Box height={(props.chart.height)+"vh"}>     
                             {
                                 (props.chart.lines !== undefined && props.chart.lines.length > 0) && (                                
-                                    <LineChart chart={filteredChart} showLegend={false}/>                                
+                                    <LineChart chart={filteredChart} showLegend={false} demo={props.demo}/>                                
                                 )                            
                             }                   
                             {
