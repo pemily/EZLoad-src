@@ -43,23 +43,18 @@ export function PageUI(props: PageUIProps){
                 <Box>
                 {
                     props.dashboardPage.charts?.map((chartSwitch, index) => {
-                        if (chartSwitch.timeLine) {
-                            const timeLineChart : TimeLineChart = chartSwitch.timeLine;
-                            return (
-                                <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+timeLineChart.title+index}
-                                        deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
-                                        saveChartUI={(chartUi: TimeLineChart, keepLines, afterSave) => {props.savePageUI(
-                                                                                                            {...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : {
-                                                                                                                timeLine: chartUi
-                                                                                                            }) 
-                                                                                                            }, keepLines, afterSave)}}
-                                        readOnly={props.readOnly}              
-                                        demo={props.demo}                              
-                                        timeLineChart={timeLineChart}
-                                        allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
-                                />
-                            );
-                        }
+                        return (
+                            <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+index}
+                                    deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
+                                    saveChartUI={(chartUi: ChartSwitch, keepLines, afterSave) => {props.savePageUI(
+                                                                                                        {...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) 
+                                                                                                        }, keepLines, afterSave)}}
+                                    readOnly={props.readOnly}              
+                                    demo={props.demo}                              
+                                    chartSwitch={chartSwitch}
+                                    allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
+                            />
+                        );
                     })
                 }
                 </Box>
