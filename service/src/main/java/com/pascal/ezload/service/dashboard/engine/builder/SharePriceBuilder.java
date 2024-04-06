@@ -60,6 +60,7 @@ public class SharePriceBuilder {
     private final Map<String, Prices> share2annualDividendYieldsTargetPrices = new HashMap<>();  // avec l'estimation sur l'année en cours
     private final Map<String, Price> shareYear2annualDividend = new HashMap<>();
     private final Map<String, Price> shareYear2annualDividendWithEstimates = new HashMap<>();
+    private final Map<EZShareEQ, Price> shareYear2estimatePricePerformanceFuture = new HashMap<>();
     private final Map<String, Prices> share2croissanceDividendAnnualWithEstimates = new HashMap<>();
 
 
@@ -81,6 +82,43 @@ public class SharePriceBuilder {
                     return currencies.convertPricesToTargetDevise(reporting, prices, true);
                 reporting.error("Les cours de l'action " + share.getEzName() + " n'ont pas été trouvé");
                 throw new RuntimeException("Les cours de l'action " + share.getEzName() + " " + share.getGoogleCode() + " n'ont pas été trouvé");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Price getEstimatedFuturePricePerf(Reporting reporting, EZShareEQ share) throws Exception {
+        return shareYear2estimatePricePerformanceFuture.computeIfAbsent(share, ezShare -> {
+            int currentYear = EZDate.today().getYear();
+            try {
+                int analyseOverNYear = 10;
+                Prices prices = actionManager.getPrices(reporting, share, List.of(new EZDate(currentYear - (analyseOverNYear*2+1), 1, 1)));
+
+                if (prices == null) {
+                    return new Price();
+                }
+
+                prices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
+                prices = perfIndexBuilder.buildPerfPrices(prices, ChartPerfFilter.VARIATION_EN_PERCENT);
+
+                // si on est en 2024,
+                // on va prendre la perf entre 2004 - 2014
+                // puis la perf entre          2005 - 2015
+                // puis la perf entre          2006 - 2016
+                // ...
+                // puis la perf entre          2014 - 2024
+                // et on fera la moyenne entre toutes ces perfs
+                List<Price> allTenYearPerfs = new LinkedList<>();
+                for (int startingYear = currentYear - (analyseOverNYear*2); startingYear + analyseOverNYear < currentYear; startingYear++) {
+                    Price perf = new Price();
+                    for (int year = startingYear; year < startingYear + analyseOverNYear; year++) {
+                        perf = perf.plus(prices.getPriceAt(EZDate.yearPeriod(year)));
+                    }
+                    allTenYearPerfs.add(perf);
+                }
+
+                return allTenYearPerfs.stream().reduce(Price::plus).orElseThrow().divide(new Price(analyseOverNYear));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
