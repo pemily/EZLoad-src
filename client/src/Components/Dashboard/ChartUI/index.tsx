@@ -18,10 +18,10 @@
 import { Box, Button, Text, Collapsible, Anchor } from "grommet";
 import { useState } from "react";
 import { Trash, Configure, ZoomIn, ZoomOut, Close, Checkbox } from 'grommet-icons';
-import { Chart, ChartSettings, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, TimeLineChartSettings, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription } from '../ChartIndexMainEditor';
 import { isDefined } from '../../../ez-api/tools';
-import { ChartSettingsEditor } from '../ChartSettingsEditor';
+import { TimeLineChartSettingsEditor } from '../TimeLineChartSettingsEditor';
 import { LineChart } from '../../Tools/LineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -33,7 +33,7 @@ export interface ChartUIProps {
     demo: boolean;
     chart: Chart; 
     allEzShare: EzShareData[];
-    saveChartUI: (chart: ChartSettings, keepLines: boolean, afterSave: () => void) => void
+    saveChartUI: (chart: TimeLineChartSettings, keepLines: boolean, afterSave: () => void) => void
     deleteChartUI: (afterSave: () => void) => void
 }      
 
@@ -185,7 +185,7 @@ export function ChartUI(props: ChartUIProps){
                 </Box>
 
                 <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
-                        <ChartSettingsEditor
+                        <TimeLineChartSettingsEditor
                             readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
                             chartSettings={props.chart}

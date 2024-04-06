@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPageChartSettings, Chart, ChartSettings } from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPageTimeLineChartSettings, Chart, TimeLineChartSettings } from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -104,7 +104,7 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {  
+function chart2TimeLineChartSettings(chart: Chart|TimeLineChartSettings) : TimeLineChartSettings {
   var c: Chart = {
       ...chart,
       lines: undefined,
@@ -118,8 +118,8 @@ function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {
   return c;
 }
 
-export function saveDashboardConfig(dashConfig: DashboardPageChartSettings[], keepLines: boolean, updModel: (dashConfig: DashboardPageChartSettings[]) => void){        
-  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => { return {...page, charts: page.charts?.map(chart2ChartSettings)}})))
+export function saveDashboardConfig(dashConfig: DashboardPageTimeLineChartSettings[], keepLines: boolean, updModel: (dashConfig: DashboardPageTimeLineChartSettings[]) => void){
+  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => { return {...page, charts: page.charts?.map(chart2TimeLineChartSettings)}})))
     .then(r => updModel(keepLines ? dashConfig : r))
     .catch(e => console.error("Save Dashboard Error: ", e));
 }

@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class ChartSettings extends Checkable<ChartSettings> {
+public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> implements DashboardChart {
 
     enum Field {targetDevise, title, brokers, accountTypes, portfolioFilters, selectedStartDateSelection, shareNames, shareSelection, additionalShareNames, showCurrency}
 
@@ -47,8 +47,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private int height = 50;
     private int nbOfPoints = 200;
 
-    public ChartSettings(){}
-    public ChartSettings(ChartSettings chartSettings){
+    public TimeLineChartSettings(){}
+    public TimeLineChartSettings(TimeLineChartSettings chartSettings){
         this.targetDevise = chartSettings.targetDevise;
         this.title = chartSettings.title;
         this.excludeBrokers = chartSettings.excludeBrokers;
@@ -73,6 +73,15 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public ChartType getType() {
+        return ChartType.TIMELINE;
+    }
+
+    @Override
+    public void setType(ChartType chartType) {
     }
 
     public void setTitle(String title) {
@@ -160,7 +169,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.algoEstimationCroissance = algoEstimationCroissance;
     }
 
-    public ChartSettings validate() {
+    public TimeLineChartSettings validate() {
         new StringValue(this, Field.targetDevise.name(), targetDevise).checkRequired();
         return this;
     }

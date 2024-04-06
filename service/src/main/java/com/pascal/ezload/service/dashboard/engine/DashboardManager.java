@@ -49,7 +49,7 @@ public class DashboardManager {
         this.ezActionManager = ezActionManager;
     }
 
-    public List<DashboardPage<ChartSettings>>  loadDashboardSettings() {
+    public List<DashboardPage<TimeLineChartSettings>>  loadDashboardSettings() {
         if (!new File(dashboardFile).exists()) {
             try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
                 FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
@@ -60,7 +60,7 @@ public class DashboardManager {
         }
 
         try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
-            List<DashboardPage<ChartSettings>> r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
+            List<DashboardPage<TimeLineChartSettings>> r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<TimeLineChartSettings>>>(){});
             if (r.isEmpty() || (r.size() == 1 && r.get(0).getCharts().isEmpty())) {
                 // recopy le default
                 try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
@@ -69,7 +69,7 @@ public class DashboardManager {
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<ChartSettings>>>(){});
+                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<TimeLineChartSettings>>>(){});
             }
             return r;
         }
@@ -80,7 +80,7 @@ public class DashboardManager {
         return new LinkedList<>();
     }
 
-    public List<DashboardPage<Chart>> loadDashboard(List<DashboardPage<ChartSettings>> dashboardSettings) {
+    public List<DashboardPage<Chart>> loadDashboard(List<DashboardPage<TimeLineChartSettings>> dashboardSettings) {
         return dashboardSettings.stream()
                 .map(page -> {
                     DashboardPage<Chart> pageWithChart = new DashboardPage<>();
@@ -99,7 +99,7 @@ public class DashboardManager {
                 .collect(Collectors.toList());
     }
 
-    public List<DashboardPage<Chart>> loadDashboardAndCreateChart(Reporting reporting, List<DashboardPage<ChartSettings>> dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
+    public List<DashboardPage<Chart>> loadDashboardAndCreateChart(Reporting reporting, List<DashboardPage<TimeLineChartSettings>> dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
         // if ezPortfolioProxy est null => dry run with no data extraction
         return dashboardSettings.stream()
                 .map(page -> {
@@ -122,16 +122,16 @@ public class DashboardManager {
                 .collect(Collectors.toList());
     }
 
-    public void saveDashboardSettings(List<DashboardPage<ChartSettings>> dashboardSettings) throws IOException {
+    public void saveDashboardSettings(List<DashboardPage<TimeLineChartSettings>> dashboardSettings) throws IOException {
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(dashboardFile, StandardCharsets.UTF_8), dashboardSettings);
     }
 
-    public Chart createEmptyChart(ChartSettings chartSettings) throws IOException {
+    public Chart createEmptyChart(TimeLineChartSettings chartSettings) throws IOException {
         return ChartsTools.createChart(chartSettings, new LinkedList<>());
     }
 
     public Chart createChart(Reporting rep, EZPortfolioProxy portfolio,
-                             ChartSettings chartSettings) throws IOException {
+                             TimeLineChartSettings chartSettings) throws IOException {
         try(Reporting reporting = rep.pushSection("Génération du graphique: '"+chartSettings.getTitle()+"'")) {
 
             EZDate today = EZDate.today();
@@ -252,7 +252,7 @@ public class DashboardManager {
         return allChartLines;
     }
 
-    private List<ChartLine> createShareCharts(ChartSettings chartSettings, ShareIndexBuilder shareIndexResult, ChartIndex chartIndex, ShareSelectionBuilder shareSelectionBuilder) {
+    private List<ChartLine> createShareCharts(TimeLineChartSettings chartSettings, ShareIndexBuilder shareIndexResult, ChartIndex chartIndex, ShareSelectionBuilder shareSelectionBuilder) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartShareIndexConfig shareIndexConfig = chartIndex.getShareIndexConfig();
 

@@ -22,7 +22,7 @@ import com.pascal.ezload.service.util.Checkable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DashboardPage<T extends ChartSettings> extends Checkable<DashboardPage<T>> {
+public class DashboardPage<T extends DashboardChart> extends Checkable<DashboardPage<T>> {
 
     private String title;
     private List<T> charts = new LinkedList<>();
@@ -36,14 +36,14 @@ public class DashboardPage<T extends ChartSettings> extends Checkable<DashboardP
     }
 
     @Override
-    public DashboardPage validate() {
-        charts.forEach(ChartSettings::validate);
+    public DashboardPage<T> validate() {
+        charts.forEach(DashboardChart::validate);
         return this;
     }
 
     @Override
     public void clearErrors(){
-        charts.forEach(ChartSettings::clearErrors);
+        charts.forEach(DashboardChart::clearErrors);
     }
 
     public String getTitle() {

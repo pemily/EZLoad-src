@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.dashboard.config.ChartSettings;
+import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
 
@@ -80,7 +80,7 @@ public class ChartsTools {
         return allDates;
     }
 
-    public static Chart createChart(ChartSettings chartSettings, List<EZDate> dates) {
+    public static Chart createChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
         Chart chart = new Chart(chartSettings);
 
         List<ChartsTools.Label> r = new LinkedList<>();

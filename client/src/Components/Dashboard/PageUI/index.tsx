@@ -18,7 +18,7 @@
 import { Box, Button } from "grommet";
 import { useState } from "react";
 import { Add } from 'grommet-icons';
-import { Chart, ChartSettings, EzShareData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart, TimeLineChartSettings, EzShareData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
 
 import { ChartUI } from "../ChartUI";
@@ -46,7 +46,7 @@ export function PageUI(props: PageUIProps){
                         return (
                             <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+chart.title+index}
                                     deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
-                                    saveChartUI={(chartUi: ChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : 
+                                    saveChartUI={(chartUi: TimeLineChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c :
                                         chartUi) }, keepLines, afterSave)}}
                                     readOnly={props.readOnly}              
                                     demo={props.demo}                              
@@ -75,6 +75,7 @@ export function PageUI(props: PageUIProps){
                                 excludeBrokers: [],
                                 title: 'Titre à changer',                                                                
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
+                                type: "TIMELINE",
                                 targetDevise: 'EUR',
                                 indexSelection: [ chartIndex ],
                                 groupedBy: "DAILY",

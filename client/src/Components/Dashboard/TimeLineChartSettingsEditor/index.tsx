@@ -18,7 +18,7 @@
 import { Box, Button, Card, CardBody, CardHeader, Tab, Tabs } from "grommet";
 import { Trash } from 'grommet-icons';
 import { useState } from "react";
-import { ChartIndex, ChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, TimeLineChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
@@ -28,11 +28,11 @@ import { ChartIndexMainEditor, getChartIndexDescription, getChartIndexTitle } fr
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
-export interface ChartSettingsEditorProps {    
-    chartSettings: ChartSettings;
+export interface TimeLineChartSettingsEditorProps {
+    chartSettings: TimeLineChartSettings;
     allEzShares: EzShareData[];    
     readOnly: boolean;
-    save: (chartSettings: ChartSettings, keepLines: boolean, afterSave: () => void) => void;
+    save: (chartSettings: TimeLineChartSettings, keepLines: boolean, afterSave: () => void) => void;
 }      
 
 
@@ -63,7 +63,7 @@ export const brokers = ["Autre",
 
 export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assurance-Vie"];
 
-export function ChartSettingsEditor(props: ChartSettingsEditorProps){        
+export function TimeLineChartSettingsEditor(props: TimeLineChartSettingsEditorProps){
     const [indiceIndex, setIndiceIndex] = useState<number>(0);     
     
     function nouvelIndice() : ChartIndex {
