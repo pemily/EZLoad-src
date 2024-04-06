@@ -69,9 +69,9 @@ public class ChartsTools {
                     newDate = to;
                 }
             }
-            else if (period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR) {
+            else {
+                // period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR
                 newDate = previousDate.createNextPeriod();
-
             }
             allDates.add(newDate);
             previousDate = newDate;
@@ -80,8 +80,8 @@ public class ChartsTools {
         return allDates;
     }
 
-    public static Chart createChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
-        Chart chart = new Chart(chartSettings);
+    public static TimeLineChart createTimeLineChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
+        TimeLineChart timeLineChart = new TimeLineChart(chartSettings);
 
         List<ChartsTools.Label> r = new LinkedList<>();
         EZDate previousDate = null;
@@ -97,11 +97,11 @@ public class ChartsTools {
             r.add(ChartsTools.date2Label(previousDate, true, true));
         }
 
-        chart.setLabels(r);
-        return chart;
+        timeLineChart.setLabels(r);
+        return timeLineChart;
     }
 
-    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+    public static ChartLine createTimeLineChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
         return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(pd -> {

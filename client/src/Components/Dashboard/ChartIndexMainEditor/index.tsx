@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { ChartIndex, TimeLineChartSettings, ChartPortfolioIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, TimeLineChart, ChartPortfolioIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { isDefined, applyEZLoadTextSignature} from '../../../ez-api/tools';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 
 export interface ChartIndexMainEditorProps {    
-    chartSettings: TimeLineChartSettings;
+    chartSettings: TimeLineChart;
     chartIndex: ChartIndex;
     save: (chartIndex:ChartIndex) => void;    
     readOnly: boolean;    

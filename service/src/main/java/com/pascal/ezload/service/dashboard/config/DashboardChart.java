@@ -11,10 +11,7 @@ public interface DashboardChart {
 
     void setTitle(String title);
 
-    ChartType getType();
-
-    void setType(ChartType chartType);
-
+    ChartType type();
 
     <T extends DashboardChart> T validate();
 

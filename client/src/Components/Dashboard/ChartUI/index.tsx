@@ -18,7 +18,7 @@
 import { Box, Button, Text, Collapsible, Anchor } from "grommet";
 import { useState } from "react";
 import { Trash, Configure, ZoomIn, ZoomOut, Close, Checkbox } from 'grommet-icons';
-import { Chart, TimeLineChartSettings, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { TimeLineChart, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription } from '../ChartIndexMainEditor';
 import { isDefined } from '../../../ez-api/tools';
 import { TimeLineChartSettingsEditor } from '../TimeLineChartSettingsEditor';
@@ -31,9 +31,9 @@ import { ComboField } from "../../Tools/ComboField";
 export interface ChartUIProps {    
     readOnly: boolean;    
     demo: boolean;
-    chart: Chart; 
+    timeLineChart: TimeLineChart;
     allEzShare: EzShareData[];
-    saveChartUI: (chart: TimeLineChartSettings, keepLines: boolean, afterSave: () => void) => void
+    saveChartUI: (timeLineChart: TimeLineChart, keepLines: boolean, afterSave: () => void) => void
     deleteChartUI: (afterSave: () => void) => void
 }      
 
@@ -43,15 +43,15 @@ interface ChartLineWithIndex extends ChartLine {
 }
 
 function buildLineWithIndex(chartProps: ChartUIProps) : ChartLineWithIndex[]{
-    if (!chartProps.chart.lines) return [];
-    return chartProps.chart.lines.map(line => { return {
+    if (!chartProps.timeLineChart.lines) return [];
+    return chartProps.timeLineChart.lines.map(line => { return {
         ...line,
-        index: chartProps.chart.indexSelection!.filter(index => index.id === line.indexId)[0]
+        index: chartProps.timeLineChart.indexSelection!.filter(index => index.id === line.indexId)[0]
     }})
 }
 
 function containsShareIndex(chartProps:ChartUIProps) : boolean {
-    return chartProps.chart.indexSelection!
+    return chartProps.timeLineChart.indexSelection!
                 .filter(indexSelect => isDefined(indexSelect.shareIndexConfig))
                 .length > 0;
 }
@@ -59,12 +59,12 @@ function containsShareIndex(chartProps:ChartUIProps) : boolean {
 
 export function ChartUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);    
-    const [filteredChart, setFilteredChart] = useState<Chart>( containsShareIndex(props) ? {...props.chart, lines:[]} : props.chart);    
+    const [filteredChart, setFilteredChart] = useState<TimeLineChart>( containsShareIndex(props) ? {...props.timeLineChart, lines:[]} : props.timeLineChart);
     const [selectedShare, setSelectedShare] = useState<string|undefined>(undefined);
     const [allIndexedLines] = useState<ChartLineWithIndex[]>(buildLineWithIndex(props));
 
     function getIndex(indexId: string) : ChartIndex {
-        return props.chart.indexSelection?.filter(i => i.id === indexId)[0]!
+        return props.timeLineChart.indexSelection?.filter(i => i.id === indexId)[0]!
     }
 
     function selectShare(selectedShare: string|undefined) : void{
@@ -95,13 +95,13 @@ export function ChartUI(props: ChartUIProps){
             <Collapsible open={!edition || props.readOnly}>                
                     <Box direction="row" margin="small">
                         <Box flex="grow" direction="column" alignSelf="center">
-                            <Text alignSelf="center"  margin="0">{props.chart.title}</Text>
+                            <Text alignSelf="center"  margin="0">{props.timeLineChart.title}</Text>
                         </Box>
                         <Box  direction="row" alignSelf="end"  margin="0" pad="0">
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!+10 }, true, () => {}) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.timeLineChart, height: props.timeLineChart.height!+10 }, true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI({...props.chart, height: props.chart.height!-10 }, true, () => {}) }/>
+                                    plain={true} label="" onClick={() => props.saveChartUI({...props.timeLineChart, height: props.timeLineChart.height!-10 }, true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
                         </Box>
@@ -111,14 +111,14 @@ export function ChartUI(props: ChartUIProps){
                         <Box alignSelf="center" direction="row" alignContent="center" flex="grow" align="center" gap="medium">
                             {                                
                                 // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
-                                (props.chart.lines !== undefined && props.chart.lines.length > 0) && containsShareIndex(props) && 
+                                (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && containsShareIndex(props) &&
                                     (<Box gap="none" margin="none" direction="row" align="center">                                       
                                         <ComboField id='indexLabelFilterCombo'   
                                             readOnly={false}
                                             description=""
                                             errorMsg=""                                
                                             value={undefined}
-                                            values={props.chart.lines === undefined ? [""] : Array.from(new Set([""].concat(allIndexedLines.filter(line => isDefined(line.index.shareIndexConfig)).map(line => line.title!))))}
+                                            values={props.timeLineChart.lines === undefined ? [""] : Array.from(new Set([""].concat(allIndexedLines.filter(line => isDefined(line.index.shareIndexConfig)).map(line => line.title!))))}
                                             onChange={newValue => {
                                                 setSelectedShare(newValue);
                                                 selectShare(newValue)
@@ -126,7 +126,7 @@ export function ChartUI(props: ChartUIProps){
                                     </Box>)
                             }
                             {                            
-                                 (props.chart.lines !== undefined && props.chart.lines.length > 0) && (props.chart.indexSelection!
+                                 (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && (props.timeLineChart.indexSelection!
                                     .map((l,i) => {                                                   
                                             return (<Anchor key={'indexLabelFilter'+i}                                                                   
                                                             size="small" icon={<Checkbox size='small' color="black"
@@ -147,14 +147,14 @@ export function ChartUI(props: ChartUIProps){
                                         }))
                             }
                         </Box>
-                        <Box height={(props.chart.height)+"vh"}>     
+                        <Box height={(props.timeLineChart.height)+"vh"}>
                             {
-                                (props.chart.lines !== undefined && props.chart.lines.length > 0) && (                                
-                                    <LineChart chart={filteredChart} showLegend={false} demo={props.demo}/>                                
+                                (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && (
+                                    <LineChart timeLineChart={filteredChart} showLegend={false} demo={props.demo}/>
                                 )                            
                             }                   
                             {
-                                (props.chart.lines === undefined || props.chart.lines.length === 0) && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)
+                                (props.timeLineChart.lines === undefined || props.timeLineChart.lines.length === 0) && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)
                             }                        
                         </Box>
                     </Box>
@@ -188,7 +188,7 @@ export function ChartUI(props: ChartUIProps){
                         <TimeLineChartSettingsEditor
                             readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
-                            chartSettings={props.chart}
+                            chartSettings={props.timeLineChart}
                             save={(newChartSettsValue, keepLines: boolean, afterSave) => {
                                     props.saveChartUI(newChartSettsValue, keepLines, afterSave)}}
                         />

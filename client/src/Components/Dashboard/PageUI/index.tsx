@@ -18,7 +18,7 @@
 import { Box, Button } from "grommet";
 import { useState } from "react";
 import { Add } from 'grommet-icons';
-import { Chart, TimeLineChartSettings, EzShareData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
+import { TimeLineChart, EzShareData, DashboardPage, ChartIndex, ChartSwitch } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
 
 import { ChartUI } from "../ChartUI";
@@ -28,9 +28,9 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 export interface PageUIProps {    
     readOnly: boolean;    
     demo: boolean;
-    dashboardPage: DashboardPageChart; 
+    dashboardPage: DashboardPage; 
     allEzShare: EzShareData[];
-    savePageUI: (page: DashboardPageChart, keepLines: boolean, afterSave: () => void) => void
+    savePageUI: (page: DashboardPage, keepLines: boolean, afterSave: () => void) => void
 }      
 
 export function PageUI(props: PageUIProps){
@@ -42,18 +42,24 @@ export function PageUI(props: PageUIProps){
               
                 <Box>
                 {
-                    props.dashboardPage.charts?.map((chart, index) => {
-                        return (
-                            <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+chart.title+index}
-                                    deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
-                                    saveChartUI={(chartUi: TimeLineChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c :
-                                        chartUi) }, keepLines, afterSave)}}
-                                    readOnly={props.readOnly}              
-                                    demo={props.demo}                              
-                                    chart={chart}
-                                    allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
-                            />
-                        );
+                    props.dashboardPage.charts?.map((chartSwitch, index) => {
+                        if (chartSwitch.timeLine) {
+                            const timeLineChart : TimeLineChart = chartSwitch.timeLine;
+                            return (
+                                <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+timeLineChart.title+index}
+                                        deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
+                                        saveChartUI={(chartUi: TimeLineChart, keepLines, afterSave) => {props.savePageUI(
+                                                                                                            {...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : {
+                                                                                                                timeLine: chartUi
+                                                                                                            }) 
+                                                                                                            }, keepLines, afterSave)}}
+                                        readOnly={props.readOnly}              
+                                        demo={props.demo}                              
+                                        timeLineChart={timeLineChart}
+                                        allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
+                                />
+                            );
+                        }
                     })
                 }
                 </Box>
@@ -70,23 +76,25 @@ export function PageUI(props: PageUIProps){
                                 currencyIndexConfig: undefined,
                                 shareIndexConfig: undefined,
                             };
-                            const newChart: Chart = {
+                            const newChart: TimeLineChart = {
                                 excludeAccountTypes: [],
                                 excludeBrokers: [],
                                 title: 'Titre à changer',                                                                
                                 selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
-                                type: "TIMELINE",
                                 targetDevise: 'EUR',
                                 indexSelection: [ chartIndex ],
                                 groupedBy: "DAILY",
                                 shareSelection: "CURRENT_SHARES",
                                 additionalShareGoogleCodeList: []
-                            };                            
+                            };       
+                            const newChartSwitch: ChartSwitch = {
+                                timeLine: newChart
+                            };                  
                             chartIndex.description = getChartIndexDescription(chartIndex)                            
                             chartIndex.label = getChartIndexTitle(chartIndex);
                             props.savePageUI({
                                                 ...props.dashboardPage,
-                                                charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]
+                                                charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChartSwitch]
                                             }, false, () => {})
                         }}
                     />

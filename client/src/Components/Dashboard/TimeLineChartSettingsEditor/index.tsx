@@ -18,7 +18,7 @@
 import { Box, Button, Card, CardBody, CardHeader, Tab, Tabs } from "grommet";
 import { Trash } from 'grommet-icons';
 import { useState } from "react";
-import { ChartIndex, TimeLineChartSettings, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, TimeLineChart, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
@@ -29,10 +29,10 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 export interface TimeLineChartSettingsEditorProps {
-    chartSettings: TimeLineChartSettings;
+    chartSettings: TimeLineChart;
     allEzShares: EzShareData[];    
     readOnly: boolean;
-    save: (chartSettings: TimeLineChartSettings, keepLines: boolean, afterSave: () => void) => void;
+    save: (chartSettings: TimeLineChart, keepLines: boolean, afterSave: () => void) => void;
 }      
 
 

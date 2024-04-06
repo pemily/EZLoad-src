@@ -22,28 +22,28 @@ import com.pascal.ezload.service.util.Checkable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DashboardPage<T extends DashboardChart> extends Checkable<DashboardPage<T>> {
+public class DashboardPage extends Checkable<DashboardPage> {
 
     private String title;
-    private List<T> charts = new LinkedList<>();
+    private List<ChartSwitch> charts = new LinkedList<>();
 
-    public List<T> getCharts() {
+    public List<ChartSwitch> getCharts() {
         return charts;
     }
 
-    public void setCharts(List<T> chartSettings) {
+    public void setCharts(List<ChartSwitch> chartSettings) {
         this.charts = chartSettings;
     }
 
     @Override
-    public DashboardPage<T> validate() {
-        charts.forEach(DashboardChart::validate);
+    public DashboardPage validate() {
+        charts.forEach(ChartSwitch::validate);
         return this;
     }
 
     @Override
     public void clearErrors(){
-        charts.forEach(DashboardChart::clearErrors);
+        charts.forEach(ChartSwitch::clearErrors);
     }
 
     public String getTitle() {

@@ -49,7 +49,7 @@ public class DashboardManager {
         this.ezActionManager = ezActionManager;
     }
 
-    public List<DashboardPage<TimeLineChartSettings>>  loadDashboardSettings() {
+    public List<DashboardPage>  loadDashboardSettings() {
         if (!new File(dashboardFile).exists()) {
             try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
                 FileUtil.string2file(dashboardFile, IOUtils.toString(in, StandardCharsets.UTF_8));
@@ -60,7 +60,7 @@ public class DashboardManager {
         }
 
         try (Reader reader = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
-            List<DashboardPage<TimeLineChartSettings>> r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<TimeLineChartSettings>>>(){});
+            List<DashboardPage> r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage>>(){});
             if (r.isEmpty() || (r.size() == 1 && r.get(0).getCharts().isEmpty())) {
                 // recopy le default
                 try (InputStream in = DashboardManager.class.getResourceAsStream("/defaultDashboard.json")) {
@@ -69,7 +69,7 @@ public class DashboardManager {
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage<TimeLineChartSettings>>>(){});
+                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage>>(){});
             }
             return r;
         }
@@ -80,18 +80,19 @@ public class DashboardManager {
         return new LinkedList<>();
     }
 
-    public List<DashboardPage<Chart>> loadDashboard(List<DashboardPage<TimeLineChartSettings>> dashboardSettings) {
+    public List<DashboardPage> loadDashboard(List<DashboardPage> dashboardSettings) {
         return dashboardSettings.stream()
                 .map(page -> {
-                    DashboardPage<Chart> pageWithChart = new DashboardPage<>();
+                    DashboardPage pageWithChart = new DashboardPage();
                     pageWithChart.setTitle(page.getTitle());
                     pageWithChart.setCharts(
                             page.getCharts().stream().map(prefs -> {
                                         try {
-                                            return createEmptyChart(prefs);
+                                            prefs.setTimeLine( createEmptyTimeLineChart(prefs.getTimeLine()));
                                         } catch (IOException e) {
                                             throw new RuntimeException(e);
                                         }
+                                        return prefs;
                                     })
                                     .collect(Collectors.toList()));
                     return pageWithChart;
@@ -99,19 +100,20 @@ public class DashboardManager {
                 .collect(Collectors.toList());
     }
 
-    public List<DashboardPage<Chart>> loadDashboardAndCreateChart(Reporting reporting, List<DashboardPage<TimeLineChartSettings>> dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
+    public List<DashboardPage> loadDashboardAndCreateChart(Reporting reporting, List<DashboardPage> dashboardSettings, EZPortfolioProxy ezPortfolioProxy) {
         // if ezPortfolioProxy est null => dry run with no data extraction
         return dashboardSettings.stream()
                 .map(page -> {
-                    DashboardPage<Chart> pageWithChart = new DashboardPage<>();
+                    DashboardPage pageWithChart = new DashboardPage();
                     pageWithChart.setTitle(page.getTitle());
                     pageWithChart.setCharts(
                     page.getCharts().stream().map(prefs -> {
                         try {
-                            return createChart(reporting,
+                            prefs.setTimeLine(createTimeLineChart(reporting,
                                     ezPortfolioProxy,
-                                    prefs
-                            );
+                                    prefs.getTimeLine()
+                            ));
+                            return prefs;
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -122,16 +124,16 @@ public class DashboardManager {
                 .collect(Collectors.toList());
     }
 
-    public void saveDashboardSettings(List<DashboardPage<TimeLineChartSettings>> dashboardSettings) throws IOException {
+    public void saveDashboardSettings(List<DashboardPage> dashboardSettings) throws IOException {
         JsonUtil.createDefaultWriter().writeValue(new FileWriter(dashboardFile, StandardCharsets.UTF_8), dashboardSettings);
     }
 
-    public Chart createEmptyChart(TimeLineChartSettings chartSettings) throws IOException {
-        return ChartsTools.createChart(chartSettings, new LinkedList<>());
+    public TimeLineChart createEmptyTimeLineChart(TimeLineChartSettings chartSettings) throws IOException {
+        return ChartsTools.createTimeLineChart(chartSettings, new LinkedList<>());
     }
 
-    public Chart createChart(Reporting rep, EZPortfolioProxy portfolio,
-                             TimeLineChartSettings chartSettings) throws IOException {
+    public TimeLineChart createTimeLineChart(Reporting rep, EZPortfolioProxy portfolio,
+                                             TimeLineChartSettings chartSettings) throws IOException {
         try(Reporting reporting = rep.pushSection("Génération du graphique: '"+chartSettings.getTitle()+"'")) {
 
             EZDate today = EZDate.today();
@@ -209,10 +211,10 @@ public class DashboardManager {
             );
 
 
-            Chart chart = ChartsTools.createChart(chartSettings, dates);
-            int lastIndex = chart.getLabels().size();
+            TimeLineChart timeLineChart = ChartsTools.createTimeLineChart(chartSettings, dates);
+            int lastIndex = timeLineChart.getLabels().size();
             // il faut couper le début de toutes les listes pour ne prendre que les dates apres startDate
-            chart.setLabels(chart.getLabels().subList(endOfFirstYearIndex, lastIndex)); // ici on coupe les labels
+            timeLineChart.setLabels(timeLineChart.getLabels().subList(endOfFirstYearIndex, lastIndex)); // ici on coupe les labels
             allChartLines.forEach(l -> { // ici on coupe les valeurs
                 if (l.getValues() != null){
                     l.setValues(l.getValues().subList(endOfFirstYearIndex, lastIndex));
@@ -221,11 +223,11 @@ public class DashboardManager {
                     l.setRichValues(l.getRichValues().subList(endOfFirstYearIndex, lastIndex));
                 }
             });
-            chart.setLines(allChartLines);
+            timeLineChart.setLines(allChartLines);
             Map<String, String> yAxisTitles = new HashMap<>();
             yAxisTitles.put("Y_AXIS_TITLE", targetDevise.getSymbol());
-            chart.setAxisId2titleY(yAxisTitles);
-            return chart;
+            timeLineChart.setAxisId2titleY(yAxisTitles);
+            return timeLineChart;
         }
     }
 
@@ -322,7 +324,7 @@ public class DashboardManager {
     }
 
     private ChartLine createChartLine(Prices prices, String indexId, String lineTitle, ChartLine.Y_AxisSetting yAxis, ChartLine.LineStyle lineStyle){
-        ChartLine chartLine = ChartsTools.createChartLine(lineStyle, yAxis, lineTitle, prices, false);
+        ChartLine chartLine = ChartsTools.createTimeLineChartLine(lineStyle, yAxis, lineTitle, prices, false);
         chartLine.setIndexId(indexId);
         return chartLine;
     }

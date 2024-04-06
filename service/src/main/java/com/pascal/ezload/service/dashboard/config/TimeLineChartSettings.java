@@ -75,13 +75,8 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
         return title;
     }
 
-    @Override
-    public ChartType getType() {
+    public ChartType type() {
         return ChartType.TIMELINE;
-    }
-
-    @Override
-    public void setType(ChartType chartType) {
     }
 
     public void setTitle(String title) {
