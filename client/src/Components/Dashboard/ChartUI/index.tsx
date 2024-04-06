@@ -22,7 +22,7 @@ import { TimeLineChart, EzShareData, ChartLine, ChartIndex } from '../../../ez-a
 import { getChartIndexDescription } from '../ChartIndexMainEditor';
 import { isDefined } from '../../../ez-api/tools';
 import { TimeLineChartSettingsEditor } from '../TimeLineChartSettingsEditor';
-import { LineChart } from '../../Tools/LineChart';
+import { LineChart } from '../../Tools/TimeLineChart';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { ComboField } from "../../Tools/ComboField";
