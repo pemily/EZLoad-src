@@ -74,6 +74,7 @@ public class ShareIndexBuilder {
                 case CUMULABLE_SHARE_BUY_SOLD -> portfolioIndexBuilder.getDate2share2BuyOrSoldAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case CUMULABLE_PERFORMANCE_ACTION -> sharePriceBuilder.getPerformance(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS -> sharePriceBuilder.getPerformanceWithDividends(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
+                case ESTIMATED_PERFORMANCE_ACTION -> sharePriceBuilder.getEstimatedFuturePricePerf(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 case CUMULABLE_SHARE_BUY -> portfolioIndexBuilder.getDate2share2BuyAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case CUMULABLE_SHARE_SOLD -> portfolioIndexBuilder.getDate2share2SoldAmount(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case ACTION_CROISSANCE -> sharePriceBuilder.getCroissanceAnnuelDuDividendeWithEstimates(reporting, ezShare, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);

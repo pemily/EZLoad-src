@@ -27,6 +27,7 @@ public enum ShareIndex {
 
     CUMULABLE_PERFORMANCE_ACTION(true), // la performance du prix de l'action en %
     CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS(true), // la performance du prix de l'action en % en incluant les dividendes
+    ESTIMATED_PERFORMANCE_ACTION(false), // la performance estimée du prix de l'action en %, (sans prendre en compte les dividendes) et en s'appuyant sur les 20 dernieres années
     // TODO ADD CUMULABLE_SHARE_TAXES, SHARE_PRU_BRUT
 
     @Deprecated

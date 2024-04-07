@@ -50,6 +50,8 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "Performance"; break;
             case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
                 result += "Performance dividende inclus"; break;
+            case "ESTIMATED_PERFORMANCE_ACTION":
+                result += "Performance estimée"; break;
             case "SHARE_PRU_BRUT":
                 result += "PRU"; break;
             case "SHARE_PRU_NET":
@@ -134,6 +136,8 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "la performance du cours de l'action"; break;
             case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
                 result += "la performance du cours de l'action incluant les dividendes"; break;
+            case "ESTIMATED_PERFORMANCE_ACTION":
+                result += "la performance estimée du cours de l'action sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années"; break;                
             case "SHARE_PRU_BRUT":
                 result += "le Prix de Revient Unitaire Brut (dividendes exclus)"; break; // utilise la date de paiement
             case "SHARE_PRU_NET":
@@ -295,6 +299,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Nombre d'actions",
                                 "Performance",
                                 "Performance dividendes inclus",
+                                "Performance estimée",
                                 "Achats/Ventes",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
@@ -308,7 +313,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'SHARE_PRICE',
                                 'SHARE_COUNT',        
                                 'CUMULABLE_PERFORMANCE_ACTION',                                          
-                                'CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS',                  
+                                'CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS',     
+                                'ESTIMATED_PERFORMANCE_ACTION',
                                 'CUMULABLE_SHARE_BUY_SOLD',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',

@@ -76,7 +76,7 @@ export function newRadarChartSwitch(): ChartSwitch{
         portfolioIndexConfig: undefined,                                
         currencyIndexConfig: undefined,
         shareIndexConfig: {
-            shareIndex: "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS"
+            shareIndex: "ESTIMATED_PERFORMANCE_ACTION"
         },
     };
     const newChart: RadarChart = {
