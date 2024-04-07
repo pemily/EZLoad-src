@@ -63,6 +63,21 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
         this.algoEstimationCroissance = chartSettings.algoEstimationCroissance;
     }
 
+    public TimeLineChartSettings(RadarChartSettings chartSettings){
+        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
+        this.targetDevise = chartSettings.getTargetDevise();
+        this.title = chartSettings.getTitle();
+        this.excludeBrokers = chartSettings.getExcludeBrokers();
+        this.excludeAccountTypes = chartSettings.getExcludeAccountTypes();
+        this.indexSelection = chartSettings.getIndexSelection();
+        this.height = chartSettings.getHeight();
+        this.nbOfPoints = chartSettings.getNbOfPoints();
+        this.shareSelection = chartSettings.getShareSelection();
+        this.additionalShareGoogleCodeList = chartSettings.getAdditionalShareGoogleCodeList();
+        this.algoEstimationCroissance = chartSettings.getAlgoEstimationCroissance();
+    }
+
     public String getTargetDevise() {
         return targetDevise;
     }

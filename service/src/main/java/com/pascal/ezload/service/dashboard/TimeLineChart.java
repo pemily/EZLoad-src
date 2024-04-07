@@ -26,15 +26,15 @@ import java.util.Map;
 
 public class TimeLineChart extends TimeLineChartSettings {
 
-    private Map<String, String> axisId2titleX = new HashMap<>(), axisId2titleY = new HashMap<>();
+    private Map<String, String> axisId2titleX = new HashMap<>(),
+                                axisId2titleY = new HashMap<>();
     private List<ChartsTools.Label> labels = new LinkedList<>();
     private List<ChartLine> lines = new LinkedList<>();
 
+    public TimeLineChart(){}
     public TimeLineChart(TimeLineChartSettings chartSettings){
         super(chartSettings);
     }
-
-    public TimeLineChart(){}
 
     public List<ChartsTools.Label> getLabels() {
         return labels;

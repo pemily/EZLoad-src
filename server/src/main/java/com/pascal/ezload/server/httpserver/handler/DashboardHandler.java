@@ -65,7 +65,7 @@ public class DashboardHandler {
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps().validate();
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-            DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
+            DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager, mainSettings);
             List<DashboardPage> dashboardSettings = dashboardManager.loadDashboardSettings();
             List<DashboardPage> chartsPages = dashboardManager.loadDashboard(dashboardSettings);
             dashboardData = new DashboardData();
@@ -93,7 +93,7 @@ public class DashboardHandler {
                     try(Reporting reporting = processLogger.getReporting().pushSection("Génération des Graphiques")) {
                         EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, settingsManager, mainSettings, ezProfil, reporting);
                         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-                        DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
+                        DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager, mainSettings);
                         List<DashboardPage> dashboardSettings = dashboardManager.loadDashboardSettings();
                         List<DashboardPage> chartsPages = dashboardManager.loadDashboardAndCreateChart(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
@@ -111,7 +111,7 @@ public class DashboardHandler {
     public synchronized List<DashboardPage> saveDashboardConfig(List<DashboardPage> dashboardSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
+        DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager), mainSettings);
         dashboardManager.saveDashboardSettings(dashboardSettings);
         return dashboardSettings;
     }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPage, TimeLineChart} from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPage, TimeLineChart, RadarChart} from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -104,7 +104,7 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-function chart2TimeLineChartSettings(timeLineChart: TimeLineChart) : TimeLineChart {
+function timeLineChart2TimeLineChartSettings(timeLineChart: TimeLineChart) : TimeLineChart {
   var c: TimeLineChart = {
       ...timeLineChart,
       lines: undefined,
@@ -118,10 +118,21 @@ function chart2TimeLineChartSettings(timeLineChart: TimeLineChart) : TimeLineCha
   return c;
 }
 
+
+function radarChart2RadarChartSettings(radarChart: RadarChart) : RadarChart {
+  var c: RadarChart = {
+      ...radarChart,
+      radarYearlyCharts: undefined,
+  };
+  delete c.radarYearlyCharts;
+  return c;
+}
+
 export function saveDashboardConfig(dashConfig: DashboardPage[], keepLines: boolean, updModel: (dashConfig: DashboardPage[]) => void){
   jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => {
     return {...page, charts: page.charts?.map(c => { 
-          if (c.timeLine) return { timeLine: chart2TimeLineChartSettings(c.timeLine)};
+          if (c.timeLine) return { timeLine: timeLineChart2TimeLineChartSettings(c.timeLine)};
+          if (c.radar) return { radar: radarChart2RadarChartSettings(c.radar)};
           return c;                                                                                                    
     })}})))
     .then(r => updModel(keepLines ? dashConfig : r))

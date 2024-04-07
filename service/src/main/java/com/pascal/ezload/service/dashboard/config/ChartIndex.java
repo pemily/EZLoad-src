@@ -23,7 +23,6 @@ public class ChartIndex {
     private String label;
     private String description;
     private String colorLine; // rgba(255,99,132,1);
-    private GraphStyle graphStyle = GraphStyle.LINE;
 
     // It's a oneOf (only one of those value below are set, others are null)
     private ChartPortfolioIndexConfig portfolioIndexConfig;
@@ -68,14 +67,6 @@ public class ChartIndex {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public GraphStyle getGraphStyle() {
-        return graphStyle;
-    }
-
-    public void setGraphStyle(GraphStyle graphStyle) {
-        this.graphStyle = graphStyle;
     }
 
     public String getId() {

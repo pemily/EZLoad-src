@@ -203,7 +203,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             readOnly={false}
                             selectedCodeValue={isDefined(props.chartIndex.currencyIndexConfig) ? 'DEVISE' : isDefined(props.chartIndex.shareIndexConfig) ? 'SHARE' : 'PORTEFEUILLE'}
                             codeValues={['PORTEFEUILLE', 'SHARE', 'DEVISE']}                            
-                            userValues={["Portefeuille", "Actions", "Devises"]}
+                            userValues={["Portefeuille", "Action", "Devise"]}
                             description=""
                             onChange={newValue  => {
                                 if (newValue === 'PORTEFEUILLE') {
@@ -292,7 +292,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             selectedCodeValue={!isDefined(props.chartIndex.shareIndexConfig?.shareIndex) ? 'SHARE_PRICE' : props.chartIndex.shareIndexConfig?.shareIndex! }
                             userValues={[                             
                                 "Cours de l'action",
-                                "Nombre d'action",
+                                "Nombre d'actions",
                                 "Performance",
                                 "Performance dividendes inclus",
                                 "Achats/Ventes",

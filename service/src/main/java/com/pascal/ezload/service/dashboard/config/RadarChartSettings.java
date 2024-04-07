@@ -11,14 +11,13 @@ import java.util.Set;
 
 public class RadarChartSettings extends Checkable<RadarChartSettings> implements DashboardChart  {
 
-
     enum Field {targetDevise, title, brokers, accountTypes, portfolioFilters, selectedStartDateSelection, shareNames, shareSelection, additionalShareNames, showCurrency}
 
     private String targetDevise; // EUR, USD
     private String title;
     private Set<String> excludeBrokers = new HashSet<>();
     private Set<String> excludeAccountTypes = new HashSet<>();
-
+    private StartDateSelection selectedStartDateSelection;
     private List<ChartIndex> indexSelection = new LinkedList<>();
 
     // Sur quelles actions ?
@@ -36,12 +35,23 @@ public class RadarChartSettings extends Checkable<RadarChartSettings> implements
         this.title = chartSettings.title;
         this.excludeBrokers = chartSettings.excludeBrokers;
         this.excludeAccountTypes = chartSettings.excludeAccountTypes;
+        this.selectedStartDateSelection = chartSettings.selectedStartDateSelection;
         this.indexSelection = chartSettings.indexSelection;
         this.height = chartSettings.height;
         this.nbOfPoints = chartSettings.nbOfPoints;
         this.shareSelection = chartSettings.shareSelection;
         this.additionalShareGoogleCodeList = chartSettings.additionalShareGoogleCodeList;
         this.algoEstimationCroissance = chartSettings.algoEstimationCroissance;
+    }
+
+
+
+    public StartDateSelection getSelectedStartDateSelection() {
+        return selectedStartDateSelection;
+    }
+
+    public void setSelectedStartDateSelection(StartDateSelection selectedStartDateSelection) {
+        this.selectedStartDateSelection = selectedStartDateSelection;
     }
 
     public String getTargetDevise() {

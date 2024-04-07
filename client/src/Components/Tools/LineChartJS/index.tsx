@@ -54,8 +54,7 @@ const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', time
     return timeLabels.map(l => l.time) as any[] as object[];
 }
 
-export function LineChart(props: LineChartProps){
-    const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
+export function LineChartJS(props: LineChartProps){    
     const lineIsVisible : boolean[] = [];    
 
    // const chartRef = useRef<ChartJS|undefined>(undefined); // https://reacthustle.com/blog/how-to-customize-events-in-chartjs-3-with-react?expand_article=1
@@ -161,17 +160,17 @@ export function LineChart(props: LineChartProps){
                             /* if (richValue.indexOf(":") === -1)
                                 return context.dataset.label+': '+richValue; */                            
                             var richVal = richValue;  
-                            if (props.demo && context.dataset.yAxisID == 'PORTFOLIO') 
+                            if (props.demo && context.dataset.yAxisID === 'PORTFOLIO') 
                                 richVal = "10 000€ (demo)";
-                            else if (props.demo && context.dataset.yAxisID == 'NB') 
+                            else if (props.demo && context.dataset.yAxisID === 'NB') 
                                 richVal = "1 000 (demo)";
                             return richVal;
                         }
                         // ajout de l'unité automatiquement                    
                         var val = context.formattedValue;  
-                        if (props.demo && context.dataset.yAxisID == 'PORTFOLIO') 
+                        if (props.demo && context.dataset.yAxisID === 'PORTFOLIO') 
                             val = "10 000€ (demo)";
-                        else if (props.demo && context.dataset.yAxisID == 'NB') 
+                        else if (props.demo && context.dataset.yAxisID === 'NB') 
                             val = "1 000 (demo)";
                         return context.dataset.label+': '+val
                                                     +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 

@@ -19,12 +19,15 @@ import { Box, Button, Text, Collapsible } from "grommet";
 import { useState } from "react";
 import { Trash, Configure, ZoomIn, ZoomOut, Close } from 'grommet-icons';
 import { TimeLineChart, EzShareData, ChartIndex, ChartSwitch, RadarChart } from '../../../ez-api/gen-api/EZLoadApi';
-import { TimeLineOrRadarChartSettingsEditor } from '../TimeLineOrRadarChartSettingsEditor';
+import { genUUID} from '../../../ez-api/tools';
+import { TimeLineOrRadarChartSettingsEditor, nouvelIndice } from '../TimeLineOrRadarChartSettingsEditor';
 import { TimeLineChartUI } from '../TimeLineChartUI';
+import { RadarChartUI } from '../RadarChartUI';
+import { isDefined } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { ComboFieldWithCode } from "../../Tools/ComboFieldWithCode";
-
+import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
 
 export interface ChartUIProps {    
     readOnly: boolean;    
@@ -35,20 +38,79 @@ export interface ChartUIProps {
     deleteChartUI: (afterSave: () => void) => void
 }      
 
+export function newTimeLineChartSwitch() : ChartSwitch{
+    const chartIndex: ChartIndex = nouvelIndice();
+    const newChart: TimeLineChart = {
+        excludeAccountTypes: [],
+        excludeBrokers: [],
+        title: 'Titre à changer',                                                                
+        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
+        targetDevise: 'EUR',
+        indexSelection: [ chartIndex ],
+        groupedBy: "DAILY",
+        shareSelection: "CURRENT_SHARES",
+        additionalShareGoogleCodeList: []
+    };       
+    const newChartSwitch: ChartSwitch = {
+        timeLine: newChart
+    }; 
+    return newChartSwitch;
+}
 
-export function ChartUI(props: ChartUIProps){
-    const [edition, setEdition] = useState<boolean>(false);    
-    const [chartSwitch, setChartSwitch ] = useState<ChartSwitch>(props.chartSwitch);
+export function newRadarChartSwitch(): ChartSwitch{
+    const chartIndex1: ChartIndex = {
+        portfolioIndexConfig: undefined,                                
+        currencyIndexConfig: undefined,
+        shareIndexConfig: {
+            shareIndex: "ACTION_CROISSANCE"
+        },
+    };
+    const chartIndex2: ChartIndex = {
+        portfolioIndexConfig: undefined,                                
+        currencyIndexConfig: undefined,
+        shareIndexConfig: {
+            shareIndex: "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT"
+        },
+    };
+    const chartIndex3: ChartIndex = {
+        portfolioIndexConfig: undefined,                                
+        currencyIndexConfig: undefined,
+        shareIndexConfig: {
+            shareIndex: "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS"
+        },
+    };
+    const newChart: RadarChart = {
+        excludeAccountTypes: [],
+        excludeBrokers: [],
+        title: 'Titre à changer',
+        selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
+        targetDevise: 'EUR',
+        indexSelection: [ chartIndex1, chartIndex2, chartIndex3],
+        shareSelection: "CURRENT_SHARES",
+        additionalShareGoogleCodeList: []
+    };       
+    const newChartSwitch: ChartSwitch = {
+        radar: newChart
+    }; 
+    chartIndex1.description = getChartIndexDescription(chartIndex1)                            
+    chartIndex1.label = getChartIndexTitle(chartIndex1);
+    chartIndex1.id = genUUID();
+
+    chartIndex2.description = getChartIndexDescription(chartIndex2)                            
+    chartIndex2.label = getChartIndexTitle(chartIndex2);
+    chartIndex2.id = genUUID();
+
+    chartIndex3.description = getChartIndexDescription(chartIndex3)                            
+    chartIndex3.label = getChartIndexTitle(chartIndex3);
+    chartIndex3.id = genUUID();
+    return newChartSwitch;
+}
+
+export function ChartSwitchUI(props: ChartUIProps){
+    const [edition, setEdition] = useState<boolean>(false);        
     
-
-    function getIndex(indexId: string) : ChartIndex {
-        return getChartSettings().indexSelection?.filter(i => i.id === indexId)[0]!
-    }
-
-
-
     function getChartSettings() : TimeLineChart | RadarChart{
-        return chartSwitch.timeLine ? chartSwitch.timeLine : chartSwitch.radar!;
+        return isDefined(props.chartSwitch.timeLine) ? props.chartSwitch.timeLine! : props.chartSwitch.radar!;
     }
 
     return (
@@ -63,12 +125,12 @@ export function ChartUI(props: ChartUIProps){
                         <Box  direction="row" alignSelf="end"  margin="0" pad="0">
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() => props.saveChartUI(
-                                                                                    chartSwitch.timeLine ? {timeLine: {...getChartSettings(), height: getChartSettings().height!+10 }} 
+                                                                                isDefined(props.chartSwitch.timeLine) ? {timeLine: {...getChartSettings(), height: getChartSettings().height!+10 }} 
                                                                                                          : { radar: {...getChartSettings(), height: getChartSettings().height!+10 } }                                                                                    
                                                                                     , true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() => props.saveChartUI(
-                                                                                    chartSwitch.timeLine ? {timeLine: {...getChartSettings(), height: getChartSettings().height!-10 }}
+                                                                                isDefined(props.chartSwitch.timeLine) ? {timeLine: {...getChartSettings(), height: getChartSettings().height!-10 }}
                                                                                     : {radar: {...getChartSettings(), height: getChartSettings().height!-10 }}
                                                                                     , true, () => {}) }/>
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
@@ -77,7 +139,8 @@ export function ChartUI(props: ChartUIProps){
                     </Box>
                     
                     <Box direction="column">                        
-                        { chartSwitch.timeLine && <TimeLineChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} timeLineChart={chartSwitch.timeLine}/> }
+                        { isDefined(props.chartSwitch.timeLine) && <TimeLineChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} timeLineChart={props.chartSwitch.timeLine!}/> }
+                        { isDefined(props.chartSwitch.radar) && <RadarChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} radarChart={props.chartSwitch.radar!}/> }
                     </Box>
             </Collapsible> 
         
@@ -104,7 +167,7 @@ export function ChartUI(props: ChartUIProps){
                     <ComboFieldWithCode id="ChartSwitch"                                        
                                         errorMsg={undefined}
                                         readOnly={props.readOnly}
-                                        selectedCodeValue={'TIME_LINE'}
+                                        selectedCodeValue={isDefined(props.chartSwitch.timeLine) ? "TIME_LINE" : "RADAR"}
                                         userValues={[                             
                                             'Graphique "Temporel"',                                
                                             'Graphique "Radar"'
@@ -114,8 +177,14 @@ export function ChartUI(props: ChartUIProps){
                                             'RADAR'
                                         ]}
                                         description=""
-                                        onChange={newValue => 
-                                            null
+                                        onChange={newValue => {
+                                            var newChartSwitch : ChartSwitch; 
+                                            if (newValue === 'TIME_LINE')
+                                                newChartSwitch = isDefined(props.chartSwitch.timeLine) ? { timeLine: props.chartSwitch.timeLine} : newTimeLineChartSwitch() 
+                                            else 
+                                                newChartSwitch = isDefined(props.chartSwitch.radar) ? { radar: props.chartSwitch.radar} : newRadarChartSwitch()                                            
+                                            props.saveChartUI(newChartSwitch, false, () => {})
+                                        }
                                         }/>      
                     { <Button size="small" icon={<Close size='small'/>}                            
                                onClick={() => { setEdition(false); } } />  }
@@ -125,10 +194,10 @@ export function ChartUI(props: ChartUIProps){
                         <TimeLineOrRadarChartSettingsEditor
                             readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
-                            timeLineChartSettings={chartSwitch.timeLine}
-                            radarChartSettings={chartSwitch.radar}
+                            timeLineChartSettings={props.chartSwitch.timeLine}
+                            radarChartSettings={props.chartSwitch.radar}
                             save={(newChartSettsValue, keepLines: boolean, afterSave) => {
-                                    props.saveChartUI(chartSwitch.timeLine ? {timeLine: newChartSettsValue} : { radar: newChartSettsValue }, keepLines, afterSave)}}
+                                    props.saveChartUI(isDefined(props.chartSwitch.timeLine) ? {timeLine: newChartSettsValue} : { radar: newChartSettsValue }, keepLines, afterSave)}}
                         />
                 </Box>
                 </>

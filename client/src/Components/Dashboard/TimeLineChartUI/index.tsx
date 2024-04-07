@@ -21,7 +21,7 @@ import { Checkbox } from 'grommet-icons';
 import { TimeLineChart, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription } from '../ChartIndexMainEditor';
 import { isDefined } from '../../../ez-api/tools';
-import { LineChart } from '../../Tools/TimeLineChart';
+import { LineChartJS } from '../../Tools/LineChartJS';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { ComboField } from "../../Tools/ComboField";
 
@@ -81,7 +81,7 @@ export function TimeLineChartUI(props: TimeLineChartUIProps){
     function unselectIndex(index: ChartIndex){
         setFilteredChart({
             ...filteredChart, 
-            lines: filteredChart.lines!.filter(l =>  l.indexId != index.id)
+            lines: filteredChart.lines!.filter(l =>  l.indexId !== index.id)
         })
     }
  
@@ -93,7 +93,7 @@ export function TimeLineChartUI(props: TimeLineChartUIProps){
                     // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
                     (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && containsShareIndex(props) &&
                         (<Box gap="none" margin="none" direction="row" align="center">                                       
-                            <ComboField id='indexLabelFilterCombo'   
+                            <ComboField id={'indexLabelFilterCombo'+props.timeLineChart.title}   
                                 readOnly={false}
                                 description=""
                                 errorMsg=""                                
@@ -130,7 +130,7 @@ export function TimeLineChartUI(props: TimeLineChartUIProps){
             <Box height={(props.timeLineChart.height)+"vh"}>
                 {
                     (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && (
-                        <LineChart timeLineChart={filteredChart} showLegend={false} demo={props.demo}/>
+                        <LineChartJS timeLineChart={filteredChart} showLegend={false} demo={props.demo}/>
                     )                            
                 }                   
                 {

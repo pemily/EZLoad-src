@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.dashboard;
 
+import com.pascal.ezload.service.dashboard.config.ChartIndex;
+import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
 import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
@@ -80,6 +82,14 @@ public class ChartsTools {
         return allDates;
     }
 
+    public static RadarChart createRadarChart(RadarChartSettings chartSettings) {
+        RadarChart radarChart = new RadarChart(chartSettings);
+
+        radarChart.setRadarYearlyCharts(List.of());
+
+        return radarChart;
+    }
+
     public static TimeLineChart createTimeLineChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
         TimeLineChart timeLineChart = new TimeLineChart(chartSettings);
 
@@ -108,7 +118,7 @@ public class ChartsTools {
                                                                                             if (pd.getValue() == null ) return null;
                                                                                             if (removeZeroValues && pd.getValue() == 0) return null;
                                                                                             float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
-                                                                                            ChartLine.RichValue v = new ChartLine.RichValue();
+                                                                                            RichValue v = new RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
                                                                                             v.setValue(pd.getValue());
                                                                                             String unit = prices.getDevise().getSymbol();
@@ -120,7 +130,7 @@ public class ChartsTools {
                                 );
     }
 
-    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values){
+    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<RichValue> values){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);
