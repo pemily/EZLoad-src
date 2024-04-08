@@ -34,6 +34,8 @@ public class YahooTools extends ExternalSiteTools{
     private static final Logger logger = Logger.getLogger("YahooTools");
     static private final GsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
+    private static final int DATE_COL = 0, VALUE_COL = 4;
+
     public static Prices getPrices(Reporting reporting, HttpUtilCached cache, EZShare ezShare, List<EZDate> listOfDates) throws Exception {
         if (!StringUtils.isBlank(ezShare.getYahooCode())) {
             Prices sharePrices = new Prices();
@@ -70,8 +72,8 @@ public class YahooTools extends ExternalSiteTools{
     private static PriceAtDate createPriceAtDate(CsvRow row) {
         // Date,Open,High,Low,Close,Adj Close,Volume
         // 2006-05-25,4.030000,4.605000,4.020000,4.600000,4.261155,395343000
-        String date = row.get(0); // format: 2020-10-25
-        String closePrice = row.get(4); // take the close
+        String date = row.get(DATE_COL); // format: 2020-10-25
+        String closePrice = row.get(VALUE_COL); // take the close
         return new PriceAtDate(EZDate.parseYYYMMDDDate(date, '-'), NumberUtils.str2Float((closePrice)), false);
     }
 
@@ -80,11 +82,16 @@ public class YahooTools extends ExternalSiteTools{
             //new Api:  https://query1.finance.yahoo.com/v8/finance/chart/AMT?formatted=true&includeAdjustedClose=true&interval=1d&period1=1662422400&period2=1662854400
             // remove 3 days to the from date because of the WE, to be sure to have a data for the from date (and avoid a 0)
             EZDate today = EZDate.today();
-            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+from.minusDays(3).toEpochSecond()+"&period2="+today.toEpochSecond()+"&interval=1d&events=history&includeAdjustedClose=true";
+            long period1 = from.minusDays(3).toEpochSecond();
+            long period2 = today.toEpochSecond();
+            if (period1 >= period2) {
+                throw new IllegalArgumentException("Erreur period1 > period2 pour "+yahooCode+" et "+from.toYYYYMMDD());
+            }
+            String url = "https://query1.finance.yahoo.com/v7/finance/download/"+yahooCode+"?period1="+period1+"&period2="+period2+"&interval=1d&events=history&includeAdjustedClose=true";
             cache.get(reporting, "yahoo_history_"+yahooCode+"_"+from.toYYYYMMDD()+"-"+today.toYYYYMMDD(), url, inputStream -> {
                 rowsConsumer.accept(
                         CsvUtil.load(inputStream, ",", 1)
-                        .filter(row -> !row.get(0).equals("null") && !row.get(4).equals("null")));
+                        .filter(row -> !row.get(DATE_COL).equals("null") && !row.get(VALUE_COL).equals("null")));
                 return null;
             });
             return;

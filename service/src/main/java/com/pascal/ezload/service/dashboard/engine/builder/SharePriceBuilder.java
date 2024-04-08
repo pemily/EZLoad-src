@@ -98,20 +98,23 @@ public class SharePriceBuilder {
             EZDate oldestDate = dates.get(0);
             try {
                 int analyseOverNYear = 10;
-                Prices prices = actionManager.getPrices(reporting, share, List.of(new EZDate(oldestDate.getYear() - (analyseOverNYear*2+1), 1, 1)));
+                List<EZDate> allPricesDate = new LinkedList<>();
+                int currentYear = EZDate.today().getYear();
+                for (int i = oldestDate.getYear() - (analyseOverNYear*2+1); i <= currentYear; i++) allPricesDate.add(new EZDate(i, 12, 31));
+                Prices prices = actionManager.getPrices(reporting, share, allPricesDate);
 
                 if (prices == null) {
                     return estimatedPerf;
                 }
 
-                prices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
-                prices = perfIndexBuilder.buildPerfPrices(prices, ChartPerfFilter.VARIATION_EN_PERCENT);
+                Prices groupedPrices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
+                Prices pricesPerf = perfIndexBuilder.buildPerfPrices(groupedPrices, ChartPerfFilter.VARIATION_EN_PERCENT);
 
                 int previousProcessedYear = -1;
                 Price previousPrice = null;
                 for (EZDate date : dates) {
-                    int currentYear = date.getYear();
-                    if (previousProcessedYear != currentYear) {
+                    int processingYear = date.getYear();
+                    if (previousProcessedYear != processingYear) {
                         // si on est en 2024,
                         // on va prendre la perf entre 2004 - 2014
                         // puis la perf entre          2005 - 2015
@@ -120,16 +123,16 @@ public class SharePriceBuilder {
                         // puis la perf entre          2014 - 2024
                         // et on fera la moyenne entre toutes ces perfs
                         List<Price> allTenYearPerfs = new LinkedList<>();
-                        for (int startingYear = currentYear - (analyseOverNYear * 2); startingYear + analyseOverNYear < currentYear; startingYear++) {
+                        for (int startingYear = processingYear - (analyseOverNYear * 2); startingYear + analyseOverNYear < processingYear; startingYear++) {
                             Price perf = new Price();
                             for (int year = startingYear; year < startingYear + analyseOverNYear; year++) {
-                                perf = perf.plus(prices.getPriceAt(EZDate.yearPeriod(year)));
+                                perf = perf.plus(pricesPerf.getPriceAt(EZDate.yearPeriod(year)));
                             }
                             allTenYearPerfs.add(perf);
                         }
 
                         previousPrice = allTenYearPerfs.stream().reduce(Price::plus).orElseThrow().divide(new Price(analyseOverNYear));
-                        previousProcessedYear = currentYear;
+                        previousProcessedYear = processingYear;
                     }
                     estimatedPerf.addPrice(new PriceAtDate(date, previousPrice));
                 }

@@ -203,7 +203,7 @@ export function LineChartJS(props: LineChartProps){
                         var result : LegendItem[] = [];                        
                         var labelIndex: number = 0;
                         var labelTextAlreadyUsed : string[] = [];
-                        timeLineChart?.data?.datasets.forEach((l:ChartDataset<any,any>, i:number) => {
+                        timeLineChart?.data?.datasets?.forEach((l:ChartDataset<any,any>, i:number) => {
                             if (!labelTextAlreadyUsed.includes(l.label)){
                                 labelTextAlreadyUsed.push(l.label);
                                 result.push({

@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box,Text, Anchor } from "grommet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Checkbox } from 'grommet-icons';
 import { RadarChart, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
 import { getChartIndexDescription } from '../ChartIndexMainEditor';
@@ -46,45 +46,52 @@ export function RadarChartUI(props: RadarChartUIProps){
     const [selectedYearIndice, setSelectedYearIndice] = useState<number>(isDefined(props.radarChart.radarYearlyCharts) ? props.radarChart.radarYearlyCharts!.length-1 : -1);
     const [selectedShare, setSelectedShare] = useState<string[]>([]);
 
+    useEffect(() => { // => si la property change, alors va ecraser mon state par la valeur de la property        
+        setSelectedYearIndice(isDefined(props.radarChart.radarYearlyCharts) ? props.radarChart.radarYearlyCharts!.length-1 : -1);
+    }, [props.radarChart.radarYearlyCharts]);
+
     return  (
         <>             
             <Box alignSelf="start" direction="row" alignContent="center" fill align="center" gap="medium">
                 <Box gap="none" margin="none" direction="row" >    
-                    <ComboField id={'radarSelectedYear'}   
-                                readOnly={false}
-                                description=""
-                                errorMsg=""                                
-                                value={selectedYearIndice < 0 ? '' : props.radarChart.radarYearlyCharts![selectedYearIndice].year+''}
-                                values={props.radarChart.radarYearlyCharts?.map(y => y.year+'')!}
-                            onChange={newValue => setSelectedYearIndice(props.radarChart.radarYearlyCharts?.map(y => y.year+'').indexOf(newValue)!) }/>
+                    {
+                    isDefined(props.radarChart.radarYearlyCharts) && <ComboField id={'radarSelectedYear'}   
+                                                            readOnly={false}
+                                                            description=""
+                                                            errorMsg=""                                
+                                                            value={selectedYearIndice < 0 ? '' : props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.year+''}
+                                                            values={props.radarChart.radarYearlyCharts?.map(y => y.year+'')!}
+                                                        onChange={newValue => setSelectedYearIndice(props.radarChart.radarYearlyCharts?.map(y => y.year+'').indexOf(newValue)!) }/>
+                    }
                 </Box>
                 {                       
                     // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
-                    selectedYearIndice !== -1 && props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas?.find(r => r.areaGroupId === "Action") &&
-                        (<Box gap="none" margin="none" direction="row" align="end" flex="grow">                                       
-                            <ComboMultipleWithCheckbox id={'indexLabelFilterCombo'+props.radarChart.title}                               
-                                showSelectionInline={false}
-                                selectedCodeValues={selectedShare}                            
-                                errorMsg={undefined}
-                                readOnly={false}
-                                userValues={ props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas!.filter(d => d.areaGroupId === "Action").map(d => d.areaName!) }
-                                codeValues={ props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas!.filter(d => d.areaGroupId === "Action").map(d => d.areaName!) }
-                                description=""
-                                onChange={newValue  => setSelectedShare(newValue)}/>
-                        </Box>)
+                    selectedYearIndice !== -1 && isDefined(props.radarChart.radarYearlyCharts) &&
+                         props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.radarAreas?.find(r => r.areaGroupId === "Action") &&
+                            (<Box gap="none" margin="none" direction="row" align="end" flex="grow">                                       
+                                <ComboMultipleWithCheckbox id={'indexLabelFilterCombo'+props.radarChart.title}                               
+                                    showSelectionInline={false}
+                                    selectedCodeValues={selectedShare}                            
+                                    errorMsg={undefined}
+                                    readOnly={false}
+                                    userValues={ props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas!.filter(d => d.areaGroupId === "Action").map(d => d.areaName!) }
+                                    codeValues={ props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas!.filter(d => d.areaGroupId === "Action").map(d => d.areaName!) }
+                                    description=""
+                                    onChange={newValue  => setSelectedShare(newValue)}/>
+                            </Box>)
                 }
 
             </Box>
             <Box height={(props.radarChart.height)+"vh"}>
                 {                    
-                        selectedYearIndice !== -1 && <RadarChartJS
-                                                        indexLabels={selectedYearIndice === -1 ? [] : props.radarChart.radarYearlyCharts![selectedYearIndice].indexLabels!} 
-                                                        radarAreas={selectedYearIndice === -1 ? [] : 
-                                                                                props.radarChart.radarYearlyCharts![selectedYearIndice].radarAreas!.filter(r => 
-                                                                                                                r.areaGroupId === "Portefeuille" 
-                                                                                                                || r.areaGroupId === "Devise" 
-                                                                                                                || selectedShare!.includes(r.areaName!))}
-                                                        demo={props.demo}/>                    
+                        <RadarChartJS
+                                indexLabels={selectedYearIndice === -1 ? [] : props.radarChart.radarYearlyCharts?.[selectedYearIndice].indexLabels!} 
+                                radarAreas={selectedYearIndice === -1 ? [] : 
+                                                        props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.radarAreas?.filter(r => 
+                                                                                        r.areaGroupId === "Portefeuille" 
+                                                                                        || r.areaGroupId === "Devise" 
+                                                                                        || selectedShare!.includes(r.areaName!))!}
+                                demo={props.demo}/>                    
                 }                   
                 {
                         selectedYearIndice === -1 && (<Text textAlign="center" weight="lighter" size="small">Cliquez sur 'Rafraichir' pour charger les données</Text>)

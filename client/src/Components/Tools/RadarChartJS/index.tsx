@@ -22,10 +22,10 @@ export function RadarChartJS(props: RadarChartProps){
 
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
         labels: props.indexLabels,
-        datasets: props.radarAreas.map(r => { return {
-            label: r.areaName!,
-            borderColor: r.borderColor!,
-            backgroundColor: r.backgroundColor!,
+        datasets: props.radarAreas?.map(r => { return {
+            label: r.areaName,
+            borderColor: r.borderColor,
+            backgroundColor: r.backgroundColor,
             data: r.datasets?.map(rv => isDefined(rv) ? rv.value! : null)!            
         }})
     }
@@ -45,8 +45,10 @@ export function RadarChartJS(props: RadarChartProps){
     
     ChartJS.register(...registerablesjs);
     // ChartJS.register(CategoryScale, BarElement, LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend);
-
+    
     return (
-        <ReactChartJS type="radar" data={config}  options={options} />                   
+        <>
+            {config.datasets !== undefined && config.datasets?.length > 0 && <ReactChartJS type="radar" data={config}  options={options} /> }
+        </>
     ); 
 }
