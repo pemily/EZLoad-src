@@ -50,8 +50,10 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "Performance"; break;
             case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
                 result += "Performance dividende inclus"; break;
-            case "ESTIMATED_PERFORMANCE_ACTION":
-                result += "Performance estimée"; break;
+            case "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION":
+                result += "Performance estimée sur 10 ans"; break;
+            case "TEN_YEARS_PERFORMANCE_ACTION":
+                result += "Performance réelle sur 10 ans"; break;
             case "SHARE_PRU_BRUT":
                 result += "PRU"; break;
             case "SHARE_PRU_NET":
@@ -64,6 +66,8 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "Rendement du dividende sur PRU net"; break;
             case "ACTION_CROISSANCE":
                 result += "Croissance du dividende annuel"; break;
+            case "ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE":
+                result += "Rendement + Croissance du dividende annuel"; break;
             default: result += "Missing case in getChartIndexTitle "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
@@ -136,8 +140,10 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "la performance du cours de l'action"; break;
             case "CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS":
                 result += "la performance du cours de l'action incluant les dividendes"; break;
-            case "ESTIMATED_PERFORMANCE_ACTION":
-                result += "la performance estimée du cours de l'action sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années"; break;                
+            case "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION":
+                result += "la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années"; break;                
+            case "TEN_YEARS_PERFORMANCE_ACTION":
+                result += "la performance du cours des 10 dernières années sans inclure les dividendes."; break;
             case "SHARE_PRU_BRUT":
                 result += "le Prix de Revient Unitaire Brut (dividendes exclus)"; break; // utilise la date de paiement
             case "SHARE_PRU_NET":
@@ -148,6 +154,8 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "le rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement"; break;
             case "ACTION_CROISSANCE":
                 result += "La croissance du dividende annuel de l'action"; break;
+            case "ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE":
+                result += "Le rendement du dividende + la croissance annuel du dividende de l'action"; break;
             default: result += "Missing case in getChartIndexDescription "+chartIndex.shareIndexConfig?.shareIndex;
         }        
     }
@@ -299,7 +307,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Nombre d'actions",
                                 "Performance",
                                 "Performance dividendes inclus",
-                                "Performance estimée",
+                                "Performance sur les 10 dernière années",
+                                "Performance estimée sur 10 ans",
                                 "Achats/Ventes",
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
@@ -307,14 +316,16 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Rendement du dividende annuel",
                                 "Rendement du dividende sur PRU Net (Date de détachement)",
                                 "Rendement du dividende sur PRU Brut (Date de détachement)",
-                                "Croissance du dividende annuel"
+                                "Croissance du dividende annuel",
+                                "Rendement + Croissance du dividende annuel"
                             ]}
                             codeValues={[
                                 'SHARE_PRICE',
                                 'SHARE_COUNT',        
                                 'CUMULABLE_PERFORMANCE_ACTION',                                          
                                 'CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS',     
-                                'ESTIMATED_PERFORMANCE_ACTION',
+                                'TEN_YEARS_PERFORMANCE_ACTION',
+                                'ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION',                                
                                 'CUMULABLE_SHARE_BUY_SOLD',
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',
@@ -322,7 +333,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'SHARE_ANNUAL_DIVIDEND_YIELD',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT',
-                                'ACTION_CROISSANCE'
+                                'ACTION_CROISSANCE',
+                                'ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE'
                             ]}
                             description=""
                             onChange={newValue => {

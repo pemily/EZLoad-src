@@ -4,7 +4,8 @@ public interface DashboardChart {
 
     enum ChartType {
         TIMELINE,
-        RADAR
+        RADAR,
+        SOLAR
     }
 
     String getTitle();

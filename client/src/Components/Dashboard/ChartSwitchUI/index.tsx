@@ -76,7 +76,7 @@ export function newRadarChartSwitch(): ChartSwitch{
         portfolioIndexConfig: undefined,                                
         currencyIndexConfig: undefined,
         shareIndexConfig: {
-            shareIndex: "ESTIMATED_PERFORMANCE_ACTION"
+            shareIndex: "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
         },
     };
     const newChart: RadarChart = {
@@ -167,22 +167,27 @@ export function ChartSwitchUI(props: ChartUIProps){
                     <ComboFieldWithCode id="ChartSwitch"                                        
                                         errorMsg={undefined}
                                         readOnly={props.readOnly}
-                                        selectedCodeValue={isDefined(props.chartSwitch.timeLine) ? "TIME_LINE" : "RADAR"}
+                                        selectedCodeValue={isDefined(props.chartSwitch.timeLine) ? "TIME_LINE" : isDefined(props.chartSwitch.radar) ? "RADAR" : "SOLAR"}
                                         userValues={[                             
                                             'Graphique "Temporel"',                                
-                                            'Graphique "Radar"'
+                                            'Graphique "Radar"',
+                                            'Graphique "Solaire"'
                                         ]}
                                         codeValues={[
                                             'TIME_LINE',
-                                            'RADAR'
+                                            'RADAR',
+                                            'SOLAR'
                                         ]}
                                         description=""
                                         onChange={newValue => {
                                             var newChartSwitch : ChartSwitch; 
                                             if (newValue === 'TIME_LINE')
                                                 newChartSwitch = isDefined(props.chartSwitch.timeLine) ? { timeLine: props.chartSwitch.timeLine} : newTimeLineChartSwitch() 
-                                            else 
+                                            else if (newValue === 'RADAR')
                                                 newChartSwitch = isDefined(props.chartSwitch.radar) ? { radar: props.chartSwitch.radar} : newRadarChartSwitch()                                            
+                                            else // SOLAR
+                                                newChartSwitch = isDefined(props.chartSwitch.solar ? { solar: props.chartSwitch.solar} : newSolarChartSwitch()                                            
+
                                             props.saveChartUI(newChartSwitch, false, () => {})
                                         }
                                         }/>      

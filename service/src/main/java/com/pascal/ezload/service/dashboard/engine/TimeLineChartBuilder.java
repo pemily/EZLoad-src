@@ -173,9 +173,11 @@ public class TimeLineChartBuilder {
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT
                                     || index == ShareIndex.CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET
                                     || index == ShareIndex.ACTION_CROISSANCE
+                                    || index == ShareIndex.ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE
                                     || index == ShareIndex.CUMULABLE_PERFORMANCE_ACTION
                                     || index == ShareIndex.CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS
-                                    || index == ShareIndex.ESTIMATED_PERFORMANCE_ACTION)
+                                    || index == ShareIndex.ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION
+                                    || index == ShareIndex.TEN_YEARS_PERFORMANCE_ACTION)
                                 yAxis = ChartLine.Y_AxisSetting.PERCENT;
                             else if (index == ShareIndex.CUMULABLE_SHARE_BUY_SOLD
                                     || index == ShareIndex.CUMULABLE_SHARE_BUY

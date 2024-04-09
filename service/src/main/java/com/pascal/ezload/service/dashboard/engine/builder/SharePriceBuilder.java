@@ -60,7 +60,8 @@ public class SharePriceBuilder {
     private final Map<String, Prices> share2annualDividendYieldsTargetPrices = new HashMap<>();  // avec l'estimation sur l'année en cours
     private final Map<String, Price> shareYear2annualDividend = new HashMap<>();
     private final Map<String, Price> shareYear2annualDividendWithEstimates = new HashMap<>();
-    private final Map<EZShareEQ, Prices> shareYear2estimatePricePerformanceFuture = new HashMap<>();
+    private final Map<EZShareEQ, Prices> shareYear210YearsPricePerformanceFuture = new HashMap<>();
+    private final Map<EZShareEQ, Prices> shareYear2estimate10YearsPricePerformanceFuture = new HashMap<>();
     private final Map<String, Prices> share2croissanceDividendAnnualWithEstimates = new HashMap<>();
 
 
@@ -91,10 +92,10 @@ public class SharePriceBuilder {
     /**
      * Calcule une estimation de la performance du cours de bourse en analysant le cours et les performances sur les 20 années précédentes, et cela pour chaque année de la liste de dates
      */
-    public Prices getEstimatedFuturePricePerf(Reporting reporting, EZShareEQ share){
-        return shareYear2estimatePricePerformanceFuture.computeIfAbsent(share, ezShare -> {
+    public Prices getEstimated10YearsPricePerf(Reporting reporting, EZShareEQ share){
+        return shareYear2estimate10YearsPricePerformanceFuture.computeIfAbsent(share, ezShare -> {
             Prices estimatedPerf = new Prices();
-            estimatedPerf.setLabel("Estimated Future Price Perf (%) of "+share.getEzName());
+            estimatedPerf.setLabel("Estimated 10 years Future Price Perf (%) of "+share.getEzName());
             EZDate oldestDate = dates.get(0);
             try {
                 int analyseOverNYear = 10;
@@ -142,6 +143,47 @@ public class SharePriceBuilder {
             }
         });
     }
+
+
+    public Prices get10YearsPerformance(Reporting reporting, EZShareEQ share){
+        return shareYear2estimate10YearsPricePerformanceFuture.computeIfAbsent(share, ezShare -> {
+            Prices estimatedPerf = new Prices();
+            estimatedPerf.setLabel("10 years Price Perf (%) of "+share.getEzName());
+            EZDate oldestDate = dates.get(0);
+            try {
+                int analyseOverNYear = 10;
+                List<EZDate> allPricesDate = new LinkedList<>();
+                int currentYear = EZDate.today().getYear();
+                for (int i = oldestDate.getYear() - (analyseOverNYear*2+1); i <= currentYear; i++) allPricesDate.add(new EZDate(i, 12, 31));
+                Prices prices = actionManager.getPrices(reporting, share, allPricesDate);
+
+                if (prices == null) {
+                    return estimatedPerf;
+                }
+
+                Prices groupedPrices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
+                Prices pricesPerf = perfIndexBuilder.buildPerfPrices(groupedPrices, ChartPerfFilter.VARIATION_EN_PERCENT);
+
+                int previousProcessedYear = -1;
+                for (EZDate date : dates) {
+                    int processingYear = date.getYear();
+                    if (previousProcessedYear != processingYear) {
+                        int startingYear = processingYear - analyseOverNYear;
+                        Price perf = new Price();
+                        for (int year = startingYear; year < startingYear + analyseOverNYear; year++) {
+                            perf = perf.plus(pricesPerf.getPriceAt(EZDate.yearPeriod(year)));
+                        }
+                        estimatedPerf.addPrice(new PriceAtDate(date, perf));
+                        previousProcessedYear = processingYear;
+                    }
+                }
+                return estimatedPerf;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
 
     public Prices getPerformance(Reporting reporting, EZShareEQ share) {
         return perf2TargetPrices.computeIfAbsent(share, ezShare -> {
