@@ -19,9 +19,11 @@ package com.pascal.ezload.service.dashboard;
 
 import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
+import com.pascal.ezload.service.dashboard.config.SolarChartSettings;
 import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.util.NumberUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,6 +84,14 @@ public class ChartsTools {
         return allDates;
     }
 
+    public static SolarChart createSolarChart(SolarChartSettings chartSettings) {
+        SolarChart solarChart = new SolarChart(chartSettings);
+
+        solarChart.setSolarYearlyCharts(List.of());
+
+        return solarChart;
+    }
+
     public static RadarChart createRadarChart(RadarChartSettings chartSettings) {
         RadarChart radarChart = new RadarChart(chartSettings);
 
@@ -117,7 +127,7 @@ public class ChartsTools {
                                                                                         .map(pd -> {
                                                                                             if (pd.getValue() == null ) return null;
                                                                                             if (removeZeroValues && pd.getValue() == 0) return null;
-                                                                                            float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
+                                                                                            float roundValue = NumberUtils.roundAmount(pd.getValue());
                                                                                             RichValue v = new RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
                                                                                             v.setValue(pd.getValue());

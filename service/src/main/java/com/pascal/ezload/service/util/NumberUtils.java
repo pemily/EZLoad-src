@@ -22,6 +22,10 @@ public class NumberUtils {
 
     private static final int NB_AFTER_COMMA = 6; // 6 chiffres apres la virgule max
 
+    public static float roundAmount(float amount) { // 2 digit after the comma
+        return(float) Math.round(amount*100.0f) / 100.0f;
+    }
+
     public static String normalizeAmount(String amount) {
         String result = amount;
         // remove the + in front of positive number

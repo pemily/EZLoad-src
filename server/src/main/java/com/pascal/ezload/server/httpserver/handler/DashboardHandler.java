@@ -61,7 +61,7 @@ public class DashboardHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public synchronized DashboardData getDashboardData() throws Exception {
         DashboardData dashboardData = ezServerState.getDashboardData();
-        if (dashboardData == null){
+        if (dashboardData == null || dashboardData.getPages().size() == 0){
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps().validate();
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);

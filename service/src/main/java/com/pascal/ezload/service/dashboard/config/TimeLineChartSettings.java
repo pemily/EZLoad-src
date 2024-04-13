@@ -78,6 +78,51 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
         this.algoEstimationCroissance = chartSettings.getAlgoEstimationCroissance();
     }
 
+    public TimeLineChartSettings(SolarChartSettings chartSettings){
+        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
+        this.targetDevise = chartSettings.getTargetDevise();
+        this.title = chartSettings.getTitle();
+        this.excludeBrokers = chartSettings.getExcludeBrokers();
+        this.excludeAccountTypes = chartSettings.getExcludeAccountTypes();
+        this.indexSelection = new LinkedList<>(chartSettings.getIndexSelection());
+        if (chartSettings.isShowLiquidity()){
+            ChartIndex liquidityIndex = new ChartIndex();
+            liquidityIndex.setId(SolarChartSettings.LIQUIDITE_INDEX_ID);
+            liquidityIndex.setLabel("Liquidités");
+            liquidityIndex.setDescription("Ajouté automatiquement pour faire le calcul");
+            ChartPortfolioIndexConfig liquidity = new ChartPortfolioIndexConfig();
+            liquidity.setPortfolioIndex(PortfolioIndex.LIQUIDITE);
+            liquidityIndex.setPortfolioIndexConfig(liquidity);
+            this.indexSelection.add(liquidityIndex);
+        }
+
+        ChartIndex shareNb = new ChartIndex();
+        shareNb.setId(SolarChartSettings.SHARE_NB_ID);
+        shareNb.setLabel("Share Count");
+        shareNb.setDescription("Ajouté automatiquement pour faire le calcul");
+        ChartShareIndexConfig shareCount = new ChartShareIndexConfig();
+        shareCount.setShareIndex(ShareIndex.SHARE_COUNT);
+        shareNb.setShareIndexConfig(shareCount);
+        this.indexSelection.add(shareNb);
+
+        ChartIndex sharePrice = new ChartIndex();
+        sharePrice.setId(SolarChartSettings.SHARE_PRICE_ID);
+        sharePrice.setLabel("Share Price");
+        sharePrice.setDescription("Ajouté automatiquement pour faire le calcul");
+        ChartShareIndexConfig sharePriceIdxCfg = new ChartShareIndexConfig();
+        sharePriceIdxCfg.setShareIndex(ShareIndex.SHARE_PRICE);
+        sharePrice.setShareIndexConfig(sharePriceIdxCfg);
+        this.indexSelection.add(sharePrice);
+
+
+        this.height = chartSettings.getHeight();
+        this.nbOfPoints = chartSettings.getNbOfPoints();
+        this.shareSelection = ShareSelection.ALL_SHARES_IN_PORTFOLIO;
+        this.additionalShareGoogleCodeList = Set.of();
+        this.algoEstimationCroissance = chartSettings.getAlgoEstimationCroissance();
+    }
+
     public String getTargetDevise() {
         return targetDevise;
     }

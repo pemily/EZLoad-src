@@ -146,7 +146,7 @@ public class SharePriceBuilder {
 
 
     public Prices get10YearsPerformance(Reporting reporting, EZShareEQ share){
-        return shareYear2estimate10YearsPricePerformanceFuture.computeIfAbsent(share, ezShare -> {
+        return shareYear210YearsPricePerformanceFuture.computeIfAbsent(share, ezShare -> {
             Prices estimatedPerf = new Prices();
             estimatedPerf.setLabel("10 years Price Perf (%) of "+share.getEzName());
             EZDate oldestDate = dates.get(0);
@@ -154,25 +154,21 @@ public class SharePriceBuilder {
                 int analyseOverNYear = 10;
                 List<EZDate> allPricesDate = new LinkedList<>();
                 int currentYear = EZDate.today().getYear();
-                for (int i = oldestDate.getYear() - (analyseOverNYear*2+1); i <= currentYear; i++) allPricesDate.add(new EZDate(i, 12, 31));
+                for (int i = oldestDate.getYear() - (analyseOverNYear+2); i <= currentYear; i++) allPricesDate.add(new EZDate(i, 12, 31));
                 Prices prices = actionManager.getPrices(reporting, share, allPricesDate);
 
                 if (prices == null) {
                     return estimatedPerf;
                 }
 
-                Prices groupedPrices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
-                Prices pricesPerf = perfIndexBuilder.buildPerfPrices(groupedPrices, ChartPerfFilter.VARIATION_EN_PERCENT);
-
                 int previousProcessedYear = -1;
                 for (EZDate date : dates) {
                     int processingYear = date.getYear();
                     if (previousProcessedYear != processingYear) {
-                        int startingYear = processingYear - analyseOverNYear;
-                        Price perf = new Price();
-                        for (int year = startingYear; year < startingYear + analyseOverNYear; year++) {
-                            perf = perf.plus(pricesPerf.getPriceAt(EZDate.yearPeriod(year)));
-                        }
+
+                        Price perf = prices.getPriceAt(EZDate.yearPeriod(processingYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).multiply(Price.CENT)
+                            .divide(prices.getPriceAt(EZDate.yearPeriod(processingYear-analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE));
+
                         estimatedPerf.addPrice(new PriceAtDate(date, perf));
                         previousProcessedYear = processingYear;
                     }

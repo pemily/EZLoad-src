@@ -18,8 +18,8 @@
 import { Box, Button, Card, CardBody, CardHeader, Tab, Tabs } from "grommet";
 import { Trash } from 'grommet-icons';
 import { useState } from "react";
-import { ChartIndex, TimeLineChart, EzShareData, RadarChart } from '../../../ez-api/gen-api/EZLoadApi';
-import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID} from '../../../ez-api/tools';
+import { ChartIndex, TimeLineChart, EzShareData, RadarChart, SolarChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { updateEZLoadTextWithSignature, isTextContainsEZLoadSignature, genUUID, isDefined} from '../../../ez-api/tools';
 import { TextField } from '../../Tools/TextField';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 import { ComboMultipleWithCheckbox } from '../../Tools/ComboMultipleWithCheckbox';
@@ -27,13 +27,15 @@ import { TextAreaField } from "../../Tools/TextAreaField";
 import { ChartIndexMainEditor, getChartIndexDescription, getChartIndexTitle } from "../ChartIndexMainEditor";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { CheckBoxField } from "../../Tools/CheckBoxField";
 
-export interface TimeLineOrRadarChartSettingsEditorProps {
+export interface ChartSettingsEditorProps {
     timeLineChartSettings: TimeLineChart | undefined;  // if defined, radar is undefined
     radarChartSettings: RadarChart | undefined; // if defined, timeLine is undefined
+    portfolioSolarChartSettings: SolarChart | undefined;
     allEzShares: EzShareData[];    
     readOnly: boolean;
-    save: (timeLineOrRadarChartSettings: TimeLineChart | RadarChart, keepLines: boolean, afterSave: () => void) => void;
+    save: (timeLineOrRadarChartSettings: TimeLineChart | RadarChart | SolarChart, keepLines: boolean, afterSave: () => void) => void;
 }      
 
 
@@ -64,8 +66,16 @@ export const brokers = ["Autre",
 
 export const accountTypes = ["Compte-Titres Ordinaire", "PEA", "PEA-PME", "Assurance-Vie"];
 
-export function nouvelIndice() : ChartIndex {
-    const chartIndex : ChartIndex = {       
+export function nouvelIndice(onlyShare: boolean) : ChartIndex {    
+    const chartIndex : ChartIndex =
+        onlyShare ? 
+        {       
+            id: genUUID(),
+            shareIndexConfig: {
+                shareIndex: "ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE"
+            }        
+        }
+        : {       
             id: genUUID(),
             portfolioIndexConfig: {
                 portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
@@ -77,15 +87,21 @@ export function nouvelIndice() : ChartIndex {
 }
 
 
-export function TimeLineOrRadarChartSettingsEditor(props: TimeLineOrRadarChartSettingsEditorProps){
+export function ChartSettingsEditor(props: ChartSettingsEditorProps){
     const [indiceIndex, setIndiceIndex] = useState<number>(0);     
-    const [chartSettings, setChartSettings] = useState<TimeLineChart | RadarChart>(props.timeLineChartSettings ? props.timeLineChartSettings : props.radarChartSettings!)
     
-    function getChartSettings() : TimeLineChart | RadarChart {
-        if (props.timeLineChartSettings) return props.timeLineChartSettings;
-        return props.radarChartSettings!;
+    function getChartSettings() : TimeLineChart | RadarChart | SolarChart {
+        if (isDefined(props.timeLineChartSettings)) return props.timeLineChartSettings!;
+        if (isDefined(props.radarChartSettings)) return props.radarChartSettings!;
+        return props.portfolioSolarChartSettings!;
     }
     
+    function getTimeLineOrRadarChartSettings() : TimeLineChart | RadarChart {
+        if (isDefined(props.timeLineChartSettings)) return props.timeLineChartSettings!;
+        if (isDefined(props.radarChartSettings)) return props.radarChartSettings!;        
+        throw "No timeline or radar is defined"
+    }
+
     return (         
 
         <Box direction="column" alignSelf="start" width="95%" >
@@ -95,8 +111,8 @@ export function TimeLineOrRadarChartSettingsEditor(props: TimeLineOrRadarChartSe
                                         // on clique sur +
                                         props.save(
                                             {...getChartSettings(),
-                                                indexSelection: getChartSettings().indexSelection === undefined ?
-                                                                [nouvelIndice()] : [...getChartSettings().indexSelection!, nouvelIndice()]
+                                                indexSelection: getChartSettings().indexSelection === undefined ? [nouvelIndice(isDefined(props.portfolioSolarChartSettings))]
+                                                                 : [...getChartSettings().indexSelection!, nouvelIndice(isDefined(props.portfolioSolarChartSettings))]
                                             }, true, () => { setIndiceIndex(nextIndex); }
                                         )
                                     }
@@ -123,14 +139,12 @@ export function TimeLineOrRadarChartSettingsEditor(props: TimeLineOrRadarChartSe
                                     description=""
                                     onChange={newValue  => props.save({...getChartSettings(), selectedStartDateSelection: newValue}, false, () => {})}/>
 
-                        { props.timeLineChartSettings && (
-                            <>
-
+                        { isDefined(props.timeLineChartSettings) && (
                                 <ComboFieldWithCode id="GroupBy"
                                         label="Période"
                                         errorMsg={undefined}
                                         readOnly={props.readOnly}
-                                        selectedCodeValue={props.timeLineChartSettings.groupedBy! }
+                                        selectedCodeValue={props.timeLineChartSettings!.groupedBy! }
                                         userValues={[                             
                                             'Par jour',                                
                                             'Par mois',
@@ -144,9 +158,18 @@ export function TimeLineOrRadarChartSettingsEditor(props: TimeLineOrRadarChartSe
                                         description=""
                                         onChange={newValue => 
                                             props.save({...props.timeLineChartSettings, groupedBy: newValue}, false, () => {})
-                                        }/>            
-                            </>
+                                        }/>                                        
                         ) }
+
+                        { isDefined(props.portfolioSolarChartSettings) && (
+                            <Box pad="small">
+                                <CheckBoxField readOnly={props.readOnly} label="Inclure les liquidités" 
+                                            value={props.portfolioSolarChartSettings?.showLiquidity!} 
+                                            onChange={newValue => 
+                                                props.save({...props.portfolioSolarChartSettings, showLiquidity: newValue}, false, () => {})
+                                            }/>
+                            </Box>
+                        )}
 
 {
 /*
@@ -188,38 +211,40 @@ Je désactive car je ne sais pas si j'active la devise USD:
                     <Card pad='10px' margin='10px'  background="light-1">
                         <CardHeader>Paramètres globaux pour les indices</CardHeader>
                         <CardBody>
-                            <Box direction="row">
-                                    <ComboFieldWithCode id="shareGroupSelection"
-                                        label="Groupe d'actions"
-                                        errorMsg={undefined}
-                                        readOnly={props.readOnly}
-                                        selectedCodeValue={getChartSettings().shareSelection!}
-                                        userValues={[                             
-                                            "Les actions courrantes du portefeuille",
-                                            "Toutes les actions qui ont été présentent dans le portefeuille",
-                                            "Uniquement les actions sélectionnées individuellement"
-                                        ]}
-                                        codeValues={[                            
-                                            "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
-                                        ]}
-                                        description=""
-                                        onChange={newValue => 
-                                            props.save({...getChartSettings(), shareSelection: newValue}, false, () => {})}
-                                    />
+                            { !isDefined(props.portfolioSolarChartSettings) && (
+                                <Box direction="row">
+                                        <ComboFieldWithCode id="shareGroupSelection"
+                                            label="Groupe d'actions"
+                                            errorMsg={undefined}
+                                            readOnly={props.readOnly}
+                                            selectedCodeValue={getTimeLineOrRadarChartSettings().shareSelection!}
+                                            userValues={[                             
+                                                "Les actions courrantes du portefeuille",
+                                                "Toutes les actions qui ont été présentent dans le portefeuille",
+                                                "Uniquement les actions sélectionnées individuellement"
+                                            ]}
+                                            codeValues={[                            
+                                                "CURRENT_SHARES", "ALL_SHARES", "ADDITIONAL_SHARES_ONLY"
+                                            ]}
+                                            description=""
+                                            onChange={newValue => 
+                                                props.save({...getChartSettings(), shareSelection: newValue}, false, () => {})}
+                                        />
 
-                                    <ComboMultipleWithCheckbox id="additionalShares"
-                                                            label="+ Actions individuelle"
-                                                            selectedCodeValues={getChartSettings().additionalShareGoogleCodeList!}
-                                                            errorMsg={undefined}
-                                                            readOnly={false}
-                                                            userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
-                                                            codeValues={props.allEzShares.map(s => s.googleCode!)}
-                                                            description=""
-                                                            showSelectionInline={false}
-                                                            onChange={newValue  => props.save({...getChartSettings(), additionalShareGoogleCodeList: newValue }, false, () => {})}
+                                        <ComboMultipleWithCheckbox id="additionalShares"
+                                                                label="+ Actions individuelle"
+                                                                selectedCodeValues={getTimeLineOrRadarChartSettings().additionalShareGoogleCodeList!}
+                                                                errorMsg={undefined}
+                                                                readOnly={false}
+                                                                userValues={props.allEzShares.map(s => s.googleCode + ' - '+ s.shareName!)}
+                                                                codeValues={props.allEzShares.map(s => s.googleCode!)}
+                                                                description=""
+                                                                showSelectionInline={false}
+                                                                onChange={newValue  => props.save({...getChartSettings(), additionalShareGoogleCodeList: newValue }, false, () => {})}
 
-                                    />
-                            </Box>   
+                                        />
+                                </Box>   
+                            ) }
 
                             <Box direction="row">
                                 <ComboFieldWithCode id="AlgoCroissance"
@@ -296,11 +321,11 @@ Je désactive car je ne sais pas si j'active la devise USD:
                                             }, true, () => {})
                                     }/>
 
-                                    <ChartIndexMainEditor                        
-                                        chartSettings={getChartSettings()}                
+                                    <ChartIndexMainEditor                                                                         
                                         allEzShares={props.allEzShares}
                                         chartIndex={chartIndex}
-                                        readOnly={props.readOnly}                                        
+                                        readOnly={props.readOnly}
+                                        shareSelectionOnly={isDefined(props.portfolioSolarChartSettings)}
                                         save={(newChartIndex)  => 
                                             props.save({...getChartSettings(), 
                                                 indexSelection: [...getChartSettings().indexSelection!.slice(0, chartIndexPosition),

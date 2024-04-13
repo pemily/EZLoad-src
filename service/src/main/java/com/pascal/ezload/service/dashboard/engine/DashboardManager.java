@@ -46,12 +46,14 @@ public class DashboardManager {
     private final String dashboardFile;
     private final TimeLineChartBuilder timeLineChartBuilder;
     private final RadarChartBuilder radarChartBuilder;
+    private final PortfolioSolarChartBuilder portfolioSolarChartBuilder;
 
-    public DashboardManager(SettingsManager settingsManager, EZActionManager ezActionManager, MainSettings mainSettings) throws Exception {
+    public DashboardManager(SettingsManager settingsManager, EZActionManager ezActionManager, MainSettings mainSettings) {
         this.dashboardFile = settingsManager.getDashboardFile();
         this.ezActionManager = ezActionManager;
         this.timeLineChartBuilder = new TimeLineChartBuilder(ezActionManager);
         this.radarChartBuilder = new RadarChartBuilder(ezActionManager, mainSettings);
+        this.portfolioSolarChartBuilder = new PortfolioSolarChartBuilder(ezActionManager, mainSettings);
     }
 
     public List<DashboardPage>  loadDashboardSettings() {
@@ -99,6 +101,9 @@ public class DashboardManager {
                                             else if (prefs.getRadar() != null){
                                                 prefs.setRadar(radarChartBuilder.createEmptyRadarChart(prefs.getRadar()));
                                             }
+                                            else if (prefs.getPortfolioSolar() != null){
+                                                prefs.setPortfolioSolar(portfolioSolarChartBuilder.createEmptySolarChart(prefs.getPortfolioSolar()));
+                                            }
                                         } catch (IOException e) {
                                             throw new RuntimeException(e);
                                         }
@@ -124,6 +129,9 @@ public class DashboardManager {
                             }
                             else if (prefs.getRadar() != null){
                                 prefs.setRadar(radarChartBuilder.createRadarChart(reporting, ezPortfolioProxy, prefs.getRadar()));
+                            }
+                            else if (prefs.getPortfolioSolar() != null){
+                                prefs.setPortfolioSolar(portfolioSolarChartBuilder.createSolarChart(reporting, ezPortfolioProxy, prefs.getPortfolioSolar()));
                             }
                             return prefs;
                         } catch (IOException e) {

@@ -23,6 +23,7 @@ import java.util.Map;
 
 public class TimeLineChartBuilder {
 
+    public static final String Y_AXIS_TITLE = "Y_AXIS_TITLE";
     private final EZActionManager ezActionManager;
 
     public TimeLineChartBuilder(EZActionManager ezActionManager){
@@ -127,7 +128,7 @@ public class TimeLineChartBuilder {
             });
             timeLineChart.setLines(allChartLines);
             Map<String, String> yAxisTitles = new HashMap<>();
-            yAxisTitles.put("Y_AXIS_TITLE", targetDevise.getSymbol());
+            yAxisTitles.put(Y_AXIS_TITLE, targetDevise.getSymbol());
             timeLineChart.setAxisId2titleY(yAxisTitles);
             return timeLineChart;
         }

@@ -9,7 +9,7 @@ public class ChartSwitch {
     // only one of this
     private TimeLineChart timeLine;
     private RadarChart radar;
-    private SolarChart solar;
+    private SolarChart portfolioSolar;
 
     public TimeLineChart getTimeLine() {
         return timeLine;
@@ -27,12 +27,12 @@ public class ChartSwitch {
         this.radar = radar;
     }
 
-    public SolarChart getSolar() {
-        return solar;
+    public SolarChart getPortfolioSolar() {
+        return portfolioSolar;
     }
 
-    public void setSolar(SolarChart solar) {
-        this.solar = solar;
+    public void setPortfolioSolar(SolarChart solar) {
+        this.portfolioSolar = solar;
     }
 
     public void validate() {
@@ -40,8 +40,8 @@ public class ChartSwitch {
             timeLine.validate();
         else if (radar != null)
             radar.validate();
-        else if (solar != null)
-            solar.validate();
+        else if (portfolioSolar != null)
+            portfolioSolar.validate();
     }
 
     public void clearErrors() {
@@ -49,8 +49,8 @@ public class ChartSwitch {
             timeLine.clearErrors();
         else if (radar != null)
             radar.clearErrors();
-        else if (solar != null)
-            solar.clearErrors();
+        else if (portfolioSolar != null)
+            portfolioSolar.clearErrors();
     }
 
 }

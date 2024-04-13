@@ -1,15 +1,15 @@
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
+import com.pascal.ezload.service.dashboard.config.SolarChartSettings;
 
 import java.util.List;
 
-public class SolarChart extends RadarChartSettings {
+public class SolarChart extends SolarChartSettings {
 
     private List<SolarYearlyChart> solarYearlyCharts;
 
     public SolarChart(){}
-    public SolarChart(RadarChartSettings chartSettings) {
+    public SolarChart(SolarChartSettings chartSettings) {
         super(chartSettings);
     }
 
@@ -21,12 +21,22 @@ public class SolarChart extends RadarChartSettings {
         this.solarYearlyCharts = radarYearlyCharts;
     }
 
-
     public static class SolarYearlyChart {
         private int year;
-        private String groupId; // indexName (chaque index aura sa propre list de label et de solarArea
-        private List<String> indexLabels; // the index names
+        private String groupId; // indexName (chaque index aura sa propre list de label et de solarArea)
+        private List<String> indexLabels; // the labels
         private List<SolarArea> solarAreas;
+        private ChartLine.Y_AxisSetting yAxisSetting;
+        private String yAxisTitle;
+
+        public ChartLine.Y_AxisSetting getYAxisSetting() {
+            return yAxisSetting;
+        }
+
+        public void setYAxisSetting(ChartLine.Y_AxisSetting yAxisSetting) {
+            this.yAxisSetting = yAxisSetting;
+        }
+
 
         public List<String> getIndexLabels() {
             return indexLabels;
@@ -59,10 +69,17 @@ public class SolarChart extends RadarChartSettings {
         public void setGroupId(String groupId) {
             this.groupId = groupId;
         }
+
+        public String getYAxisTitle() {
+            return yAxisTitle;
+        }
+
+        public void setYAxisTitle(String yAxisTitle) {
+            this.yAxisTitle = yAxisTitle;
+        }
     }
 
     public static class SolarArea {
-        private String areaName;
         private String backgroundColor; // rgba(255,99,132,1);
         private RichValue data;
 
@@ -72,14 +89,6 @@ public class SolarChart extends RadarChartSettings {
 
         public void setData(RichValue data) {
             this.data = data;
-        }
-
-        public String getAreaName() {
-            return areaName;
-        }
-
-        public void setAreaName(String areaName) {
-            this.areaName = areaName;
         }
 
         public String getBackgroundColor() {

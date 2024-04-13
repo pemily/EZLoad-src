@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { ChartIndex, TimeLineChart, ChartPortfolioIndexConfig, ChartShareIndexConfig, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
+import { ChartIndex, ChartPortfolioIndexConfig, ChartShareIndexConfig, EzShareData, RadarChart } from '../../../ez-api/gen-api/EZLoadApi';
 import { isDefined, applyEZLoadTextSignature} from '../../../ez-api/tools';
 import { ComboFieldWithCode } from '../../Tools/ComboFieldWithCode';
 
-export interface ChartIndexMainEditorProps {    
-    chartSettings: TimeLineChart;
+export interface ChartIndexMainEditorProps {        
+    shareSelectionOnly: boolean; // True if portfolioSolar chart is selected
     chartIndex: ChartIndex;
     save: (chartIndex:ChartIndex) => void;    
     readOnly: boolean;    
@@ -214,8 +214,8 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             errorMsg={undefined}
                             readOnly={false}
                             selectedCodeValue={isDefined(props.chartIndex.currencyIndexConfig) ? 'DEVISE' : isDefined(props.chartIndex.shareIndexConfig) ? 'SHARE' : 'PORTEFEUILLE'}
-                            codeValues={['PORTEFEUILLE', 'SHARE', 'DEVISE']}                            
-                            userValues={["Portefeuille", "Action", "Devise"]}
+                            codeValues={ props.shareSelectionOnly ? ['SHARE'] : ['PORTEFEUILLE', 'SHARE', 'DEVISE']}                            
+                            userValues={ props.shareSelectionOnly ? ["Action"] : ["Portefeuille", "Action", "Devise"]}
                             description=""
                             onChange={newValue  => {
                                 if (newValue === 'PORTEFEUILLE') {
@@ -301,7 +301,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                             label="Indice"
                             errorMsg={undefined}
                             readOnly={props.readOnly}
-                            selectedCodeValue={!isDefined(props.chartIndex.shareIndexConfig?.shareIndex) ? 'SHARE_PRICE' : props.chartIndex.shareIndexConfig?.shareIndex! }
+                            selectedCodeValue={!isDefined(props.chartIndex.shareIndexConfig?.shareIndex) ? (props.shareSelectionOnly ? 'ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE' : 'SHARE_PRICE') : props.chartIndex.shareIndexConfig?.shareIndex! }
                             userValues={[                             
                                 "Cours de l'action",
                                 "Nombre d'actions",
@@ -335,7 +335,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT',
                                 'ACTION_CROISSANCE',
                                 'ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE'
-                            ]}
+                            ]} // Elimine SHARE_PRICE & SHARE_COUNT  ].filter((v, i) => props.shareSelectionOnly  ? i > 1 : true)} // Elimine SHARE_PRICE & SHARE_COUNT 
                             description=""
                             onChange={newValue => {
                                 const chartShareIndex : ChartShareIndexConfig = {

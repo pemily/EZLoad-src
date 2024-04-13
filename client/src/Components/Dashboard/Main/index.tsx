@@ -102,7 +102,7 @@ export function DashboardMain(props: DashboardMainProps){
                 { dashboardPages && editPages && (
                     <Box  margin={{horizontal: "xlarge", vertical:"medium"}} pad="xsmall">
                      { dashboardPages.map((page, pageIndex) => (
-                        <Box direction="row" >
+                        <Box direction="row" key={"editPageBox"+pageIndex}>
                             <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
                             readOnly={props.processRunning} value={page.title} label="" onChange={newValue => {
                                 const f: DashboardPage[] = dashboardPages.map((p,i) => i === pageIndex ? 

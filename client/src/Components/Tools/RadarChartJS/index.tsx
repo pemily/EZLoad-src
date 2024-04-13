@@ -3,7 +3,6 @@ import { RadarArea, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 import { isDefined } from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
 
 export interface RadarChartProps {
