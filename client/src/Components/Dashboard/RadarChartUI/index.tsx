@@ -82,7 +82,7 @@ export function RadarChartUI(props: RadarChartUIProps){
                 }
 
             </Box>
-            <Box height={(props.radarChart.height)+"vh"}>
+            <Box height={(props.radarChart.height)+"vh"} pad="none" margin="none" gap="none">
                 {                    
                         <RadarChartJS
                                 indexLabels={selectedYearIndice === -1 ? [] : props.radarChart.radarYearlyCharts?.[selectedYearIndice].indexLabels!} 
@@ -91,6 +91,8 @@ export function RadarChartUI(props: RadarChartUIProps){
                                                                                         r.areaGroupId === "Portefeuille" 
                                                                                         || r.areaGroupId === "Devise" 
                                                                                         || selectedShare!.includes(r.areaName!))!}
+                                yAxisID={selectedYearIndice === -1 ? [] : props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.yaxisSetting!}
+                                yAxisTitle={selectedYearIndice === -1 ? [] : props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.yaxisTitle!}
                                 demo={props.demo}/>                    
                 }                   
                 {

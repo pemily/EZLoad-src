@@ -24,8 +24,12 @@ export function SolarChartJS(props: SolarChartProps){
           axis: "xy",
         },
         scales: {
-          radialLinear: {
-            display: !props.demo || (props.yAxisID !== "NB" && props.yAxisID !== "PORTFOLIO"),
+          radialLinear: {            
+            ticks:{
+              backdropColor: "black",
+              color: "black",
+              showLabelBackdrop: props.demo && (props.yAxisID === "NB" || props.yAxisID === "PORTFOLIO"),
+            }                   
           }
         },
         plugins: {

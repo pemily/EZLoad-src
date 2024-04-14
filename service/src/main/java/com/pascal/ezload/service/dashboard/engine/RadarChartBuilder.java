@@ -9,6 +9,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.service.util.NumberUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -47,6 +48,8 @@ public class RadarChartBuilder {
             RadarChart.RadarYearlyChart ryc = new RadarChart.RadarYearlyChart();
             ryc.setYear(years.get(yearIndex));
             ryc.setIndexLabels(timeLineChart.getIndexSelection().stream().map(ChartIndex::getLabel).toList());
+            ryc.setYAxisTitle(new LinkedList<>());
+            ryc.setYAxisSetting(new LinkedList<>());
 
             Map<String, RadarChart.RadarArea> areaName2RadarArea = new HashMap<>();
 
@@ -72,6 +75,10 @@ public class RadarChartBuilder {
             int yearIndexFinal = yearIndex;
             // pour chaque index
             timeLineChart.getIndexSelection().forEach(i -> {
+                ryc.getYAxisSetting().add(timeLineChart.getLines().stream().filter(f -> f.getIndexId().equals(i.getId())).findFirst().map(ChartLine::getYAxisSetting).orElse(null));
+                ryc.getYAxisTitle().add(timeLineChart.getAxisId2titleY().get(TimeLineChartBuilder.Y_AXIS_TITLE));
+
+
                 // dans chaque aire
                 areaName2RadarArea.values().forEach(area -> {
                     // retrouve la timeLine de cette index
@@ -79,12 +86,11 @@ public class RadarChartBuilder {
                     // et ajoute-lui la donnée pour cette année
                     if (clOptional.isPresent()){
                         ChartLine cl = clOptional.get();
-                        if (!mainSettings.getDemo() || (cl.getYAxisSetting() != ChartLine.Y_AxisSetting.PORTFOLIO && cl.getYAxisSetting() != ChartLine.Y_AxisSetting.NB))
-                            area.getDatasets().add(cl.getRichValues().get(yearIndexFinal));
-                        else
-                            area.getDatasets().add(null);
+                        area.getDatasets().add(normalize(cl.getRichValues().get(yearIndexFinal)));
                     }
-                    else area.getDatasets().add(null);
+                    else {
+                        area.getDatasets().add(null);
+                    }
                 });
             });
             ryc.setRadarAreas(areaName2RadarArea.values().stream().toList());
@@ -94,6 +100,12 @@ public class RadarChartBuilder {
         return radarChart;
     }
 
+    private RichValue normalize(RichValue richValue) {
+        if (richValue != null && richValue.getValue() != null){
+            richValue.setValue(NumberUtils.roundAmount(richValue.getValue()));
+        }
+        return richValue;
+    }
 
 
 }

@@ -53,7 +53,7 @@ public class DashboardManager {
         this.ezActionManager = ezActionManager;
         this.timeLineChartBuilder = new TimeLineChartBuilder(ezActionManager);
         this.radarChartBuilder = new RadarChartBuilder(ezActionManager, mainSettings);
-        this.portfolioSolarChartBuilder = new PortfolioSolarChartBuilder(ezActionManager, mainSettings);
+        this.portfolioSolarChartBuilder = new PortfolioSolarChartBuilder(ezActionManager);
     }
 
     public List<DashboardPage>  loadDashboardSettings() {
@@ -76,7 +76,9 @@ public class DashboardManager {
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                r = JsonUtil.createDefaultMapper().readValue(reader, new TypeReference<List<DashboardPage>>(){});
+                try (Reader reader2 = new FileReader(dashboardFile, StandardCharsets.UTF_8)) {
+                    r = JsonUtil.createDefaultMapper().readValue(reader2, new TypeReference<List<DashboardPage>>() {});
+                }
             }
             return r;
         }

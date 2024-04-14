@@ -26,6 +26,8 @@ public class RadarChart extends RadarChartSettings {
         private int year;
         private List<String> indexLabels; // the index names
         private List<RadarArea> radarAreas;
+        private List<ChartLine.Y_AxisSetting> yAxisSetting;
+        private List<String> yAxisTitle;
 
         public List<String> getIndexLabels() {
             return indexLabels;
@@ -49,6 +51,22 @@ public class RadarChart extends RadarChartSettings {
 
         public void setRadarAreas(List<RadarArea> radarAreas) {
             this.radarAreas = radarAreas;
+        }
+
+        public List<ChartLine.Y_AxisSetting> getYAxisSetting() {
+            return yAxisSetting;
+        }
+
+        public void setYAxisSetting(List<ChartLine.Y_AxisSetting> YAxisSetting) {
+            this.yAxisSetting = YAxisSetting;
+        }
+
+        public List<String> getYAxisTitle() {
+            return yAxisTitle;
+        }
+
+        public void setYAxisTitle(List<String> yAxisTitle) {
+            this.yAxisTitle = yAxisTitle;
         }
     }
 
@@ -98,5 +116,6 @@ public class RadarChart extends RadarChartSettings {
         public void setBackgroundColor(String backgroundColor) {
             this.backgroundColor = backgroundColor;
         }
+
     }
 }

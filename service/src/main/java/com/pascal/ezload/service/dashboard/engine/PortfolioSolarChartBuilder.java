@@ -1,6 +1,5 @@
 package com.pascal.ezload.service.dashboard.engine;
 
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.dashboard.*;
 import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.SolarChartSettings;
@@ -21,11 +20,9 @@ public class PortfolioSolarChartBuilder {
 
     public static final String LIQUIDITY_NAME = ShareValue.LIQUIDITY_NAME;
     private final EZActionManager ezActionManager;
-    private final MainSettings mainSettings;
 
-    public PortfolioSolarChartBuilder(EZActionManager ezActionManager, MainSettings mainSettings) {
+    public PortfolioSolarChartBuilder(EZActionManager ezActionManager) {
         this.ezActionManager = ezActionManager;
-        this.mainSettings = mainSettings;
     }
 
     public SolarChart createEmptySolarChart(SolarChartSettings chartSettings) {
@@ -155,24 +152,29 @@ public class PortfolioSolarChartBuilder {
 
         int sumOfAllPartitions = allAreas.stream().mapToInt(area -> area.sizeOfAreaInPartitionUnit).sum();
 
-        // ici on a creer toutes les areas, trouver le pgcd entre toutes les valorisations
-        int pgcd = sumOfAllPartitions;
-        for (Area area : allAreas) {
-            pgcd = pgcd(pgcd, area.sizeOfAreaInPartitionUnit());
-        }
+        List<SolarChart.SolarArea> solarAreas = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
 
-        int numberTotalOfAreas = sumOfAllPartitions / pgcd;
+        if (sumOfAllPartitions != 0) {
+            // ici on a creer toutes les areas, trouver le pgcd entre toutes les valorisations
+            int pgcd = sumOfAllPartitions;
+            for (Area area : allAreas) {
+                pgcd = pgcd(pgcd, area.sizeOfAreaInPartitionUnit());
+            }
 
-        List<SolarChart.SolarArea> solarAreas = new ArrayList<>(numberTotalOfAreas);
+            int numberTotalOfAreas = sumOfAllPartitions / pgcd;
 
-        List<String> labels = new ArrayList<>(numberTotalOfAreas);
-        for (Area area : allAreas){
-            SolarChart.SolarArea solarArea = new SolarChart.SolarArea();
-            solarArea.setBackgroundColor(shareName2colorCode.apply(area.shareName()).getColor(0.5f));
-            solarArea.setData(area.indexValue());
-            for (int i = 0; i < area.sizeOfAreaInPartitionUnit; i++) {
-                solarAreas.add(solarArea);
-                labels.add(area.shareName + "  ("+area.occupancyPercent()+"%) ");
+            solarAreas = new ArrayList<>(numberTotalOfAreas);
+
+            labels = new ArrayList<>(numberTotalOfAreas);
+            for (Area area : allAreas) {
+                SolarChart.SolarArea solarArea = new SolarChart.SolarArea();
+                solarArea.setBackgroundColor(shareName2colorCode.apply(area.shareName()).getColor(0.5f));
+                solarArea.setData(area.indexValue());
+                for (int i = 0; i < area.sizeOfAreaInPartitionUnit; i++) {
+                    solarAreas.add(solarArea);
+                    labels.add(area.shareName + "  (" + area.occupancyPercent() + "%) ");
+                }
             }
         }
 

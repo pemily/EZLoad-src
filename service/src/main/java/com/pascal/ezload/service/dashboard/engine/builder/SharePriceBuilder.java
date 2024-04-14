@@ -166,8 +166,12 @@ public class SharePriceBuilder {
                     int processingYear = date.getYear();
                     if (previousProcessedYear != processingYear) {
 
-                        Price perf = prices.getPriceAt(EZDate.yearPeriod(processingYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).multiply(Price.CENT)
-                            .divide(prices.getPriceAt(EZDate.yearPeriod(processingYear-analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE));
+                        Price perf = new Price();
+
+                        if (prices.getPriceAt(EZDate.yearPeriod(processingYear-analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).getValue() != 0) {
+                            perf = prices.getPriceAt(EZDate.yearPeriod(processingYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).multiply(Price.CENT)
+                                    .divide(prices.getPriceAt(EZDate.yearPeriod(processingYear - analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE));
+                        }
 
                         estimatedPerf.addPrice(new PriceAtDate(date, perf));
                         previousProcessedYear = processingYear;

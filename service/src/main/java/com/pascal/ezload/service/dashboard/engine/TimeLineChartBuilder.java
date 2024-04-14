@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class TimeLineChartBuilder {
 
-    public static final String Y_AXIS_TITLE = "Y_AXIS_TITLE";
+    public static final String Y_AXIS_TITLE = "Y_AXIS_TITLE"; // le nom que je donne a l'axe des Y
     private final EZActionManager ezActionManager;
 
     public TimeLineChartBuilder(EZActionManager ezActionManager){

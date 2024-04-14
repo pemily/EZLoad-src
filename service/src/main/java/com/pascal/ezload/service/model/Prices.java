@@ -79,7 +79,7 @@ public class Prices {
     // si la date exacte n'est pas présente, on teste sur les 20 derniers jours
     public PriceAtDate getPriceAt(EZDate date){
         if (period != null && date.getPeriod() != period){
-            throw new IllegalStateException("Prices list "+period+" and given date "+date+" don't have the same types");
+            throw new IllegalStateException("Prices list "+period+" and given date "+date+" don't have the same types. You MUST use the method: getPriceAt(EZDate date, PERIOD_ALGO algo) instead");
         }
         return getLatestValueInPeriodOrAtDate(date);
     }

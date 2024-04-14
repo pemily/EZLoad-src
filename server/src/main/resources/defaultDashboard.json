@@ -125,7 +125,7 @@
       {
         "portfolioSolar" : {
           "targetDevise" : "EUR",
-          "title" : "Actions du portefeuille",
+          "title" : "Actions dans le portefeuille",
           "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
           "indexSelection" : [
             {
@@ -314,6 +314,36 @@
               "colorLine" : "rgba(116,18,247,0.6)",
               "shareIndexConfig" : {
                 "shareIndex" : "CUMULABLE_PERFORMANCE_ACTION"
+              }
+            }
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Performance estimé (basé sur 10 ans d'historique) vs Performance Réelle",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "YEARLY",
+          "indexSelection" : [
+            {
+              "id" : "a8474613-651e-4355-94be-121dc18d3cb9",
+              "label" : " Performance réelle sur 10 ans\t ",
+              "description" : " Affiche la performance du cours des 10 dernières années sans inclure les dividendes.\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "TEN_YEARS_PERFORMANCE_ACTION"
+              }
+            },
+            {
+              "id" : "7885efd8-0a7b-4aa9-8756-632f88b7bbd2",
+              "label" : " Performance estimée sur 10 ans\t ",
+              "description" : " Affiche la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
               }
             }
           ],
