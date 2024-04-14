@@ -125,7 +125,7 @@ public class SharePriceBuilder {
                         // et on fera la moyenne entre toutes ces perfs
                         List<Price> allTenYearPerfs = new LinkedList<>();
                         for (int startingYear = processingYear - (analyseOverNYear * 2); startingYear + analyseOverNYear < processingYear; startingYear++) {
-                            Price perf = new Price();
+                            Price perf = new Price(0);
                             for (int year = startingYear; year < startingYear + analyseOverNYear; year++) {
                                 perf = perf.plus(pricesPerf.getPriceAt(EZDate.yearPeriod(year)));
                             }
@@ -166,7 +166,7 @@ public class SharePriceBuilder {
                     int processingYear = date.getYear();
                     if (previousProcessedYear != processingYear) {
 
-                        Price perf = new Price();
+                        Price perf = new Price(0);
 
                         if (prices.getPriceAt(EZDate.yearPeriod(processingYear-analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).getValue() != 0) {
                             perf = prices.getPriceAt(EZDate.yearPeriod(processingYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).multiply(Price.CENT)

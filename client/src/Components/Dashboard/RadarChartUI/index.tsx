@@ -59,7 +59,7 @@ export function RadarChartUI(props: RadarChartUIProps){
                     // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
                     selectedYearIndice !== -1 && isDefined(props.radarChart.radarYearlyCharts) &&
                          props.radarChart.radarYearlyCharts?.[selectedYearIndice]?.radarAreas?.find(r => r.areaGroupId === "Action") &&
-                            (<Box gap="none" margin="none" direction="row" align="end" flex="grow">                                       
+                            (<Box gap="none" margin="none" direction="row" align="end" flex="grow">
                                 <ComboMultipleWithCheckbox id={'indexLabelFilterCombo'+props.radarChart.title}                               
                                     showSelectionInline={false}
                                     selectedCodeValues={selectedShare}                            

@@ -88,11 +88,11 @@ export function TimeLineChartUI(props: TimeLineChartUIProps){
 
     return (
         <>
-            <Box alignSelf="center" direction="row" alignContent="center" flex="grow" align="center" gap="medium">
+            <Box alignSelf="center" direction="row" alignContent="center" fill align="center" gap="medium">
                 {                                
                     // si il y a des index d'action, affiche la combo box avec toutes les actions dedans
                     (props.timeLineChart.lines !== undefined && props.timeLineChart.lines.length > 0) && containsShareIndex(props) &&
-                        (<Box gap="none" margin="none" direction="row" align="center">                                       
+                        (<Box gap="none" margin="none" direction="row" align="center" flex="grow">                                       
                             <ComboField id={'indexLabelFilterCombo'+props.timeLineChart.title}   
                                 readOnly={false}
                                 description=""
@@ -111,7 +111,7 @@ export function TimeLineChartUI(props: TimeLineChartUIProps){
                                 return (<Anchor key={'indexLabelFilter'+i}                                                                   
                                                 size="small" icon={<Checkbox size='small' color="black"
                                                             style={{background: filteredChart.lines?.filter(l2 => l2.indexId === l.id).length === 0 ?  "white" : l.colorLine }}/>} 
-                                                            gap="xsmall" margin="none"
+                                                            gap="xsmall" margin="small"
                                                             label={l.label} 
                                                             onClick={() =>{       
                                                                 if (filteredChart.lines?.filter(l2 => l2.indexId === l.id).length === 0) {
