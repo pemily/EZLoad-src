@@ -15,11 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Box,Text, Anchor } from "grommet";
+import { Box,Text } from "grommet";
 import { useState, useEffect } from "react";
-import { Checkbox } from 'grommet-icons';
-import { RadarChart, EzShareData, ChartLine, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
-import { getChartIndexDescription } from '../ChartIndexMainEditor';
+import { RadarChart, EzShareData } from '../../../ez-api/gen-api/EZLoadApi';
 import { isDefined } from '../../../ez-api/tools';
 import { RadarChartJS } from '../../Tools/RadarChartJS';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -33,13 +31,6 @@ export interface RadarChartUIProps {
     radarChart: RadarChart;
     allEzShare: EzShareData[];    
 }      
-
-function containsShareIndex(chartProps:RadarChartUIProps) : boolean {
-    return chartProps.radarChart.indexSelection!
-                .filter(indexSelect => isDefined(indexSelect.shareIndexConfig))
-                .length > 0;
-}
-
 
 
 export function RadarChartUI(props: RadarChartUIProps){        

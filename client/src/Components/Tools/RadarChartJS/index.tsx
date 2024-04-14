@@ -1,9 +1,25 @@
-import { Box } from "grommet";
-import { RadarArea, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
-import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs, RadialLinearScale } from 'chart.js';
+/*
+ * ezClient - EZLoad an automatic loader for EZPortfolio
+ * Copyright © 2021 EMILY Pascal (pascal.emily@gmail.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { RadarArea } from '../../../ez-api/gen-api/EZLoadApi';
+import { Chart as ChartJS, ChartData, ChartType , DefaultDataPoint, ChartOptions, registerables as registerablesjs } from 'chart.js';
 import { isDefined } from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
-import { fr } from 'date-fns/locale'; 
 
 export interface RadarChartProps {
     indexLabels: string[];
@@ -16,10 +32,6 @@ export interface RadarChartProps {
 
 
 export function RadarChartJS(props: RadarChartProps){    
-    
-    const finalLabels: object[]|undefined = undefined;
-
-    const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = [];
 
     const config: ChartData<ChartType, DefaultDataPoint<ChartType>, unknown> = {
         labels: props.indexLabels,
