@@ -58,6 +58,8 @@ export function getChartIndexTitle(chartIndex: ChartIndex) : string {
                 result += "PRU"; break;
             case "SHARE_PRU_NET":
                 result += "PRU Net"; break;
+            case "SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE":
+                result += "Moyenne du rendement du dividende annuel"; break;
             case "SHARE_ANNUAL_DIVIDEND_YIELD":
                 result += "Rendement du dividende annuel"; break;
             case "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT":
@@ -132,6 +134,8 @@ export function getChartIndexDescription(chartIndex: ChartIndex): string{
                 result += "le nombre d'action possédé"; break;
             case "CUMULABLE_SHARE_DIVIDEND":
                 result += "les dividendes à la date du détachement"; break;
+            case "SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE":
+                result += "Moyenne du rendement du dividende annuel sur la période"; break;
             case "SHARE_ANNUAL_DIVIDEND_YIELD":
                 result += "le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte"; break;
             case "SHARE_PRICE":
@@ -313,6 +317,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 "Prix de Revient Unitaire Brut",
                                 "Prix de Revient Unitaire Net",
                                 "Dividendes Brut (Date de détachement)",
+                                "Moyenne du rendement du dividende annuel",
                                 "Rendement du dividende annuel",
                                 "Rendement du dividende sur PRU Net (Date de détachement)",
                                 "Rendement du dividende sur PRU Brut (Date de détachement)",
@@ -330,6 +335,7 @@ export function ChartIndexMainEditor(props: ChartIndexMainEditorProps){
                                 'SHARE_PRU_BRUT',
                                 'SHARE_PRU_NET',
                                 'CUMULABLE_SHARE_DIVIDEND',
+                                'SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE',
                                 'SHARE_ANNUAL_DIVIDEND_YIELD',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET',
                                 'CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT',

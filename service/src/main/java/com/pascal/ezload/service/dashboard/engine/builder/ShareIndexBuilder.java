@@ -56,6 +56,7 @@ public class ShareIndexBuilder {
                 case SHARE_PRICE -> sharePriceBuilder.getPricesToTargetDevise(reporting, ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 case CUMULABLE_SHARE_DIVIDEND -> sharePriceBuilder.getDividendsWithCurrentYearEstimates(reporting, ezShare, SharePriceBuilder.DIVIDEND_SELECTION.ALL, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.SUM_ALL_VALUES_IN_PERIOD);
                 case SHARE_ANNUAL_DIVIDEND_YIELD -> sharePriceBuilder.getRendementDividendeAnnuel(reporting, ezShare, algoEstimationCroissance).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
+                case SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE -> sharePriceBuilder.getShare2annualDividendYieldsAverage(reporting, ezShare, algoEstimationCroissance);
                 case SHARE_COUNT -> portfolioIndexBuilder.getDate2share2ShareNb(ezShare).getPriceAt(date, Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
                 case CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT -> {
                         Price pru = portfolioIndexBuilder.getDate2share2PRUBrut(ezShare).getPriceAt(date);
