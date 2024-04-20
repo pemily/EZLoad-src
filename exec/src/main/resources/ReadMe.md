@@ -4,6 +4,9 @@
 
 
 ## Historique 
+### Version 2.8
+* Ajout de la courbe sur le rendement moyen
+
 ### Version 2.7.2
 * Correction de bugs
 

@@ -58,6 +58,7 @@ public class SharePriceBuilder {
     private final Map<String, Prices> share2DividendsWithEstimatesTargetPrices = new HashMap<>(); // avec l'estimation sur l'année en cours
     private final Map<String, Prices> share2HistoricalDividendsTargetPrices = new HashMap<>(); // historique avec l'estimation sur l'année en cours
     private final Map<String, Prices> share2annualDividendYieldsTargetPrices = new HashMap<>();  // avec l'estimation sur l'année en cours
+    private final Map<String, Price> share2annualDividendYieldsAverage = new HashMap<>();  // moyenne du rendement sur la periode
     private final Map<String, Price> shareYear2annualDividend = new HashMap<>();
     private final Map<String, Price> shareYear2annualDividendWithEstimates = new HashMap<>();
     private final Map<EZShareEQ, Prices> shareYear210YearsPricePerformanceFuture = new HashMap<>();
@@ -135,7 +136,7 @@ public class SharePriceBuilder {
                         previousPrice = allTenYearPerfs.stream().reduce(Price::plus).orElseThrow().divide(new Price(analyseOverNYear));
                         previousProcessedYear = processingYear;
                     }
-                    estimatedPerf.addPrice(new PriceAtDate(date, previousPrice));
+                    estimatedPerf.addPrice(new PriceAtDate(date, new Price(calculRendementAnnuel(previousPrice, analyseOverNYear))));
                 }
                 return estimatedPerf;
             } catch (Exception e) {
@@ -173,7 +174,7 @@ public class SharePriceBuilder {
                                     .divide(prices.getPriceAt(EZDate.yearPeriod(processingYear - analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE));
                         }
 
-                        estimatedPerf.addPrice(new PriceAtDate(date, perf));
+                        estimatedPerf.addPrice(new PriceAtDate(date, new Price(calculRendementAnnuel(perf, analyseOverNYear))));
                         previousProcessedYear = processingYear;
                     }
                 }
@@ -184,6 +185,19 @@ public class SharePriceBuilder {
         });
     }
 
+    private float calculRendementAnnuel(Price perf, int nbOfYear){
+        return ((float) Math.pow(perf.plus(Price.CENT).divide(Price.CENT).getValue(), 1f/nbOfYear) - 1)*100;
+    }
+
+    public Price getShare2annualDividendYieldsAverage(Reporting reporting, EZShareEQ share, ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO algoEstimationCroissance){
+        return share2annualDividendYieldsAverage.computeIfAbsent(share+"_"+algoEstimationCroissance, ezShare -> {
+            List<PriceAtDate> rendements = getRendementDividendeAnnuel(reporting, share, algoEstimationCroissance).getPrices();
+            return new Price((float)rendements
+                                            .stream()
+                                            .mapToDouble(Price::getValue)
+                                            .sum() / rendements.size());
+        });
+    }
 
     public Prices getPerformance(Reporting reporting, EZShareEQ share) {
         return perf2TargetPrices.computeIfAbsent(share, ezShare -> {

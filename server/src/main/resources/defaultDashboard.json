@@ -239,7 +239,7 @@
           "targetDevise" : "EUR",
           "title" : "Dividendes",
           "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-          "groupedBy" : "DAILY",
+          "groupedBy" : "YEARLY",
           "indexSelection" : [
             {
               "label" : " Dividendes\t ",
@@ -253,7 +253,7 @@
               "id" : "08b5f700-4a92-4d16-86b3-1989c21771f2",
               "label" : " Croissance du dividende annuel\t ",
               "description" : " Affiche La croissance du dividende annuel de l'action\t ",
-              "colorLine" : "rgba(75,255,44,1.0)",
+              "colorLine" : "rgba(75,255,44,0.6)",
               "shareIndexConfig" : {
                 "shareIndex" : "ACTION_CROISSANCE"
               }
@@ -262,7 +262,7 @@
               "id" : "1a6323d5-11cb-46a3-8a32-4ac92db1189a",
               "label" : " Rendement du dividende annuel\t ",
               "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
-              "colorLine" : "rgba(12,128,224,1.0)",
+              "colorLine" : "rgba(12,128,224,0.6)",
               "shareIndexConfig" : {
                 "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
               }
@@ -278,6 +278,9 @@
             }
           ],
           "shareSelection" : "CURRENT_SHARES",
+          "additionalShareGoogleCodeList" : [
+            "EPA:TTE"
+          ],
           "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
           "height" : 50,
           "nbOfPoints" : 200
@@ -300,26 +303,26 @@
             },
             {
               "id" : "69f6e4c3-abf0-4929-9023-8c6f94dff650",
-              "label" : " Rendement du dividende sur PRU brut\t ",
-              "description" : " Affiche le rendement du dividende basé sur votre PRU brut (dividendes exclus) à la date détachement\t ",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
               "colorLine" : "rgba(24,237,104,0.6)",
               "shareIndexConfig" : {
-                "shareIndex" : "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_BRUT"
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
               }
             },
             {
-              "id" : "248e0aea-e45f-4117-a6a0-0c00cba58415",
-              "label" : " Performance\t ",
-              "description" : " Affiche la performance du cours de l'action\t ",
+              "id" : "3eb8a8b5-262d-48e3-9417-3ed5a88a8e51",
+              "label" : " Performance estimée sur 10 ans\t ",
+              "description" : " Affiche la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années\t ",
               "colorLine" : "rgba(116,18,247,0.6)",
               "shareIndexConfig" : {
-                "shareIndex" : "CUMULABLE_PERFORMANCE_ACTION"
+                "shareIndex" : "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
               }
             }
           ],
           "shareSelection" : "CURRENT_SHARES",
           "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-          "height" : 50,
+          "height" : 80,
           "nbOfPoints" : 200
         }
       },
@@ -334,6 +337,7 @@
               "id" : "a8474613-651e-4355-94be-121dc18d3cb9",
               "label" : " Performance réelle sur 10 ans\t ",
               "description" : " Affiche la performance du cours des 10 dernières années sans inclure les dividendes.\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
               "shareIndexConfig" : {
                 "shareIndex" : "TEN_YEARS_PERFORMANCE_ACTION"
               }
@@ -342,8 +346,47 @@
               "id" : "7885efd8-0a7b-4aa9-8756-632f88b7bbd2",
               "label" : " Performance estimée sur 10 ans\t ",
               "description" : " Affiche la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années\t ",
+              "colorLine" : "rgba(24,237,104,0.6)",
               "shareIndexConfig" : {
                 "shareIndex" : "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
+              }
+            }
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Analyse pour Achat d'action ??? ",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "DAILY",
+          "indexSelection" : [
+            {
+              "id" : "9e898314-226d-4ef6-8576-4fda87b33482",
+              "label" : " Prix\t ",
+              "description" : " Affiche le cours de l'action\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_PRICE"
+              }
+            },
+            {
+              "id" : "21197cf3-e77b-4bdb-94f7-7fc0f952b10b",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+              }
+            },
+            {
+              "id" : "deebb349-6cef-4d30-a0f7-63072ca15b47",
+              "label" : " Moyenne du rendement du dividende annuel\t ",
+              "description" : " Affiche Moyenne du rendement du dividende annuel sur la période\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE"
               }
             }
           ],
