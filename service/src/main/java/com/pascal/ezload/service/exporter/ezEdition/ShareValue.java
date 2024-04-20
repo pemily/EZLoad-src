@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public class ShareValue {
     public static final String LIQUIDITY_CODE = "LIQUIDITE";
-    private static final String LIQUIDITY_NAME = "Liquidité ";
+    public static final String LIQUIDITY_NAME = "Liquidité ";
 
     private String tickerCode; // Correspond a la colonne Ticker Google Finance dans MonPortefeuille
     private String userShareName; // can be null if it is not yet filled

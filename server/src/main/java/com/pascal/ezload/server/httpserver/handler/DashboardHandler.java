@@ -24,9 +24,7 @@ import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.dashboard.Chart;
 import com.pascal.ezload.service.dashboard.DashboardData;
-import com.pascal.ezload.service.dashboard.config.ChartSettings;
 import com.pascal.ezload.service.dashboard.config.DashboardPage;
 import com.pascal.ezload.service.dashboard.engine.DashboardManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
@@ -63,13 +61,13 @@ public class DashboardHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public synchronized DashboardData getDashboardData() throws Exception {
         DashboardData dashboardData = ezServerState.getDashboardData();
-        if (dashboardData == null){
+        if (dashboardData == null || dashboardData.getPages().size() == 0){
             SettingsManager settingsManager = SettingsManager.getInstance();
             MainSettings mainSettings = settingsManager.loadProps().validate();
             EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-            DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
-            List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
-            List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboard(dashboardSettings);
+            DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager, mainSettings);
+            List<DashboardPage> dashboardSettings = dashboardManager.loadDashboardSettings();
+            List<DashboardPage> chartsPages = dashboardManager.loadDashboard(dashboardSettings);
             dashboardData = new DashboardData();
             dashboardData.setPages(chartsPages);
             dashboardData.setShareGoogleCodeAndNames(new LinkedList<>());
@@ -95,9 +93,9 @@ public class DashboardHandler {
                     try(Reporting reporting = processLogger.getReporting().pushSection("Génération des Graphiques")) {
                         EZPortfolioProxy ezPortfolioProxy = PortfolioUtil.loadOriginalEzPortfolioProxyOrGetFromCache(ezServerState, settingsManager, mainSettings, ezProfil, reporting);
                         EZActionManager actionManager = mainSettings.getEzLoad().getEZActionManager(settingsManager);
-                        DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager);
-                        List<DashboardPage<ChartSettings>> dashboardSettings = dashboardManager.loadDashboardSettings();
-                        List<DashboardPage<Chart>> chartsPages = dashboardManager.loadDashboardAndCreateChart(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
+                        DashboardManager dashboardManager = new DashboardManager(settingsManager, actionManager, mainSettings);
+                        List<DashboardPage> dashboardSettings = dashboardManager.loadDashboardSettings();
+                        List<DashboardPage> chartsPages = dashboardManager.loadDashboardAndCreateChart(processLogger.getReporting(), dashboardSettings, ezPortfolioProxy);
                         DashboardData dashboardData = new DashboardData();
                         dashboardData.setPages(chartsPages);
                         dashboardData.setShareGoogleCodeAndNames(loadAllEZShares(actionManager));
@@ -110,10 +108,10 @@ public class DashboardHandler {
     @Path("/saveDashboardConfig")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public synchronized List<DashboardPage<ChartSettings>> saveDashboardConfig(List<DashboardPage<ChartSettings>> dashboardSettings) throws Exception {
+    public synchronized List<DashboardPage> saveDashboardConfig(List<DashboardPage> dashboardSettings) throws Exception {
         SettingsManager settingsManager = SettingsManager.getInstance();
         MainSettings mainSettings = settingsManager.loadProps();
-        DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager));
+        DashboardManager dashboardManager = new DashboardManager(settingsManager, mainSettings.getEzLoad().getEZActionManager(settingsManager), mainSettings);
         dashboardManager.saveDashboardSettings(dashboardSettings);
         return dashboardSettings;
     }

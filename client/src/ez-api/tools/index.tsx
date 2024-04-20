@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPageChartSettings, Chart, ChartSettings } from '../gen-api/EZLoadApi';
+import { PortfolioSolarChartUI } from '../../Components/Dashboard/PortfolioSolarChartUI';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPage, TimeLineChart, RadarChart, SolarChart} from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -104,12 +105,13 @@ export async function stream(promise: Promise<HttpResponse<any, any>>, onText: (
     });
 }
 
-function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {  
-  var c: Chart = {
-      ...chart,
+function timeLineChart2TimeLineChartSettings(timeLineChart: TimeLineChart) : TimeLineChart {
+  var c: TimeLineChart = {
+      ...timeLineChart,
       lines: undefined,
       labels: undefined,
-      axisId2titleX: undefined
+      axisId2titleX: undefined,
+      axisId2titleY: undefined,
   };
   delete c.lines;
   delete c.labels;
@@ -118,8 +120,34 @@ function chart2ChartSettings(chart: Chart|ChartSettings) : ChartSettings {
   return c;
 }
 
-export function saveDashboardConfig(dashConfig: DashboardPageChartSettings[], keepLines: boolean, updModel: (dashConfig: DashboardPageChartSettings[]) => void){        
-  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => { return {...page, charts: page.charts?.map(chart2ChartSettings)}})))
+
+function radarChart2RadarChartSettings(radarChart: RadarChart) : RadarChart {
+  var c: RadarChart = {
+      ...radarChart,
+      radarYearlyCharts: undefined,
+  };
+  delete c.radarYearlyCharts;
+  return c;
+}
+
+
+function solarChart2portfolioSolarChartSettings(solarChart: SolarChart) : RadarChart {
+  var c: SolarChart = {
+      ...solarChart,
+      solarYearlyCharts: undefined,      
+  };
+  delete c.solarYearlyCharts;  
+  return c;
+}
+
+export function saveDashboardConfig(dashConfig: DashboardPage[], keepLines: boolean, updModel: (dashConfig: DashboardPage[]) => void){
+  jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => {
+    return {...page, charts: page.charts?.map(c => { 
+          if (c.timeLine) return { timeLine: timeLineChart2TimeLineChartSettings(c.timeLine)};
+          if (c.radar) return { radar: radarChart2RadarChartSettings(c.radar)};
+          if (c.portfolioSolar) return { portfolioSolar: solarChart2portfolioSolarChartSettings(c.portfolioSolar)};
+          return c;                                                                                                    
+    })}})))
     .then(r => updModel(keepLines ? dashConfig : r))
     .catch(e => console.error("Save Dashboard Error: ", e));
 }

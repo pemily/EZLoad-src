@@ -336,6 +336,7 @@ export function App(){
                 <Tabs justify="center" activeIndex={activeIndex} onActive={(n) => setActiveIndex(n)}>
                     <Tab title="Tableau de bord" icon={<LineChart size="small"/>}>
                         <DashboardMain enabled={mainSettings !== undefined} processRunning={processRunning} 
+                                        demo={mainSettings.demo || false}
                                         dashboardData={dashboardData}
                                         refreshDashboard={refreshDashboardData}                                        
                                         actionWithMsg={actionWithMsg}/>

@@ -36,7 +36,7 @@ public class ShareSelectionBuilder {
     public Set<EZShareEQ> getSelectedShares(ShareSelection shareSelection, Set<String> additionalShareGoogleCode){
         Set<EZShareEQ> shares =
                 switch (shareSelection) {
-                    case ALL_SHARES -> new HashSet<>(portfolioResult.getAllShares());
+                    case ALL_SHARES_IN_PORTFOLIO -> new HashSet<>(portfolioResult.getAllShares());
                     case CURRENT_SHARES -> new HashSet<>(portfolioResult.getCurrentShares());
                     case ADDITIONAL_SHARES_ONLY -> new HashSet<>();
                 };

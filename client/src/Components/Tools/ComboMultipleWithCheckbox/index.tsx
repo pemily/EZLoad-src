@@ -29,6 +29,7 @@ export interface ComboMultipleWithCheckboxProps {
     label?: string;    
     errorMsg: string|undefined;
     readOnly: boolean;
+    showSelectionInline: boolean;
 }
 
 
@@ -51,7 +52,7 @@ export function ComboMultipleWithCheckbox(props: ComboMultipleWithCheckboxProps)
             <FormField key={"ComboForm"+props.id} name={props.id} htmlFor={props.id} label={props.label} help={props.description} 
                 margin="none" error={props.errorMsg}>
             <SelectMultiple id={props.id}       
-                showSelectedInline         
+                showSelectedInline={props.showSelectionInline}
                 onSearch={(text) => {
                     // The line below escapes regular expression special characters:
                     // [ \ ^ $ . | ? * + ( )

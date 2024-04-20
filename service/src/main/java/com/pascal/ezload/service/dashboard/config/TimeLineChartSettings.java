@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class ChartSettings extends Checkable<ChartSettings> {
+public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> implements DashboardChart {
 
     enum Field {targetDevise, title, brokers, accountTypes, portfolioFilters, selectedStartDateSelection, shareNames, shareSelection, additionalShareNames, showCurrency}
 
@@ -47,8 +47,8 @@ public class ChartSettings extends Checkable<ChartSettings> {
     private int height = 50;
     private int nbOfPoints = 200;
 
-    public ChartSettings(){}
-    public ChartSettings(ChartSettings chartSettings){
+    public TimeLineChartSettings(){}
+    public TimeLineChartSettings(TimeLineChartSettings chartSettings){
         this.targetDevise = chartSettings.targetDevise;
         this.title = chartSettings.title;
         this.excludeBrokers = chartSettings.excludeBrokers;
@@ -63,6 +63,66 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.algoEstimationCroissance = chartSettings.algoEstimationCroissance;
     }
 
+    public TimeLineChartSettings(RadarChartSettings chartSettings){
+        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
+        this.targetDevise = chartSettings.getTargetDevise();
+        this.title = chartSettings.getTitle();
+        this.excludeBrokers = chartSettings.getExcludeBrokers();
+        this.excludeAccountTypes = chartSettings.getExcludeAccountTypes();
+        this.indexSelection = chartSettings.getIndexSelection();
+        this.height = chartSettings.getHeight();
+        this.nbOfPoints = chartSettings.getNbOfPoints();
+        this.shareSelection = chartSettings.getShareSelection();
+        this.additionalShareGoogleCodeList = chartSettings.getAdditionalShareGoogleCodeList();
+        this.algoEstimationCroissance = chartSettings.getAlgoEstimationCroissance();
+    }
+
+    public TimeLineChartSettings(SolarChartSettings chartSettings){
+        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
+        this.targetDevise = chartSettings.getTargetDevise();
+        this.title = chartSettings.getTitle();
+        this.excludeBrokers = chartSettings.getExcludeBrokers();
+        this.excludeAccountTypes = chartSettings.getExcludeAccountTypes();
+        this.indexSelection = new LinkedList<>(chartSettings.getIndexSelection());
+        if (chartSettings.isShowLiquidity()){
+            ChartIndex liquidityIndex = new ChartIndex();
+            liquidityIndex.setId(SolarChartSettings.LIQUIDITE_INDEX_ID);
+            liquidityIndex.setLabel("Liquidités");
+            liquidityIndex.setDescription("Ajouté automatiquement pour faire le calcul");
+            ChartPortfolioIndexConfig liquidity = new ChartPortfolioIndexConfig();
+            liquidity.setPortfolioIndex(PortfolioIndex.LIQUIDITE);
+            liquidityIndex.setPortfolioIndexConfig(liquidity);
+            this.indexSelection.add(liquidityIndex);
+        }
+
+        ChartIndex shareNb = new ChartIndex();
+        shareNb.setId(SolarChartSettings.SHARE_NB_ID);
+        shareNb.setLabel("Share Count");
+        shareNb.setDescription("Ajouté automatiquement pour faire le calcul");
+        ChartShareIndexConfig shareCount = new ChartShareIndexConfig();
+        shareCount.setShareIndex(ShareIndex.SHARE_COUNT);
+        shareNb.setShareIndexConfig(shareCount);
+        this.indexSelection.add(shareNb);
+
+        ChartIndex sharePrice = new ChartIndex();
+        sharePrice.setId(SolarChartSettings.SHARE_PRICE_ID);
+        sharePrice.setLabel("Share Price");
+        sharePrice.setDescription("Ajouté automatiquement pour faire le calcul");
+        ChartShareIndexConfig sharePriceIdxCfg = new ChartShareIndexConfig();
+        sharePriceIdxCfg.setShareIndex(ShareIndex.SHARE_PRICE);
+        sharePrice.setShareIndexConfig(sharePriceIdxCfg);
+        this.indexSelection.add(sharePrice);
+
+
+        this.height = chartSettings.getHeight();
+        this.nbOfPoints = chartSettings.getNbOfPoints();
+        this.shareSelection = ShareSelection.ALL_SHARES_IN_PORTFOLIO;
+        this.additionalShareGoogleCodeList = Set.of();
+        this.algoEstimationCroissance = chartSettings.getAlgoEstimationCroissance();
+    }
+
     public String getTargetDevise() {
         return targetDevise;
     }
@@ -73,6 +133,10 @@ public class ChartSettings extends Checkable<ChartSettings> {
 
     public String getTitle() {
         return title;
+    }
+
+    public ChartType type() {
+        return ChartType.TIMELINE;
     }
 
     public void setTitle(String title) {
@@ -160,7 +224,7 @@ public class ChartSettings extends Checkable<ChartSettings> {
         this.algoEstimationCroissance = algoEstimationCroissance;
     }
 
-    public ChartSettings validate() {
+    public TimeLineChartSettings validate() {
         new StringValue(this, Field.targetDevise.name(), targetDevise).checkRequired();
         return this;
     }

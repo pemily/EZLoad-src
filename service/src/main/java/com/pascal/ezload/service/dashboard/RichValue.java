@@ -15,10 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard.config;
+package com.pascal.ezload.service.dashboard;
 
-public enum ShareSelection {
-    ADDITIONAL_SHARES_ONLY, // pas d'ajout de groupe d'action, seulement les actions additionnelles
-    CURRENT_SHARES,  // Les cours des valeurs d'actions actuelles
-    ALL_SHARES_IN_PORTFOLIO,   // Tout les actions que j'ai eu un jour dans le portefeuille
-}
+public class RichValue {
+        private String label;
+        private Float value;
+        private boolean estimated;
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public Float getValue() {
+            return value;
+        }
+
+        public void setValue(Float value) {
+            this.value = value;
+        }
+
+        public boolean isEstimated() {
+            return estimated;
+        }
+
+        public void setEstimated(boolean estimated) {
+            this.estimated = estimated;
+        }
+    }

@@ -3,106 +3,173 @@
     "title" : "Analyse du Portefeuille",
     "charts" : [
       {
-        "targetDevise" : "EUR",
-        "title" : "Portefeuille",
-        "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-        "groupedBy" : "DAILY",
-        "indexSelection" : [
-          {
-            "label" : " Valeur",
-            "description" : " Affiche la valeur de votre portefeuille incluant les liquidités\t ",
-            "colorLine" : "rgba(243,128,31,1.0)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Portefeuille",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "DAILY",
+          "indexSelection" : [
+            {
+              "label" : " Valeur",
+              "description" : " Affiche la valeur de votre portefeuille incluant les liquidités\t ",
+              "colorLine" : "rgba(243,128,31,1.0)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY"
+              }
+            },
+            {
+              "id" : "c50c6c43-aaba-44f9-9bbb-c033725434bb",
+              "label" : " Liquidités\t ",
+              "description" : " Affiche Les liquidités\t ",
+              "colorLine" : "rgba(75,255,44,1.0)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "LIQUIDITE"
+              }
+            },
+            {
+              "id" : "099c7f37-7257-4007-99b5-6a3f85798afa",
+              "label" : " Gains latents\t ",
+              "description" : " Affiche vos gains latents (valeur du portefeuille - les achats - les taxes + les ventes + les dividendes)\t ",
+              "colorLine" : "rgba(12,128,224,1.0)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "GAINS_NET"
+              }
+            },
+            {
+              "id" : "4a355e6f-c9b5-44bc-93e5-338062d15f50",
+              "label" : " Entrées/Sorties\t ",
+              "description" : " Affiche les dépôts et retraits des liquidités. Correspond à vos investissement\t ",
+              "colorLine" : "rgba(180,1,211,1.0)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "ENTREES_SORTIES"
+              }
             }
-          },
-          {
-            "id" : "c50c6c43-aaba-44f9-9bbb-c033725434bb",
-            "label" : " Liquidités\t ",
-            "description" : " Affiche Les liquidités\t ",
-            "colorLine" : "rgba(75,255,44,1.0)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "LIQUIDITE"
-            }
-          },
-          {
-            "id" : "099c7f37-7257-4007-99b5-6a3f85798afa",
-            "label" : " Gains latents\t ",
-            "description" : " Affiche vos gains latents (valeur du portefeuille - les achats - les taxes + les ventes + les dividendes)\t ",
-            "colorLine" : "rgba(12,128,224,1.0)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "GAINS_NET"
-            }
-          },
-          {
-            "id" : "4a355e6f-c9b5-44bc-93e5-338062d15f50",
-            "label" : " Entrées/Sorties\t ",
-            "description" : " Affiche les dépôts et retraits des liquidités. Correspond à vos investissement\t ",
-            "colorLine" : "rgba(180,1,211,1.0)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "ENTREES_SORTIES"
-            }
-          }
-        ],
-        "shareSelection" : "CURRENT_SHARES",
-        "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-        "height" : 50,
-        "nbOfPoints" : 200
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
       },
       {
-        "targetDevise" : "EUR",
-        "title" : "Analyse des dividendes annuel",
-        "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-        "groupedBy" : "YEARLY",
-        "indexSelection" : [
-          {
-            "label" : " Dividendes\t ",
-            "description" : " Affiche les dividendes reçu (date de paiement)\t ",
-            "colorLine" : "rgba(243,128,31,0.6)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "CUMULABLE_PORTFOLIO_DIVIDENDES"
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Analyse des dividendes annuel",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "YEARLY",
+          "indexSelection" : [
+            {
+              "label" : " Dividendes\t ",
+              "description" : " Affiche les dividendes reçu (date de paiement)\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "CUMULABLE_PORTFOLIO_DIVIDENDES"
+              }
+            },
+            {
+              "id" : "ea7574a7-ca7f-4223-a173-e01e6815a5fd",
+              "label" : " Croissance théorique du dividende annuel\t ",
+              "description" : " Affiche la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\t ",
+              "colorLine" : "rgba(75,255,44,0.6)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE"
+              }
+            },
+            {
+              "id" : "6fe02b9e-eb18-4632-bc3a-1251cb93ef27",
+              "label" : " Rendement théorique du dividende annuel\t ",
+              "description" : " Affiche le rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité\t ",
+              "colorLine" : "rgba(12,128,224,0.6)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT"
+              }
+            },
+            {
+              "id" : "55e597f7-a975-4af1-8d5a-1e12a852cfcd",
+              "label" : " Rendement du dividende réellement constaté\t ",
+              "description" : " Affiche le rendement des dividendes réellement constaté de votre portefeuille (basé sur les dividendes brut réellement perçu et la valeur de votre portefeuille avec les liquidités)\t ",
+              "colorLine" : "rgba(180,1,211,0.6)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT"
+              }
             }
-          },
-          {
-            "id" : "ea7574a7-ca7f-4223-a173-e01e6815a5fd",
-            "label" : " Croissance théorique du dividende annuel\t ",
-            "description" : " Affiche la croissance théorique de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\t ",
-            "colorLine" : "rgba(75,255,44,0.6)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "CROISSANCE_THEORIQUE_DU_PORTEFEUILLE"
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Analyse de la Performance Annuel du Portefeuille",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "YEARLY",
+          "indexSelection" : [
+            {
+              "label" : " Performance\t ",
+              "description" : " Affiche la performance du portefeuille\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "portfolioIndexConfig" : {
+                "portfolioIndex" : "CUMULABLE_PERFORMANCE_PORTEFEUILLE"
+              }
             }
-          },
-          {
-            "id" : "6fe02b9e-eb18-4632-bc3a-1251cb93ef27",
-            "label" : " Rendement théorique du dividende annuel\t ",
-            "description" : " Affiche le rendement de votre portefeuille sur le dividende annuel et la valeur des actions dans votre portefeuille.\nLes liquidités ne sont pas incluses dans le calcul, et si des actions ont été vendu ou acheté en cours d'année, le rendement prend en compte le dividende annuel alors qu'il ne sera pas obligatoirement perçu dans son intégralité\t ",
-            "colorLine" : "rgba(12,128,224,0.6)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "ANNUAL_DIVIDEND_THEORETICAL_YIELD_BRUT"
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "portfolioSolar" : {
+          "targetDevise" : "EUR",
+          "title" : "Actions dans le portefeuille",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "indexSelection" : [
+            {
+              "id" : "9792849b-131c-4f85-81c8-41ac8060f0b7",
+              "label" : " Rendement + Croissance du dividende annuel\t ",
+              "description" : " Affiche Le rendement du dividende + la croissance annuel du dividende de l'action\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE"
+              }
+            },
+            {
+              "id" : "57cf282a-4cea-4a2a-863c-46069945824e",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
+              "colorLine" : "rgba(158,227,3,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+              }
+            },
+            {
+              "id" : "3fb20a30-ba0e-45af-8548-c9732532a15b",
+              "label" : " Croissance du dividende annuel\t ",
+              "description" : " Affiche La croissance du dividende annuel de l'action\t ",
+              "colorLine" : "rgba(50,251,68,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ACTION_CROISSANCE"
+              }
+            },
+            {
+              "id" : "4c143a47-4ee4-4c3c-bfee-dd67063f04ce",
+              "label" : " Nb d'actions\t ",
+              "description" : " Affiche le nombre d'action possédé\t ",
+              "colorLine" : "rgba(1,183,178,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_COUNT"
+              }
             }
-          },
-          {
-            "id" : "55e597f7-a975-4af1-8d5a-1e12a852cfcd",
-            "label" : " Rendement réel constaté\t ",
-            "description" : " Affiche le rendement réel constaté de votre portefeuille (basé sur les dividendes brut réellement percu et la valeur de votre portefeuille avec les liquiditées)\t ",
-            "colorLine" : "rgba(180,1,211,0.6)",
-            "graphStyle" : "LINE",
-            "portfolioIndexConfig" : {
-              "portfolioIndex" : "CUMULABLE_DIVIDEND_REAL_YIELD_BRUT"
-            }
-          }
-        ],
-        "shareSelection" : "CURRENT_SHARES",
-        "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-        "height" : 50,
-        "nbOfPoints" : 200
+          ],
+          "showLiquidity" : true,
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
       }
     ]
   },
@@ -110,157 +177,224 @@
     "title" : "Analyse des Actions",
     "charts" : [
       {
-        "targetDevise" : "EUR",
-        "title" : "Action",
-        "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-        "groupedBy" : "DAILY",
-        "indexSelection" : [
-          {
-            "label" : " Prix\t ",
-            "description" : " Affiche le cours de l'action\t ",
-            "colorLine" : "rgba(243,128,31,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_PRICE"
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Action",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "DAILY",
+          "indexSelection" : [
+            {
+              "label" : " Prix\t ",
+              "description" : " Affiche le cours de l'action\t ",
+              "colorLine" : "rgba(243,128,31,1.0)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_PRICE"
+              }
+            },
+            {
+              "id" : "60823248-1dfd-4542-99b3-0fa900dec360",
+              "label" : " Nb d'actions\t ",
+              "description" : " Affiche le nombre d'action possédé\t ",
+              "colorLine" : "rgba(113,248,19,1.0)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_COUNT"
+              }
+            },
+            {
+              "id" : "31fec78b-7cb9-4753-8054-50963b035e82",
+              "label" : " PRU\t ",
+              "description" : " Affiche le Prix de Revient Unitaire Brut (dividendes exclus)\t ",
+              "colorLine" : "rgba(3,202,156,1.0)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_PRU_BRUT"
+              }
+            },
+            {
+              "id" : "98c2a215-f4fc-438e-b856-002ca14fa334",
+              "label" : " PRU Net\t ",
+              "description" : " Affiche le Prix de Revient Unitaire Net (dividendes inclus)\t ",
+              "colorLine" : "rgba(65,53,254,1.0)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_PRU_NET"
+              }
+            },
+            {
+              "id" : "5ea42bca-9004-42ee-896c-7c04d16f9c13",
+              "label" : " Achats/Ventes\t ",
+              "description" : " Affiche les achats et les ventes de l'action\t ",
+              "colorLine" : "rgba(213,7,177,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "CUMULABLE_SHARE_BUY_SOLD"
+              }
             }
-          },
-          {
-            "id" : "60823248-1dfd-4542-99b3-0fa900dec360",
-            "label" : " Nb d'actions\t ",
-            "description" : " Affiche le nombre d'action possédé\t ",
-            "colorLine" : "rgba(113,248,19,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_COUNT"
-            }
-          },
-          {
-            "id" : "31fec78b-7cb9-4753-8054-50963b035e82",
-            "label" : " PRU\t ",
-            "description" : " Affiche le Prix de Revient Unitaire Brut (dividendes exclus)\t ",
-            "colorLine" : "rgba(3,202,156,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_PRU_BRUT"
-            }
-          },
-          {
-            "id" : "98c2a215-f4fc-438e-b856-002ca14fa334",
-            "label" : " PRU Net\t ",
-            "description" : " Affiche le Prix de Revient Unitaire Net (dividendes inclus)\t ",
-            "colorLine" : "rgba(65,53,254,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_PRU_NET"
-            }
-          },
-          {
-            "id" : "5ea42bca-9004-42ee-896c-7c04d16f9c13",
-            "label" : " Achats/Ventes\t ",
-            "description" : " Affiche les achats et les ventes de l'action\t ",
-            "colorLine" : "rgba(213,7,177,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "CUMULABLE_SHARE_BUY_SOLD"
-            }
-          }
-        ],
-        "shareSelection" : "CURRENT_SHARES",
-        "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-        "height" : 50,
-        "nbOfPoints" : 200
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
       },
       {
-        "targetDevise" : "EUR",
-        "title" : "Dividendes",
-        "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-        "groupedBy" : "DAILY",
-        "indexSelection" : [
-          {
-            "label" : " Dividendes\t ",
-            "description" : " Affiche les dividendes à la date du détachement\t ",
-            "colorLine" : "rgba(243,128,31,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "CUMULABLE_SHARE_DIVIDEND"
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Dividendes",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "YEARLY",
+          "indexSelection" : [
+            {
+              "label" : " Dividendes\t ",
+              "description" : " Affiche les dividendes à la date du détachement\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "CUMULABLE_SHARE_DIVIDEND"
+              }
+            },
+            {
+              "id" : "08b5f700-4a92-4d16-86b3-1989c21771f2",
+              "label" : " Croissance du dividende annuel\t ",
+              "description" : " Affiche La croissance du dividende annuel de l'action\t ",
+              "colorLine" : "rgba(75,255,44,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ACTION_CROISSANCE"
+              }
+            },
+            {
+              "id" : "1a6323d5-11cb-46a3-8a32-4ac92db1189a",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
+              "colorLine" : "rgba(12,128,224,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+              }
+            },
+            {
+              "id" : "758631e7-0970-465b-a1b8-33af05733090",
+              "label" : " Rendement du dividende sur PRU net\t ",
+              "description" : " Affiche le rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement\t ",
+              "colorLine" : "rgba(180,1,211,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET"
+              }
             }
-          },
-          {
-            "id" : "08b5f700-4a92-4d16-86b3-1989c21771f2",
-            "label" : " Croissance du dividende annuel\t ",
-            "description" : " Affiche La croissance du dividende annuel de l'action\t ",
-            "colorLine" : "rgba(75,255,44,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "ACTION_CROISSANCE"
-            }
-          },
-          {
-            "id" : "1a6323d5-11cb-46a3-8a32-4ac92db1189a",
-            "label" : " Rendement du dividende annuel\t ",
-            "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
-            "colorLine" : "rgba(12,128,224,1.0)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
-            }
-          },
-          {
-            "id" : "758631e7-0970-465b-a1b8-33af05733090",
-            "label" : " Rendement du dividende sur PRU net\t ",
-            "description" : " Affiche le rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement\t ",
-            "colorLine" : "rgba(180,1,211,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET"
-            }
-          }
-        ],
-        "shareSelection" : "CURRENT_SHARES",
-        "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-        "height" : 50,
-        "nbOfPoints" : 200
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "additionalShareGoogleCodeList" : [
+            "EPA:TTE"
+          ],
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
       },
       {
-        "targetDevise" : "EUR",
-        "title" : "Titre à changer",
-        "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
-        "groupedBy" : "YEARLY",
-        "indexSelection" : [
-          {
-            "label" : " Croissance du dividende annuel\t ",
-            "description" : " Affiche La croissance du dividende annuel de l'action\t ",
-            "colorLine" : "rgba(243,128,31,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "ACTION_CROISSANCE"
+        "radar" : {
+          "targetDevise" : "EUR",
+          "title" : "Triangle Croissance, Rendement, Performance",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "indexSelection" : [
+            {
+              "id" : "c3167cc1-d8b1-460e-a374-2c7e0c868b24",
+              "label" : " Croissance du dividende annuel\t ",
+              "description" : " Affiche La croissance du dividende annuel de l'action\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ACTION_CROISSANCE"
+              }
+            },
+            {
+              "id" : "69f6e4c3-abf0-4929-9023-8c6f94dff650",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
+              "colorLine" : "rgba(24,237,104,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+              }
+            },
+            {
+              "id" : "3eb8a8b5-262d-48e3-9417-3ed5a88a8e51",
+              "label" : " Performance estimée sur 10 ans\t ",
+              "description" : " Affiche la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années\t ",
+              "colorLine" : "rgba(116,18,247,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
+              }
             }
-          },
-          {
-            "id" : "58ec6d3d-e251-4c5b-8c49-4b32bc8a3609",
-            "label" : " Rendement du dividende annuel\t ",
-            "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
-            "colorLine" : "rgba(24,237,104,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 80,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Performance estimé (basé sur 10 ans d'historique) vs Performance Réelle",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "YEARLY",
+          "indexSelection" : [
+            {
+              "id" : "a8474613-651e-4355-94be-121dc18d3cb9",
+              "label" : " Performance réelle sur 10 ans\t ",
+              "description" : " Affiche la performance du cours des 10 dernières années sans inclure les dividendes.\t ",
+              "colorLine" : "rgba(243,128,31,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "TEN_YEARS_PERFORMANCE_ACTION"
+              }
+            },
+            {
+              "id" : "7885efd8-0a7b-4aa9-8756-632f88b7bbd2",
+              "label" : " Performance estimée sur 10 ans\t ",
+              "description" : " Affiche la performance estimée du cours de l'action sur 10 ans sans inclure les dividendes. L'analyse se base sur le cours et la performance des 20 dernières années\t ",
+              "colorLine" : "rgba(24,237,104,0.6)",
+              "shareIndexConfig" : {
+                "shareIndex" : "ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION"
+              }
             }
-          },
-          {
-            "id" : "c88a3cc3-62c0-458e-a61b-d69f2705dc23",
-            "label" : " Rendement du dividende sur PRU net\t ",
-            "description" : " Affiche le rendement du dividende basé sur votre PRU net (dividendes inclus) à la date détachement\t ",
-            "colorLine" : "rgba(116,18,247,0.6)",
-            "graphStyle" : "LINE",
-            "shareIndexConfig" : {
-              "shareIndex" : "CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET"
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
+      },
+      {
+        "timeLine" : {
+          "targetDevise" : "EUR",
+          "title" : "Analyse pour Achat d'action ??? ",
+          "selectedStartDateSelection" : "FROM_MY_FIRST_OPERATION",
+          "groupedBy" : "DAILY",
+          "indexSelection" : [
+            {
+              "id" : "9e898314-226d-4ef6-8576-4fda87b33482",
+              "label" : " Prix\t ",
+              "description" : " Affiche le cours de l'action\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_PRICE"
+              }
+            },
+            {
+              "id" : "21197cf3-e77b-4bdb-94f7-7fc0f952b10b",
+              "label" : " Rendement du dividende annuel\t ",
+              "description" : " Affiche le rendement du dividende annuel (Pour l'année en cours, le dividende est augmenté de la plus petite croissance du dividende sur les 10 dernieres années).\nIl peut donc être légèrement supérieur a celui de Revenue&Dividendes qui ne prend pas cette hausse en compte\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD"
+              }
+            },
+            {
+              "id" : "deebb349-6cef-4d30-a0f7-63072ca15b47",
+              "label" : " Moyenne du rendement du dividende annuel\t ",
+              "description" : " Affiche Moyenne du rendement du dividende annuel sur la période\t ",
+              "shareIndexConfig" : {
+                "shareIndex" : "SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE"
+              }
             }
-          }
-        ],
-        "shareSelection" : "CURRENT_SHARES",
-        "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
-        "height" : 50,
-        "nbOfPoints" : 200
+          ],
+          "shareSelection" : "CURRENT_SHARES",
+          "algoEstimationCroissance" : "MINIMAL_CROISSANCE_BETWEEN_MOY_OF_LAST_1_5_10_YEARS",
+          "height" : 50,
+          "nbOfPoints" : 200
+        }
       }
     ]
   }

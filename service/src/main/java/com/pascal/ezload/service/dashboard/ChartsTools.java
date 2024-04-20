@@ -17,9 +17,13 @@
  */
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.dashboard.config.ChartSettings;
+import com.pascal.ezload.service.dashboard.config.ChartIndex;
+import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
+import com.pascal.ezload.service.dashboard.config.SolarChartSettings;
+import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
+import com.pascal.ezload.service.util.NumberUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,9 +73,9 @@ public class ChartsTools {
                     newDate = to;
                 }
             }
-            else if (period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR) {
+            else {
+                // period == PERIOD_INTERVAL.MONTH || period == PERIOD_INTERVAL.YEAR
                 newDate = previousDate.createNextPeriod();
-
             }
             allDates.add(newDate);
             previousDate = newDate;
@@ -80,8 +84,24 @@ public class ChartsTools {
         return allDates;
     }
 
-    public static Chart createChart(ChartSettings chartSettings, List<EZDate> dates) {
-        Chart chart = new Chart(chartSettings);
+    public static SolarChart createSolarChart(SolarChartSettings chartSettings) {
+        SolarChart solarChart = new SolarChart(chartSettings);
+
+        solarChart.setSolarYearlyCharts(List.of());
+
+        return solarChart;
+    }
+
+    public static RadarChart createRadarChart(RadarChartSettings chartSettings) {
+        RadarChart radarChart = new RadarChart(chartSettings);
+
+        radarChart.setRadarYearlyCharts(List.of());
+
+        return radarChart;
+    }
+
+    public static TimeLineChart createTimeLineChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
+        TimeLineChart timeLineChart = new TimeLineChart(chartSettings);
 
         List<ChartsTools.Label> r = new LinkedList<>();
         EZDate previousDate = null;
@@ -97,18 +117,18 @@ public class ChartsTools {
             r.add(ChartsTools.date2Label(previousDate, true, true));
         }
 
-        chart.setLabels(r);
-        return chart;
+        timeLineChart.setLabels(r);
+        return timeLineChart;
     }
 
-    public static ChartLine createChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
+    public static ChartLine createTimeLineChartLine(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, Prices prices, boolean removeZeroValues){
         return createChartLineWithRichValues(lineStyle, YAxisSetting, lineTitle, prices.getPrices()
                                                                                         .stream()
                                                                                         .map(pd -> {
                                                                                             if (pd.getValue() == null ) return null;
                                                                                             if (removeZeroValues && pd.getValue() == 0) return null;
-                                                                                            float roundValue = (float) Math.round(pd.getValue()*100.0f) / 100.0f;
-                                                                                            ChartLine.RichValue v = new ChartLine.RichValue();
+                                                                                            float roundValue = NumberUtils.roundAmount(pd.getValue());
+                                                                                            RichValue v = new RichValue();
                                                                                             v.setEstimated(pd.isEstimated());
                                                                                             v.setValue(pd.getValue());
                                                                                             String unit = prices.getDevise().getSymbol();
@@ -120,7 +140,7 @@ public class ChartsTools {
                                 );
     }
 
-    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<ChartLine.RichValue> values){
+    public static ChartLine createChartLineWithRichValues(ChartLine.LineStyle lineStyle, ChartLine.Y_AxisSetting YAxisSetting, String lineTitle, List<RichValue> values){
         ChartLine chartLine = new ChartLine();
         chartLine.setTitle(lineTitle);
         chartLine.setLineStyle(lineStyle);

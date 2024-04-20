@@ -18,7 +18,7 @@
 import { Box, Button, Text, Collapsible, Tabs, Tab, ThemeContext } from "grommet";
 import { useState, } from "react";
 import { Add, Refresh, Trash, Configure, Close } from 'grommet-icons';
-import { ActionWithMsg, EzShareData, DashboardData, DashboardPageChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { ActionWithMsg, EzShareData, DashboardData, DashboardPage } from '../../../ez-api/gen-api/EZLoadApi';
 import { saveDashboardConfig, isDefined } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -28,6 +28,7 @@ import { TextField } from "../../Tools/TextField";
 
 export interface DashboardMainProps {
     enabled: boolean;
+    demo: boolean;
     processRunning: boolean;
     dashboardData: DashboardData|undefined;
     actionWithMsg: ActionWithMsg|undefined;
@@ -36,7 +37,7 @@ export interface DashboardMainProps {
 
 export function DashboardMain(props: DashboardMainProps){        
     const [allEzShares, setEZShares] = useState<EzShareData[]>(props.dashboardData?.shareGoogleCodeAndNames === undefined ? [] : props.dashboardData.shareGoogleCodeAndNames);
-    const [dashboardPages, setDashboardPages] = useState<DashboardPageChart[]|undefined>(props.dashboardData?.pages);    
+    const [dashboardPages, setDashboardPages] = useState<DashboardPage[]|undefined>(props.dashboardData?.pages);    
     const [editPages, setPageEdition] = useState<boolean>(false);
 
     if (!props.enabled){
@@ -81,6 +82,7 @@ export function DashboardMain(props: DashboardMainProps){
                                         <Tab title={page.title} key={"page"+pageIndex}>
                                         <PageUI allEzShare={allEzShares} 
                                                 readOnly={props.processRunning}
+                                                demo={props.demo}
                                                 dashboardPage={page}
                                                 savePageUI={(newPage, keepLines, afterSave) => saveDashboardConfig(dashboardPages.map((p,i) => i === pageIndex ? newPage : p), keepLines, afterSavePage => {
                                                     setDashboardPages(dashboardPages.map((p,i) => i === pageIndex ? (keepLines ? newPage : afterSavePage[i]) : p));
@@ -100,10 +102,10 @@ export function DashboardMain(props: DashboardMainProps){
                 { dashboardPages && editPages && (
                     <Box  margin={{horizontal: "xlarge", vertical:"medium"}} pad="xsmall">
                      { dashboardPages.map((page, pageIndex) => (
-                        <Box direction="row" >
+                        <Box direction="row" key={"editPageBox"+pageIndex}>
                             <TextField key={"editPage"+pageIndex} id={"dashboardPage"+pageIndex}
                             readOnly={props.processRunning} value={page.title} label="" onChange={newValue => {
-                                const f: DashboardPageChart[] = dashboardPages.map((p,i) => i === pageIndex ? 
+                                const f: DashboardPage[] = dashboardPages.map((p,i) => i === pageIndex ? 
                                                                 {
                                                                     ...p,
                                                                     title: newValue

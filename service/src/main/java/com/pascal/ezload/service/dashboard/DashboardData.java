@@ -23,14 +23,14 @@ import java.util.List;
 
 public class DashboardData {
 
-    private List<DashboardPage<Chart>> pages;
+    private List<DashboardPage> pages;
     private List<EzShareData> shareGoogleCodeAndNames;
 
-    public List<DashboardPage<Chart>> getPages() {
+    public List<DashboardPage> getPages() {
         return pages;
     }
 
-    public void setPages(List<DashboardPage<Chart>> pages) {
+    public void setPages(List<DashboardPage> pages) {
         this.pages = pages;
     }
 

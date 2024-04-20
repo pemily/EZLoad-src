@@ -32,6 +32,7 @@ public class MainSettings {
     private ChromeSettings chrome;
     private EZLoad ezLoad;
     private String activeEzProfilName;
+    private boolean demo;
 
     public ChromeSettings getChrome() {
         return chrome;
@@ -67,6 +68,14 @@ public class MainSettings {
 
     public void setActiveEzProfilName(String activeEzProfilName) {
         this.activeEzProfilName = activeEzProfilName;
+    }
+
+    public boolean getDemo() {
+        return demo;
+    }
+
+    public void setDemo(boolean demo) {
+        this.demo = demo;
     }
 
     public static class ChromeSettings extends Checkable<ChromeSettings> {

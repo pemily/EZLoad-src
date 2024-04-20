@@ -16,24 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box, Button } from "grommet";
-import { useState } from "react";
 import { Add } from 'grommet-icons';
-import { Chart, ChartSettings, EzShareData, DashboardPageChart, ChartIndex } from '../../../ez-api/gen-api/EZLoadApi';
-import { getChartIndexDescription, getChartIndexTitle } from '../ChartIndexMainEditor';
+import { EzShareData, DashboardPage, ChartSwitch } from '../../../ez-api/gen-api/EZLoadApi';
+import { newTimeLineChartSwitch } from '../ChartSwitchUI';
 
-import { ChartUI } from "../ChartUI";
+import { ChartSwitchUI } from "../ChartSwitchUI";
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 export interface PageUIProps {    
     readOnly: boolean;    
-    dashboardPage: DashboardPageChart; 
+    demo: boolean;
+    dashboardPage: DashboardPage; 
     allEzShare: EzShareData[];
-    savePageUI: (page: DashboardPageChart, keepLines: boolean, afterSave: () => void) => void
+    savePageUI: (page: DashboardPage, keepLines: boolean, afterSave: () => void) => void
 }      
 
 export function PageUI(props: PageUIProps){
-    const [edition, setEdition] = useState<boolean>(false);
 
     return (    
         <Box width="100%" pad="medium">            
@@ -41,14 +40,16 @@ export function PageUI(props: PageUIProps){
               
                 <Box>
                 {
-                    props.dashboardPage.charts?.map((chart, index) => {
+                    props.dashboardPage.charts?.map((chartSwitch, index) => {
                         return (
-                            <ChartUI key={"chartUI"+props.dashboardPage.title+"_"+chart.title+index}
+                            <ChartSwitchUI key={"chartUI"+props.dashboardPage.title+"_"+index}
                                     deleteChartUI={(afterSave) => { props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.filter((c,i) => i !== index) }, true, afterSave)}}
-                                    saveChartUI={(chartUi: ChartSettings, keepLines, afterSave) => {props.savePageUI({...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : 
-                                        chartUi) }, keepLines, afterSave)}}
-                                    readOnly={props.readOnly}                                            
-                                    chart={chart}
+                                    saveChartUI={(chartUi: ChartSwitch, keepLines, afterSave) => {props.savePageUI(
+                                                                                                        {...props.dashboardPage, charts: props.dashboardPage.charts?.map((c,i) => i !== index ? c : chartUi) 
+                                                                                                        }, keepLines, afterSave)}}
+                                    readOnly={props.readOnly}              
+                                    demo={props.demo}                              
+                                    chartSwitch={chartSwitch}
                                     allEzShare={props.allEzShare === undefined ? [] : props.allEzShare}
                             />
                         );
@@ -58,32 +59,12 @@ export function PageUI(props: PageUIProps){
 
                 <Box alignSelf="end" margin="small" direction="row" >
 
-                        <Button size="small" icon={<Add size='small' />}
-                        label="Nouveau Graphique" onClick={() => {
-                            // init
-                            const chartIndex: ChartIndex = {
-                                portfolioIndexConfig: {
-                                    portfolioIndex: "VALEUR_PORTEFEUILLE_WITH_LIQUIDITY",
-                                },                                
-                                currencyIndexConfig: undefined,
-                                shareIndexConfig: undefined,
-                            };
-                            const newChart: Chart = {
-                                excludeAccountTypes: [],
-                                excludeBrokers: [],
-                                title: 'Titre à changer',                                                                
-                                selectedStartDateSelection: "FROM_MY_FIRST_OPERATION",
-                                targetDevise: 'EUR',
-                                indexSelection: [ chartIndex ],
-                                groupedBy: "DAILY",
-                                shareSelection: "CURRENT_SHARES",
-                                additionalShareGoogleCodeList: []
-                            };                            
-                            chartIndex.description = getChartIndexDescription(chartIndex)                            
-                            chartIndex.label = getChartIndexTitle(chartIndex);
+                        <Button size="small" icon={<Add size='small'/>}
+                            disabled={props.readOnly}
+                            label="Nouveau Graphique" onClick={() => {
                             props.savePageUI({
                                                 ...props.dashboardPage,
-                                                charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newChart]
+                                                charts: [...(props.dashboardPage.charts === undefined) ? [] : props.dashboardPage.charts, newTimeLineChartSwitch()]
                                             }, false, () => {})
                         }}
                     />

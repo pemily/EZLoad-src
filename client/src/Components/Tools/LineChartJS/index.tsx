@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Box } from "grommet";
-import { Chart, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
+import { TimeLineChart, ChartIndex, Label, RichValue } from '../../../ez-api/gen-api/EZLoadApi';
 import { Chart as ChartJS, ChartData, LegendItem, LegendElement, ChartType , DefaultDataPoint, ChartDataset, TimeScale, CategoryScale, BarElement, LineElement, PointElement, LinearScale, Title, ChartOptions, Tooltip, Legend, registerables as registerablesjs } from 'chart.js';
 import { isDefined } from '../../../ez-api/tools';
 import { Chart as ReactChartJS } from 'react-chartjs-2';
@@ -24,8 +24,9 @@ import 'chartjs-adapter-date-fns';
 import { fr } from 'date-fns/locale'; 
 
 export interface LineChartProps {
-    chart: Chart;        
+    timeLineChart: TimeLineChart;
     showLegend: boolean;
+    demo: boolean;
 }      
  
 
@@ -53,33 +54,32 @@ const simplifyLabelIfPossible = (computedPeriod : 'month' | 'year' | 'day', time
     return timeLabels.map(l => l.time) as any[] as object[];
 }
 
-export function LineChart(props: LineChartProps){
-    const MAX_VISIBLE_LINES_AT_LOAD = 5; // au dela de ce nombre de lignes, les lignes seront désactivé au chargement
+export function LineChartJS(props: LineChartProps){    
     const lineIsVisible : boolean[] = [];    
 
    // const chartRef = useRef<ChartJS|undefined>(undefined); // https://reacthustle.com/blog/how-to-customize-events-in-chartjs-3-with-react?expand_article=1
    function getIndex(indexId: string) : ChartIndex {
-     return props.chart.indexSelection?.filter(i => i.id === indexId)[0]!
+     return props.timeLineChart.indexSelection?.filter(i => i.id === indexId)[0]!
    } 
 
 
-    if (props.chart.lines) {
-        for (var i = 0; i < props.chart.lines?.length ; i++){
-            lineIsVisible[i] = true; // props.chart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
+    if (props.timeLineChart.lines) {
+        for (var i = 0; i < props.timeLineChart.lines?.length ; i++){
+            lineIsVisible[i] = true; // props.timeLineChart.lines?.length < MAX_VISIBLE_LINES_AT_LOAD;
         }
     }
 
-    if (!props.chart.lines){
+    if (!props.timeLineChart.lines){
         return (<Box width="100%" height="75vh" pad="small" ></Box>);
     }
 
-    const computedPeriod = computeXPeriod(props.chart.groupedBy);
-    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.chart.labels!);    
-    const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.chart.lines.map((chartLine, index) =>
+    const computedPeriod = computeXPeriod(props.timeLineChart.groupedBy);
+    const finalLabels: object[]|undefined = simplifyLabelIfPossible(computedPeriod, props.timeLineChart.labels!);
+    const finalLines: ChartDataset<any, DefaultDataPoint<ChartType>>[] = props.timeLineChart.lines.map((chartLine, index) =>
         {            
             const richValuesFiltered : RichValue[] | undefined = !isDefined(chartLine.richValues) ? undefined : computedPeriod === "day" ? chartLine.richValues :
-                                                                    computedPeriod === "month" ? chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfMonth) :
-                                                                    chartLine.richValues?.filter((v: any, i: number) => props.chart.labels![i].endOfYear);            
+                                                                    computedPeriod === "month" ? chartLine.richValues?.filter((v: any, i: number) => props.timeLineChart.labels![i].endOfMonth) :
+                                                                    chartLine.richValues?.filter((v: any, i: number) => props.timeLineChart.labels![i].endOfYear);
 
             const lineIndex : ChartIndex = getIndex(chartLine.indexId!);
             if (chartLine.lineStyle === "BAR_STYLE"){
@@ -144,7 +144,7 @@ export function LineChart(props: LineChartProps){
         plugins: {
             title: {
                 display: false,
-                text: props.chart.title
+                text: props.timeLineChart.title
             },
             tooltip: {
                 enabled: true,
@@ -158,13 +158,23 @@ export function LineChart(props: LineChartProps){
                         if (context.dataset.tooltips){                            
                             const richValue : string = context.dataset.tooltips[context.dataIndex].replaceAll('\n', '     |     ');
                             /* if (richValue.indexOf(":") === -1)
-                                return context.dataset.label+': '+richValue; */
-                            return richValue;
+                                return context.dataset.label+': '+richValue; */                            
+                            var richVal = richValue;  
+                            if (props.demo && context.dataset.yAxisID === 'PORTFOLIO') 
+                                richVal = "10 000€ (demo)";
+                            else if (props.demo && context.dataset.yAxisID === 'NB') 
+                                richVal = "1 000 (demo)";
+                            return richVal;
                         }
-                        // ajout de l'unité automatiquement                        
-                        return context.dataset.label+': '+context.formattedValue
+                        // ajout de l'unité automatiquement                    
+                        var val = context.formattedValue;  
+                        if (props.demo && context.dataset.yAxisID === 'PORTFOLIO') 
+                            val = "10 000€ (demo)";
+                        else if (props.demo && context.dataset.yAxisID === 'NB') 
+                            val = "1 000 (demo)";
+                        return context.dataset.label+': '+val
                                                     +   (context.dataset.yAxisID === 'PERCENT' ? ' %' : 
-                                                            context.dataset.yAxisID === 'NB' ? '' : ' '+props.chart.axisId2titleY?.Y_AXIS_TITLE);
+                                                            context.dataset.yAxisID === 'NB' ? '' : ' '+props.timeLineChart.axisId2titleY?.Y_AXIS_TITLE);
                     }
                 }
             },
@@ -175,10 +185,10 @@ export function LineChart(props: LineChartProps){
                     // Afffiche/Cache toutes les courbes qui on le meme nom de legend d'un seul coup
 
                     // https://www.chartjs.org/docs/latest/configuration/legend.html
-                    const ci = legend.chart;      
+                    const ci = legend.chart;
                     
-                    // https://stackoverflow.com/questions/72236230/remove-redundant-legends-on-the-chart-using-generatelabels-with-chartjs-v3
-                    // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-chart-js/70723008#70723008
+                    // https://stackoverflow.com/questions/72236230/remove-redundant-legends-on-the-timeLineChart-using-generatelabels-with-chartjs-v3
+                    // https://stackoverflow.com/questions/70582403/hide-or-show-two-datasets-with-one-click-event-of-legend-in-timeLineChart-js/70723008#70723008
                     let hidden = lineIsVisible[legendItem.datasetIndex!]; //  !ci.getDatasetMeta(legendItem.datasetIndex!).hidden;                            
                     ci.data.datasets?.forEach((dataset: ChartDataset<any,any>, datasetIndex: number) => {
                         if (dataset.label === legendItem.text) {
@@ -189,11 +199,11 @@ export function LineChart(props: LineChartProps){
                     ci.update();
                 },
                 labels: {                
-                    generateLabels(chart: any){                               
+                    generateLabels(timeLineChart: any){
                         var result : LegendItem[] = [];                        
                         var labelIndex: number = 0;
                         var labelTextAlreadyUsed : string[] = [];
-                        chart?.data?.datasets.forEach((l:ChartDataset<any,any>, i:number) => {
+                        timeLineChart?.data?.datasets?.forEach((l:ChartDataset<any,any>, i:number) => {
                             if (!labelTextAlreadyUsed.includes(l.label)){
                                 labelTextAlreadyUsed.push(l.label);
                                 result.push({
@@ -202,7 +212,7 @@ export function LineChart(props: LineChartProps){
                                     text: l.label,
                                     fillStyle: l.backgroundColor,
                                     strokeStyle: l.backgroundColor,
-                                    hidden: !lineIsVisible[i] // chart.getDatasetMeta(i).hidden
+                                    hidden: !lineIsVisible[i] // timeLineChart.getDatasetMeta(i).hidden
                                 });
                             }
                         });
@@ -228,7 +238,7 @@ export function LineChart(props: LineChartProps){
                display: true,
                title: {
                     display: true,                    
-                    text: props.chart.axisId2titleX!['x']
+                    text: props.timeLineChart.axisId2titleX!['x']
                },               
                ticks: {
                     source: "labels",
@@ -236,7 +246,7 @@ export function LineChart(props: LineChartProps){
                     autoSkip: true,         
                     autoSkipPadding: 25,                    
                     crossAlign: "near",
-                    align: 'start',
+                    align: 'start',                    
 
                },
                grid: {
@@ -246,7 +256,7 @@ export function LineChart(props: LineChartProps){
             },          
             PERCENT: {
                 type: 'linear',
-                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
+                display: 'auto', //props.timeLineChart.lines.filter(l => l.yaxisSetting === "PERCENT").length > 0,
                 position: 'left',
                 beginAtZero: true,
                 title: {
@@ -256,41 +266,52 @@ export function LineChart(props: LineChartProps){
             },
             PORTFOLIO: {
                 type: 'linear',
-                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
+                display: 'auto', //props.timeLineChart.lines.filter(l => l.yaxisSetting === "PORTFOLIO").length > 0,
                 position: 'left',
                 beginAtZero: true,
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
-                },        
+                    text: props.timeLineChart.axisId2titleY!['Y_AXIS_TITLE']
+                },    
+                ticks: {
+                    color: 'black',
+                    backdropColor: 'black',
+                    showLabelBackdrop: props.demo
+                }    
+                
             },        
             NB: {
                 type: 'linear',
-                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
+                display: 'auto', //props.timeLineChart.lines.filter(l => l.yaxisSetting === "NB").length > 0,
                 position: 'left',
                 beginAtZero: true,
                 title: {
                     display: false
                 },
+                ticks: {
+                    color: 'black',
+                    backdropColor: 'black',
+                    showLabelBackdrop: props.demo
+                }    
             },                         
             SHARE: {
                 type: 'linear',
-                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
+                display: 'auto', //props.timeLineChart.lines.filter(l => l.yaxisSetting === "SHARE").length > 0,
                 position: 'left',
                 beginAtZero: true,
                 title: {
                     display: true,
-                    text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
+                    text: props.timeLineChart.axisId2titleY!['Y_AXIS_TITLE']
                 },
             },                      
             DEVISE:{
                 type: 'linear',
-                display: 'auto', //props.chart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
+                display: 'auto', //props.timeLineChart.lines.filter(l => l.yaxisSetting === "DEVISE").length > 0,
                 position: 'right',
                 beginAtZero: true,
                 title: {
                   display: true,
-                  text: props.chart.axisId2titleY!['Y_AXIS_TITLE']
+                  text: props.timeLineChart.axisId2titleY!['Y_AXIS_TITLE']
                 },
                 // grid line settings
                 grid: {

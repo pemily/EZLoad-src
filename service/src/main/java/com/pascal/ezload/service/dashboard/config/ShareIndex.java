@@ -24,9 +24,12 @@ public enum ShareIndex {
     SHARE_PRU_BRUT(false), // sans dividendes
     SHARE_PRU_NET(false), // le PRU en incluant les dividendes
     SHARE_ANNUAL_DIVIDEND_YIELD(false), // rendement en %
+    SHARE_ANNUAL_DIVIDEND_YIELD_AVERAGE(false), // moyenne du rendement en %
 
     CUMULABLE_PERFORMANCE_ACTION(true), // la performance du prix de l'action en %
     CUMULABLE_PERFORMANCE_ACTION_WITH_DIVIDENDS(true), // la performance du prix de l'action en % en incluant les dividendes
+    TEN_YEARS_PERFORMANCE_ACTION(false), // la performance réelle du prix de l'action en % sur 10 ans
+    ESTIMATED_TEN_YEARS_PERFORMANCE_ACTION(false), // la performance estimée du prix de l'action en % sur 10ans, (sans prendre en compte les dividendes) et en s'appuyant sur les 20 dernieres années
     // TODO ADD CUMULABLE_SHARE_TAXES, SHARE_PRU_BRUT
 
     @Deprecated
@@ -39,6 +42,7 @@ public enum ShareIndex {
     CUMULABLE_SHARE_DIVIDEND_YIELD_BASED_ON_PRU_NET(true), // rendement du PRU Net (avec dividende) en %
 
     ACTION_CROISSANCE(false), // La plus petite croissance du dividende annuel sur les periodes de 1 an, 5 ans, 10 ans
+    ACTION_DIVIDEND_YIELD_PLUS_CROISSANCE(false), // Le rendement du dividende + la croissance du dividende
     ;
 
     private final boolean cumulable;
