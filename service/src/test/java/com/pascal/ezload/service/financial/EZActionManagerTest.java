@@ -21,6 +21,7 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
+import com.pascal.ezload.service.util.EZActionManagerUtil;
 import com.pascal.ezload.service.util.LoggerReporting;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -32,9 +33,7 @@ public class EZActionManagerTest {
 
     @Test
     public void testTeslaNoError() throws IOException {
-        String dir = System.getProperty("java.io.tmpdir")+File.separator+this.getClass().getSimpleName()+"_"+Math.random();
-        new File(dir).mkdirs();
-        EZActionManager actionManager = new EZActionManager(dir, dir+ File.separator+"shares.json");
+        EZActionManager actionManager = EZActionManagerUtil.getEzActionManager();
         EzData data = new EzData();
         data.put(new EzDataKey("ezOperation_Lieu"), "NASDAQ/NGS (GLOBAL SELECT MARKET)");
 

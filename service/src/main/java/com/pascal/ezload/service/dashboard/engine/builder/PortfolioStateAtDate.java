@@ -63,15 +63,15 @@ public class PortfolioStateAtDate {
     private final Map<EZShareEQ, Price> shareSoldDetails;
 
     //
-    private final Map<EZShareEQ, Price> sharePRBrut; // Prix de revient d'une valeur. (les prix d'achats - les prix de ventes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Price> sharePRBrut; // Prix de revient d'une valeur. (les prix d'achats) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShareEQ, Price> sharePRUBrut; // (les taxes d'achat + les prix d'achats + les taxes de ventes - les prix de ventes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Price> sharePRUBrut; // (les taxes d'achat + les prix d'achats + les taxes de ventes) / nb d'action == PR / nb d'action
 
-    private final Map<EZShareEQ, Price> sharePRNet; // Prix de revient d'une valeur avec dividend. (les prix d'achats - les prix de ventes - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
+    private final Map<EZShareEQ, Price> sharePRNet; // Prix de revient d'une valeur avec dividend. (les prix d'achats - dividendes) => represente le revenue lié a une valeur (aide a calculer le PRU)
 
     // le PRU de l'action
-    private final Map<EZShareEQ, Price> sharePRUNet; // (les prix d'achats - les prix de ventes - dividendes) / nb d'action == PR / nb d'action
+    private final Map<EZShareEQ, Price> sharePRUNet; // (les prix d'achats - dividendes) / nb d'action == PR / nb d'action
 
     /*
      Si je veux comptabiliser les taxes

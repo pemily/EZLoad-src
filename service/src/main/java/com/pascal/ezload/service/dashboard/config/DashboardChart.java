@@ -22,7 +22,8 @@ public interface DashboardChart {
     enum ChartType {
         TIMELINE,
         RADAR,
-        SOLAR
+        SOLAR,
+        IMPOT
     }
 
     String getTitle();

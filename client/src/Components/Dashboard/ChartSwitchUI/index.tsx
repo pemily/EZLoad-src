@@ -76,6 +76,17 @@ export function newPortfolioSolarChartSwitch() : ChartSwitch {
     
 }
 
+export function newImpotChartSwitch() : ChartSwitch {
+    const newChartSwitch: ChartSwitch = {
+        impot: {
+            title: 'Aide de déclaration des Impôts',
+            buyIncreasePercent: 15,
+            ezPortfolioDeviseCode: "USD"
+        }
+    }; 
+    return newChartSwitch;
+}
+
 export function newRadarChartSwitch(): ChartSwitch{
     const chartIndex1: ChartIndex = {
         portfolioIndexConfig: undefined,                                
@@ -193,16 +204,21 @@ export function ChartSwitchUI(props: ChartUIProps){
                     <ComboFieldWithCode id="ChartSwitch"                                        
                                         errorMsg={undefined}
                                         readOnly={props.readOnly}
-                                        selectedCodeValue={isDefined(props.chartSwitch.timeLine) ? "TIME_LINE" : isDefined(props.chartSwitch.radar) ? "RADAR" : "PORTFOLIO_SOLAR"}
+                                        selectedCodeValue={isDefined(props.chartSwitch.timeLine) ? "TIME_LINE" 
+                                                         : isDefined(props.chartSwitch.radar) ? "RADAR" 
+                                                         : isDefined(props.chartSwitch.portfolioSolar) ? "PORTFOLIO_SOLAR"
+                                                         : "IMPOT"}
                                         userValues={[                             
                                             'Graphique "Temporel"',                                
                                             'Graphique "Radar"',
-                                            'Graphique "Solaire"'
+                                            'Graphique "Solaire"',
+                                            'Aide Impot'
                                         ]}
                                         codeValues={[
                                             'TIME_LINE',
                                             'RADAR',
-                                            'PORTFOLIO_SOLAR'
+                                            'PORTFOLIO_SOLAR',
+                                            'IMPOT'
                                         ]}
                                         description=""
                                         onChange={newValue => {
@@ -211,8 +227,10 @@ export function ChartSwitchUI(props: ChartUIProps){
                                                 newChartSwitch = isDefined(props.chartSwitch.timeLine) ? { timeLine: props.chartSwitch.timeLine} : newTimeLineChartSwitch() 
                                             else if (newValue === 'RADAR')
                                                 newChartSwitch = isDefined(props.chartSwitch.radar) ? { radar: props.chartSwitch.radar} : newRadarChartSwitch()                                            
-                                            else // SOLAR
+                                            else if (newValue === 'SOLAR')
                                                 newChartSwitch = isDefined(props.chartSwitch.portfolioSolar) ? { portfolioSolar: props.chartSwitch.portfolioSolar} : newPortfolioSolarChartSwitch()                                            
+                                            else // IMPOT
+                                                newChartSwitch = isDefined(props.chartSwitch.impot) ? { impot: props.chartSwitch.impot} : newImpotChartSwitch()                                                                                        
 
                                             props.saveChartUI(newChartSwitch, false, () => {})
                                         }
@@ -220,8 +238,9 @@ export function ChartSwitchUI(props: ChartUIProps){
                     { <Button size="small" icon={<Close size='small'/>}                            
                                onClick={() => { setEdition(false); } } />  }
                 </Box>
-
-                <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
+{console.log(props.chartSwitch)}
+                {!isDefined(props.chartSwitch.impot) && 
+                    (<Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
                         <ChartSettingsEditor
                             readOnly={props.readOnly}
                             allEzShares={props.allEzShare}
@@ -234,7 +253,8 @@ export function ChartSwitchUI(props: ChartUIProps){
                                                                 : isDefined(props.chartSwitch.radar) ? { radar: newChartSettsValue }
                                                                 : { portfolioSolar: newChartSettsValue }, keepLines, afterSave)}}
                         />
-                </Box>
+                    </Box>
+                )}                
                 </>
             )}
         </Box>

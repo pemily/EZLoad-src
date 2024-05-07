@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.service.dashboard.ImpotChart;
 import com.pascal.ezload.service.dashboard.RadarChart;
 import com.pascal.ezload.service.dashboard.SolarChart;
 import com.pascal.ezload.service.dashboard.TimeLineChart;
@@ -27,6 +28,7 @@ public class ChartSwitch {
     private TimeLineChart timeLine;
     private RadarChart radar;
     private SolarChart portfolioSolar;
+    private ImpotChart impot;
 
     public TimeLineChart getTimeLine() {
         return timeLine;
@@ -59,6 +61,8 @@ public class ChartSwitch {
             radar.validate();
         else if (portfolioSolar != null)
             portfolioSolar.validate();
+        else if (impot != null)
+            impot.validate();
     }
 
     public void clearErrors() {
@@ -68,6 +72,15 @@ public class ChartSwitch {
             radar.clearErrors();
         else if (portfolioSolar != null)
             portfolioSolar.clearErrors();
+        else if (impot != null)
+            impot.clearErrors();
     }
 
+    public ImpotChart getImpot() {
+        return impot;
+    }
+
+    public void setImpot(ImpotChart impotChart) {
+        this.impot = impotChart;
+    }
 }
