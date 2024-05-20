@@ -22,6 +22,7 @@ public class ImpotBuilder {
     private final StringBuilder ezDeclaration = new StringBuilder();
     private float plusMoinsValue = 0;
     private float fraisCourtage = 0;
+    private float fraisCourtier = 0;
     private final Map<String, Float> countryCode2dividendes = new HashMap<>();
     private final Map<String, Float> countryCode2taxes = new HashMap<>();
 
@@ -42,14 +43,14 @@ public class ImpotBuilder {
         result.append("- "+italic("Les frais de courtier sont intégrés dans le calcul du PMP.")+"\n");
 
         countryCode2dividendes.forEach((cc, v) -> ezDeclaration.append("\t\tDividende brut soumis à abattement\t\t"+CountryUtil.foundByCode(cc).getName()+"\tEuro\t"+ NumberUtils.float2Str(v)+"\n"));
-        countryCode2taxes.forEach((cc,v) -> ezDeclaration.append("\t\tRetenue fiscale pays sur dividende soumis à abattement\t\t"+CountryUtil.foundByCode(cc).getName()+"\tEuro\t"+(NumberUtils.float2Str(-v))));
+        countryCode2taxes.forEach((cc,v) -> ezDeclaration.append("\t\tRetenue fiscale pays sur dividende soumis à abattement\t\t"+CountryUtil.foundByCode(cc).getName()+"\tEuro\t"+(NumberUtils.float2Str(-v))+"\n"));
         result.append(title(2, "EZDeclaration"));
         result.append("- "+italic("A faire uniquement pour les courtiers étranger.")+"\n");
         result.append("- "+italic("Dans l'onglet 'Export', copiez les lignes completes ci-dessous dans la case A2 de l'onglet VosDividendes:")+pre(ezDeclaration));
 
 
         result.append(title(2, "Plus/Moins Value report"));
-        plusMoinsValueReport.append("- "+bold("Plus/moins value total annuel: "+float2Str(plusMoinsValue))+" <== Ce chiffre doit être entré à la ligne 4 [ici]("+urlPlusMoinsValueReportable+")\n");
+        plusMoinsValueReport.append("- "+bold("Plus/moins value total annuel: "+float2Str(plusMoinsValue - fraisCourtier))+"\n");
 
         result.append(plusMoinsValueReport);
         result.append( "\n---\n");
@@ -60,12 +61,17 @@ public class ImpotBuilder {
         fraisCourtageReport.append("- "+bold("Frais de courtage payé: "+float2Str(fraisCourtage))+"\n");
 
 
+
         result.append(title(2, "Dividendes report"));
         result.append(dividendesReport);
         result.append(title(2, "Taxes report"));
         result.append(taxesReport);
-        result.append(title(2, "Frais de courtage report"));
+        result.append(title(2, "Frais de courtage par action report"));
         result.append(fraisCourtageReport);
+        if (fraisCourtier > 0) {
+            result.append(title(2, "Frais de garde (indépendant d'action):"));
+            result.append("- " + bold("Frais payé (est déduis dans la plus/moins value total annuel): " + float2Str(fraisCourtier)) + "\n");
+        }
         result.append(title(2, "Détails du calcul du Prix Moyen Pondéré pour:"));
         share2pmpReport.forEach((key, value) -> {
             result.append(title(3, key.getGoogleCode()));
@@ -132,5 +138,9 @@ public class ImpotBuilder {
         fraisCourtageReport.append("- "+ date.toEzPortoflioDate()+" Frais de courtage de "+float2Str(amount)+"€ pour l'action: "+share.getGoogleCode()+"\n");
         share2pmpReport.computeIfAbsent(share, s -> new StringBuilder()).append("- "+ date.toEzPortoflioDate()+" Courtage de "+share.getGoogleCode()+" pour un montant de "+float2Str(amount)+"€ nouveau PMP: "+float2Str(pmp)+"\n");
         fraisCourtage += amount;
+    }
+
+    public void fraisCourtier(EZDate date, float amount) {
+        fraisCourtier += amount;
     }
 }

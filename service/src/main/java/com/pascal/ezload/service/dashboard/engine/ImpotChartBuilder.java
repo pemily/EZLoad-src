@@ -74,6 +74,7 @@ public class ImpotChartBuilder {
                         case "Vente titres" -> processData.vente(devise, op);
                         case "Courtage sur achat de titres" -> processData.fraisCourtageSurAchat(devise, op);
                         case "Courtage sur vente de titres" -> processData.fraisCourtageSurVente(devise, op);
+                        case "Droits de garde/Frais divers" -> processData.fraisCourtier(devise,  op);
                     }
                 });
 
@@ -202,6 +203,13 @@ public class ImpotChartBuilder {
             share2FraisCourtageSurVente.put(share, oldMontantPayesPourLesActions + amount);
             float newPMP = computeNewPmp(share, 0, amount);
             impotBuilder.fraisCourtage(date, share, amount, newPMP);
+        }
+
+        public void fraisCourtier(EZDevise devise, Row op) {
+            EZDate date = op.getValueDate(MesOperations.DATE_COL);
+            ImpotBuilder impotBuilder = getImpotBuilder(date, devise);
+            float amount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
+            impotBuilder.fraisCourtier(date, amount);
         }
     }
 
