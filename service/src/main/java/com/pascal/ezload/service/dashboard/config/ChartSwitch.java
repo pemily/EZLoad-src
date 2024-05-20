@@ -54,6 +54,14 @@ public class ChartSwitch {
         this.portfolioSolar = solar;
     }
 
+    public ImpotChart getImpot() {
+        return impot;
+    }
+
+    public void setImpot(ImpotChart impotChart) {
+        this.impot = impotChart;
+    }
+
     public void validate() {
         if (timeLine != null)
             timeLine.validate();
@@ -76,11 +84,4 @@ public class ChartSwitch {
             impot.clearErrors();
     }
 
-    public ImpotChart getImpot() {
-        return impot;
-    }
-
-    public void setImpot(ImpotChart impotChart) {
-        this.impot = impotChart;
-    }
 }

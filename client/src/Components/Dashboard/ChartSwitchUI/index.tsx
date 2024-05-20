@@ -18,12 +18,14 @@
 import { Box, Button, Text, Collapsible } from "grommet";
 import { useState } from "react";
 import { Trash, Configure, ZoomIn, ZoomOut, Close } from 'grommet-icons';
-import { TimeLineChart, EzShareData, ChartIndex, ChartSwitch, RadarChart, SolarChart } from '../../../ez-api/gen-api/EZLoadApi';
+import { TimeLineChart, EzShareData, ChartIndex, ChartSwitch, RadarChart, SolarChart, ImpotChart } from '../../../ez-api/gen-api/EZLoadApi';
 import { genUUID} from '../../../ez-api/tools';
 import { ChartSettingsEditor, nouvelIndice } from '../ChartSettingsEditor';
+import { ImpotSettingsEditor } from '../ImpotSettingsEditor';
 import { TimeLineChartUI } from '../TimeLineChartUI';
 import { RadarChartUI } from '../RadarChartUI';
 import { PortfolioSolarChartUI } from '../PortfolioSolarChartUI';
+import { ImpotChartUI } from '../ImpotChartUI';
 import { isDefined } from '../../../ez-api/tools';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
@@ -79,9 +81,9 @@ export function newPortfolioSolarChartSwitch() : ChartSwitch {
 export function newImpotChartSwitch() : ChartSwitch {
     const newChartSwitch: ChartSwitch = {
         impot: {
-            title: 'Aide de déclaration des Impôts',
-            buyIncreasePercent: 15,
-            ezPortfolioDeviseCode: "USD"
+            title: 'Aide de déclaration des Impôts',            
+            ezPortfolioDeviseCode: "EUR",
+            urlPlusMoinsValueReportable: ''
         }
     }; 
     return newChartSwitch;
@@ -139,8 +141,15 @@ export function newRadarChartSwitch(): ChartSwitch{
 export function ChartSwitchUI(props: ChartUIProps){
     const [edition, setEdition] = useState<boolean>(false);        
     
-    function getChartSettings() : TimeLineChart | RadarChart | SolarChart{
-        return isDefined(props.chartSwitch.timeLine) ? props.chartSwitch.timeLine! : isDefined(props.chartSwitch.portfolioSolar) ? props.chartSwitch.portfolioSolar! : props.chartSwitch.radar!;
+    function getChartSettings() : TimeLineChart | RadarChart | SolarChart | ImpotChart{
+        return isDefined(props.chartSwitch.timeLine) ? props.chartSwitch.timeLine! : 
+            isDefined(props.chartSwitch.portfolioSolar) ? props.chartSwitch.portfolioSolar! :
+            isDefined(props.chartSwitch.radar) ? props.chartSwitch.radar! : props.chartSwitch.impot!;
+    }
+
+    function getChartSettingsExceptImpot() : TimeLineChart | RadarChart | SolarChart {
+        return isDefined(props.chartSwitch.timeLine) ? props.chartSwitch.timeLine! : 
+            isDefined(props.chartSwitch.portfolioSolar) ? props.chartSwitch.portfolioSolar! : props.chartSwitch.radar!;
     }
 
     return (
@@ -153,22 +162,26 @@ export function ChartSwitchUI(props: ChartUIProps){
                             <Text alignSelf="center" margin="0">{getChartSettings().title}</Text>
                         </Box>
                         <Box  direction="row" alignSelf="end" margin="0" pad="0">
-                            <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI(
-                                                                                isDefined(props.chartSwitch.timeLine) ? 
-                                                                                                        {timeLine: {...getChartSettings(), height: getChartSettings().height!+10 }} 
-                                                                                                         : isDefined(props.chartSwitch.radar) ? 
-                                                                                                            { radar: {...getChartSettings(), height: getChartSettings().height!+10 } }    
-                                                                                                            : { portfolioSolar: {...getChartSettings(), height: getChartSettings().height!+10 } }                                                                                
-                                                                                    , true, () => {}) }/>
-                            <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
-                                    plain={true} label="" onClick={() => props.saveChartUI(
+                            { !isDefined(props.chartSwitch.impot) && (
+                                 <>
+                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomIn size='small' />} gap="xxsmall" margin="xxsmall"
+                                        plain={true} label="" onClick={() => props.saveChartUI(
                                                                                     isDefined(props.chartSwitch.timeLine) ? 
-                                                                                                            {timeLine: {...getChartSettings(), height: getChartSettings().height!-10 }} 
+                                                                                                            {timeLine: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!+10 }} 
                                                                                                             : isDefined(props.chartSwitch.radar) ? 
-                                                                                                                { radar: {...getChartSettings(), height: getChartSettings().height!-10 } }    
-                                                                                                                : { portfolioSolar: {...getChartSettings(), height: getChartSettings().height!-10 } }
-                                                                                    , true, () => {}) }/>
+                                                                                                                { radar: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!+10 } }    
+                                                                                                                : { portfolioSolar: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!+10 } }                                                                                
+                                                                                        , true, () => {}) }/>
+                                <Button fill={false} size="small" alignSelf="start" icon={<ZoomOut size='small' />} gap="xxsmall" margin="xxsmall"
+                                        plain={true} label="" onClick={() => props.saveChartUI(
+                                                                                        isDefined(props.chartSwitch.timeLine) ? 
+                                                                                                                {timeLine: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!-10 }} 
+                                                                                                                : isDefined(props.chartSwitch.radar) ? 
+                                                                                                                    { radar: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!-10 } }    
+                                                                                                                    : { portfolioSolar: {...getChartSettingsExceptImpot(), height: getChartSettingsExceptImpot().height!-10 } }
+                                                                                        , true, () => {}) }/>
+                                </>)
+                            }
                             <Button fill={false} size="small" alignSelf="start" icon={<Configure size='small' />} gap="xxsmall" margin="xxsmall"
                                     plain={true} label="" onClick={() =>  setEdition(true)}/>
                         </Box>
@@ -178,6 +191,7 @@ export function ChartSwitchUI(props: ChartUIProps){
                         { isDefined(props.chartSwitch.timeLine) && <TimeLineChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} timeLineChart={props.chartSwitch.timeLine!}/> }
                         { isDefined(props.chartSwitch.radar) && <RadarChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} radarChart={props.chartSwitch.radar!}/> }
                         { isDefined(props.chartSwitch?.portfolioSolar) && <PortfolioSolarChartUI allEzShare={props.allEzShare} demo={props.demo} readOnly={props.readOnly} solarChart={props.chartSwitch.portfolioSolar!}/> }
+                        { isDefined(props.chartSwitch.impot) && <ImpotChartUI readOnly={props.readOnly} demo={props.demo} impotChart={props.chartSwitch.impot!}/> }
                     </Box>
             </Collapsible> 
         
@@ -238,7 +252,7 @@ export function ChartSwitchUI(props: ChartUIProps){
                     { <Button size="small" icon={<Close size='small'/>}                            
                                onClick={() => { setEdition(false); } } />  }
                 </Box>
-{console.log(props.chartSwitch)}
+
                 {!isDefined(props.chartSwitch.impot) && 
                     (<Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
                         <ChartSettingsEditor
@@ -254,7 +268,19 @@ export function ChartSwitchUI(props: ChartUIProps){
                                                                 : { portfolioSolar: newChartSettsValue }, keepLines, afterSave)}}
                         />
                     </Box>
-                )}                
+                )}    
+                {
+                    isDefined(props.chartSwitch.impot) && (
+                        <Box margin={{left:'medium', top:'none', bottom: 'none'}} direction="column">
+                            <ImpotSettingsEditor
+                                readOnly={props.readOnly}
+                                impotChartSettings={props.chartSwitch.impot!}                                
+                                save={(newChartSettsValue, keepLines: boolean, afterSave) => {
+                                        props.saveChartUI({impot: newChartSettsValue}, keepLines, afterSave)}}
+                            />
+                        </Box>
+                    )
+                }            
                 </>
             )}
         </Box>

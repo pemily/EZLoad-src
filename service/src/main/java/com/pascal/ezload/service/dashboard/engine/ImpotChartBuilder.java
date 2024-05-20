@@ -16,9 +16,11 @@ import com.pascal.ezload.service.sources.Reporting;
 import com.pascal.ezload.service.util.DeviseUtil;
 import com.pascal.ezload.service.util.finance.CurrencyMap;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ImpotChartBuilder {
 
@@ -75,7 +77,7 @@ public class ImpotChartBuilder {
                     }
                 });
 
-        processData.generateReports();
+        impotChart.setImpotAnnuels(processData.generateReports());
         return impotChart;
     }
 
@@ -100,23 +102,6 @@ public class ImpotChartBuilder {
             this.profileName = profileName;
         }
 
-        private void vente(EZDevise devise, Row op) {
-            EZDate date = op.getValueDate(MesOperations.DATE_COL);
-            ImpotBuilder yearlyImpotBuilder = getImpotBuilder(date, devise);
-            EZShareEQ share = getShare(op);
-            float quantity = Math.abs(op.getValueFloat(MesOperations.QUANTITE_COL));
-            float amount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
-            amount -= share2Taxes.getOrDefault(share, 0f) + share2FraisCourtageSurVente.getOrDefault(share, 0f);
-            float oldNbActions = share2nbActionEnPortefeuille.getOrDefault(share, 0f);
-            float newNbActions = oldNbActions + quantity;
-            share2nbActionEnPortefeuille.put(share, newNbActions);
-            float pmp = share2PrixMoyenPondere.getOrDefault(share, 0f);
-            yearlyImpotBuilder.vente(date, share, quantity, amount, pmp);
-
-            share2Taxes.put(share, 0f); // on a pris en comptes sur l'achat, je reset
-            share2FraisCourtageSurVente.put(share, 0f);  // on a pris en comptes sur l'achat, je reset
-        }
-
         private void dividendes(EZDevise devise, Row op) {
             EZDate date = op.getValueDate(MesOperations.DATE_COL);
             ImpotBuilder impotBuilder = getImpotBuilder(date, devise);
@@ -139,29 +124,58 @@ public class ImpotChartBuilder {
             EZShareEQ share = getShare(op);
             float quantity = Math.abs(op.getValueFloat(MesOperations.QUANTITE_COL));
             float buyAmount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
-            buyAmount += buyAmount * chartSettings.getBuyIncreasePercent() / 100f; // correction de l'amount en tenant compte de l'avantage d'achat en % (options entreprise)
             buyAmount += share2FraisCourtageSurAchat.getOrDefault(share, 0f);
             buyAmount += share2Taxes.getOrDefault(share, 0f);
-            float oldNbActions = share2nbActionEnPortefeuille.getOrDefault(share, 0f);
-            float oldPMP = share2PrixMoyenPondere.getOrDefault(share, 0f);
-            float newNbActions = oldNbActions + quantity;
-            float newPMP = ((oldPMP * oldNbActions) + buyAmount) / newNbActions;
-            share2nbActionEnPortefeuille.put(share, newNbActions);
-            share2PrixMoyenPondere.put(share, newPMP) ;
-            impotBuilder.achat(date, share, quantity, buyAmount);
+            float newPMP = computeNewPmp(share, quantity, buyAmount);
+            impotBuilder.achat(date, share, quantity, buyAmount, newPMP);
 
             share2Taxes.put(share, 0f); // on a pris en comptes sur l'achat, je reset
             share2FraisCourtageSurAchat.put(share, 0f);  // on a pris en comptes sur l'achat, je reset
         }
 
-        public void generateReports() {
-            year2impotBuilder.values()
-                    .forEach(ImpotBuilder::generate);
+        private float computeNewPmp(EZShareEQ share, float additionalShareQuantity, float cost) {
+            float oldNbActions = share2nbActionEnPortefeuille.getOrDefault(share, 0f);
+            float oldPMP = share2PrixMoyenPondere.getOrDefault(share, 0f);
+            float newNbActions = oldNbActions + additionalShareQuantity;
+            float newPMP;
+            if (newNbActions == 0) { // si j'ai des frais de courtage avant l'achat d'une action, dans ce cas, le seul moment ou il ne seront pas comptabilisé dans le PMP
+                newPMP = oldPMP;
+            }
+            else {
+                newPMP = ((oldPMP * oldNbActions) + cost) / newNbActions;
+            }
+            share2nbActionEnPortefeuille.put(share, newNbActions);
+            share2PrixMoyenPondere.put(share, newPMP);
+            return newPMP;
+        }
+
+        private void vente(EZDevise devise, Row op) {
+            EZDate date = op.getValueDate(MesOperations.DATE_COL);
+            ImpotBuilder yearlyImpotBuilder = getImpotBuilder(date, devise);
+            EZShareEQ share = getShare(op);
+            float quantity = Math.abs(op.getValueFloat(MesOperations.QUANTITE_COL));
+            float amount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
+            amount -= share2Taxes.getOrDefault(share, 0f) + share2FraisCourtageSurVente.getOrDefault(share, 0f);
+            float oldNbActions = share2nbActionEnPortefeuille.getOrDefault(share, 0f);
+            float newNbActions = oldNbActions + quantity;
+            share2nbActionEnPortefeuille.put(share, newNbActions);
+            float pmp = share2PrixMoyenPondere.getOrDefault(share, 0f);
+            yearlyImpotBuilder.vente(date, share, quantity, amount, pmp);
+
+            share2Taxes.put(share, 0f); // on a pris en comptes sur l'achat, je reset
+            share2FraisCourtageSurVente.put(share, 0f);  // on a pris en comptes sur l'achat, je reset
+        }
+
+        public List<ImpotChart.ImpotAnnuel> generateReports() {
+            return year2impotBuilder.values().stream()
+                    .map(ImpotBuilder::generate)
+                    .sorted(Comparator.comparingInt(ImpotChart.ImpotAnnuel::getYear))
+                    .collect(Collectors.toList());
         }
 
 
         private ImpotBuilder getImpotBuilder(EZDate date, EZDevise devise) {
-            return year2impotBuilder.computeIfAbsent(date.getYear(), year -> new ImpotBuilder(profileName, year, devise, chartSettings.getBuyIncreasePercent()));
+            return year2impotBuilder.computeIfAbsent(date.getYear(), year -> new ImpotBuilder(profileName, year, devise, chartSettings.getUrlPlusMoinsValueReportable()));
         }
 
         private EZShareEQ getShare(Row op) {
@@ -175,7 +189,8 @@ public class ImpotChartBuilder {
             float amount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
             float oldMontantPayesPourLesActions = share2FraisCourtageSurAchat.getOrDefault(share, 0f);
             share2FraisCourtageSurAchat.put(share, oldMontantPayesPourLesActions + amount);
-            impotBuilder.fraisCourtage(date, share, amount);
+            float newPMP = computeNewPmp(share, 0, amount);
+            impotBuilder.fraisCourtage(date, share, amount, newPMP);
         }
 
         public void fraisCourtageSurVente(EZDevise devise, Row op) {
@@ -185,7 +200,8 @@ public class ImpotChartBuilder {
             float amount = currencyMap.convertPriceToTarget(date, Math.abs(op.getValueFloat(MesOperations.AMOUNT_COL)));
             float oldMontantPayesPourLesActions = share2FraisCourtageSurVente.getOrDefault(share, 0f);
             share2FraisCourtageSurVente.put(share, oldMontantPayesPourLesActions + amount);
-            impotBuilder.fraisCourtage(date, share, amount);
+            float newPMP = computeNewPmp(share, 0, amount);
+            impotBuilder.fraisCourtage(date, share, amount, newPMP);
         }
     }
 

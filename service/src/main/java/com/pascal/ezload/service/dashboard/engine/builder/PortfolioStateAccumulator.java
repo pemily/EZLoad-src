@@ -201,6 +201,7 @@ public class PortfolioStateAccumulator {
         previousState.getShareSoldDetails()
                 .compute(share, (sh, oldValue) -> oldValue == null ? amount : oldValue.plus(amount)); // le detail par actions
 
+        //tous les PRU sont faux => remplacer par le PMP (voir impots)
          /* ERREUR la vente n'a pas d'impact sur le PRU https://communaute.moning.co/t/recalcul-du-pru-suite-a-vente-partiel/10410/6
         // PR  ( les prix d'achats - les prix de ventes)
         previousState.getSharePRBrut()

@@ -138,9 +138,9 @@ public class DashboardManager {
                             else if (prefs.getPortfolioSolar() != null){
                                 prefs.setPortfolioSolar(portfolioSolarChartBuilder.createSolarChart(reporting, ezPortfolioProxy, prefs.getPortfolioSolar()));
                             }
-                           /* else if (prefs.getImpot() != null) {
-                                prefs.setImpot(*/impotChartBuilder.createImpotChart(reporting, ezPortfolioProxy, new ImpotChartSettings()/*prefs.getImpot())*/);
-                            //}
+                            else if (prefs.getImpot() != null) {
+                                prefs.setImpot(impotChartBuilder.createImpotChart(reporting, ezPortfolioProxy, prefs.getImpot()));
+                            }
                             return prefs;
                         } catch (Exception e) {
                             throw new RuntimeException(e);
