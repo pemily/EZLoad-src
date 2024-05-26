@@ -22,10 +22,13 @@ import java.util.Optional;
 
 public enum OperationTitle {
 
+    AchatOptions("Achat options"),
     AchatTitres("Achat titres"),
     AcompteImpotSurRevenu("Acompte Impôt sur le Revenu"),
     CourtageSurAchatDeTitres("Courtage sur achat de titres"),
+    CourtageSurAchatOptions("Courtage sur achat options"),
     CourtageSurVenteDeTitres("Courtage sur vente de titres"),
+    CourtageSurVenteOptions("Courtage sur vente options"),
     Divers("Divers"),
     DividendeBrut("Dividende brut"),
     DividendeBrutNonSoumisAAbattement("Dividende brut NON soumis à abattement"),
@@ -37,6 +40,7 @@ public enum OperationTitle {
     RetenueFiscale("Retenue fiscale"),
     RetraitFonds("Retrait fonds"),
     TaxeSurLesTransactions("Taxe sur les Transactions"),
+    VenteOptions("Vente options"),
     VenteTitres("Vente titres"),
     VersementFonds("Versement fonds");
 

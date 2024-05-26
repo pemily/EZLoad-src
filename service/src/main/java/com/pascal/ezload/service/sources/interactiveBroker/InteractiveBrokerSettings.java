@@ -15,24 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard.config;
+package com.pascal.ezload.service.sources.interactiveBroker;
 
-public interface DashboardChart {
-
-    enum ChartType {
-        TIMELINE,
-        RADAR,
-        SOLAR,
-        IMPOT
-    }
-
-    String getTitle();
-
-    void setTitle(String title);
-
-    ChartType type();
-
-    <T extends DashboardChart> T validate();
-
-    void clearErrors();
+public class InteractiveBrokerSettings {
 }

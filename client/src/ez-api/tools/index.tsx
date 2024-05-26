@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import { PortfolioSolarChartUI } from '../../Components/Dashboard/PortfolioSolarChartUI';
-import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPage, TimeLineChart, RadarChart, SolarChart} from '../gen-api/EZLoadApi';
+import { Api, MainSettings, EzProfil, AuthInfo, HttpResponse, RuleDefinitionSummary, RuleDefinition, DashboardPage, TimeLineChart, RadarChart, SolarChart, ImpotChart} from '../gen-api/EZLoadApi';
 
 console.log("API Url is: http://localhost:"+window.location.port+"/api");
 export const ezApi = new Api({baseUrl: "http://localhost:"+window.location.port+"/api"});
@@ -140,12 +140,23 @@ function solarChart2portfolioSolarChartSettings(solarChart: SolarChart) : RadarC
   return c;
 }
 
+
+function impotChart2ImpotChartSettings(impotChart: ImpotChart) : ImpotChart {
+  var c: ImpotChart = {
+      ...impotChart,
+      impotAnnuels: undefined,      
+  };
+  delete c.impotAnnuels;  
+  return c;
+}
+
 export function saveDashboardConfig(dashConfig: DashboardPage[], keepLines: boolean, updModel: (dashConfig: DashboardPage[]) => void){
   jsonCall(ezApi.dashboard.saveDashboardConfig(dashConfig.map(page => {
     return {...page, charts: page.charts?.map(c => { 
           if (c.timeLine) return { timeLine: timeLineChart2TimeLineChartSettings(c.timeLine)};
           if (c.radar) return { radar: radarChart2RadarChartSettings(c.radar)};
           if (c.portfolioSolar) return { portfolioSolar: solarChart2portfolioSolarChartSettings(c.portfolioSolar)};
+          if (c.impot) return { impot: impotChart2ImpotChartSettings(c.impot)};
           return c;                                                                                                    
     })}})))
     .then(r => updModel(keepLines ? dashConfig : r))

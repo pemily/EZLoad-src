@@ -15,24 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pascal.ezload.service.dashboard.config;
+package com.pascal.ezload.service.util;
 
-public interface DashboardChart {
+import com.pascal.ezload.service.financial.EZActionManager;
 
-    enum ChartType {
-        TIMELINE,
-        RADAR,
-        SOLAR,
-        IMPOT
+import java.io.File;
+import java.io.IOException;
+
+public class EZActionManagerUtil {
+
+
+    public static EZActionManager getEzActionManager() throws IOException {
+        String dir = System.getProperty("java.io.tmpdir")+ File.separator+EZActionManagerUtil.class.getSimpleName()+"_"+Math.random();
+        new File(dir).mkdirs();
+        EZActionManager actionManager = new EZActionManager(dir, dir+ File.separator+"shares.json");
+        return actionManager;
     }
 
-    String getTitle();
-
-    void setTitle(String title);
-
-    ChartType type();
-
-    <T extends DashboardChart> T validate();
-
-    void clearErrors();
 }

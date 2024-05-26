@@ -42,18 +42,18 @@ import java.util.stream.Collectors;
 public class DashboardManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");
 
-    private final EZActionManager ezActionManager;
     private final String dashboardFile;
     private final TimeLineChartBuilder timeLineChartBuilder;
     private final RadarChartBuilder radarChartBuilder;
     private final PortfolioSolarChartBuilder portfolioSolarChartBuilder;
+    private final ImpotChartBuilder impotChartBuilder;
 
     public DashboardManager(SettingsManager settingsManager, EZActionManager ezActionManager, MainSettings mainSettings) {
         this.dashboardFile = settingsManager.getDashboardFile();
-        this.ezActionManager = ezActionManager;
         this.timeLineChartBuilder = new TimeLineChartBuilder(ezActionManager);
-        this.radarChartBuilder = new RadarChartBuilder(ezActionManager, mainSettings);
+        this.radarChartBuilder = new RadarChartBuilder(ezActionManager);
         this.portfolioSolarChartBuilder = new PortfolioSolarChartBuilder(ezActionManager);
+        this.impotChartBuilder = new ImpotChartBuilder(ezActionManager, mainSettings);
     }
 
     public List<DashboardPage>  loadDashboardSettings() {
@@ -106,6 +106,9 @@ public class DashboardManager {
                                             else if (prefs.getPortfolioSolar() != null){
                                                 prefs.setPortfolioSolar(portfolioSolarChartBuilder.createEmptySolarChart(prefs.getPortfolioSolar()));
                                             }
+                                            else if (prefs.getImpot() != null) {
+                                                prefs.setImpot(impotChartBuilder.createEmptyImpotChart(prefs.getImpot()));
+                                            }
                                         } catch (IOException e) {
                                             throw new RuntimeException(e);
                                         }
@@ -135,8 +138,11 @@ public class DashboardManager {
                             else if (prefs.getPortfolioSolar() != null){
                                 prefs.setPortfolioSolar(portfolioSolarChartBuilder.createSolarChart(reporting, ezPortfolioProxy, prefs.getPortfolioSolar()));
                             }
+                            else if (prefs.getImpot() != null) {
+                                prefs.setImpot(impotChartBuilder.createImpotChart(reporting, ezPortfolioProxy, prefs.getImpot()));
+                            }
                             return prefs;
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     })

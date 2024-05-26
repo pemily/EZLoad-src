@@ -34,11 +34,9 @@ import java.util.*;
 public class RadarChartBuilder {
 
     private final EZActionManager ezActionManager;
-    private final MainSettings mainSettings;
 
-    public RadarChartBuilder(EZActionManager ezActionManager, MainSettings mainSettings) {
+    public RadarChartBuilder(EZActionManager ezActionManager) {
         this.ezActionManager = ezActionManager;
-        this.mainSettings = mainSettings;
     }
 
     public RadarChart createEmptyRadarChart(RadarChartSettings chartSettings) throws IOException {

@@ -17,10 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard;
 
-import com.pascal.ezload.service.dashboard.config.ChartIndex;
-import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
-import com.pascal.ezload.service.dashboard.config.SolarChartSettings;
-import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
+import com.pascal.ezload.service.dashboard.config.*;
 import com.pascal.ezload.service.model.EZDate;
 import com.pascal.ezload.service.model.Prices;
 import com.pascal.ezload.service.util.NumberUtils;
@@ -98,6 +95,12 @@ public class ChartsTools {
         radarChart.setRadarYearlyCharts(List.of());
 
         return radarChart;
+    }
+
+
+    public static ImpotChart createImpotChart(ImpotChartSettings chartSettings) {
+        ImpotChart impotChart = new ImpotChart(chartSettings);
+        return impotChart;
     }
 
     public static TimeLineChart createTimeLineChart(TimeLineChartSettings chartSettings, List<EZDate> dates) {
