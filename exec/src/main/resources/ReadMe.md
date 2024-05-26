@@ -4,6 +4,9 @@
 
 
 ## Historique 
+### Version 2.9
+* Ajout du rapport pour les impôts
+
 ### Version 2.8
 * Ajout de la courbe sur le rendement moyen
 
