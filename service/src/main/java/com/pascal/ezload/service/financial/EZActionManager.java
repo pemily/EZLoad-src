@@ -267,7 +267,7 @@ public class EZActionManager {
             }
             catch (Exception e){
                 reporting.info("Tentative avec YahooFinance");
-                dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
             }
             return dividends;
         }
