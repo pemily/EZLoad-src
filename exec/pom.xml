@@ -57,6 +57,9 @@
                                     <mainClass>com.pascal.ezload.server.EZLoad</mainClass>
                                 </manifest>
                             </archive>
+                            <archiverConfig>
+                                <compress>true</compress>
+                            </archiverConfig>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
@@ -76,6 +79,9 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <archiverConfig>
+                                <compress>true</compress>
+                            </archiverConfig>
                             <descriptors>
                                 <descriptor>final-zip-assembly.xml</descriptor>
                             </descriptors>

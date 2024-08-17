@@ -63,13 +63,13 @@ public class SeekingAlphaTools extends ExternalSiteTools {
 
         ) {
             List<String[]> chromeHeader = HttpUtil.chromeHeader();
-            String realUrl = "https://seekingalpha-com.translate.goog/api/v3/symbols/"+URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8)+"/dividend_history?group_by=quarterly&sort=-date&_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp";
-            String url = realUrl.replace("-com.translate.goog", ".com");
+            String downloadUrl = "https://seekingalpha-com.translate.goog/api/v3/symbols/"+URLEncoder.encode(ezShare.getSeekingAlphaCode(), StandardCharsets.UTF_8)+"/dividend_history?group_by=quarterly&sort=-date&_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp";
+            String url = downloadUrl.replace("-com.translate.goog", ".com");
             try (Reporting reporting = rep.pushSection("Extraction des dividendes depuis " + url)) {
                     return cache.get(reporting, getDividendsCacheName(ezShare, from), url,
                             () -> {
-                                HttpResponse<InputStream> resp = HttpUtil.httpGET(realUrl, chromeHeader);
-                                if (resp.statusCode() != 200) throw new RuntimeException("Error when downloading "+url);
+                                HttpResponse<InputStream> resp = HttpUtil.httpGET(url, chromeHeader);
+                                if (resp.statusCode() != 200) throw new RuntimeException("Error when downloading "+url+" code: "+resp.statusCode());
                                 return new GZIPInputStream(resp.body());
                             },
                             inputStream -> {
