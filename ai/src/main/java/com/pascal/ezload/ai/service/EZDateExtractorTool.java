@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.ai.service;
 
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import dev.langchain4j.agent.tool.Tool;
 
 import java.time.LocalDate;

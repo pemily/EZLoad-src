@@ -17,31 +17,25 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirect2EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectModelChecker;
 import com.pascal.ezload.service.sources.bourseDirect.transform.BourseDirectText2Model;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.ezload.service.sources.jsonSource.JsonSource;
-import com.pascal.ezload.service.util.FileProcessor;
-import com.pascal.ezload.service.util.JsonUtil;
-import com.pascal.ezload.service.util.PdfTextExtractor;
+import com.pascal.ezload.common.util.FileProcessor;
+import com.pascal.ezload.common.util.PdfTextExtractor;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 

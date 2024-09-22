@@ -29,7 +29,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ import javax.crypto.spec.SecretKeySpec;
 import com.google.gson.Gson;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 
 public class AuthManager {
 

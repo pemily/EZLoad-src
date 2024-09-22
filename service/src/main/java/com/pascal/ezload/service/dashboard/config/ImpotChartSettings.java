@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
-import com.pascal.ezload.service.util.Checkable;
+import com.pascal.ezload.common.util.Checkable;
 
 public class ImpotChartSettings extends Checkable<ImpotChartSettings> implements DashboardChart  {
 

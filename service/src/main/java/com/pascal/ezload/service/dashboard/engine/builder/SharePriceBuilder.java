@@ -17,15 +17,18 @@
  */
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.dashboard.config.ChartGroupedBy;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.Price;
+import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.model.GroupedBy;
 import com.pascal.ezload.service.dashboard.config.ChartPerfFilter;
 import com.pascal.ezload.service.dashboard.engine.tag.DividendInfo;
 import com.pascal.ezload.service.dashboard.engine.tag.DividendTagDetails;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.DeviseUtil;
-import com.pascal.ezload.service.util.finance.Dividend;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.DeviseUtil;
+import com.pascal.ezload.common.util.finance.Dividend;
 
 import java.util.*;
 
@@ -109,7 +112,7 @@ public class SharePriceBuilder {
                     return estimatedPerf;
                 }
 
-                Prices groupedPrices = perfIndexBuilder.buildGroupBy(prices, ChartGroupedBy.YEARLY, false);
+                Prices groupedPrices = perfIndexBuilder.buildGroupBy(prices, GroupedBy.YEARLY, false);
                 Prices pricesPerf = perfIndexBuilder.buildPerfPrices(groupedPrices, ChartPerfFilter.VARIATION_EN_PERCENT);
 
                 int previousProcessedYear = -1;
@@ -288,7 +291,7 @@ public class SharePriceBuilder {
                 .map(d -> new PriceAtDate(d.getDetachmentDate(), new Price(d.getAmount())))
                 .sorted(Comparator.comparing(PriceAtDate::getDate))
                 .forEach(dividendes::addPrice);
-        return new PerfIndexBuilder(ChartGroupedBy.YEARLY).buildGroupBy(dividendes, true);
+        return new PerfIndexBuilder(GroupedBy.YEARLY).buildGroupBy(dividendes, true);
     }
 
 
@@ -443,7 +446,7 @@ public class SharePriceBuilder {
         // il y aura une date par année
         return share2croissanceDividendAnnualWithEstimates.computeIfAbsent(ezShare.getEzName()+"_"+algoEstimationCroissance, k -> {
                         Prices allDividends = getHistoricalDividends(reporting, ezShare, HISTORICAL_NB_OF_YEAR, DIVIDEND_SELECTION.ONLY_REGULAR); // remonte a 10 ans en arriere
-                        Prices dividendPerYear = perfIndexBuilder.buildGroupBy(allDividends, ChartGroupedBy.YEARLY,true);
+                        Prices dividendPerYear = perfIndexBuilder.buildGroupBy(allDividends, GroupedBy.YEARLY,true);
                         Prices croissance = perfIndexBuilder.buildPerfPrices(dividendPerYear, ChartPerfFilter.VARIATION_EN_PERCENT);
 
                         PriceAtDate minimalCroissance = algoEstimationCroissance == ESTIMATION_CROISSANCE_CURRENT_YEAR_ALGO.MINIMAL_CROISSANCE_OF_LAST_TEN_YEARS ?

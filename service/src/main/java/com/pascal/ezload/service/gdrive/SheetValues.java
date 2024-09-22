@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.gdrive;
 
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;

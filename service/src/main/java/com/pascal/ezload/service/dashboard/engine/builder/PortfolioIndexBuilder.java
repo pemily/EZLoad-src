@@ -18,12 +18,16 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.model.Price;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.service.dashboard.config.PortfolioIndex;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.DeviseUtil;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.DeviseUtil;
 
 import java.util.*;
 import java.util.function.Function;

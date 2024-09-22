@@ -22,8 +22,8 @@ import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.StringValue;
 
 public class BourseDirectEZAccountDeclaration extends Checkable<BourseDirectEZAccountDeclaration> implements EZAccountDeclaration, AccountData {
 

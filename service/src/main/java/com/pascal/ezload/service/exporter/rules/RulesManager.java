@@ -22,8 +22,8 @@ import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.FileState;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
-import com.pascal.ezload.service.util.FileProcessor;
-import com.pascal.ezload.service.util.JsonUtil;
+import com.pascal.ezload.common.util.FileProcessor;
+import com.pascal.ezload.common.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -100,7 +100,9 @@ public class RulesManager {
         boolean isNewUserRule = ruleDef.isNewUserRule();
         ruleDef.beforeSave(RulesManager::normalize); // the before save set to null the newUserRule
 
-        JsonUtil.createDefaultWriter().writeValue(new FileWriter(newFilePath, StandardCharsets.UTF_8), ruleDef);
+        try (FileWriter f = new FileWriter(newFilePath, StandardCharsets.UTF_8)) {
+            JsonUtil.createDefaultWriter().writeValue(f, ruleDef);
+        }
 
         if (isRenaming && isNewUserRule){
             // it is a rename, remove the old file
@@ -171,7 +173,9 @@ public class RulesManager {
         function.setScript(Arrays.stream(function.getScript()).map(RulesManager::normalizeNoTrim).collect(Collectors.toList()).toArray(new String[]{}));
 
         function.beforeSave();
-        JsonUtil.createDefaultWriter().writeValue(new FileWriter(commonFile, StandardCharsets.UTF_8), function);
+        try (FileWriter f = new FileWriter(commonFile, StandardCharsets.UTF_8)) {
+            JsonUtil.createDefaultWriter().writeValue(f, function);
+        }
 
         brokerAndFileVersion2CommonFunctionsCache.put(function.getBroker().getDirName()+function.getBrokerFileVersion(), function);
     }

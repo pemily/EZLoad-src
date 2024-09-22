@@ -17,8 +17,8 @@
  */
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.Price;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.Price;
 
 import java.util.HashMap;
 import java.util.Map;

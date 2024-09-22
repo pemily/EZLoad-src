@@ -18,7 +18,7 @@
 package com.pascal.ezload.service.financial;
 
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 
 import java.util.*;
 

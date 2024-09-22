@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.common.model.EZDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -19,6 +19,7 @@ package com.pascal.ezload.service.util;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.pascal.ezload.common.util.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

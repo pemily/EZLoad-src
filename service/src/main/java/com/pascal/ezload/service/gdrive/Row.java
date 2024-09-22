@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.gdrive;
 
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.pascal.ezload.service.util.NumberUtils.str2Float;
-import static com.pascal.ezload.service.util.NumberUtils.str2Int;
+import static com.pascal.ezload.common.util.NumberUtils.str2Float;
+import static com.pascal.ezload.common.util.NumberUtils.str2Int;
 
 public class Row {
 

@@ -27,11 +27,11 @@ import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.gdrive.Row;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZDevise;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.DeviseUtil;
-import com.pascal.ezload.service.util.finance.CurrencyMap;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.DeviseUtil;
+import com.pascal.ezload.common.util.finance.CurrencyMap;
 
 import java.util.Comparator;
 import java.util.HashMap;

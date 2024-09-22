@@ -17,12 +17,12 @@
  */
 package com.pascal.ezload.server.httpserver.exec;
 
+import com.pascal.ezload.ibkr.EZ_IbkrApi;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.server.httpserver.EzServerState;
-import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.util.Tail;
+import com.pascal.ezload.common.util.Tail;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -131,5 +131,6 @@ public class ProcessManager {
             executor.shutdownNow();
             serverState.setProcessRunning(false);
         }
+        EZ_IbkrApi.getInstance().disconnect();
     }
 }

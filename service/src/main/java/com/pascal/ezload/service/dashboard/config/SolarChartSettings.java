@@ -18,8 +18,8 @@
 package com.pascal.ezload.service.dashboard.config;
 
 import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.StringValue;
 
 import java.util.HashSet;
 import java.util.LinkedList;

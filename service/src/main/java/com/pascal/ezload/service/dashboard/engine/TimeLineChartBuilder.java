@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.engine;
 
+import com.pascal.ezload.common.model.GroupedBy;
 import com.pascal.ezload.service.dashboard.ChartLine;
 import com.pascal.ezload.service.dashboard.ChartsTools;
 import com.pascal.ezload.service.dashboard.Colors;
@@ -26,11 +27,11 @@ import com.pascal.ezload.service.dashboard.engine.builder.*;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZDevise;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
 import com.pascal.ezload.service.model.Prices;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.DeviseUtil;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.DeviseUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -93,8 +94,8 @@ public class TimeLineChartBuilder {
             int startDateYear = startDate.getYear();
             startDate = new EZDate(startDate.getYear(), 1, 1); // je démarre toujours au 1er janvier
 
-            ChartsTools.PERIOD_INTERVAL period = chartSettings.getGroupedBy() == ChartGroupedBy.MONTHLY ? ChartsTools.PERIOD_INTERVAL.MONTH
-                    : chartSettings.getGroupedBy() == ChartGroupedBy.YEARLY ? ChartsTools.PERIOD_INTERVAL.YEAR
+            ChartsTools.PERIOD_INTERVAL period = chartSettings.getGroupedBy() == GroupedBy.MONTHLY ? ChartsTools.PERIOD_INTERVAL.MONTH
+                    : chartSettings.getGroupedBy() == GroupedBy.YEARLY ? ChartsTools.PERIOD_INTERVAL.YEAR
                     : ChartsTools.PERIOD_INTERVAL.DAY;
 
             int nbOfYear = today.getYear() - startDate.getYear();
@@ -153,7 +154,7 @@ public class TimeLineChartBuilder {
 
 
 
-    private List<ChartLine> createPortfolioCharts(ChartGroupedBy chartGroupBy, PortfolioIndexBuilder portfolioResult, ChartIndex chartIndex) {
+    private List<ChartLine> createPortfolioCharts(GroupedBy chartGroupBy, PortfolioIndexBuilder portfolioResult, ChartIndex chartIndex) {
         List<ChartLine> allChartLines = new LinkedList<>();
         ChartPortfolioIndexConfig portfolioIndexConfig = chartIndex.getPortfolioIndexConfig();
         if (portfolioIndexConfig != null){
@@ -215,7 +216,7 @@ public class TimeLineChartBuilder {
         return allChartLines;
     }
 
-    private List<ChartLine> createCurrencyCharts(Reporting reporting, ChartGroupedBy chartGroupBy, CurrenciesIndexBuilder currenciesResult, ChartIndex chartIndex) {
+    private List<ChartLine> createCurrencyCharts(Reporting reporting, GroupedBy chartGroupBy, CurrenciesIndexBuilder currenciesResult, ChartIndex chartIndex) {
         List<ChartLine> allChartLines = new LinkedList<>();
         CurrencyIndexConfig currencyIndexConfig = chartIndex.getCurrencyIndexConfig();
         if (currencyIndexConfig != null){
@@ -233,7 +234,7 @@ public class TimeLineChartBuilder {
         return allChartLines;
     }
 
-    private ChartLine.LineStyle getLineStyle(ChartGroupedBy chartGroupBy, ChartIndex chartIndex) {
+    private ChartLine.LineStyle getLineStyle(GroupedBy chartGroupBy, ChartIndex chartIndex) {
         ChartLine.LineStyle lineStyle = ChartLine.LineStyle.LINE_STYLE;
         GraphStyle graphStyle = getGraphStyle(chartGroupBy, chartIndex);
         if (graphStyle == GraphStyle.BAR){
@@ -253,16 +254,16 @@ public class TimeLineChartBuilder {
         return chartLine;
     }
 
-    private GraphStyle getGraphStyle(ChartGroupedBy chartGroupBy, ChartIndex chartIndex){
+    private GraphStyle getGraphStyle(GroupedBy chartGroupBy, ChartIndex chartIndex){
         boolean isLine = true;
         if (chartIndex.getShareIndexConfig() != null) {
-            isLine = chartGroupBy == ChartGroupedBy.DAILY && !chartIndex.getShareIndexConfig().getShareIndex().isCumulable();
+            isLine = chartGroupBy == GroupedBy.DAILY && !chartIndex.getShareIndexConfig().getShareIndex().isCumulable();
         }
         if (chartIndex.getPortfolioIndexConfig() != null){
-            isLine = chartGroupBy == ChartGroupedBy.DAILY && !chartIndex.getPortfolioIndexConfig().getPortfolioIndex().isCumulable();
+            isLine = chartGroupBy == GroupedBy.DAILY && !chartIndex.getPortfolioIndexConfig().getPortfolioIndex().isCumulable();
         }
         if (chartIndex.getCurrencyIndexConfig() != null){
-            isLine = chartGroupBy == ChartGroupedBy.DAILY;
+            isLine = chartGroupBy == GroupedBy.DAILY;
         }
         return isLine ? GraphStyle.LINE : GraphStyle.BAR;
     }

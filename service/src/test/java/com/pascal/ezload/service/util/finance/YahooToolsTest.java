@@ -17,12 +17,15 @@
  */
 package com.pascal.ezload.service.util.finance;
 
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.util.finance.CurrencyMap;
+import com.pascal.ezload.common.util.finance.Dividend;
+import com.pascal.ezload.common.util.finance.YahooTools;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.model.PriceAtDate;
-import com.pascal.ezload.service.util.DeviseUtil;
-import com.pascal.ezload.service.util.HttpUtilCached;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.util.DeviseUtil;
+import com.pascal.ezload.common.util.HttpUtilCached;
+import com.pascal.ezload.common.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -145,8 +148,8 @@ public class YahooToolsTest {
 
     @Test
     public void testCurrencyMap() throws Exception {
-        EZDate from = EZDate.parseYYYMMDDDate("2022/09/04", '/');
-        EZDate to = EZDate.parseYYYMMDDDate("2022/09/11", '/');
+        EZDate from = EZDate.parseYYYYMMDDDate("2022/09/04", '/');
+        EZDate to = EZDate.parseYYYYMMDDDate("2022/09/11", '/');
         List<EZDate> dates = List.of(from, to);
         CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
         float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1, false), false);
@@ -157,8 +160,8 @@ public class YahooToolsTest {
 
     @Test
     public void testCurrencyMap2() throws Exception {
-        EZDate from = EZDate.parseYYYMMDDDate("2021/01/01", '/');
-        EZDate to = EZDate.parseYYYMMDDDate("2023/01/22", '/');
+        EZDate from = EZDate.parseYYYYMMDDDate("2021/01/01", '/');
+        EZDate to = EZDate.parseYYYYMMDDDate("2023/01/22", '/');
         List<EZDate> dates = List.of(from, to);
         CurrencyMap currencyMap = YahooTools.getCurrencyMap(new LoggerReporting(), cache(), DeviseUtil.USD, DeviseUtil.EUR, dates);
         float px = currencyMap.getTargetPrice(new PriceAtDate(from, 1, false), false);
@@ -171,7 +174,7 @@ public class YahooToolsTest {
     public void testSearchDividends() throws Exception {
         Optional<EZShare> action = YahooTools.searchAction(new LoggerReporting(), cache(), "US92936U1097");
         Assertions.assertEquals("W. P. Carey Inc.", action.get().getEzName());
-        List<Dividend> dividends = YahooTools.searchDividends(new LoggerReporting(), cache(), action.get(), EZDate.parseYYYMMDDDate("2021/01/01", '/'));
+        List<Dividend> dividends = YahooTools.searchDividends(new LoggerReporting(), cache(), action.get(), EZDate.parseYYYYMMDDDate("2021/01/01", '/'));
         Assertions.assertEquals(4, dividends.size());
         Assertions.assertEquals("1.048000", dividends.get(0).getAmount());
         Assertions.assertEquals("2021/03/30", dividends.get(0).getDate().toYYYYMMDD());

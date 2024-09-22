@@ -22,8 +22,8 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.EZModel;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.JsonUtil;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.JsonUtil;
 
 import java.io.FileReader;
 import java.io.IOException;

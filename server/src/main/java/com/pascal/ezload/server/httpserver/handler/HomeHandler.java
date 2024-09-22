@@ -32,11 +32,10 @@ import com.pascal.ezload.service.financial.EZActionManager;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.rules.update.RulesVersionManager;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectSearchAccounts;
-import com.pascal.ezload.service.util.FileUtil;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.util.FileUtil;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
@@ -132,7 +131,7 @@ public class HomeHandler {
     public void renameEzProfile(@NotNull @QueryParam("oldProfile") String oldProfileName,
                              @NotNull @QueryParam("newProfile") String newRawProfileName) throws Exception {
 
-        String newProfileName = com.pascal.ezload.service.util.StringUtils.cleanFileName(newRawProfileName);
+        String newProfileName = com.pascal.ezload.common.util.StringUtils.cleanFileName(newRawProfileName);
         if (oldProfileName.equals(newProfileName) || StringUtils.isBlank(newProfileName)) return;
         SettingsManager settingsManager = SettingsManager.getInstance();
         if (StringUtils.isBlank(oldProfileName)){

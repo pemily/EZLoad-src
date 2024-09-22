@@ -17,15 +17,15 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
+import com.pascal.ezload.common.util.BRException;
+import com.pascal.ezload.common.util.DeviseUtil;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EZAccountDeclaration;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectOperation;
-import com.pascal.ezload.service.util.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

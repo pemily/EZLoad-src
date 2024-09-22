@@ -26,7 +26,7 @@ import com.pascal.ezload.service.exporter.rules.RulesEngine;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EZOperation;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 
 import java.io.IOException;
 import java.util.LinkedList;

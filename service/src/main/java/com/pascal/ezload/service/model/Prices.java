@@ -17,8 +17,13 @@
  */
 package com.pascal.ezload.service.model;
 
-import com.pascal.ezload.service.dashboard.config.ChartGroupedBy;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.model.Period;
+import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.model.GroupedBy;
 import com.pascal.ezload.service.dashboard.engine.builder.PerfIndexBuilder;
+
 
 import java.util.*;
 
@@ -122,11 +127,11 @@ public class Prices {
                 PerfIndexBuilder perfIndexBuilder = null;
                 Prices newPrices = null;
                 if (date.getPeriod() == Period.YEARLY){
-                    perfIndexBuilder = new PerfIndexBuilder(ChartGroupedBy.YEARLY);
+                    perfIndexBuilder = new PerfIndexBuilder(GroupedBy.YEARLY);
                     newPrices = perfIndexBuilder.buildGroupBy(this, true);
                 }
                 else if (date.getPeriod() == Period.MONTHLY && period != Period.YEARLY){
-                    perfIndexBuilder = new PerfIndexBuilder(ChartGroupedBy.MONTHLY);
+                    perfIndexBuilder = new PerfIndexBuilder(GroupedBy.MONTHLY);
                     newPrices = perfIndexBuilder.buildGroupBy(this, true);
                 }
                 else if (date.getPeriod() == Period.DAILY && period == Period.DAILY){

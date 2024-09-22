@@ -18,8 +18,7 @@
 package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.util.NumberUtils;
 import org.apache.commons.jexl3.JexlContext;
 
 import java.util.HashMap;

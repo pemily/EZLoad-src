@@ -20,11 +20,8 @@ package com.pascal.ezload.server;
 import com.pascal.ezload.server.httpserver.EZHttpServer;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
-import com.pascal.ezload.service.config.EzProfil;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.rules.update.RulesVersionManager;
-import com.pascal.ezload.service.util.HttpUtil;
+import com.pascal.ezload.common.util.HttpUtil;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
 import java.awt.*;
@@ -32,7 +29,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.util.Set;
 
 
 public class EZLoad {

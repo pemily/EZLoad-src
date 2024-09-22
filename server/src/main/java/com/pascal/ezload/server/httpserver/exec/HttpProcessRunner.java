@@ -17,8 +17,8 @@
  */
 package com.pascal.ezload.server.httpserver.exec;
 
-import com.pascal.ezload.service.util.FileLinkCreator;
-import com.pascal.ezload.service.util.HtmlReporting;
+import com.pascal.ezload.common.util.FileLinkCreator;
+import com.pascal.ezload.common.util.HtmlReporting;
 
 import java.io.Closeable;
 import java.io.IOException;

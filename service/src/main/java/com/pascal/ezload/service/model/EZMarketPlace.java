@@ -17,6 +17,8 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.common.model.EZCountry;
+
 public class EZMarketPlace {
 
     private String stockExchange;

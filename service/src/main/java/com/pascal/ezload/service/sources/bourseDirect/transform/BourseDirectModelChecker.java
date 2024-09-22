@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import org.apache.commons.lang3.StringUtils;
 

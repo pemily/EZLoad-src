@@ -18,9 +18,8 @@
 package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.NumberUtils;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;

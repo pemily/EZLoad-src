@@ -17,9 +17,10 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.common.model.GroupedBy;
 import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.StringValue;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
     private Set<String> excludeBrokers = new HashSet<>();
     private Set<String> excludeAccountTypes = new HashSet<>();
     private StartDateSelection selectedStartDateSelection;
-    private ChartGroupedBy groupedBy;
+    private GroupedBy groupedBy;
     private List<ChartIndex> indexSelection = new LinkedList<>();
 
     // Sur quelles actions ?
@@ -64,7 +65,7 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
     }
 
     public TimeLineChartSettings(RadarChartSettings chartSettings){
-        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.groupedBy = GroupedBy.YEARLY;
         this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
         this.targetDevise = chartSettings.getTargetDevise();
         this.title = chartSettings.getTitle();
@@ -79,7 +80,7 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
     }
 
     public TimeLineChartSettings(SolarChartSettings chartSettings){
-        this.groupedBy = ChartGroupedBy.YEARLY;
+        this.groupedBy = GroupedBy.YEARLY;
         this.selectedStartDateSelection = chartSettings.getSelectedStartDateSelection();
         this.targetDevise = chartSettings.getTargetDevise();
         this.title = chartSettings.getTitle();
@@ -143,11 +144,11 @@ public class TimeLineChartSettings extends Checkable<TimeLineChartSettings> impl
         this.title = title;
     }
 
-    public ChartGroupedBy getGroupedBy() {
+    public GroupedBy getGroupedBy() {
         return groupedBy;
     }
 
-    public void setGroupedBy(ChartGroupedBy groupedBy) {
+    public void setGroupedBy(GroupedBy groupedBy) {
         this.groupedBy = groupedBy;
     }
 

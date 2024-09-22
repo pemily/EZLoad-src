@@ -17,14 +17,12 @@
  */
 package com.pascal.ezload.service.exporter.rules;
 
-import com.pascal.ezload.service.util.StringValue;
-import com.pascal.ezload.service.util.StringValues;
+import com.pascal.ezload.common.util.StringValue;
+import com.pascal.ezload.common.util.StringValues;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class RuleDefinition extends RuleDefinitionSummary {
 

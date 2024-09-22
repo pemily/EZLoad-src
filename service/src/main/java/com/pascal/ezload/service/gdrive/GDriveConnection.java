@@ -31,8 +31,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.FileValue;
+import com.pascal.ezload.common.sources.Reporting;
 
 import java.io.*;
 import java.security.GeneralSecurityException;

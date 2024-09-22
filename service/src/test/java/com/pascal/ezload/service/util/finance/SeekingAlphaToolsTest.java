@@ -17,13 +17,15 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.pascal.ezload.common.util.finance.Dividend;
+import com.pascal.ezload.common.util.finance.SeekingAlphaTools;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.model.EZShare;
-import com.pascal.ezload.service.util.HttpUtil;
-import com.pascal.ezload.service.util.HttpUtilCached;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.util.HttpUtil;
+import com.pascal.ezload.common.util.HttpUtilCached;
+import com.pascal.ezload.common.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -17,8 +17,8 @@
  */
 package com.pascal.ezload.service.exporter.rules;
 
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.StringValue;
 
 import java.util.function.Function;
 

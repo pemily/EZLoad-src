@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.engine.tag;
 
-import com.pascal.ezload.service.model.Tag;
+import com.pascal.ezload.common.model.Tag;
 
 import java.util.LinkedList;
 import java.util.List;

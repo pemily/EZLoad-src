@@ -23,9 +23,9 @@ import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
-import com.pascal.ezload.service.util.FileUtil;
-import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.TextReporting;
+import com.pascal.ezload.common.util.FileUtil;
+import com.pascal.ezload.common.util.ModelUtils;
+import com.pascal.ezload.common.util.TextReporting;
 
 import java.io.File;
 import java.io.IOException;
