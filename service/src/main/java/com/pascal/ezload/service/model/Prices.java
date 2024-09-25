@@ -35,7 +35,7 @@ public class Prices {
     }
 
     private String label;
-    private final ArrayList<PriceAtDate> pricesList = new ArrayList<>();
+    private final LinkedList<PriceAtDate> pricesList = new LinkedList<>();
     private EZDevise devise;
 
     private Period period; // automatically fill when the first priceAtDate is added

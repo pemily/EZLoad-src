@@ -3,6 +3,8 @@ package com.pascal.ezload.ibkr;
 import com.ib.client.Contract;
 import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.model.Period;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.common.util.DeviseUtil;
 import com.pascal.ezload.common.util.LoggerReporting;
@@ -91,6 +93,9 @@ public class EZ_IbkrApi {
         String endDateTime = ""; // Vide signifie "maintenant"
         String duration = computeDuration(from);
         String barSize = "1 day"; // Intervalle d'une journée
+        if (from.getPeriod() == Period.YEARLY ||from.getPeriod() == Period.MONTHLY){
+            barSize = "1 month";
+        }
         int useRTH = 1; // Heures de marché régulières
 
         Prices prices = new Prices();
@@ -98,11 +103,35 @@ public class EZ_IbkrApi {
         prices.setDevise(deviseCode);
         session.init(reporting, prices);
         session.getClient().reqHistoricalData(1, contract, endDateTime, duration, barSize, whatToShow.name(), useRTH, 1, false, null);
-        return session.getPricesToFill();
+        Prices p = session.getPricesToFill();
+        if (p != null && from.getPeriod() == Period.YEARLY){
+            // on recoit tout les mois de la meme année. ne recupere que le dernier de l'année
+            Prices yearlyPrices = new Prices();
+            yearlyPrices.setLabel(pricesLabel);
+            yearlyPrices.setDevise(deviseCode);
+            PriceAtDate latestVisited = null;
+            for (PriceAtDate priceAtDate : p.getPrices()) {
+                if (latestVisited != null && latestVisited.getDate().getYear() != priceAtDate.getDate().getYear()){
+                    yearlyPrices.addPrice(latestVisited);
+                }
+                latestVisited = priceAtDate;
+            }
+            if (latestVisited != null) {
+                yearlyPrices.addPrice(latestVisited);
+            }
+            p = yearlyPrices;
+        }
+        return p;
     }
 
 
     private String computeDuration(EZDate from) {
+        if (from.getPeriod() == Period.YEARLY){
+            return (EZDate.today().getYear() - from.getYear())+" Y";
+        }
+        if (from.getPeriod() == Period.MONTHLY){
+            return from.nbOfMonthesTo(EZDate.today())+" M";
+        }
         long nbOfDays = from.nbOfDaysTo(EZDate.today()); // on recul de n jours // S	Seconds, D	Day, W	Week, M	Month, Y	Year
         if (nbOfDays >= 365){
             int nbOfYear = (int) (nbOfDays / 365);

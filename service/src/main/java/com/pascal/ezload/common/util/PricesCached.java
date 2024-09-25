@@ -9,12 +9,13 @@ import com.pascal.ezload.service.model.Prices;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PricesCached {
     private final String cacheDir;
+
+    private final Map<String, Prices> firstCacheLevel = new HashMap<>();
 
     public PricesCached(String cacheDir){
         this.cacheDir = cacheDir;
@@ -34,25 +35,34 @@ public class PricesCached {
             PriceAtDateJson priceAtDateJson = new PriceAtDateJson();
             priceAtDateJson.setEstimated(priceAtDate.isEstimated());
             priceAtDateJson.setValue(priceAtDate.getValue());
-            priceAtDateJson.setDateYYYYMMDD(priceAtDate.getDate().toYYYYMMDD());
+            priceAtDateJson.setEpochSecond(priceAtDate.getDate().toEpochSecond());
             pricesToSave.getPrices().add(priceAtDateJson);
         });
         try (FileWriter f = new FileWriter(getCacheFile(cacheName), StandardCharsets.UTF_8)) {
             JsonUtil.createDefaultWriter().writeValue(f, pricesToSave);
         }
+        firstCacheLevel.put(cacheName, prices);
     }
 
     public Prices load(String cacheName) throws IOException {
+        Prices p = firstCacheLevel.get(cacheName);
+        if (p != null){
+            return p;
+        }
         try (InputStream fileInputStream = new BufferedInputStream(new FileInputStream(getCacheFile(cacheName)))) {
             SerialisablePrices savedPrices = JsonUtil.readWithDefaultMapper(fileInputStream, SerialisablePrices.class);
             Prices prices = new Prices();
             prices.setLabel(savedPrices.getPriceLabel());
             prices.setDevise(savedPrices.getDeviseCode() == null ? null : DeviseUtil.foundByCode(savedPrices.getDeviseCode()));
-            savedPrices.getPrices().forEach(priceAtDateJson -> {
-                Price price = new Price(priceAtDateJson.getValue(), priceAtDateJson.isEstimated());
-                PriceAtDate priceAtDate = new PriceAtDate(EZDate.parseYYYYMMDDDate(priceAtDateJson.getDateYYYYMMDD(), '/'), price);
-                prices.addPrice(priceAtDate);
+
+            savedPrices.getPrices()
+                    .forEach(priceAtDateJson -> {
+                        Price price = new Price(priceAtDateJson.getValue(), priceAtDateJson.isEstimated());
+                        PriceAtDate priceAtDate = new PriceAtDate(new EZDate(priceAtDateJson.getEpochSecond()), price);
+                        prices.addPrice(priceAtDate);
             });
+
+            firstCacheLevel.put(cacheName, prices);
             return prices;
         }
     }
@@ -64,7 +74,7 @@ public class PricesCached {
     }
 
 
-    public static class SerialisablePrices {
+    public static class SerialisablePrices implements java.io.Serializable{
         private String priceLabel, deviseCode;
         private List<PriceAtDateJson> prices = new LinkedList<>();
 
@@ -94,17 +104,10 @@ public class PricesCached {
     }
 
     public static class PriceAtDateJson {
-        private String dateYYYYMMDD;
+        private long epochSecond;
         private Float value;
         private boolean estimated;
 
-        public String getDateYYYYMMDD() {
-            return dateYYYYMMDD;
-        }
-
-        public void setDateYYYYMMDD(String dateYYYYMMDD) {
-            this.dateYYYYMMDD = dateYYYYMMDD;
-        }
 
         public Float getValue() {
             return value;
@@ -120,6 +123,14 @@ public class PricesCached {
 
         public void setEstimated(boolean estimated) {
             this.estimated = estimated;
+        }
+
+        public long getEpochSecond() {
+            return epochSecond;
+        }
+
+        public void setEpochSecond(long epochSecond) {
+            this.epochSecond = epochSecond;
         }
     }
 }

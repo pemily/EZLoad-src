@@ -172,9 +172,10 @@ public class SharePriceBuilder {
 
                         Price perf = new Price(0);
 
-                        if (prices.getPriceAt(EZDate.yearPeriod(processingYear-analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).getValue() != 0) {
+                        PriceAtDate p = prices.getPriceAt(EZDate.yearPeriod(processingYear - analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE);
+                        if (p.getValue() != null && p.getValue() != 0) {
                             perf = prices.getPriceAt(EZDate.yearPeriod(processingYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE).multiply(Price.CENT)
-                                    .divide(prices.getPriceAt(EZDate.yearPeriod(processingYear - analyseOverNYear), Prices.PERIOD_ALGO.TAKE_LAST_PERIOD_VALUE));
+                                    .divide(p);
                         }
 
                         estimatedPerf.addPrice(new PriceAtDate(date, new Price(calculRendementAnnuel(perf, analyseOverNYear))));
@@ -197,6 +198,7 @@ public class SharePriceBuilder {
             List<PriceAtDate> rendements = getRendementDividendeAnnuel(reporting, share, algoEstimationCroissance).getPrices();
             return new Price((float)rendements
                                             .stream()
+                                            .filter(p -> p.getValue() != null)
                                             .mapToDouble(Price::getValue)
                                             .sum() / rendements.size());
         });

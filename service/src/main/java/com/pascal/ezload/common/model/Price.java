@@ -35,12 +35,12 @@ public class Price {
     }
 
     public Price(Price price){
-        if (price.getValue() == null){
+        if (price.value == null){
             this.value = null; // unknown value
             this.estimated = false;
         }
         else {
-            this.value = price.getValue(); // unknown value
+            this.value = price.value;
             this.estimated = price.estimated;
         }
         this.tags = price.tags == null ? null : new HashMap<>(tags);

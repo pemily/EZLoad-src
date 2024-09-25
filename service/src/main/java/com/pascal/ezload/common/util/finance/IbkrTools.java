@@ -1,8 +1,6 @@
 package com.pascal.ezload.common.util.finance;
 
-import com.pascal.ezload.common.model.EZCountry;
-import com.pascal.ezload.common.model.EZDate;
-import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.model.*;
 import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.common.util.*;
 import com.pascal.ezload.ibkr.EZ_IbkrApi;
@@ -20,11 +18,11 @@ public class IbkrTools {
     public static Prices getPrices(Reporting reporting, PricesCached pricesCache, EZShare ezShare, List<EZDate> listOfDates) throws HttpUtil.DownloadException, IOException, InterruptedException {
         if (!StringUtils.isBlank(ezShare.getGoogleCode())) {
             EZDate from = listOfDates.get(0);
-            Prices sharePrices;
+            Prices result;
 
             String cacheName = getPricesCacheName(ezShare, from);
             if (pricesCache.exists(cacheName)){
-                sharePrices = pricesCache.load(cacheName);
+                result = pricesCache.load(cacheName);
             }
             else {
                 EZ_IbkrApi ibkr = EZ_IbkrApi.getInstance();
@@ -34,13 +32,20 @@ public class IbkrTools {
                 String exchange = GoogleTools.getExchange(fullShareName);
                 String shareCode = GoogleTools.getCodeOnly(fullShareName);
 
-                sharePrices = ibkr.getPrices(reporting, shareCode, exchange, getDevise(ezShare), from);
+                Prices sharePrices = ibkr.getPrices(reporting, shareCode, exchange, getDevise(ezShare), from);
                 if (sharePrices == null){
                     sharePrices = ibkr.getPrices(reporting, shareCode, null, getDevise(ezShare), from);
                 }
-                pricesCache.save(cacheName, sharePrices);
+
+                result = new Prices();
+                result.setLabel(sharePrices.getLabel());
+                result.setDevise(sharePrices.getDevise());
+                new PricesTools<>(sharePrices.getPrices().stream(), listOfDates, PriceAtDate::getDate, pd -> pd, result)
+                        .fillPricesForAListOfDates();
+
+                pricesCache.save(cacheName, result);
             }
-            return checkResult(reporting, ezShare, sharePrices, listOfDates.size());
+            return checkResult(reporting, ezShare, result, listOfDates.size());
         }
         throw new HttpUtil.DownloadException("Pas de code IBKR pour "+ezShare.getEzName());
     }
@@ -73,8 +78,16 @@ public class IbkrTools {
 
             // cette conversion n'existe pas sur le Forex (il faut inverser les devises)
             devisePrices = ibkr.getCurrencyMap(reporting, toDevise, fromDevise, from);
-            pricesCache.save(cacheNameReversed, devisePrices);
-            return new CurrencyMap(toDevise, fromDevise, devisePrices.getPrices()).reverse();
+
+
+            Prices result = new Prices();
+            result.setLabel(devisePrices.getLabel());
+            result.setDevise(devisePrices.getDevise());
+            new PricesTools<>(devisePrices.getPrices().stream(), listOfDates, PriceAtDate::getDate, pd -> pd, result)
+                    .fillPricesForAListOfDates();
+
+            pricesCache.save(cacheNameReversed, result);
+            return new CurrencyMap(toDevise, fromDevise, result.getPrices()).reverse();
         }
 
 
@@ -86,13 +99,17 @@ public class IbkrTools {
     }
 
     public static String getPricesCacheName(EZShare ezShare, EZDate from){
-        return "ibkr_history_" + ezShare.getGoogleCode() + "_" + from.toYYYYMMDD() + "-" + EZDate.today().toYYYYMMDD();
+        return format("ibkr_history_" + ezShare.getGoogleCode() + "_" + from.toYYYYMMDD() + "-" + EZDate.today().toYYYYMMDD()+"-"+from.getPeriod());
     }
 
 
     public static String getCurrencyMapCacheName(EZDevise devise1, EZDevise devise2, EZDate from){
-        return "ibkr_currencyMap_" + devise1.getCode() + "_" + devise2.getCode() + from.toYYYYMMDD() + "-" + "-" + EZDate.today().toYYYYMMDD();
+        return format("ibkr_currencyMap_" + devise1.getCode() + "_" + devise2.getCode() + from.toYYYYMMDD()  + "-" + EZDate.today().toYYYYMMDD()+"-"+from.getPeriod());
     }
 
+    private static String format(String cacheName) {
+        cacheName = cacheName.replaceAll("[*?:/\\\\]", "_");
+        return cacheName;
+    }
 
 }
