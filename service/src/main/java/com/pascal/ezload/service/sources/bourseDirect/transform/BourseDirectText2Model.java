@@ -17,11 +17,11 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect.transform;
 
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.*;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectModel;
 import com.pascal.ezload.service.sources.bourseDirect.transform.model.BourseDirectOperation;
-import com.pascal.ezload.service.util.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

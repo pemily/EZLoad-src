@@ -20,17 +20,12 @@ package com.pascal.ezload.service.dashboard.engine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.dashboard.*;
 import com.pascal.ezload.service.dashboard.config.*;
-import com.pascal.ezload.service.dashboard.engine.builder.*;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.DeviseUtil;
-import com.pascal.ezload.service.util.FileUtil;
-import com.pascal.ezload.service.util.JsonUtil;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.FileUtil;
+import com.pascal.ezload.common.util.JsonUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -153,7 +148,9 @@ public class DashboardManager {
     }
 
     public void saveDashboardSettings(List<DashboardPage> dashboardSettings) throws IOException {
-        JsonUtil.createDefaultWriter().writeValue(new FileWriter(dashboardFile, StandardCharsets.UTF_8), dashboardSettings);
+        try (FileWriter f = new FileWriter(dashboardFile, StandardCharsets.UTF_8)) {
+            JsonUtil.createDefaultWriter().writeValue(f, dashboardSettings);
+        }
     }
 
 }

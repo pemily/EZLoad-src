@@ -20,8 +20,8 @@ package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 import com.pascal.ezload.service.exporter.ezEdition.EzPerformanceEdition;
 import com.pascal.ezload.service.gdrive.Row;
 import com.pascal.ezload.service.gdrive.SheetValues;
-import com.pascal.ezload.service.util.NumberUtils;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.NumberUtils;
+import com.pascal.ezload.common.util.StringUtils;
 
 public class MaPerformance {
     public static final int INPUT_OUTPUT_COL = 0; // 0 car la liste chargé ne contient que la cellule qui doit etre mise a jour

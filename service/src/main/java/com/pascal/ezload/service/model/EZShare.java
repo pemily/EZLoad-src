@@ -17,11 +17,10 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.common.model.EZCountry;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ActionData;
-import com.pascal.ezload.service.util.CountryUtil;
-
-import java.util.Objects;
+import com.pascal.ezload.common.util.CountryUtil;
 
 /**
  * Si l'action a ete cree depuis la 1ere lecture d'un nouveau EZPortfolio, elle aura un ticker Google mais pas le ISIN

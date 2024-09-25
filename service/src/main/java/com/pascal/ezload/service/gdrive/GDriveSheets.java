@@ -21,11 +21,11 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.BRException;
-import com.pascal.ezload.service.util.Sleep;
-import com.pascal.ezload.service.util.StringUtils;
-import com.pascal.ezload.service.util.SupplierThatThrow;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.BRException;
+import com.pascal.ezload.common.util.Sleep;
+import com.pascal.ezload.common.util.StringUtils;
+import com.pascal.ezload.common.util.SupplierThatThrow;
 
 import java.io.IOException;
 import java.util.*;

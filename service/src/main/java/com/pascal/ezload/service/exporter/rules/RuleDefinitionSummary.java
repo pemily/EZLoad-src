@@ -18,7 +18,7 @@
 package com.pascal.ezload.service.exporter.rules;
 
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.Checkable;
+import com.pascal.ezload.common.util.Checkable;
 
 import java.util.Arrays;
 import java.util.function.Function;

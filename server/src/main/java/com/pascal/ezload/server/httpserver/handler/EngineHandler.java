@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.server.httpserver.handler;
 
+import com.pascal.ezload.common.util.StringUtils;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
@@ -31,10 +32,10 @@ import com.pascal.ezload.service.exporter.ezEdition.*;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
 import com.pascal.ezload.service.exporter.rules.RuleDefinitionSummary;
 import com.pascal.ezload.service.exporter.rules.RulesEngine;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.model.EZModel;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectAnalyser;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
@@ -254,7 +255,7 @@ public class EngineHandler {
     @Produces(MediaType.APPLICATION_JSON)
     // input format is: 2021-11-09T22:52:57.346Z
     public EzProcess setStartDate(@NotNull @QueryParam("date") String startDate, @NotNull BourseDirectEZAccountDeclaration account) throws Exception {
-        String[] dateTime = com.pascal.ezload.service.util.StringUtils.divide(startDate, 'T');
+        String[] dateTime = StringUtils.divide(startDate, 'T');
         if (dateTime == null || dateTime.length != 2){
             throw new IllegalArgumentException("Invalid date format: "+startDate);
         }

@@ -18,9 +18,8 @@
 package com.pascal.ezload.service.exporter;
 
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.FileValue;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.StringValue;
 
 public class EZPortfolioSettings extends Checkable<EZPortfolioSettings> {
 

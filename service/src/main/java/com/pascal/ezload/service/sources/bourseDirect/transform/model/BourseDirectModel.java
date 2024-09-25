@@ -18,9 +18,8 @@
 package com.pascal.ezload.service.sources.bourseDirect.transform.model;
 
 
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BourseDirectModel {

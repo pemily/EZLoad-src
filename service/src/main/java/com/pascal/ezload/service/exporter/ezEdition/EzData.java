@@ -18,14 +18,14 @@
 package com.pascal.ezload.service.exporter.ezEdition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.pascal.ezload.service.util.NumberUtils.str2Float;
-import static com.pascal.ezload.service.util.NumberUtils.str2Int;
+import static com.pascal.ezload.common.util.NumberUtils.str2Float;
+import static com.pascal.ezload.common.util.NumberUtils.str2Int;
 
 public class EzData {
 

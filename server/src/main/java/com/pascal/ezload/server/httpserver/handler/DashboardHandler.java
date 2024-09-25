@@ -29,7 +29,7 @@ import com.pascal.ezload.service.dashboard.config.DashboardPage;
 import com.pascal.ezload.service.dashboard.engine.DashboardManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.*;

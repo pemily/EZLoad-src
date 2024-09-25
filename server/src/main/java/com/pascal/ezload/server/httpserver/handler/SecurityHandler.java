@@ -20,19 +20,17 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.server.httpserver.exec.EzProcess;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
 import com.pascal.ezload.service.config.AuthInfo;
-import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 
 
 @Path("security")

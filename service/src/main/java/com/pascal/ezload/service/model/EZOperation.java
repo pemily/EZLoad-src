@@ -19,6 +19,7 @@ package com.pascal.ezload.service.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.OperationData;

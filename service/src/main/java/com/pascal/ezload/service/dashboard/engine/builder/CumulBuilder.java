@@ -17,7 +17,7 @@
  */
 package com.pascal.ezload.service.dashboard.engine.builder;
 
-import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
 
 public class CumulBuilder {

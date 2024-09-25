@@ -17,9 +17,11 @@
  */
 package com.pascal.ezload.service.dashboard.config;
 
+import com.pascal.ezload.common.model.GroupedBy;
+
 public class ChartPerfSettings {
 
-    private ChartGroupedBy perfGroupedBy; // calcul: la valeur du Price à la date n - la valeur du Price à la date n-1
+    private GroupedBy perfGroupedBy; // calcul: la valeur du Price à la date n - la valeur du Price à la date n-1
     private ChartPerfFilter perfFilter; // Transformé en % ou reste en valeur ?
 
     public ChartPerfFilter getPerfFilter() {
@@ -30,11 +32,11 @@ public class ChartPerfSettings {
         this.perfFilter = perfFilter;
     }
 
-    public ChartGroupedBy getPerfGroupedBy() {
+    public GroupedBy getPerfGroupedBy() {
         return perfGroupedBy;
     }
 
-    public void setPerfGroupedBy(ChartGroupedBy perfGroupedBy) {
+    public void setPerfGroupedBy(GroupedBy perfGroupedBy) {
         this.perfGroupedBy = perfGroupedBy;
     }
 

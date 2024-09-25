@@ -21,7 +21,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.security.AuthManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.ezload.service.util.FileUtil;
+import com.pascal.ezload.common.util.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 

@@ -19,7 +19,7 @@ package com.pascal.ezload.service.exporter;
 
 
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

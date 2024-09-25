@@ -17,18 +17,18 @@
  */
 package com.pascal.ezload.service.util.finance;
 
+import com.pascal.ezload.common.util.finance.BourseDirectTools;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.HttpUtilCached;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.util.HttpUtilCached;
+import com.pascal.ezload.common.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

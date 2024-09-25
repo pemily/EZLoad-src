@@ -19,9 +19,8 @@ package com.pascal.ezload.service.exporter.rules.exprEvaluator;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
-import com.pascal.ezload.service.util.LoggerReporting;
-import com.pascal.ezload.service.util.ModelUtils;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.util.LoggerReporting;
+import com.pascal.ezload.common.util.NumberUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

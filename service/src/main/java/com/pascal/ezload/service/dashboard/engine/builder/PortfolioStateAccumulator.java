@@ -21,12 +21,12 @@ import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.OperationTitle;
 import com.pascal.ezload.service.gdrive.Row;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.Price;
-import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.Price;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;

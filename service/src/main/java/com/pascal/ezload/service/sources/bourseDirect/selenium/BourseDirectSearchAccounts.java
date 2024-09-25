@@ -20,14 +20,13 @@ package com.pascal.ezload.service.sources.bourseDirect.selenium;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BourseDirectSearchAccounts extends BourseDirectSeleniumHelper {

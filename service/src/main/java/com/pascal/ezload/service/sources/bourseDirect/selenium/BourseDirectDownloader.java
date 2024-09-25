@@ -17,15 +17,16 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
+import com.pascal.ezload.common.util.BRException;
+import com.pascal.ezload.common.util.Month;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
-import com.pascal.ezload.service.util.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
@@ -35,8 +36,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

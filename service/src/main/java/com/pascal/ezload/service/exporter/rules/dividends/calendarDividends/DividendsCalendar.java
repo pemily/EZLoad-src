@@ -20,10 +20,10 @@ package com.pascal.ezload.service.exporter.rules.dividends.calendarDividends;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.exporter.ezEdition.EzPortefeuilleEdition;
 import com.pascal.ezload.service.exporter.rules.dividends.DividendsAlgo;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.NumberUtils;
-import com.pascal.ezload.service.util.finance.Dividend;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.NumberUtils;
+import com.pascal.ezload.common.util.finance.Dividend;
 
 import java.util.List;
 import java.util.Map;

@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.util;
 
+import com.pascal.ezload.common.util.NumberUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

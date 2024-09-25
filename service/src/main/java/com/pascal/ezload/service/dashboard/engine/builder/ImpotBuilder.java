@@ -18,10 +18,10 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 import com.pascal.ezload.service.dashboard.ImpotChart;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.EZDevise;
-import com.pascal.ezload.service.util.CountryUtil;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.util.CountryUtil;
+import com.pascal.ezload.common.util.NumberUtils;
 
 import java.util.HashMap;
 import java.util.Map;

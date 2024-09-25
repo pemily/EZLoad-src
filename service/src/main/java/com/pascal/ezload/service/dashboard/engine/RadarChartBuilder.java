@@ -17,16 +17,15 @@
  */
 package com.pascal.ezload.service.dashboard.engine;
 
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.dashboard.*;
 import com.pascal.ezload.service.dashboard.config.ChartIndex;
 import com.pascal.ezload.service.dashboard.config.RadarChartSettings;
 import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.NumberUtils;
 
 import java.io.IOException;
 import java.util.*;

@@ -19,7 +19,7 @@ package com.pascal.ezload.service.sources.bourseDirect.transform;
 
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.model.BrokerCustomCode;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.*;

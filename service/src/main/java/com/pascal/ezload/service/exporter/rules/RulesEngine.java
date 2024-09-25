@@ -30,13 +30,13 @@ import com.pascal.ezload.service.exporter.rules.dividends.annualDividends.Annual
 import com.pascal.ezload.service.exporter.rules.dividends.calendarDividends.DividendsCalendar;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.model.EZDate;
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.model.EZOperation;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.JsonUtil;
-import com.pascal.ezload.service.util.finance.Dividend;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.JsonUtil;
+import com.pascal.ezload.common.util.finance.Dividend;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

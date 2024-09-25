@@ -23,7 +23,7 @@ import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectEZAccountDeclaration;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
 import com.pascal.ezload.service.sources.bourseDirect.selenium.BourseDirectDownloader;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.util.LoggerReporting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -18,11 +18,11 @@
 package com.pascal.ezload.service.dashboard.engine.builder;
 
 import com.pascal.ezload.service.dashboard.config.ShareIndex;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.model.Price;
-import com.pascal.ezload.service.model.PriceAtDate;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.Price;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.service.model.Prices;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 
 import java.util.HashMap;
 import java.util.List;

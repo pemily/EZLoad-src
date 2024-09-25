@@ -22,16 +22,14 @@ import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.sources.Reporting;
+import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.ezload.service.util.BaseSelenium;
-import com.pascal.ezload.service.util.Sleep;
+import com.pascal.ezload.common.util.BaseSelenium;
+import com.pascal.ezload.common.util.Sleep;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-
-import java.util.function.Consumer;
 
 public class BourseDirectSeleniumHelper extends BaseSelenium {
 

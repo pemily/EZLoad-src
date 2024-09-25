@@ -22,11 +22,10 @@ import com.pascal.ezload.service.exporter.ezEdition.EzDataKey;
 import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.util.EZActionManagerUtil;
-import com.pascal.ezload.service.util.LoggerReporting;
+import com.pascal.ezload.common.util.LoggerReporting;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 
 public class EZActionManagerTest {

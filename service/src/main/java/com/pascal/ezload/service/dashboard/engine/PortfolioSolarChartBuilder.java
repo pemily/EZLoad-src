@@ -24,9 +24,9 @@ import com.pascal.ezload.service.dashboard.config.TimeLineChartSettings;
 import com.pascal.ezload.service.exporter.EZPortfolioProxy;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.model.EZDate;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.NumberUtils;
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.NumberUtils;
 
 import java.io.IOException;
 import java.util.*;

@@ -17,8 +17,8 @@
  */
 package com.pascal.ezload.service.dashboard.engine.tag;
 
-import com.pascal.ezload.service.model.PriceAtDate;
-import com.pascal.ezload.service.model.Tag;
+import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.model.Tag;
 
 public class DividendInfo implements Tag {
 

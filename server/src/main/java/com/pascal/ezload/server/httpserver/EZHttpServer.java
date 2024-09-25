@@ -18,11 +18,10 @@
 package com.pascal.ezload.server.httpserver;
 
 import com.pascal.ezload.server.httpserver.handler.LastAccessProvider;
-import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.FileLinkCreator;
+import com.pascal.ezload.common.util.FileLinkCreator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;

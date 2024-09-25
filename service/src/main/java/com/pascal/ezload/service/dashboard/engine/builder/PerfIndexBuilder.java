@@ -17,6 +17,10 @@
  */
 package com.pascal.ezload.service.dashboard.engine.builder;
 
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.GroupedBy;
+import com.pascal.ezload.common.model.Price;
+import com.pascal.ezload.common.model.PriceAtDate;
 import com.pascal.ezload.service.dashboard.config.*;
 import com.pascal.ezload.service.model.*;
 
@@ -25,9 +29,9 @@ import java.util.function.Supplier;
 
 public class PerfIndexBuilder {
 
-    private final ChartGroupedBy defaultGroupedBy;
+    private final GroupedBy defaultGroupedBy;
 
-    public PerfIndexBuilder(ChartGroupedBy defaultGroupedBy){
+    public PerfIndexBuilder(GroupedBy defaultGroupedBy){
         this.defaultGroupedBy = defaultGroupedBy;
     }
 
@@ -40,7 +44,7 @@ public class PerfIndexBuilder {
                                 createGroupedPrices(prices, defaultGroupedBy, init(), keepLast()); // we always take the most recent data
     }
 
-    public Prices buildGroupBy(Prices prices, ChartGroupedBy groupedBy, boolean isCumulable){
+    public Prices buildGroupBy(Prices prices, GroupedBy groupedBy, boolean isCumulable){
         return isCumulable ? createGroupedPrices(prices, groupedBy, init(), sum()) : // we sum all the data inside the same period
                 createGroupedPrices(prices, groupedBy, init(), keepLast()); // we always take the most recent data
     }
@@ -58,8 +62,8 @@ public class PerfIndexBuilder {
     }
 
 
-    private Prices createGroupedPrices(Prices prices, ChartGroupedBy groupedBy, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
-        if (groupedBy == ChartGroupedBy.DAILY || prices.getPrices().isEmpty()) return prices;
+    private Prices createGroupedPrices(Prices prices, GroupedBy groupedBy, Supplier<Price> groupByFirstValueFct, BiFunction<Price, Price, Price> groupByFct) {
+        if (groupedBy == GroupedBy.DAILY || prices.getPrices().isEmpty()) return prices;
 
         PriceAtDate firstDate = prices.getPrices().get(0);
 
@@ -147,7 +151,7 @@ public class PerfIndexBuilder {
     }
 
 
-    private static EZDate createPeriod(ChartGroupedBy groupedBy, EZDate date) {
+    private static EZDate createPeriod(GroupedBy groupedBy, EZDate date) {
         return switch (groupedBy) {
             case DAILY -> date;
             case MONTHLY -> EZDate.monthPeriod(date.getYear(), date.getMonth());

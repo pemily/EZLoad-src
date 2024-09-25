@@ -17,11 +17,10 @@
  */
 package com.pascal.ezload.server.httpserver.handler;
 
-import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.util.StringUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;

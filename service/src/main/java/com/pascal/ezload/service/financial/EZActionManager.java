@@ -17,13 +17,16 @@
  */
 package com.pascal.ezload.service.financial;
 
+import com.pascal.ezload.common.model.EZDate;
+import com.pascal.ezload.common.model.EZDevise;
+import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.util.*;
+import com.pascal.ezload.common.util.finance.*;
 import com.pascal.ezload.service.dashboard.engine.builder.SharePriceBuilder;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.ShareValue;
 import com.pascal.ezload.service.model.*;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.*;
-import com.pascal.ezload.service.util.finance.*;
+import com.pascal.ezload.common.sources.Reporting;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -36,12 +39,14 @@ import java.util.stream.Collectors;
 public class EZActionManager {
     private static final Logger logger = Logger.getLogger("EZActionManager");
 
-    private final HttpUtilCached cache;
+    private final HttpUtilCached httpCache;
+    private final PricesCached pricesCache;
     private final String shareDataFile;
     private ShareDataFileContent ezShareData;
 
     public EZActionManager(String cacheDir, String shareDataFile) throws IOException {
-        this.cache = new HttpUtilCached(cacheDir);
+        this.httpCache = new HttpUtilCached(cacheDir);
+        this.pricesCache = new PricesCached(cacheDir);
         this.shareDataFile = shareDataFile;
         loadEZActions();
     }
@@ -88,9 +93,9 @@ public class EZActionManager {
                 .orElseGet(() -> {
                     // does not yet exist, create it
                     try {
-                        Optional<EZShare> ezAction = BourseDirectTools.searchAction(reporting, cache, isin, broker, ezData);
+                        Optional<EZShare> ezAction = BourseDirectTools.searchAction(reporting, httpCache, isin, broker, ezData);
                         if (ezAction.isPresent()){
-                            YahooTools.addYahooInfoTo(reporting, cache, ezAction.get());
+                            YahooTools.addYahooInfoTo(reporting, httpCache, ezAction.get());
                             EZShare newAction = ezAction.get();
                             newAction.setDescription(EZShare.NEW_SHARE);
                             ezShareData.getShares().add(newAction);
@@ -181,7 +186,9 @@ public class EZActionManager {
     private void saveEZActions() throws IOException {
         ezShareData.getShares()
                 .sort(Comparator.comparing(EZShare::getEzName, Comparator.nullsLast(Comparator.naturalOrder())));
-        JsonUtil.createDefaultWriter().writeValue(new FileWriter(shareDataFile, StandardCharsets.UTF_8), ezShareData);
+        try (FileWriter f = new FileWriter(shareDataFile, StandardCharsets.UTF_8)) {
+            JsonUtil.createDefaultWriter().writeValue(f, ezShareData);
+        }
     }
 
     public ActionWithMsg createActionWithSimpleMsg() {
@@ -251,23 +258,25 @@ public class EZActionManager {
         EZDate fixedFrom = from.toStartPeriodDate();
         try(Reporting reporting = rep.pushSection("Extraction des dividendes pour "+ezShare.getEzName())) {
             List<Dividend> dividends = null;
-            try {
-                if (cache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
-                    dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom);
-                }
+            // TODO PASCAL
 
-                if (dividends == null && !cache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom)) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
-                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+            try {
+                if (httpCache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
+                    dividends = SeekingAlphaTools.searchDividends(reporting, httpCache, ezShare, fixedFrom);
+                }
+/*
+                if (dividends == null && !httpCache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom)) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
+                    dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, httpCache, ezShare, fixedFrom));
                 }
 
                 if (dividends == null && !StringUtils.isBlank(ezShare.getYahooCode())){
-                    dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+                    dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, httpCache, ezShare, fixedFrom));
                 }
-
+*/
             }
             catch (Exception e){
                 reporting.info("Tentative avec YahooFinance");
-                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, cache, ezShare, fixedFrom));
+                dividends = retryIfDownloadError(rep, 2, () -> YahooTools.searchDividends(reporting, httpCache, ezShare, fixedFrom));
             }
             return dividends;
         }
@@ -311,12 +320,12 @@ public class EZActionManager {
             EZDate to = EZDate.today().minusDays(3); // do not take the current days, since the current price is not always up to date
             EZDate from = to.minusDays(12);
             try {
-                yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, cache, ezShare, from, to));
+                yahooPrices = StringUtils.isBlank(ezShare.getYahooCode()) ? null : retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, httpCache, ezShare, from, to));
             } catch (Exception e) {
             }
             Prices seekingPrices = null;
             try {
-                seekingPrices = StringUtils.isBlank(ezShare.getSeekingAlphaCode()) ? null : retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ezShare, from, to));
+                seekingPrices = StringUtils.isBlank(ezShare.getSeekingAlphaCode()) ? null : retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, httpCache, ezShare, from, to));
             } catch (Exception e) {
             }
             Prices googlePrices = null;
@@ -349,11 +358,11 @@ public class EZActionManager {
 */
 
             try {
-                List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
+                List<Dividend> dividends = SeekingAlphaTools.searchDividends(reporting, httpCache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
                 checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "seekingAlpha");
             } catch (Exception e) {
                 try {
-                    List<Dividend> dividends = YahooTools.searchDividends(reporting, cache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
+                    List<Dividend> dividends = YahooTools.searchDividends(reporting, httpCache, ezShare, EZDate.today().minusYears(SharePriceBuilder.HISTORICAL_NB_OF_YEAR));
                     checkPasDeBaisseDeDividendes(reporting, errors, ezShare, dividends, "yahoo");
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "Erreur lors du téléchargement des dividendes sur seekingAlpha & yahoo de l'action " + toString(ezShare), e);
@@ -414,7 +423,8 @@ public class EZActionManager {
 
     public CurrencyMap getCurrencyMap(Reporting rep, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche de la conversion "+fromDevise+" vers "+toDevise)) {
-            return retryIfDownloadError(rep, 2, () -> YahooTools.getCurrencyMap(reporting, cache, fromDevise, toDevise, listOfDates));
+            return IbkrTools.getCurrencyMap(rep, pricesCache, fromDevise, toDevise, listOfDates);
+            //return retryIfDownloadError(rep, 2, () -> YahooTools.getCurrencyMap(reporting, httpCache, fromDevise, toDevise, listOfDates));
         }
     }
 
@@ -480,16 +490,19 @@ public class EZActionManager {
     public Prices getPrices(Reporting rep, EZShare ez, EZDate from, EZDate to) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
             Prices prices = null;
+
+            // TODO PASCAL
+
             try {
-                if (cache.exists(SeekingAlphaTools.getPricesCacheName(ez, from))) {
-                    prices = SeekingAlphaTools.getPrices(reporting, cache, ez, from, to);
+                if (httpCache.exists(SeekingAlphaTools.getPricesCacheName(ez, from))) {
+                    prices = SeekingAlphaTools.getPrices(reporting, httpCache, ez, from, to);
                 }
                 if (prices == null) {
-                    prices = retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, cache, ez, from, to));
+                    prices = retryIfDownloadError(rep, 2, () -> YahooTools.getPrices(reporting, httpCache, ez, from, to));
                 }
             }
             catch(Exception e){
-                prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ez, from, to));
+                prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, httpCache, ez, from, to));
             }
             return prices;
         }
@@ -498,6 +511,9 @@ public class EZActionManager {
     public Prices getPrices(Reporting rep, EZShare ez, List<EZDate> listOfDates) throws Exception {
         try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
             Prices prices = null;
+
+            prices = IbkrTools.getPrices(reporting, pricesCache, ez, listOfDates);
+            /*
             try {
                 if (cache.exists(SeekingAlphaTools.getPricesCacheName(ez, listOfDates.get(0)))) {
                     prices = SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates);
@@ -508,7 +524,7 @@ public class EZActionManager {
             }
             catch(Exception e){
                 prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, cache, ez, listOfDates));
-            }
+            }*/
             return prices;
         }
     }

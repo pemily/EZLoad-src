@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.model;
 
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.BrokerData;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.ReportData;

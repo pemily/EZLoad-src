@@ -27,8 +27,8 @@ import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.EZPorfolioProxyV5_V6
 import com.pascal.ezload.service.exporter.ezPortfolio.v5_v6.MesOperations;
 import com.pascal.ezload.service.gdrive.GDriveConnection;
 import com.pascal.ezload.service.gdrive.GDriveSheets;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.StringUtils;
 
 import java.util.*;
 

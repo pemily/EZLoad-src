@@ -19,9 +19,9 @@ package com.pascal.ezload.service.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pascal.ezload.service.financial.EZActionManager;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.FileValue;
-import com.pascal.ezload.service.util.StringValue;
+import com.pascal.ezload.common.util.Checkable;
+import com.pascal.ezload.common.util.FileValue;
+import com.pascal.ezload.common.util.StringValue;
 
 public class MainSettings {
 

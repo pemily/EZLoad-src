@@ -18,9 +18,9 @@
 package com.pascal.ezload.service.rules.update;
 
 import com.pascal.ezload.service.config.MainSettings;
-import com.pascal.ezload.service.sources.Reporting;
-import com.pascal.ezload.service.util.FileProcessor;
-import com.pascal.ezload.service.util.StringUtils;
+import com.pascal.ezload.common.sources.Reporting;
+import com.pascal.ezload.common.util.FileProcessor;
+import com.pascal.ezload.common.util.StringUtils;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.EmptyCommitException;
 import org.eclipse.jgit.api.errors.GitAPIException;

@@ -20,8 +20,7 @@ package com.pascal.ezload.service.config;
 import com.pascal.ezload.service.exporter.EZPortfolioSettings;
 import com.pascal.ezload.service.model.EnumEZBroker;
 import com.pascal.ezload.service.sources.bourseDirect.BourseDirectSettings;
-import com.pascal.ezload.service.util.Checkable;
-import com.pascal.ezload.service.util.FileValue;
+import com.pascal.ezload.common.util.Checkable;
 
 
 public class EzProfil extends Checkable<EzProfil> {

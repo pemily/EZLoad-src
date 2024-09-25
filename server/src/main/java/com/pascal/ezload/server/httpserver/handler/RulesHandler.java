@@ -20,7 +20,6 @@ package com.pascal.ezload.server.httpserver.handler;
 import com.pascal.ezload.server.EZLoad;
 import com.pascal.ezload.server.httpserver.EzServerState;
 import com.pascal.ezload.server.httpserver.exec.ProcessManager;
-import com.pascal.ezload.service.config.MainSettings;
 import com.pascal.ezload.service.config.SettingsManager;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.rules.CommonFunctions;
@@ -28,14 +27,13 @@ import com.pascal.ezload.service.exporter.rules.RuleDefinition;
 import com.pascal.ezload.service.exporter.rules.RulesManager;
 import com.pascal.ezload.service.exporter.rules.exprEvaluator.ExpressionEvaluator;
 import com.pascal.ezload.service.model.EnumEZBroker;
-import com.pascal.ezload.service.util.TextReporting;
+import com.pascal.ezload.common.util.TextReporting;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,7 +110,7 @@ public class RulesHandler {
     }
 
     @GET
-    @Path("common/{broker}/{brokerFileVersion}")
+    @Path("com/pascal/ezload/{broker}/{brokerFileVersion}")
     @Produces(MediaType.APPLICATION_JSON)
     public CommonFunctions getCommonFunction(@NotNull @PathParam("broker") EnumEZBroker broker,
                                              @NotNull @PathParam("brokerFileVersion") int brokerFileVersion) throws Exception {

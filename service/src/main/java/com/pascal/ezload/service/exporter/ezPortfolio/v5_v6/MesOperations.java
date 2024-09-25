@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.exporter.ezPortfolio.v5_v6;
 
+import com.pascal.ezload.common.model.EZDate;
 import com.pascal.ezload.service.exporter.ezEdition.EzData;
 import com.pascal.ezload.service.exporter.ezEdition.EzOperationEdition;
 import com.pascal.ezload.service.exporter.ezEdition.data.common.AccountData;
