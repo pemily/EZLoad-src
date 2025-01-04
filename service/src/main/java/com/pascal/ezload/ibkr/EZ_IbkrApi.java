@@ -1,14 +1,17 @@
 package com.pascal.ezload.ibkr;
 
 import com.ib.client.Contract;
-import com.pascal.ezload.common.model.EZDate;
-import com.pascal.ezload.common.model.EZDevise;
-import com.pascal.ezload.common.model.Period;
-import com.pascal.ezload.common.model.PriceAtDate;
+import com.pascal.ezload.common.model.*;
 import com.pascal.ezload.common.sources.Reporting;
 import com.pascal.ezload.common.util.DeviseUtil;
 import com.pascal.ezload.common.util.LoggerReporting;
 import com.pascal.ezload.service.model.Prices;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
 
 public class EZ_IbkrApi {
 
@@ -73,7 +76,63 @@ public class EZ_IbkrApi {
     public Prices getPrices(Reporting reporting, String shareSymbol, String exchange, EZDevise deviseCode, EZDate from) throws InterruptedException {
         Contract contract = getContract(shareSymbol, exchange, deviseCode);
 
-        return searchHistoricalData(reporting, "Prices of "+ exchange +":"+ shareSymbol, deviseCode, from, contract, WhatToShow.TRADES);
+        return searchHistoricalData(reporting, "Prices of "+ exchange +":"+ shareSymbol, deviseCode, from, null, contract, WhatToShow.TRADES);
+    }
+
+    // exchange can be: null (SMART will be used) NYSE, NASDAQ, AMEX, Euronext, LSE (London Stock Exchange), etc ...
+    // ajuste le prix de l'action pour ne pas subir la baisse dûe au paiement des dividendes ou a un split d'actions
+    // Ici a la date du jour, le Prices et le adjustedPrices seront toujours identique, mais lorsque l'on remonte le temps on verra que le adjusted prices sera plus bas car il integrera les dividendes ou les splits
+    public Prices getAdjustedPrices(Reporting reporting, String shareSymbol, String exchange, EZDevise deviseCode, EZDate from) throws InterruptedException {
+        Contract contract = getContract(shareSymbol, exchange, deviseCode);
+
+        return searchHistoricalData(reporting, "Adjusted Prices of "+ exchange +":"+ shareSymbol, deviseCode, from, null, contract, WhatToShow.ADJUSTED_LAST);
+    }
+
+    public Prices getDividends(Reporting reporting, String shareSymbol, String exchange, EZDevise deviseCode, EZDate from) throws InterruptedException {
+        if (from.isPeriod())
+            throw new IllegalArgumentException("From cannot be a period");
+
+        Contract contract = getContract(shareSymbol, exchange, deviseCode);
+
+        List<PriceAtDate> dividends = new ArrayList<>(50);
+        Prices prices = searchHistoricalData(reporting, "Prices of " + exchange + ":" + shareSymbol, deviseCode, from, null, contract, WhatToShow.TRADES);
+        if (prices == null) return null;
+
+        Prices adjustedPrices = searchHistoricalData(reporting, "Adjusted Prices of " + exchange + ":" + shareSymbol, deviseCode, from, null, contract, WhatToShow.ADJUSTED_LAST);
+        if (adjustedPrices == null) return null;
+
+        List<PriceAtDate> priceAtDateList = new ArrayList<>(prices.getPrices());
+
+        Price previousAdjustedPrice = null;
+        PriceAtDate previousTradePrice = null;
+
+        for (ListIterator<PriceAtDate> iter = priceAtDateList.listIterator(priceAtDateList.size()); iter.hasPrevious(); ) {
+            PriceAtDate tradePrice = iter.previous();  // the list will be processed in the reversed order from now to the past
+            PriceAtDate adjustedPrice = adjustedPrices.getPriceAt(tradePrice.getDate());
+            if (previousAdjustedPrice != null) {
+                // Facteur d'ajustement entre deux jours consécutifs
+                Price adjustmentFactor = adjustedPrice.divide(previousAdjustedPrice);
+                // Calcul du prix attendu en fonction de ce facteur
+                Price expectedTrade = previousTradePrice.multiply(adjustmentFactor);
+
+                // Différence entre le prix attendu et le prix réel
+                Price dividend = tradePrice.minus(expectedTrade);
+
+                if (dividend.getValue() > 0.02f) { // à cause des pb de float et de precision
+                    dividends.add(new PriceAtDate(previousTradePrice.getDate(), new Price(dividend.round().getValue(), true)));
+                }
+            }
+            previousAdjustedPrice = adjustedPrice;
+            previousTradePrice = tradePrice;
+        }
+
+        Prices result = new Prices();
+        result.setDevise(deviseCode);
+        result.setLabel("Dividends of "+shareSymbol);
+        for (ListIterator<PriceAtDate> iter = dividends.listIterator(dividends.size()); iter.hasPrevious(); ){
+            result.addPrice(iter.previous());
+        }
+        return result;
     }
 
     public Prices getCurrencyMap(Reporting reporting, EZDevise fromDevise, EZDevise toDevise, EZDate from) throws InterruptedException {
@@ -84,13 +143,19 @@ public class EZ_IbkrApi {
         contract.secType(ContractType.CASH.name()); // Type du contrat: Forex
         contract.exchange("IDEALPRO"); // exchange pour Forex
 
-        return searchHistoricalData(reporting, fromDevise.getSymbol()+" => "+toDevise.getSymbol(), null, from, contract, WhatToShow.MIDPOINT);
+        return searchHistoricalData(reporting, fromDevise.getSymbol()+" => "+toDevise.getSymbol(), null, from, null, contract, WhatToShow.MIDPOINT);
     }
 
 
-    private Prices searchHistoricalData(Reporting reporting, String pricesLabel, EZDevise deviseCode, EZDate from, Contract contract, WhatToShow whatToShow) throws InterruptedException {
+    private Prices searchHistoricalData(Reporting reporting, String pricesLabel, EZDevise deviseCode, EZDate from, EZDate to, Contract contract, WhatToShow whatToShow) throws InterruptedException {
         // Période de temps pour les données historiques
         String endDateTime = ""; // Vide signifie "maintenant"
+        if (to != null) {
+            // Formatteur pour correspondre au format attendu
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd"); // -HH:mm:ss
+            // Conversion en chaîne de caractères
+            endDateTime = to.toLocalDate().format(formatter) +  "-23:50:00";
+        }
         String duration = computeDuration(from);
         String barSize = "1 day"; // Intervalle d'une journée
         if (from.getPeriod() == Period.YEARLY ||from.getPeriod() == Period.MONTHLY){
@@ -156,9 +221,11 @@ public class EZ_IbkrApi {
         LoggerReporting loggerReporting = new LoggerReporting();
 
         ezIbkrApi.connectIfNotConnected(loggerReporting);
-        Prices p = ezIbkrApi.getPrices(loggerReporting, "AVGO", "SMART", DeviseUtil.USD, EZDate.today().minusYears(5));
-        System.out.println(p);
-        System.out.println(p.getPrices());
+
+//        Prices dividends = ezIbkrApi.getDividends(loggerReporting, "AVGO", "SMART", DeviseUtil.USD, EZDate.today().minusYears(2));
+        Prices dividends = ezIbkrApi.getDividends(loggerReporting, "AVGO", "SMART", DeviseUtil.USD, EZDate.monthPeriod(2024, 12).minusYears(2));
+
+        dividends.getPrices().forEach(d -> System.out.println(d.getDate()+" "+d.getValue()));
 
         ezIbkrApi.disconnect();
 

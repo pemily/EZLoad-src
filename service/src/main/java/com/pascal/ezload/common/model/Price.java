@@ -56,7 +56,7 @@ public class Price {
     }
 
     public Float getValue() {
-        return value;
+        return value == null ? null : value;
     }
 
     public void addTag(String key, Tag value){
@@ -74,67 +74,67 @@ public class Price {
     }
 
     public String toString(){
-        return (estimated ? " estimated" : "")+" value: "+ value + " Tags: "+tags;
+        return (estimated ? " estimated" : "")+" value: "+ getValue() + " Tags: "+tags;
     }
 
-    public Price minus(Price value) {
+    public Price minus(Price p) {
         Float newValue = null;
         if (this.value == null) {
-            if (value.getValue() != null){
-                newValue = - value.getValue();
+            if (p.value != null){
+                newValue = - p.value;
             }
         }
         else {
-            if (value.getValue() == null){
+            if (p.value == null){
                 newValue = this.value;
             }
             else {
-                newValue = this.value - value.getValue();
+                newValue = this.value - p.value;
             }
         }
-        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | p.isEstimated());
     }
 
-    public Price plus(Price value) {
+    public Price plus(Price p) {
         Float newValue = null;
         if (this.value == null) {
-            if (value.getValue() != null){
-                newValue = value.getValue();
+            if (p.value != null){
+                newValue = p.value;
             }
         }
         else {
-            if (value.getValue() == null){
+            if (p.value == null){
                 newValue = this.value;
             }
             else {
-                newValue = this.value + value.getValue();
+                newValue = this.value + p.value;
             }
         }
-        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | p.isEstimated());
     }
 
-    public Price multiply(Price value) {
+    public Price multiply(Price p) {
         Float newValue = null;
         if (this.value == null) {
-            if (value.getValue() != null){
+            if (p.value != null){
                 newValue = 0f;
             }
         }
         else {
-            if (value.getValue() == null){
+            if (p.value == null){
                 newValue = 0f;
             }
             else {
-                newValue = this.value * value.getValue();
+                newValue = this.value * p.value;
             }
         }
-        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | p.isEstimated());
     }
 
-    public Price divide(Price value) {
+    public Price divide(Price p) {
         Float newValue;
         if (this.value == null) {
-            if (value.getValue() != null && value.getValue() != 0){
+            if (p.value != null && p.value != 0){
                 newValue = null;
             }
             else {
@@ -142,14 +142,19 @@ public class Price {
             }
         }
         else {
-            if (value.getValue() == null || value.getValue() == 0){
+            if (p.value == null || p.value == 0){
                 throw new IllegalStateException("Division par zero");
             }
             else {
-                newValue = this.value / value.getValue();
+                newValue = this.value / p.getValue();
             }
         }
-        return newValue == null ? new Price() : new Price(newValue, estimated | value.isEstimated());
+        return newValue == null ? new Price() : new Price(newValue, estimated | p.isEstimated());
+    }
+
+    public Price round(){
+        int PRECISION = 100;
+        return value == null ? new Price() : new Price(Math.round(value*PRECISION)/(float)PRECISION, estimated);
     }
 
     public Price reverse(){

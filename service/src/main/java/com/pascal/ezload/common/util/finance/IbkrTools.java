@@ -8,6 +8,7 @@ import com.pascal.ezload.service.model.EZShare;
 import com.pascal.ezload.service.model.Prices;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.pascal.ezload.common.util.finance.ExternalSiteTools.checkResult;
@@ -49,6 +50,40 @@ public class IbkrTools {
         }
         throw new HttpUtil.DownloadException("Pas de code IBKR pour "+ezShare.getEzName());
     }
+
+
+    public static List<Dividend> getDividends(Reporting reporting, PricesCached pricesCache, EZShare ezShare, EZDate from) throws IOException, InterruptedException, HttpUtil.DownloadException {
+        if (!StringUtils.isBlank(ezShare.getGoogleCode())) {
+            Prices result;
+
+            String cacheName = getDividendsCacheName(ezShare, from);
+            if (pricesCache.exists(cacheName)){
+                result = pricesCache.load(cacheName);
+            }
+            else {
+                EZ_IbkrApi ibkr = EZ_IbkrApi.getInstance();
+                ibkr.connectIfNotConnected(reporting);
+                String fullShareName = ezShare.getGoogleCode();
+
+                String exchange = GoogleTools.getExchange(fullShareName);
+                String shareCode = GoogleTools.getCodeOnly(fullShareName);
+
+                result = ibkr.getDividends(reporting, shareCode, exchange, getDevise(ezShare), from);
+                if (result == null){
+                    result = ibkr.getDividends(reporting, shareCode, null, getDevise(ezShare), from);
+                }
+
+                pricesCache.save(cacheName, result);
+            }
+
+            List<Dividend> dividends = new ArrayList<>();
+            EZDevise devise = result.getDevise();
+            result.getPrices().stream().forEach(p -> dividends.add(new Dividend("IBKR", p.getValue(), p.getDate(), p.getDate(), p.getDate(), p.getDate(), p.getDate(), null, devise, false)));
+            return dividends;
+        }
+        throw new HttpUtil.DownloadException("Pas de code IBKR pour "+ezShare.getEzName());
+    }
+
 
     public static CurrencyMap getCurrencyMap(Reporting reporting, PricesCached pricesCache, EZDevise fromDevise, EZDevise toDevise, List<EZDate> listOfDates) throws IOException, InterruptedException {
         if (fromDevise.equals(toDevise)){
@@ -102,6 +137,9 @@ public class IbkrTools {
         return format("ibkr_history_" + ezShare.getGoogleCode() + "_" + from.toYYYYMMDD() + "-" + EZDate.today().toYYYYMMDD()+"-"+from.getPeriod());
     }
 
+    public static String getDividendsCacheName(EZShare ezShare, EZDate from){
+        return format("ibkr_dividends_" + ezShare.getGoogleCode() + "_" + from.toYYYYMMDD() + "-" + EZDate.today().toYYYYMMDD()+"-"+from.getPeriod());
+    }
 
     public static String getCurrencyMapCacheName(EZDevise devise1, EZDevise devise2, EZDate from){
         return format("ibkr_currencyMap_" + devise1.getCode() + "_" + devise2.getCode() + from.toYYYYMMDD()  + "-" + EZDate.today().toYYYYMMDD()+"-"+from.getPeriod());
@@ -111,5 +149,6 @@ public class IbkrTools {
         cacheName = cacheName.replaceAll("[*?:/\\\\]", "_");
         return cacheName;
     }
+
 
 }

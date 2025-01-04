@@ -364,7 +364,7 @@ public class SettingsManager {
         if (chromeSettings.getUserDataDir() == null)
             chromeSettings.setUserDataDir(Files.createTempDirectory("ezload").toFile().getAbsolutePath()+File.separator+"chromeData");
 
-        if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(13);
+        if (chromeSettings.getDefaultTimeout() == 0) chromeSettings.setDefaultTimeout(20);
 
         new File(chromeSettings.getUserDataDir()).mkdirs();
 

@@ -129,6 +129,7 @@ public class BaseSelenium {
         driver.get(url);
 
         waitUrlIs(url);
+        waitPageLoaded();
     }
 
     public List<WebElement> getAllElements(String element, String className){
