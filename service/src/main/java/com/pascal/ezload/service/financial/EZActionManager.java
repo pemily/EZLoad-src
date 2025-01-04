@@ -261,9 +261,12 @@ public class EZActionManager {
             // TODO PASCAL
 
             try {
-                if (httpCache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
+                dividends = IbkrTools.getDividends(reporting, pricesCache, ezShare, fixedFrom);
+
+/**                if (httpCache.exists(SeekingAlphaTools.getDividendsCacheName(ezShare, fixedFrom))) { // je n'ai pas de cache yahoo, j'essaie d'abord sur seeking, si ca marche pas je testerais sur yahoo
                     dividends = SeekingAlphaTools.searchDividends(reporting, httpCache, ezShare, fixedFrom);
                 }
+ */
 /*
                 if (dividends == null && !httpCache.exists(YahooTools.getDividendsCacheName(ezShare, fixedFrom)) && !StringUtils.isBlank(ezShare.getSeekingAlphaCode())) {
                     dividends = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.searchDividends(reporting, httpCache, ezShare, fixedFrom));
@@ -491,6 +494,8 @@ public class EZActionManager {
         try(Reporting reporting = rep.pushSection("Recherche du prix pour "+ez.getEzName())) {
             Prices prices = null;
 
+            throw new IllegalStateException("TODO");
+            /*
             // TODO PASCAL
 
             try {
@@ -504,7 +509,7 @@ public class EZActionManager {
             catch(Exception e){
                 prices = retryIfDownloadError(rep, 2, () -> SeekingAlphaTools.getPrices(reporting, httpCache, ez, from, to));
             }
-            return prices;
+            return prices;*/
         }
     }
 

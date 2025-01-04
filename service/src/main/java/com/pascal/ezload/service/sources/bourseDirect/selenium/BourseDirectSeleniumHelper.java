@@ -17,6 +17,7 @@
  */
 package com.pascal.ezload.service.sources.bourseDirect.selenium;
 
+import com.pascal.ezload.common.util.Month;
 import com.pascal.ezload.service.config.AuthInfo;
 import com.pascal.ezload.service.config.EzProfil;
 import com.pascal.ezload.service.config.MainSettings;
@@ -91,7 +92,10 @@ public class BourseDirectSeleniumHelper extends BaseSelenium {
 
 
     protected void goToAvisOperes() throws Exception {
-        goTo("https://www.boursedirect.fr/priv/avis-operes.php");
+        goTo("https://www.boursedirect.fr/fr/page/avis-operes");
     }
 
+    protected void goToAvisOperes(String cptIndex, Month month) throws Exception {
+        goTo("https://www.boursedirect.fr/priv/new/avis-operes.php?tr=RO&nc="+cptIndex+"&month="+ month.getMonth()+"&year="+ month.getYear());
+    }
 }

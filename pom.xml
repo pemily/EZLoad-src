@@ -28,7 +28,7 @@
         mvn versions:set -DnewVersion=2.0-SNAPSHOT
         mvn versions:commit # pour supprimer les fichiers backup du pom.xml
     -->
-    <version>3.0</version>
+    <version>3.0.1-SNAPSHOT</version>
     <description>EZLoad an automatic loader for EZPortfolio</description>
     <inceptionYear>2021</inceptionYear>
     <packaging>pom</packaging>

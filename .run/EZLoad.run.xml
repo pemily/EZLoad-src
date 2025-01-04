@@ -18,7 +18,7 @@
 
 -->
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="EZLoad" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="EZLoad Sandbox" type="Application" factoryName="Application">
     <envs>
       <env name="ezloadConfig" value="C:\dev\sources\EZLoad-src\sandbox\ezload.yaml" />
     </envs>

@@ -107,7 +107,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
 
                     String cptIndex = selectAccount(account);
 
-                    goToMonth(cptIndex, new Month(fromDate));
+                    goToAvisOperes(cptIndex, new Month(fromDate));
 
                     Month dateFromPage = extractDateFromPage();
                     // just a check to be sure we are on the correct page
@@ -115,7 +115,7 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
                         reporting.info("The date of the download page: " + dateFromPage + " is not the expected one: " + fromDate+" => restart from the beginning");
                         // BourseDirect fournit le relevé jusqu'a un an en arriere
                         fromDate = new EZDate(currentdate.getYear() - 1, currentdate.getMonthValue(), 1);
-                        goToMonth(cptIndex, new Month(fromDate));
+                        goToAvisOperes(cptIndex, new Month(fromDate));
                         dateFromPage = extractDateFromPage();
                     }
 
@@ -150,16 +150,16 @@ public class BourseDirectDownloader extends BourseDirectSeleniumHelper {
         }
     }
 
-    private void goToMonth(String cptIndex, Month month) throws Exception {
-        goTo("https://www.boursedirect.fr/priv/avis-operes.php?tr=RO&nc="+cptIndex+"&month="+ month.getMonth()+"&year="+ month.getYear());
-    }
 
     private String selectAccount(BourseDirectEZAccountDeclaration account) {
+        WebElement legacy_iframe = getDriver().findElement(By.className("iframe-legacy-resized"));
+        getDriver().switchTo().frame(legacy_iframe);
         WebElement option = findByContainsText("option", account.getNumber());
         reporting.info("Account "+account.getNumber()+" found");
         String cptIndex = option.getAttribute("value");
         Select select = new Select (getParent(option));
         select.selectByValue(cptIndex);
+        getDriver().switchTo().defaultContent();
         return cptIndex;
     }
 
