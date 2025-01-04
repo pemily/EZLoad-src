@@ -4,6 +4,9 @@
 
 
 ## Historique
+### Version 3.1
+* Utilisation de IBKR pour recuperer les dividendes
+
 ### Version 3.0
 * Connection a IBKR client pour recuperer les datas
 
