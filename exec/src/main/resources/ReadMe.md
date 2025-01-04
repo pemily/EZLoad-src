@@ -3,7 +3,10 @@
 <a href="https://github.com/pemily/EZLoad-src/raw/main/release/${project.version}/EZLoad-${project.version}.zip" download>EZLoad-${project.version}.zip</a>
 
 
-## Historique 
+## Historique
+### Version 3.0
+* Connection a IBKR client pour recuperer les datas
+
 ### Version 2.9
 * Ajout du rapport pour les impôts
 
